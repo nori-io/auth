@@ -4,43 +4,45 @@ import (
 	"time"
 )
 
-type ArticlesModel struct {
-	Id              int64  `json:"id"`
-	Title           string `json:"title"`
-	Body            string `json:"body"`
-	State           string `json:"state"`
-	MetaDescription string `json:"meta_description"`
-	Tags            string `json:"tags"`
+type AuthModel struct {
+	Id              uint64
+	UserId          uint64
+	Phone           string
+	Email           string
+	Password        string
+	Salt            string
+	Created         time.Time
+	Updated         time.Time
+	IsEmailVerified bool
+	IsPhoneVerified bool
 }
 
-type CommentsModel struct {
-	Id          int64     `json:"id"`
-	ParentId    int64     `json:"-"`
-	PostId      int64     `json:"-"`
-	Message     string    `json:"message"`
-	Created     time.Time `json:"created"`
-	State       string    `json:"state"`
-	ArticleIdFk int64     `json:"article_id_fk"`
+type AuthenticationHistoryModel struct {
+	Id        int64
+	UserId    int64
+	LoggedIn  time.Time
+	Meta      string
+	LoggedOut time.Time
+	Secret    string
 }
 
-type UserModel struct {
-	Id   int64  `json:"id"`
-	Name string `json:"name"`
+type AuthProvidersModel struct {
+	Provider        string
+	ProviderUserKey string
+	UserId          int64
+}
 
-	Email         string `json:"email"`
-	EmailVerified bool   `json:"-"`
+type UsersModel struct {
+	Id            int64
+	ProfileTypeId int64
+	StatusId      int64
+	Kind          string
+	Created       time.Time
+	Updated       time.Time
+	Email         string
+}
 
-	Phone            string `json:"-"`
-	PhoneCountryCode string `json:"-"`
-	PhoneVerified    bool   `json:"-"`
-
-	Salt     string `json:"-"`
-	Password string `json:"-"`
-
-	State string `json:"-"`
-
-	MfaEnabled bool `json:"-"`
-
-	CreatedAt time.Time `json:"-"`
-	UpdatedAt time.Time `json:"-"`
+type UserStatusModel struct {
+	Id   int64
+	Name string
 }

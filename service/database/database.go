@@ -6,37 +6,30 @@ import (
 )
 
 type Database interface {
-	Article() Article
-	Comment() Comment
-	User() User
+	Users() Users
+	AuthenticationHistory() AuthenticationHistory
+	Auth() Auth
 }
 
-type Article interface {
-	Create(*ArticlesModel) error
-	Update(*ArticlesModel) error
-	FindById(id int64) (model *ArticlesModel, err error)
-	//FindByEmail(email string) (model *ArticlesModel, err error)
+type AuthenticationHistory interface {
+	Create(*AuthenticationHistoryModel) error
+	Update(*AuthenticationHistoryModel) error
 }
 
-type Comment interface {
-	Create(*CommentsModel) error
-	Update(*CommentsModel) error
-	FindById(id int64) (model *CommentsModel, err error)
-	//FindByEmail(email string) (model *ArticlesModel, err error)
+type Users interface {
+	Create(*UsersModel) error
+	Update(*UsersModel) error
 }
 
-type User interface {
-	Create(*UserModel) error
-	Update(*UserModel) error
-	FindById(id string) (model *UserModel, err error)
-	FindByEmail(email string) (model *UserModel, err error)
+type Auth interface {
+	Create(model *AuthModel) error
+	Update(*AuthModel) error
 }
-
 type database struct {
-	db      *sql.DB
-	article *article
-	comment *comment
-	user    *user
+	db                    *sql.DB
+	users                 *users
+	authenticationHistory *authenticationHistory
+	auth                  *auth
 }
 
 var instance *database
@@ -47,13 +40,13 @@ func DB(db *sql.DB) Database {
 	once.Do(func() {
 		instance = &database{
 			db: db,
-			article: &article{
+			users: &users{
 				db: db,
 			},
-			comment: &comment{
+			authenticationHistory: &authenticationHistory{
 				db: db,
 			},
-			user: &user{
+			auth: &auth{
 				db: db,
 			},
 		}
@@ -61,14 +54,14 @@ func DB(db *sql.DB) Database {
 	return instance
 }
 
-func (db *database) Article() Article {
-	return db.article
+func (db *database) Users() Users {
+	return db.users
 }
 
-func (db *database) Comment() Comment {
-	return db.comment
+func (db *database) AuthenticationHistory() AuthenticationHistory {
+	return db.authenticationHistory
 }
 
-func (db *database) User() User {
-	return db.user
+func (db *database) Auth() Auth {
+	return db.auth
 }

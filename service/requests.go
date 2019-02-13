@@ -3,9 +3,9 @@ package service
 /*
 // SignUp Request
 type SignUpRequest struct {
-	Email    string `json:"email"`
-	Name     string `json:"name"`
-	Password string `json:"password"`
+	Email    string
+	Name     string
+	Password string
 }
 
 func (r SignUpRequest) Validate() error {
@@ -15,9 +15,8 @@ func (r SignUpRequest) Validate() error {
 
 // LogIn Request
 type LoginRequest struct {
-	Email    string `json:"email"     valid:"required,email"`
-	Password string `json:"password"  valid:"required,printableascii"`
-}
+	Email    string `
+	Password string
 
 func (r LoginRequest) Validate() error {
 	_, err := govalidator.ValidateStruct(r)

@@ -2,11 +2,15 @@ package main
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
+	"github.com/nori-io/auth/service"
+	"github.com/nori-io/auth/service/database"
+	"github.com/nori-io/auth/service/database/sqlScripts"
 	cfg "github.com/nori-io/nori-common/config"
 	"github.com/nori-io/nori-common/meta"
 	noriPlugin "github.com/nori-io/nori-common/plugin"
-	"github.com/nori-io/auth/service"
-	"github.com/nori-io/auth/service/database"
+	"log"
 )
 
 type plugin struct {
@@ -15,6 +19,7 @@ type plugin struct {
 
 var (
 	Plugin plugin
+	ctx = context.Background()
 )
 
 func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {
@@ -34,11 +39,92 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			return err
 		}
 
+
 		p.instance = service.NewService(
 			registry.Logger(p.Meta()),
 			database.DB(db.GetDB()),
 		)
-		service.Transport(			http, p.instance, registry.Logger(p.Meta()))
+
+		sql1, err := registry.Sql()
+		if err != nil {
+			return err
+		}
+		db1:= sql1.GetDB()
+
+		tx, err := db1.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
+
+		if err != nil {
+			fmt.Println(err)
+			log.Fatal(err)
+		}
+		_, execErr := tx.Exec(
+			sqlScripts.CreateTableUsers)
+		if execErr != nil {
+			_ = tx.Rollback()
+			fmt.Println(execErr)
+			log.Fatal(execErr)
+
+		}
+		_, execErr = tx.Exec(
+			sqlScripts.CreateTableAuth)
+		if execErr != nil {
+			_ = tx.Rollback()
+			fmt.Println(execErr)
+			log.Fatal(execErr)
+		}
+		_, execErr = tx.Exec(
+			sqlScripts.CreateTableAuthProviders)
+		if execErr != nil {
+			_ = tx.Rollback()
+			fmt.Println(execErr)
+			log.Fatal(execErr)
+		}
+
+		_, execErr = tx.Exec(
+			sqlScripts.CreateTableAuthenticationHistory)
+		if execErr != nil {
+			_ = tx.Rollback()
+			fmt.Println(execErr)
+			log.Fatal(execErr)
+		}
+
+		_, execErr = tx.Exec(
+			sqlScripts.CreateTableUserMfaPhone)
+		if execErr != nil {
+			_ = tx.Rollback()
+			fmt.Println(execErr)
+			log.Fatal(execErr)
+		}
+
+		_, execErr = tx.Exec(
+			sqlScripts.CreateTableUsersMfaCode)
+		if execErr != nil {
+			_ = tx.Rollback()
+			fmt.Println(execErr)
+			log.Fatal(execErr)
+		}
+		_, execErr = tx.Exec(
+			sqlScripts.CreateTableUserMfaSecret)
+		if execErr != nil {
+			_ = tx.Rollback()
+			fmt.Println(execErr)
+			log.Fatal(execErr)
+		}
+
+
+		if err := tx.Commit(); err != nil {
+			fmt.Println(err)
+			log.Fatal(err)
+		}
+
+
+
+
+		service.Transport(http, p.instance, registry.Logger(p.Meta()))
+
+
+
+
 	}
 	return nil
 }
@@ -89,57 +175,7 @@ func (p plugin) Install(_ context.Context, registry noriPlugin.Registry) error {
 		return err
 	}
 	db := sql.GetDB()
-	_, err = db.Exec(`
-		CREATE TABLE IF NOT EXISTS articles (
-  		id INT AUTO_INCREMENT PRIMARY KEY,
-  		title VARCHAR(255) NOT NULL,
-  		body LONGTEXT NOT NULL,
-  		state SET('draft', 'public', 'password', 'deleted') NOT NULL,
-  		meta_description VARCHAR(255) NOT NULL,
- 	    tags TEXT NOT NULL,
- 		UNIQUE INDEX id_UNIQUE (id ASC) INVISIBLE,
-  		INDEX state_idx (state ASC) INVISIBLE,
-  		ENGINE = InnoDB;
-
-		CREATE TABLE IF NOT EXISTS comments (
-  		id INT AUTO_INCREMENT PRIMARY KEY,
-  		parent_id INT NULL,
-  		post_id INT NULL,
-  		message TEXT NOT NULL,
-  		created INT NOT NULL,
-  		state SET('deleted', 'blocked', 'public') NOT NULL,
-  		article_id_fk INT NOT NULL,
-  		UNIQUE INDEX id_UNIQUE (id ASC) VISIBLE,
-  		INDEX state_idx (state ASC) INVISIBLE,
-  		CONSTRAINT article_id_fk
-		FOREIGN KEY (id)
-    	REFERENCES db_articles.articles (id)
-    	ON DELETE CASCADE
-    	ON UPDATE CASCADE)
-		ENGINE = InnoDB;
-
-CREATE TABLE IF NOT EXISTS users (
-		    id    BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-			name  varchar(255) NOT NULL,
-
-    		email 			varchar(255) NOT NULL UNIQUE,
-    		email_verified  tinyint NOT NULL DEFAULT FALSE,
-
-    		phone              varchar(20),
-    		phone_country_code varchar(5),
-    		phone_verified     boolean NOT NULL DEFAULT FALSE,
-
-    		salt               varchar(65) NOT NULL,
-    		password           varchar(255) NOT NULL,
-
-    		state              varchar(16) NOT NULL DEFAULT 'active',
-
-    		mfa_enabled        tinyint NOT NULL DEFAULT 0,
-
-    		created_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    		updated_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-		)  ENGINE=InnoDB;
-	`)
+	_, err = db.Exec(sqlScripts.CreateTableUsersMfaCode)
 	return err
 }
 

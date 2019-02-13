@@ -4,11 +4,11 @@ package service
 /*
 // SignUpResponse
 type SignUpResponse struct {
-	Id             uint64 `json:"id"`
-	Name           string `json:"name,omitempty"`
-	Email          string `json:"email,omitempty"`
-	HttpStatusCode int    `json:"-"`
-	Err            error  `json:"-"`
+	Id             uint64
+	Name           string
+	Email          string
+	HttpStatusCode int
+	Err            error
 }
 
 func (d *SignUpResponse) Error() error {
@@ -21,12 +21,12 @@ func (d *SignUpResponse) StatusCode() int {
 
 // LogInResponse
 type LogInResponse struct {
-	Id             uint64             `json:"id"`
-	Token          string             `json:"token"`
-    User           database.UserModel `json:"user"`
-	MFA            string             `json:"mfa"`
-	HttpStatusCode int                `json:"-"`
-	Err            error              `json:"-"`
+	Id             uint64
+	Token          string
+    User           database.UserModel
+	MFA            string
+	HttpStatusCode int
+	Err            error
 }
 
 func (d *LogInResponse) Error() error {
@@ -39,8 +39,8 @@ func (d *LogInResponse) StatusCode() int {
 
 // LogOut Response
 type LogOutResponse struct {
-	HttpStatusCode int   `json:"-"`
-	Err            error `json:"-"`
+	HttpStatusCode int
+	Err            error `
 }
 
 func (d *LogOutResponse) Error() error {

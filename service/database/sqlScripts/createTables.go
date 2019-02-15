@@ -1,9 +1,7 @@
 package sqlScripts
 
-
 const (
-	CreateTableUsers=
-	`CREATE TABLE IF NOT EXISTS users (
+	CreateTableUsers = `CREATE TABLE IF NOT EXISTS users (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   kind VARCHAR(255) NOT NULL,
   status_id INT UNSIGNED NOT NULL,
@@ -14,7 +12,7 @@ const (
   PRIMARY KEY (id))
 ENGINE = InnoDB;
 `
-	CreateTableAuthenticationHistory =` 
+	CreateTableAuthenticationHistory = ` 
 CREATE TABLE IF NOT EXISTS authentication_history (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id INT UNSIGNED NOT NULL,
@@ -30,7 +28,7 @@ CREATE TABLE IF NOT EXISTS authentication_history (
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 `
-	CreateTableAuth=`
+	CreateTableAuth = `
 CREATE TABLE IF NOT EXISTS auth (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id INT UNSIGNED NOT NULL,
@@ -54,7 +52,7 @@ CREATE TABLE IF NOT EXISTS auth (
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 `
-	CreateTableUserMfaSecret=`
+	CreateTableUserMfaSecret = `
 CREATE TABLE IF NOT EXISTS user_mfa_secret (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id INT UNSIGNED NOT NULL,
@@ -70,7 +68,7 @@ CREATE TABLE IF NOT EXISTS user_mfa_secret (
 ENGINE = InnoDB;
 `
 
-CreateTableUserMfaPhone= `
+	CreateTableUserMfaPhone = `
 CREATE TABLE IF NOT EXISTS user_mfa_phone (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id INT UNSIGNED NOT NULL,
@@ -86,7 +84,7 @@ CREATE TABLE IF NOT EXISTS user_mfa_phone (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 `
-CreateTableUsersMfaCode=`
+	CreateTableUsersMfaCode = `
 CREATE TABLE IF NOT EXISTS users_mfa_code (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id INT UNSIGNED NOT NULL,
@@ -100,7 +98,7 @@ CREATE TABLE IF NOT EXISTS users_mfa_code (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 `
-CreateTableAuthProviders=`
+	CreateTableAuthProviders = `
 CREATE TABLE IF NOT EXISTS auth_providers (
   provider VARCHAR(64) NOT NULL,
   provider_user_key VARCHAR(128) NOT NULL,

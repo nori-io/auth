@@ -2,13 +2,12 @@ package service
 
 import (
 	"context"
-	"github.com/cheebo/gorest"
-	"github.com/cheebo/rand"
-	"github.com/sirupsen/logrus"
 	"github.com/nori-io/auth/service/database"
 	"github.com/nori-io/nori-common/interfaces"
+	//"github.com/cheebo/gorest"
+	//	"github.com/cheebo/rand"
+	"github.com/sirupsen/logrus"
 )
-
 
 type Service interface {
 	SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpResponse)
@@ -46,48 +45,48 @@ func NewService(
 }
 
 func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpResponse) {
-	var err error
-	var model *database.UsersModel
-	resp = &SignUpResponse{}
+	/*	var err error
+		var model *database.UsersModel
+		resp = &SignUpResponse{}
 
 	errField := rest.ErrFieldResp{
-		Meta: rest.ErrFieldRespMeta{
-			ErrCode: 400,
-		},
-	}
-
-	if model, err = s.db.Users().FindByEmail(req.Email); err != nil {
-		resp.Err = rest.ErrorInternal(err.Error())
-		return resp
-	}
-	if model != nil && model.Id != 0 {
-		errField.AddError("email", 400, "Email already exists.")
-	}
-	if errField.HasErrors() {
-		resp.Err = errField
-		return resp
-	}
-
-	model = &database.UsersModel{
-		Email:    req.Email,
-		Name:     req.Name,
-		Password: req.Password,
-	}
-
-	err = s.db.Users().Create(model)
-	if err != nil {
-		s.log.Error(err)
-		resp.Err = rest.ErrFieldResp{
 			Meta: rest.ErrFieldRespMeta{
-				ErrCode:    500,
-				ErrMessage: err.Error(),
+				ErrCode: 400,
 			},
 		}
-		return resp
-	}
 
-	resp.Name = req.Name
-	resp.Email = req.Email
+		if model, err = s.db.Users().FindByEmail(req.Email); err != nil {
+			resp.Err = rest.ErrorInternal(err.Error())
+			return resp
+		}
+		if model != nil && model.Id != 0 {
+			errField.AddError("email", 400, "Email already exists.")
+		}
+		if errField.HasErrors() {
+			resp.Err = errField
+			return resp
+		}
+
+		model = &database.UsersModel{
+			Email:    req.Email,
+			Name:     req.Name,
+			Password: req.Password,
+		}
+
+		err = s.db.Users().Create(model)
+		if err != nil {
+			s.log.Error(err)
+			resp.Err = rest.ErrFieldResp{
+				Meta: rest.ErrFieldRespMeta{
+					ErrCode:    500,
+					ErrMessage: err.Error(),
+				},
+			}
+			return resp
+		}
+
+		resp.Name = req.Name
+		resp.Email = req.Email*/
 
 	return resp
 }
@@ -95,7 +94,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 func (s *service) Login(ctx context.Context, req LoginRequest) (resp *LogInResponse) {
 	resp = &LogInResponse{}
 
-	model, err := s.db.Users().FindByEmail(req.Email)
+	/*model, err := s.db.Users().FindByEmail(req.Email)
 	if err != nil {
 		resp.Err = rest.ErrorInternal("Internal error")
 		return resp
@@ -145,7 +144,7 @@ func (s *service) Login(ctx context.Context, req LoginRequest) (resp *LogInRespo
 	resp.Id = uint64(model.Id)
 	resp.Token = token
 	resp.User = *model
-
+	*/
 	return resp
 }
 

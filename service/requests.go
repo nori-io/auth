@@ -30,4 +30,3 @@ func (r LoginRequest) Validate() error {
 
 // LogOut Request
 type LogoutRequest struct{}
-

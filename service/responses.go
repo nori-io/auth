@@ -25,7 +25,7 @@ func (d *SignUpResponse) StatusCode() int {
 type LogInResponse struct {
 	Id             uint64
 	Token          string
-    User           database.UsersModel
+	User           database.UsersModel
 	MFA            string
 	HttpStatusCode int
 	Err            error
@@ -52,4 +52,3 @@ func (d *LogOutResponse) Error() error {
 func (d *LogOutResponse) StatusCode() int {
 	return d.HttpStatusCode
 }
-

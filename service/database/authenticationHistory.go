@@ -1,4 +1,3 @@
-
 package database
 
 import (
@@ -9,7 +8,6 @@ import (
 type authenticationHistory struct {
 	db *sql.DB
 }
-
 
 func (a *authenticationHistory) Create(model *AuthenticationHistoryModel) error {
 	_, err := a.db.Exec("INSERT INTO authentication_history (user_id, logged_in, meta, logged_out, secret) VALUES(?,?,?,?,?)",
@@ -25,4 +23,3 @@ func (a *authenticationHistory) Update(model *AuthenticationHistoryModel) error 
 		model.UserId, model.LoggedIn, model.Meta, model.LoggedOut, model.Secret, model.Id)
 	return err
 }
-

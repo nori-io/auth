@@ -20,7 +20,7 @@ type plugin struct {
 
 var (
 	Plugin plugin
-	ctx = context.Background()
+	ctx    = context.Background()
 )
 
 func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {
@@ -37,6 +37,7 @@ func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {
 func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 
 	if p.instance == nil {
+
 		http, err := registry.Http()
 		if err != nil {
 			return err
@@ -62,7 +63,6 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			return err
 		}
 
-
 		p.instance = service.NewService(
 			auth,
 			session,
@@ -70,12 +70,14 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			registry.Logger(p.Meta()),
 			database.DB(db.GetDB()),
 		)
+		service.Transport(auth, transport, session,
+			http, p.instance, registry.Logger(p.Meta()))
 
 		sql1, err := registry.Sql()
 		if err != nil {
 			return err
 		}
-		db1:= sql1.GetDB()
+		db1 := sql1.GetDB()
 
 		tx, err := db1.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
 
@@ -137,20 +139,13 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			log.Fatal(execErr)
 		}
 
-
 		if err := tx.Commit(); err != nil {
 			fmt.Println(err)
 			log.Fatal(err)
 		}
 
-
-
-
-		service.Transport(http, p.instance, registry.Logger(p.Meta()))
-
-
-
-
+		service.Transport(auth, transport, session,
+			http, p.instance, registry.Logger(p.Meta()))
 	}
 	return nil
 }
@@ -178,8 +173,11 @@ func (p plugin) Meta() meta.Meta {
 			VersionConstraint: ">=1.0.0, <2.0.0",
 		},
 		Dependencies: []meta.Dependency{
-			meta.SQL.Dependency("1.0.0"),
+			meta.Auth.Dependency("1.0.0"),
 			meta.HTTP.Dependency("1.0.0"),
+			meta.SQL.Dependency("1.0.0"),
+			meta.Mail.Dependency("1.0.0"),
+			meta.HTTPTransport.Dependency("1.0.0"),
 		},
 		Description: meta.Description{
 			Name:        "NoriCMS Naive Posts Plugin",

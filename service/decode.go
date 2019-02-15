@@ -34,4 +34,3 @@ func DecodeLogOutRequest(_ context.Context, r *http.Request) (interface{}, error
 	var body LogoutRequest
 	return body, nil
 }
-

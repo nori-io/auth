@@ -1,6 +1,11 @@
 package service
 
-/*
+import (
+	"context"
+	"encoding/json"
+	"net/http"
+)
+
 func DecodeSignUpRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var body SignUpRequest
 
@@ -29,4 +34,4 @@ func DecodeLogOutRequest(_ context.Context, r *http.Request) (interface{}, error
 	var body LogoutRequest
 	return body, nil
 }
-*/
+

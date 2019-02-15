@@ -1,7 +1,9 @@
 package service
 
+import "github.com/nori-io/auth/service/database"
+
 //import "github.com/nori-io/noricms/service/database"
-/*
+
 // SignUpResponse
 type SignUpResponse struct {
 	Id             uint64
@@ -23,7 +25,7 @@ func (d *SignUpResponse) StatusCode() int {
 type LogInResponse struct {
 	Id             uint64
 	Token          string
-    User           database.UserModel
+    User           database.UsersModel
 	MFA            string
 	HttpStatusCode int
 	Err            error
@@ -40,7 +42,7 @@ func (d *LogInResponse) StatusCode() int {
 // LogOut Response
 type LogOutResponse struct {
 	HttpStatusCode int
-	Err            error `
+	Err            error
 }
 
 func (d *LogOutResponse) Error() error {
@@ -50,4 +52,4 @@ func (d *LogOutResponse) Error() error {
 func (d *LogOutResponse) StatusCode() int {
 	return d.HttpStatusCode
 }
-*/
+

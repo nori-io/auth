@@ -15,6 +15,7 @@ import (
 
 type plugin struct {
 	instance service.Service
+	config   *service.Config
 }
 
 var (
@@ -24,12 +25,34 @@ var (
 
 func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {
 	configManager.Register(p.Meta())
+
+	cm := configManager.Register(p.Meta())
+	p.config = &service.Config{
+		Sub: cm.String("jwt.sub", "jwt.sub value"),
+		Iss: cm.String("jwt.iss", "jwt.iss value"),
+	}
 	return nil
 }
 
 func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
+
 	if p.instance == nil {
 		http, err := registry.Http()
+		if err != nil {
+			return err
+		}
+
+		transport, err := registry.HTTPTransport()
+		if err != nil {
+			return err
+		}
+
+		auth, err := registry.Auth()
+		if err != nil {
+			return err
+		}
+
+		session, err := registry.Session()
 		if err != nil {
 			return err
 		}
@@ -41,6 +64,9 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 
 
 		p.instance = service.NewService(
+			auth,
+			session,
+			p.config,
 			registry.Logger(p.Meta()),
 			database.DB(db.GetDB()),
 		)

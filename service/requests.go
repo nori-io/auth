@@ -1,6 +1,10 @@
 package service
 
-/*
+import (
+	"github.com/asaskevich/govalidator"
+	"github.com/cheebo/gorest"
+)
+
 // SignUp Request
 type SignUpRequest struct {
 	Email    string
@@ -15,8 +19,9 @@ func (r SignUpRequest) Validate() error {
 
 // LogIn Request
 type LoginRequest struct {
-	Email    string `
+	Email    string
 	Password string
+}
 
 func (r LoginRequest) Validate() error {
 	_, err := govalidator.ValidateStruct(r)
@@ -25,4 +30,4 @@ func (r LoginRequest) Validate() error {
 
 // LogOut Request
 type LogoutRequest struct{}
-*/
+

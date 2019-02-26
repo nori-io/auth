@@ -17,15 +17,15 @@ func (r SignUpRequest) Validate() error {
 }
 
 // LogIn Request
-type LoginRequest struct {
+type SignInRequest struct {
 	Email    string
 	Password string
 }
 
-func (r LoginRequest) Validate() error {
+func (r SignInRequest) Validate() error {
 	_, err := govalidator.ValidateStruct(r)
 	return rest.ValidateResponse(err)
 }
 
 // LogOut Request
-type LogoutRequest struct{}
+type SignOutRequest struct{}

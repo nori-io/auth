@@ -7,7 +7,6 @@ import (
 
 func MakeSignUpEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, r interface{}) (interface{}, error) {
-
 		req := r.(SignUpRequest)
 		resp := s.SignUp(ctx, req)
 		return *resp, resp.Error()
@@ -16,20 +15,20 @@ func MakeSignUpEndpoint(s Service) endpoint.Endpoint {
 	return nil
 }
 
-func MakeLogInEndpoint(s Service) endpoint.Endpoint {
+func MakeSignInEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, r interface{}) (interface{}, error) {
 
-		req := r.(LoginRequest)
-		resp := s.Login(ctx, req)
+		req := r.(SignInRequest)
+		resp := s.SignIn(ctx, req)
 		return *resp, resp.Error()
 	}
 	return nil
 }
 
-func MakeLogOutEndpoint(s Service) endpoint.Endpoint {
+func MakeSignOutEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, r interface{}) (interface{}, error) {
-		req := r.(LogoutRequest)
-		resp := s.Logout(ctx, req)
+		req := r.(SignOutRequest)
+		resp := s.SignOut(ctx, req)
 		return *resp, resp.Error()
 	}
 	return nil

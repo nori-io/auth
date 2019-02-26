@@ -15,8 +15,8 @@ import (
 
 type Service interface {
 	SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpResponse)
-	Login(ctx context.Context, req LoginRequest) (resp *LogInResponse)
-	Logout(ctx context.Context, req LogoutRequest) (resp *LogOutResponse)
+	SignIn(ctx context.Context, req SignInRequest) (resp *SignInResponse)
+	SignOut(ctx context.Context, req SignOutRequest) (resp *SignOutResponse)
 }
 
 type Config struct {
@@ -93,8 +93,8 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	return resp
 }
 
-func (s *service) Login(ctx context.Context, req LoginRequest) (resp *LogInResponse) {
-	resp = &LogInResponse{}
+func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInResponse) {
+	resp = &SignInResponse{}
 
 	model, err := s.db.Auth().FindByEmail(req.Email)
 	if err != nil {
@@ -149,8 +149,8 @@ func (s *service) Login(ctx context.Context, req LoginRequest) (resp *LogInRespo
 	return resp
 }
 
-func (s *service) Logout(ctx context.Context, req LogoutRequest) (resp *LogOutResponse) {
-	resp = &LogOutResponse{}
+func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOutResponse) {
+	resp = &SignOutResponse{}
 	s.session.Delete(s.session.SessionId(ctx))
 	return resp
 }

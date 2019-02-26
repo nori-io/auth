@@ -19,7 +19,7 @@ func DecodeSignUpRequest(_ context.Context, r *http.Request) (interface{}, error
 }
 
 func DecodeLogInRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var body LoginRequest
+	var body SignInRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		return body, err
@@ -31,6 +31,6 @@ func DecodeLogInRequest(_ context.Context, r *http.Request) (interface{}, error)
 }
 
 func DecodeLogOutRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var body LogoutRequest
+	var body SignOutRequest
 	return body, nil
 }

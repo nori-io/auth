@@ -22,7 +22,7 @@ func (d *SignUpResponse) StatusCode() int {
 }
 
 // LogInResponse
-type LogInResponse struct {
+type SignInResponse struct {
 	Id             uint64
 	Token          string
 	User           database.AuthModel
@@ -31,24 +31,24 @@ type LogInResponse struct {
 	Err            error
 }
 
-func (d *LogInResponse) Error() error {
+func (d *SignInResponse) Error() error {
 	return d.Err
 }
 
-func (d *LogInResponse) StatusCode() int {
+func (d *SignInResponse) StatusCode() int {
 	return d.HttpStatusCode
 }
 
 // LogOut Response
-type LogOutResponse struct {
+type SignOutResponse struct {
 	HttpStatusCode int
 	Err            error
 }
 
-func (d *LogOutResponse) Error() error {
+func (d *SignOutResponse) Error() error {
 	return d.Err
 }
 
-func (d *LogOutResponse) StatusCode() int {
+func (d *SignOutResponse) StatusCode() int {
 	return d.HttpStatusCode
 }

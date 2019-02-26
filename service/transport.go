@@ -1,8 +1,6 @@
 package service
 
 import (
-	http2 "net/http"
-
 	"github.com/nori-io/nori-common/endpoint"
 	"github.com/nori-io/nori-common/interfaces"
 	"github.com/nori-io/nori-common/transport/http"
@@ -30,7 +28,7 @@ func Transport(
 		logger,
 	)
 	signinHandler := http.NewServer(
-		MakeLogInEndpoint(srv),
+		MakeSignInEndpoint(srv),
 		DecodeLogInRequest,
 		http.EncodeJSONResponse,
 		logger,
@@ -41,7 +39,7 @@ func Transport(
 	}
 
 	signoutHandler := http.NewServer(
-		authenticated(MakeLogOutEndpoint(srv)),
+		authenticated(MakeSignOutEndpoint(srv)),
 		DecodeLogOutRequest,
 		http.EncodeJSONResponse,
 		logger,
@@ -55,9 +53,7 @@ func Transport(
 
 	router.Handle("/auth/signin", signinHandler).Methods("POST")
 	router.Handle("/auth/signout", signoutHandler).Methods("GET")
-	router.HandleFunc("/register", func (w http2.ResponseWriter, r *http2.Request) {
 
-	})
 }
 
 

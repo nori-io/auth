@@ -7,6 +7,7 @@ import (
 
 func MakeSignUpEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, r interface{}) (interface{}, error) {
+
 		req := r.(SignUpRequest)
 		resp := s.SignUp(ctx, req)
 		return *resp, resp.Error()
@@ -17,6 +18,7 @@ func MakeSignUpEndpoint(s Service) endpoint.Endpoint {
 
 func MakeLogInEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, r interface{}) (interface{}, error) {
+
 		req := r.(LoginRequest)
 		resp := s.Login(ctx, req)
 		return *resp, resp.Error()

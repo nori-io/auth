@@ -23,3 +23,25 @@ func (a *auth) Update(model *AuthModel) error {
 		model.UserId, model.Id)
 	return err
 }
+
+func (a *auth) FindByEmail(email string) (model *AuthModel, err error) {
+	rows, err := a.db.Query("SELECT id, name, email, salt, password FROM users WHERE email = ? LIMIT 1", email)
+	if err != nil {
+		return nil, err
+	}
+	model = &AuthModel{}
+
+	defer rows.Close()
+	for rows.Next() {
+		var m UsersModel
+		rows.Scan(&m.Id, &m.Email)
+		model.Id = m.Id
+		model.Email = m.Email
+	}
+
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+
+	return model, nil
+}

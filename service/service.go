@@ -2,8 +2,12 @@ package service
 
 import (
 	"context"
-	"github.com/nori-io/auth/service/database"
+
+	"github.com/cheebo/gorest"
+	"github.com/cheebo/rand"
 	"github.com/nori-io/nori-common/interfaces"
+
+	"github.com/nori-io/auth/service/database"
 	//"github.com/cheebo/gorest"
 	//	"github.com/cheebo/rand"
 	"github.com/sirupsen/logrus"
@@ -45,20 +49,20 @@ func NewService(
 }
 
 func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpResponse) {
-	/*	var err error
-		var model *database.UsersModel
+	var err error
+		var model *database.AuthModel
 		resp = &SignUpResponse{}
-
-	errField := rest.ErrFieldResp{
+		errField := rest.ErrFieldResp{
 			Meta: rest.ErrFieldRespMeta{
 				ErrCode: 400,
 			},
 		}
 
-		if model, err = s.db.Users().FindByEmail(req.Email); err != nil {
+		if model, err = s.db.Auth().FindByEmail(req.Email); err != nil {
 			resp.Err = rest.ErrorInternal(err.Error())
 			return resp
 		}
+
 		if model != nil && model.Id != 0 {
 			errField.AddError("email", 400, "Email already exists.")
 		}
@@ -67,13 +71,12 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 			return resp
 		}
 
-		model = &database.UsersModel{
+		model = &database.AuthModel{
 			Email:    req.Email,
-			Name:     req.Name,
 			Password: req.Password,
 		}
 
-		err = s.db.Users().Create(model)
+		err = s.db.Auth().Create(model)
 		if err != nil {
 			s.log.Error(err)
 			resp.Err = rest.ErrFieldResp{
@@ -85,8 +88,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 			return resp
 		}
 
-		resp.Name = req.Name
-		resp.Email = req.Email*/
+		resp.Email = req.Email
 
 	return resp
 }
@@ -94,7 +96,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 func (s *service) Login(ctx context.Context, req LoginRequest) (resp *LogInResponse) {
 	resp = &LogInResponse{}
 
-	/*model, err := s.db.Users().FindByEmail(req.Email)
+	model, err := s.db.Auth().FindByEmail(req.Email)
 	if err != nil {
 		resp.Err = rest.ErrorInternal("Internal error")
 		return resp
@@ -121,7 +123,6 @@ func (s *service) Login(ctx context.Context, req LoginRequest) (resp *LogInRespo
 			return map[string]string{
 				"id":    string(model.Id),
 				"email": model.Email,
-				"name":  model.Name,
 			}
 		case "jti":
 			return sid
@@ -144,7 +145,7 @@ func (s *service) Login(ctx context.Context, req LoginRequest) (resp *LogInRespo
 	resp.Id = uint64(model.Id)
 	resp.Token = token
 	resp.User = *model
-	*/
+
 	return resp
 }
 

@@ -23,3 +23,4 @@ func (u *users) Update(model *UsersModel) error {
 		model.ProfileTypeId, model.StatusId, model.Kind, model.Created, model.Updated, model.Email, model.Id)
 	return err
 }
+

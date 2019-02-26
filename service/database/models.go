@@ -33,7 +33,7 @@ type AuthProvidersModel struct {
 }
 
 type UsersModel struct {
-	Id            int64
+	Id            uint64
 	ProfileTypeId int64
 	StatusId      int64
 	Kind          string

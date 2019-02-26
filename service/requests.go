@@ -8,7 +8,6 @@ import (
 // SignUp Request
 type SignUpRequest struct {
 	Email    string
-	Name     string
 	Password string
 }
 

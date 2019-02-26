@@ -1,9 +1,12 @@
 package service
 
 import (
+	http2 "net/http"
+
 	"github.com/nori-io/nori-common/endpoint"
 	"github.com/nori-io/nori-common/interfaces"
 	"github.com/nori-io/nori-common/transport/http"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -26,8 +29,7 @@ func Transport(
 		http.EncodeJSONResponse,
 		logger,
 	)
-
-	loginHandler := http.NewServer(
+	signinHandler := http.NewServer(
 		MakeLogInEndpoint(srv),
 		DecodeLogInRequest,
 		http.EncodeJSONResponse,
@@ -38,7 +40,7 @@ func Transport(
 		http.ServerBefore(transport.ToContext()),
 	}
 
-	logoutHandler := http.NewServer(
+	signoutHandler := http.NewServer(
 		authenticated(MakeLogOutEndpoint(srv)),
 		DecodeLogOutRequest,
 		http.EncodeJSONResponse,
@@ -46,7 +48,16 @@ func Transport(
 		opts...,
 	)
 
-	router.Handle("/v1/auth/signup", signupHandler).Methods("POST")
-	router.Handle("/v1/auth/login", loginHandler).Methods("POST")
-	router.Handle("/v1/auth/logout", logoutHandler).Methods("GET")
+/*	router.HandleFunc("/test", func(w http2.ResponseWriter, r *http2.Request) {
+		w.Write([]byte("Hello World!!!"))
+	}).Methods("GET")*/
+	router.Handle("/auth/signup", signupHandler).Methods("POST")
+
+	router.Handle("/auth/signin", signinHandler).Methods("POST")
+	router.Handle("/auth/signout", signoutHandler).Methods("GET")
+	router.HandleFunc("/register", func (w http2.ResponseWriter, r *http2.Request) {
+
+	})
 }
+
+

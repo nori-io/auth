@@ -10,17 +10,23 @@ type auth struct {
 }
 
 func (a *auth) Create(model *AuthModel) error {
-	_, err := a.db.Exec("INSERT INTO auth (user_id, phone, email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?,?)",
-		model.UserId, model.Phone, model.Email, model.Password, model.Salt, model.Created, model.Updated, model.IsEmailVerified, model.IsPhoneVerified)
-	return err
+
+
+	_, err1 := a.db.Exec("INSERT INTO users (kind, status_id, type, created, updated, mfa_type) VALUES(?,?,?,?,?,?)",
+		model.Kind_Users, model.StatusId_Users, model.Type_Users, model.Created_Users, model.Updated_Users, model.Mfa_type_Users)
+	return err1
+
+	_, err2 := a.db.Exec("INSERT INTO auth (user_id, phone, email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?,?)",
+		model.Id_Auth, model.Phone_Auth, model.Email_Auth, model.Password_Auth, model.Salt_Auth, model.Created_Auth, model.Updated_Auth, model.IsEmailVerified_Auth, model.IsPhoneVerified_Auth)
+	return err2
 }
 
 func (a *auth) Update(model *AuthModel) error {
-	if model.Id == 0 {
+	if model.Id_Auth == 0 {
 		return errors.New("Empty model")
 	}
 	_, err := a.db.Exec("UPDATE auth SET profile_user_id = ?, phone = ?, email = ?, password = ? salt = ? created =? WHERE id = ? ",
-		model.UserId, model.Id)
+		model.UserId_Auth, model.Id_Auth)
 	return err
 }
 
@@ -34,9 +40,9 @@ func (a *auth) FindByEmail(email string) (model *AuthModel, err error) {
 	defer rows.Close()
 	for rows.Next() {
 		var m AuthModel
-		rows.Scan(&m.Id, &m.Email)
-		model.Id = m.Id
-		model.Email = m.Email
+		rows.Scan(&m.Id_Auth, &m.Email_Auth)
+		model.Id_Auth = m.Id_Auth
+		model.Email_Auth = m.Email_Auth
 	}
 
 	if rows.Err() != nil {

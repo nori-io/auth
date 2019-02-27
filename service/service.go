@@ -63,7 +63,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 			return resp
 		}
 
-		if model != nil && model.Id != 0 {
+		if model != nil && model.Id_Auth != 0 {
 			errField.AddError("email", 400, "Email already exists.")
 		}
 		if errField.HasErrors() {
@@ -72,8 +72,8 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 		}
 
 		model = &database.AuthModel{
-			Email:    req.Email,
-			Password: req.Password,
+			Email_Auth:    req.Email,
+			Password_Auth: req.Password,
 
 		}
 
@@ -107,7 +107,7 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 		return resp
 	}
 
-	if req.Password != model.Password {
+	if req.Password != model.Password_Auth {
 		resp.Err = rest.ErrorNotFound("User not found")
 		return resp
 	}
@@ -122,8 +122,8 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 		switch key {
 		case "raw":
 			return map[string]string{
-				"id":    string(model.Id),
-				"email": model.Email,
+				"id":    string(model.Id_Auth),
+				"email": model.Email_Auth,
 			}
 		case "jti":
 			return sid
@@ -143,7 +143,7 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 
 	s.session.Save([]byte(sid), interfaces.SessionActive, 0)
 
-	resp.Id = uint64(model.Id)
+	resp.Id = uint64(model.Id_Auth)
 	resp.Token = token
 	resp.User = *model
 

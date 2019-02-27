@@ -31,7 +31,7 @@ func (a *auth) Create(model *AuthModel) error {
 		log.Fatalf("Insert table 'users' error",execErr)
 	}
 
-    lastid,err:=a.db.Exec("select * from users where id = (select max(id) from users")
+    lastid,err:=a.db.Exec("select top '1' * from users order by id desc")
 	if err != nil {
 		log.Fatalf("Select table 'users' error ",err)
 	}

@@ -1,8 +1,16 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 	"errors"
+	"log"
+	"strconv"
+)
+
+var(
+	ctx= context.Background()
+
 )
 
 type auth struct {
@@ -11,14 +19,39 @@ type auth struct {
 
 func (a *auth) Create(model *AuthModel) error {
 
+	tx, err := a.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	_, err1 := a.db.Exec("INSERT INTO users (kind, status_id, type, created, updated, mfa_type) VALUES(?,?,?,?,?,?)",
+	_, execErr:= tx.Exec ("INSERT INTO users (kind, status_id, type, created, updated, mfa_type) VALUES(?,?,?,?,?,?)",
 		model.Kind_Users, model.StatusId_Users, model.Type_Users, model.Created_Users, model.Updated_Users, model.Mfa_type_Users)
-	return err1
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatalf("Insert table 'users' error",execErr)
+	}
 
-	_, err2 := a.db.Exec("INSERT INTO auth (user_id, phone, email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?,?)",
-		model.Id_Auth, model.Phone_Auth, model.Email_Auth, model.Password_Auth, model.Salt_Auth, model.Created_Auth, model.Updated_Auth, model.IsEmailVerified_Auth, model.IsPhoneVerified_Auth)
-	return err2
+    lastid,err:=a.db.Exec("select * from users where id = (select max(id) from users")
+	if err != nil {
+		log.Fatalf("Select table 'users' error ",err)
+	}
+	number,err:=lastid.LastInsertId()
+	if err != nil {
+		log.Fatalf("LastInsertId() taking error",err)
+	}
+	_, execErr = tx.Exec("INSERT INTO auth (user_id, phone, email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES("+(strconv.FormatInt(number,10))+",?,?,?,?,?,?,?,?)",
+		model.UserId_Auth, model.Phone_Auth, model.Email_Auth, model.Password_Auth, model.Salt_Auth, model.Created_Auth, model.Updated_Auth, model.IsEmailVerified_Auth, model.IsPhoneVerified_Auth)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatalf("Insert table 'auth' error",execErr)
+	}
+
+	if err := tx.Commit(); err != nil {
+		log.Fatalf("Commit transaction error",err)
+	}
+
+	return nil
+
 }
 
 func (a *auth) Update(model *AuthModel) error {

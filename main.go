@@ -3,14 +3,15 @@ package main
 import (
 	"context"
 	"database/sql"
-	"fmt"
-	"github.com/nori-io/auth/service"
-	"github.com/nori-io/auth/service/database"
-	"github.com/nori-io/auth/service/database/sqlScripts"
+	"log"
+
 	cfg "github.com/nori-io/nori-common/config"
 	"github.com/nori-io/nori-common/meta"
 	noriPlugin "github.com/nori-io/nori-common/plugin"
-	"log"
+
+	"github.com/nori-io/auth/service"
+	"github.com/nori-io/auth/service/database"
+	"github.com/nori-io/auth/service/database/sqlScripts"
 )
 
 type plugin struct {
@@ -20,7 +21,7 @@ type plugin struct {
 
 var (
 	Plugin plugin
-	ctx    = context.Background()
+	ctx= context.Background()
 )
 
 func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {
@@ -82,14 +83,12 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 		tx, err := db1.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
 
 		if err != nil {
-			fmt.Println(err)
 			log.Fatal(err)
 		}
 		_, execErr := tx.Exec(
 			sqlScripts.CreateTableUsers)
 		if execErr != nil {
 			_ = tx.Rollback()
-			fmt.Println(execErr)
 			log.Fatal(execErr)
 
 		}
@@ -97,14 +96,12 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			sqlScripts.CreateTableAuth)
 		if execErr != nil {
 			_ = tx.Rollback()
-			fmt.Println(execErr)
 			log.Fatal(execErr)
 		}
 		_, execErr = tx.Exec(
 			sqlScripts.CreateTableAuthProviders)
 		if execErr != nil {
 			_ = tx.Rollback()
-			fmt.Println(execErr)
 			log.Fatal(execErr)
 		}
 
@@ -112,7 +109,6 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			sqlScripts.CreateTableAuthenticationHistory)
 		if execErr != nil {
 			_ = tx.Rollback()
-			fmt.Println(execErr)
 			log.Fatal(execErr)
 		}
 
@@ -120,7 +116,6 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			sqlScripts.CreateTableUserMfaPhone)
 		if execErr != nil {
 			_ = tx.Rollback()
-			fmt.Println(execErr)
 			log.Fatal(execErr)
 		}
 
@@ -128,19 +123,16 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			sqlScripts.CreateTableUsersMfaCode)
 		if execErr != nil {
 			_ = tx.Rollback()
-			fmt.Println(execErr)
 			log.Fatal(execErr)
 		}
 		_, execErr = tx.Exec(
 			sqlScripts.CreateTableUserMfaSecret)
 		if execErr != nil {
 			_ = tx.Rollback()
-			fmt.Println(execErr)
 			log.Fatal(execErr)
 		}
 
 		if err := tx.Commit(); err != nil {
-			fmt.Println(err)
 			log.Fatal(err)
 		}
 

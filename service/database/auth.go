@@ -10,7 +10,7 @@ type auth struct {
 }
 
 func (a *auth) Create(model *AuthModel) error {
-	_, err := a.db.Exec("INSERT INTO auth (user_id, phone, email, password, salt, created, updated, isEmailVerified, IsPhoneVerified) VALUES(?,?,?,?,?,?,?,?)",
+	_, err := a.db.Exec("INSERT INTO auth (user_id, phone, email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?,?)",
 		model.UserId, model.Phone, model.Email, model.Password, model.Salt, model.Created, model.Updated, model.IsEmailVerified, model.IsPhoneVerified)
 	return err
 }
@@ -25,7 +25,7 @@ func (a *auth) Update(model *AuthModel) error {
 }
 
 func (a *auth) FindByEmail(email string) (model *AuthModel, err error) {
-	rows, err := a.db.Query("SELECT id, name, email, salt, password FROM users WHERE email = ? LIMIT 1", email)
+	rows, err := a.db.Query("SELECT user_id, phone, email, password, salt, created, updated, is_email_verified, is_phone_verified FROM auth WHERE email = ? LIMIT 1", email)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (a *auth) FindByEmail(email string) (model *AuthModel, err error) {
 
 	defer rows.Close()
 	for rows.Next() {
-		var m UsersModel
+		var m AuthModel
 		rows.Scan(&m.Id, &m.Email)
 		model.Id = m.Id
 		model.Email = m.Email

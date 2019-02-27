@@ -7,8 +7,8 @@ import (
 
 // SignUp Request
 type SignUpRequest struct {
-	Email    string
-	Password string
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 func (r SignUpRequest) Validate() error {

@@ -74,6 +74,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 		model = &database.AuthModel{
 			Email:    req.Email,
 			Password: req.Password,
+
 		}
 
 		err = s.db.Auth().Create(model)

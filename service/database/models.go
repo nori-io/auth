@@ -4,6 +4,15 @@ import (
 	"time"
 )
 
+type UsersModel struct {
+	Id       uint64
+	Status_account int64
+	Type     string
+	Created  time.Time
+	Updated  time.Time
+	Mfa_type string
+}
+
 type AuthModel struct {
 	Id              uint64
 	UserId          uint64
@@ -29,17 +38,9 @@ type AuthenticationHistoryModel struct {
 type AuthProvidersModel struct {
 	Provider        string
 	ProviderUserKey string
-	UserId          int64
 }
 
-type UsersModel struct {
-	Id       uint64
-	StatusId int64
-	Type     string
-	Created  time.Time
-	Updated  time.Time
-	Mfa_type string
-}
+
 
 type UserStatusModel struct {
 	Id   int64

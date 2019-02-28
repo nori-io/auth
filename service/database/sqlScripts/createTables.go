@@ -3,7 +3,7 @@ package sqlScripts
 const (
 	CreateTableUsers = `CREATE TABLE IF NOT EXISTS users (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  status_id INT UNSIGNED NOT NULL,
+  status_account ENUM('active', 'locked', 'blocked', 'deleted') NOT NULL,
   type VARCHAR(64) NOT NULL,
   created DATETIME NOT NULL,
   updated DATETIME NULL,

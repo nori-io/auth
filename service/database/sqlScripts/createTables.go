@@ -3,7 +3,6 @@ package sqlScripts
 const (
 	CreateTableUsers = `CREATE TABLE IF NOT EXISTS users (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  kind VARCHAR(255) NOT NULL,
   status_id INT UNSIGNED NOT NULL,
   type VARCHAR(64) NOT NULL,
   created DATETIME NOT NULL,

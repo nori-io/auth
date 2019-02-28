@@ -22,8 +22,8 @@ func (u *users) CreateAuth(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		log.Fatal(err)
 	}
 
-	_, execErr := tx.Exec("INSERT INTO users (kind, status_id, type, created, updated, mfa_type) VALUES(?,?,?,?,?,?)",
-		modelUsers.Kind, modelUsers.StatusId, modelUsers.Type, modelUsers.Created, modelUsers.Updated, modelUsers.Mfa_type)
+	_, execErr := tx.Exec("INSERT INTO users ( status_id, type, created, updated, mfa_type) VALUES(?,?,?,?,?)",
+		modelUsers.StatusId, modelUsers.Type, modelUsers.Created, modelUsers.Updated, modelUsers.Mfa_type)
 	if execErr != nil {
 		_ = tx.Rollback()
 		log.Fatalf("Insert table 'users' error", execErr)

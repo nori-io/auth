@@ -34,7 +34,6 @@ type AuthProvidersModel struct {
 
 type UsersModel struct {
 	Id       uint64
-	Kind     int64
 	StatusId int64
 	Type     string
 	Created  time.Time

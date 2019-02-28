@@ -15,8 +15,6 @@ type AuthModel struct {
 	Updated         time.Time
 	IsEmailVerified bool
 	IsPhoneVerified bool
-
-	Users UsersModel
 }
 
 type AuthenticationHistoryModel struct {

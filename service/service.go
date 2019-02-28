@@ -50,7 +50,7 @@ func NewService(
 
 func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpResponse) {
 	var err error
-	var model *database.AuthModel
+	var modelAuth *database.AuthModel
 	resp = &SignUpResponse{}
 	errField := rest.ErrFieldResp{
 		Meta: rest.ErrFieldRespMeta{
@@ -58,12 +58,12 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 		},
 	}
 
-	if model, err = s.db.Auth().FindByEmail(req.Email); err != nil {
+	if modelAuth, err = s.db.Auth().FindByEmail(req.Email); err != nil {
 		resp.Err = rest.ErrorInternal(err.Error())
 		return resp
 	}
 
-	if model != nil && model.Id != 0 {
+	if modelAuth != nil && modelAuth.Id != 0 {
 		errField.AddError("email", 400, "Email already exists.")
 	}
 	if errField.HasErrors() {
@@ -71,12 +71,14 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 		return resp
 	}
 
-	model = &database.AuthModel{
+	modelAuth = &database.AuthModel{
 		Email:    req.Email,
 		Password: req.Password,
 	}
 
-	err = s.db.Auth().Create(model)
+	modelUsers:=&database.UsersModel{}
+
+	err = s.db.Users().CreateAuth(modelAuth,modelUsers)
 	if err != nil {
 		s.log.Error(err)
 		resp.Err = rest.ErrFieldResp{

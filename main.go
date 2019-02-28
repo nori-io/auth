@@ -21,7 +21,7 @@ type plugin struct {
 
 var (
 	Plugin plugin
-	ctx= context.Background()
+	ctx    = context.Background()
 )
 
 func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {

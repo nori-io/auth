@@ -6,7 +6,7 @@ const (
   kind VARCHAR(255) NOT NULL,
   status_id INT UNSIGNED NOT NULL,
   type VARCHAR(64) NOT NULL,
-  created DATETIME NULL,
+  created DATETIME NOT NULL,
   updated DATETIME NULL,
   mfa_type VARCHAR(8) NOT NULL,
   PRIMARY KEY (id))
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS auth (
   email VARCHAR(255) NULL,
   password VARCHAR(65) NOT NULL,
   salt VARCHAR(65) NOT NULL,
-  created DATETIME NULL,
+  created DATETIME NOT NULL,
   updated DATETIME NULL,
   is_email_verified TINYINT(1) NOT NULL DEFAULT 0,
   is_phone_verified TINYINT(1) NOT NULL DEFAULT 0,

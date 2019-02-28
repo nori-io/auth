@@ -23,7 +23,7 @@ func (a *auth) Create(model *AuthModel) error {
 	}
 
 	_, execErr := tx.Exec("INSERT INTO users (kind, status_id, type, created, updated, mfa_type) VALUES(?,?,?,?,?,?)",
-		model.Kind_Users, model.StatusId_Users, model.Type_Users, model.Created_Users, model.Updated_Users, model.Mfa_type_Users)
+		model.Users.Kind, model.Users.StatusId, model.Users.Type, model.Users.Created, model.Users.Updated, model.Users.Mfa_type)
 	if execErr != nil {
 		_ = tx.Rollback()
 		log.Fatalf("Insert table 'users' error", execErr)
@@ -41,15 +41,12 @@ func (a *auth) Create(model *AuthModel) error {
 	defer lastId.Close()
 	for lastId.Next() {
 		var m AuthModel
-		log.Println("Number is", lastIdNumber)
-		lastId.Scan(&m.Id_Auth)
-		lastIdNumber = m.Id_Auth
-		log.Println("Number is", lastIdNumber)
-
+		lastId.Scan(&m.Id)
+		lastIdNumber = m.Id
 	}
 
 	_, execErr = tx.Exec("INSERT INTO auth (user_id, phone, email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?,?)",
-		lastIdNumber, model.Phone_Auth, model.Email_Auth, model.Password_Auth, model.Salt_Auth, model.Created_Auth, model.Updated_Auth, model.IsEmailVerified_Auth, model.IsPhoneVerified_Auth)
+		lastIdNumber, model.Phone, model.Email, model.Password, model.Salt, model.Created, model.Updated, model.IsEmailVerified, model.IsPhoneVerified)
 	if execErr != nil {
 		_ = tx.Rollback()
 		log.Fatalf("Insert table 'auth' error", execErr.Error())
@@ -64,11 +61,11 @@ func (a *auth) Create(model *AuthModel) error {
 }
 
 func (a *auth) Update(model *AuthModel) error {
-	if model.Id_Auth == 0 {
+	if model.Id == 0 {
 		return errors.New("Empty model")
 	}
 	_, err := a.db.Exec("UPDATE auth SET profile_user_id = ?, phone = ?, email = ?, password = ? salt = ? created =? WHERE id = ? ",
-		model.UserId_Auth, model.Id_Auth)
+		model.UserId, model.Id)
 	return err
 }
 
@@ -82,9 +79,9 @@ func (a *auth) FindByEmail(email string) (model *AuthModel, err error) {
 	defer rows.Close()
 	for rows.Next() {
 		var m AuthModel
-		rows.Scan(&m.Id_Auth, &m.Email_Auth)
-		model.Id_Auth = m.Id_Auth
-		model.Email_Auth = m.Email_Auth
+		rows.Scan(&m.Id, &m.Email)
+		model.Id = m.Id
+		model.Email = m.Email
 	}
 
 	if rows.Err() != nil {

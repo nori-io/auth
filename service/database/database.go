@@ -25,7 +25,6 @@ type Auth interface {
 	Create(model *AuthModel) error
 	Update(*AuthModel) error
 	FindByEmail(email string) (model *AuthModel, err error)
-
 }
 type database struct {
 	db                    *sql.DB

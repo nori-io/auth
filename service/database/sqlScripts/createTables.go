@@ -1,6 +1,9 @@
 package sqlScripts
 
 const (
+
+	SetDatabaseSettings=`SET GLOBAL sql_mode=''`
+
 	CreateTableUsers = `CREATE TABLE IF NOT EXISTS users (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   status_account ENUM('active', 'locked', 'blocked', 'deleted') NOT NULL,

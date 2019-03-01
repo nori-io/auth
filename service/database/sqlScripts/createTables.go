@@ -3,6 +3,7 @@ package sqlScripts
 const (
 
 	SetDatabaseSettings=`SET GLOBAL sql_mode=''`
+	SetDatabaseStricts=`SET sql_mode='STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE'`
 
 	CreateTableUsers = `CREATE TABLE IF NOT EXISTS users (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,

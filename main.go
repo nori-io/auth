@@ -96,6 +96,15 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 		}
 
 		_, execErr = tx.Exec(
+			sqlScripts.SetDatabaseStricts)
+		if execErr != nil {
+			_ = tx.Rollback()
+			log.Fatal(execErr)
+
+		}
+
+
+		_, execErr = tx.Exec(
 			sqlScripts.CreateTableUsers)
 		if execErr != nil {
 			_ = tx.Rollback()

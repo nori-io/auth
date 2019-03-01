@@ -1,9 +1,8 @@
 package sqlScripts
 
 const (
-
-	SetDatabaseSettings=`SET GLOBAL sql_mode=''`
-	SetDatabaseStricts=`SET sql_mode='STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE'`
+	SetDatabaseSettings = `SET GLOBAL sql_mode=''`
+	SetDatabaseStricts  = `SET sql_mode='STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE'`
 
 	CreateTableUsers = `CREATE TABLE IF NOT EXISTS users (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -39,6 +38,21 @@ CREATE TABLE IF NOT EXISTS auth (
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 `
+	CreateTableAuthProviders = `
+CREATE TABLE IF NOT EXISTS auth_providers (
+  provider VARCHAR(64) NOT NULL,
+  provider_user_key VARCHAR(128) NOT NULL,
+  user_id INT UNSIGNED NOT NULL,
+  PRIMARY KEY (provider, provider_user_key),
+  INDEX user_id_idx (user_id ASC),
+  CONSTRAINT auth_providers_user_id_fk
+    FOREIGN KEY (user_id)
+    REFERENCES users (id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+`
+
 	CreateTableAuthenticationHistory = ` 
 CREATE TABLE IF NOT EXISTS authentication_history (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -100,20 +114,6 @@ CREATE TABLE IF NOT EXISTS users_mfa_code (
     REFERENCES users (id)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-`
-	CreateTableAuthProviders = `
-CREATE TABLE IF NOT EXISTS auth_providers (
-  provider VARCHAR(64) NOT NULL,
-  provider_user_key VARCHAR(128) NOT NULL,
-  user_id INT UNSIGNED NOT NULL,
-  PRIMARY KEY (provider, provider_user_key),
-  INDEX user_id_idx (user_id ASC),
-  CONSTRAINT auth_providers_user_id_fk
-    FOREIGN KEY (user_id)
-    REFERENCES users (id)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 `
 )

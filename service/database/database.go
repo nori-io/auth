@@ -18,18 +18,17 @@ type AuthenticationHistory interface {
 
 type Users interface {
 	CreateAuth(*AuthModel, *UsersModel) error
-//	CreateProvider(*ProviderModel, *UsersModel) error
+	//	CreateProvider(*ProviderModel, *UsersModel) error
 	//Update(*UsersModel) error
 }
 
-
 type Auth interface {
-//	Update(*AuthModel) error
-FindByEmail(email string) (model *AuthModel, err error)
+	//	Update(*AuthModel) error
+	FindByEmail(email string) (model *AuthModel, err error)
 }
 
 type Provider interface {
-//	Update(*ProviderModel) error
+	//	Update(*ProviderModel) error
 	//FindBy...
 }
 type database struct {

@@ -5,12 +5,12 @@ import (
 )
 
 type UsersModel struct {
-	Id       uint64
+	Id             uint64
 	Status_account string
-	Type     string
-	Created  time.Time
-	Updated  time.Time
-	Mfa_type string
+	Type           string
+	Created        time.Time
+	Updated        time.Time
+	Mfa_type       string
 }
 
 type AuthModel struct {
@@ -26,23 +26,34 @@ type AuthModel struct {
 	IsPhoneVerified bool
 }
 
-type AuthenticationHistoryModel struct {
-	Id        int64
-	UserId    int64
-	LoggedIn  time.Time
-	Meta      string
-	LoggedOut time.Time
-	Secret    string
-}
-
 type AuthProvidersModel struct {
 	Provider        string
 	ProviderUserKey string
+	UserId          uint64
 }
 
+type AuthenticationHistoryModel struct {
+	Id        uint64
+	UserId    uint64
+	LoggedIn  time.Time
+	Meta      string
+	LoggedOut time.Time
+}
 
+type UserMfaSecretModel struct {
+	Id     uint64
+	UserId uint64
+	Secret string
+}
 
-type UserStatusModel struct {
-	Id   int64
-	Name string
+type UserMfaPhoneModel struct {
+	Id     uint64
+	UserId uint64
+	Phone  string
+}
+
+type UsersMfaCodeModel struct {
+	Id     uint64
+	UserId uint64
+	code   string
 }

@@ -36,7 +36,7 @@ func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {
 
 func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 
-	ctx:= context.Background()
+	ctx := context.Background()
 
 	if p.instance == nil {
 
@@ -102,7 +102,6 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			log.Fatal(execErr)
 
 		}
-
 
 		_, execErr = tx.Exec(
 			sqlScripts.CreateTableUsers)

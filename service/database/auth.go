@@ -3,12 +3,12 @@ package database
 import (
 	"database/sql"
 	"errors"
-
 )
 
 type auth struct {
 	db *sql.DB
 }
+
 func (a *auth) Update(model *AuthModel) error {
 	if model.Id == 0 {
 		return errors.New("Empty model")

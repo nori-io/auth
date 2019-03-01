@@ -76,9 +76,9 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 		Password: req.Password,
 	}
 
-	modelUsers:=&database.UsersModel{}
+	modelUsers := &database.UsersModel{}
 
-	err = s.db.Users().CreateAuth(modelAuth,modelUsers)
+	err = s.db.Users().CreateAuth(modelAuth, modelUsers)
 	if err != nil {
 		s.log.Error(err)
 		resp.Err = rest.ErrFieldResp{

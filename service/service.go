@@ -22,6 +22,7 @@ type Service interface {
 type Config struct {
 	Sub func() string
 	Iss func() string
+	UserType func() string
 }
 
 type service struct {

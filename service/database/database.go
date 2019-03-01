@@ -4,6 +4,9 @@ import (
 	"database/sql"
 	"sync"
 )
+var (
+	userType string
+)
 
 type Database interface {
 	Users() Users
@@ -58,6 +61,11 @@ func DB(db *sql.DB) Database {
 		}
 	})
 	return instance
+}
+
+func SetUserType(userTypeTemp string) string{
+	userType=userTypeTemp
+	return userType
 }
 
 func (db *database) Users() Users {

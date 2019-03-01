@@ -7,6 +7,7 @@ import (
 
 	"github.com/asaskevich/govalidator"
 	"golang.org/x/net/context"
+
 )
 
 type users struct {
@@ -25,7 +26,7 @@ func (u *users) CreateAuth(modelAuth *AuthModel, modelUsers *UsersModel) error {
 	}
 
 	_, execErr := tx.Exec("INSERT INTO users (status_account, type, created, updated, mfa_type) VALUES(?,?,?,?,?)",
-		"active", modelUsers.Type, time.Now(), time.Now(), modelUsers.Mfa_type)
+		"active", userType , time.Now(), time.Now(), modelUsers.Mfa_type)
 	if execErr != nil {
 		_ = tx.Rollback()
 		log.Fatalf("Insert table 'users' error", execErr)

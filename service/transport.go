@@ -46,11 +46,8 @@ func Transport(
 		opts...,
 	)
 
-	/*	router.HandleFunc("/test", func(w http2.ResponseWriter, r *http2.Request) {
-		w.Write([]byte("Hello World!!!"))
-	}).Methods("GET")*/
-	router.Handle("/auth/signup", signupHandler).Methods("POST")
 
+	router.Handle("/auth/signup", signupHandler).Methods("POST")
 	router.Handle("/auth/signin", signinHandler).Methods("POST")
 	router.Handle("/auth/signout", signoutHandler).Methods("GET")
 

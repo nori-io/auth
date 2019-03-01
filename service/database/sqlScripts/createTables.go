@@ -9,9 +9,33 @@ const (
   status_account ENUM('active', 'locked', 'blocked', 'deleted') NOT NULL,
   type VARCHAR(64) NOT NULL,
   created DATETIME NOT NULL,
-  updated DATETIME NULL,
+  updated DATETIME NOT NULL,
   mfa_type VARCHAR(8) NOT NULL,
   PRIMARY KEY (id))
+ENGINE = InnoDB;
+`
+	CreateTableAuth = `
+CREATE TABLE IF NOT EXISTS auth (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id INT UNSIGNED NOT NULL,
+  phone VARCHAR(45) NULL,
+  email VARCHAR(255) NULL,
+  password VARCHAR(65) NOT NULL,
+  salt VARCHAR(65) NOT NULL,
+  created DATETIME NOT NULL,
+  updated DATETIME NOT NULL,
+  is_email_verified TINYINT(1) NOT NULL DEFAULT 0,
+  is_phone_verified TINYINT(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (id),
+  INDEX user_id_idx (user_id ASC),
+  UNIQUE INDEX phone_unique (phone ASC),
+  UNIQUE INDEX email_unique (email ASC),
+  UNIQUE INDEX user_id_unique (user_id ASC),
+  CONSTRAINT auth_user_id_fk
+    FOREIGN KEY (user_id)
+    REFERENCES users (id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 `
 	CreateTableAuthenticationHistory = ` 
@@ -30,30 +54,7 @@ CREATE TABLE IF NOT EXISTS authentication_history (
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 `
-	CreateTableAuth = `
-CREATE TABLE IF NOT EXISTS auth (
-  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  user_id INT UNSIGNED NOT NULL,
-  phone VARCHAR(45) NULL,
-  email VARCHAR(255) NULL,
-  password VARCHAR(65) NOT NULL,
-  salt VARCHAR(65) NOT NULL,
-  created DATETIME NOT NULL,
-  updated DATETIME NULL,
-  is_email_verified TINYINT(1) NOT NULL DEFAULT 0,
-  is_phone_verified TINYINT(1) NOT NULL DEFAULT 0,
-  PRIMARY KEY (id),
-  INDEX user_id_idx (user_id ASC),
-  UNIQUE INDEX phone_unique (phone ASC),
-  UNIQUE INDEX email_unique (email ASC),
-  UNIQUE INDEX user_id_unique (user_id ASC),
-  CONSTRAINT auth_user_id_fk
-    FOREIGN KEY (user_id)
-    REFERENCES users (id)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-`
+
 	CreateTableUserMfaSecret = `
 CREATE TABLE IF NOT EXISTS user_mfa_secret (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,

@@ -6,7 +6,7 @@ import (
 
 type UsersModel struct {
 	Id       uint64
-	Status_account int64
+	Status_account string
 	Type     string
 	Created  time.Time
 	Updated  time.Time

@@ -5,6 +5,7 @@ import (
 		"log"
 	"time"
 
+	"github.com/asaskevich/govalidator"
 	"golang.org/x/net/context"
 )
 
@@ -47,7 +48,7 @@ func (u *users) CreateAuth(modelAuth *AuthModel, modelUsers *UsersModel) error {
 	}
 
 	_, execErr = tx.Exec("INSERT INTO auth (user_id, phone, email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?,?)",
-		lastIdNumber, modelAuth.Phone, modelAuth.Email, modelAuth.Password, modelAuth.Salt, modelAuth.Created, modelAuth.Updated, modelAuth.IsEmailVerified, modelAuth.IsPhoneVerified)
+		lastIdNumber, modelAuth.Phone, modelAuth.Email, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
 	if execErr != nil {
 		_ = tx.Rollback()
 		log.Fatalf("Insert table 'auth' error", execErr.Error())
@@ -56,7 +57,7 @@ func (u *users) CreateAuth(modelAuth *AuthModel, modelUsers *UsersModel) error {
 	if err := tx.Commit(); err != nil {
 		log.Fatalf("Commit transaction error", err)
 	}
-
+	log.Println("Type is ", govalidator.IsNull(modelUsers.Type))
 	return nil
 
 }

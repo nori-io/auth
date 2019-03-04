@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 )
 
@@ -31,7 +30,6 @@ func DecodeSignUpRequest(types []interface{}, type_default string) func(_ contex
 			if value == body.Type {
 				isTypeValid = true
 			}
-			log.Println("IsTypeValid is false")
 		}
 
 		if type_default == body.Type {

@@ -38,7 +38,7 @@ func (u *users) CreateAuth(modelAuth *AuthModel, modelUsers *UsersModel) error {
 	}
 
 	if lastId.Err() != nil {
-		log.Fatalf("Taking lastId error ", err)
+		return err
 	}
 
 	defer lastId.Close()

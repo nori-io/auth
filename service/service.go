@@ -5,11 +5,8 @@ import (
 
 	"github.com/cheebo/gorest"
 	"github.com/cheebo/rand"
-	"github.com/nori-io/nori-common/interfaces"
-
 	"github.com/nori-io/auth/service/database"
-	//"github.com/cheebo/gorest"
-	//	"github.com/cheebo/rand"
+	"github.com/nori-io/nori-common/interfaces"
 	"github.com/sirupsen/logrus"
 )
 
@@ -20,9 +17,10 @@ type Service interface {
 }
 
 type Config struct {
-	Sub func() string
-	Iss func() string
-	UserType func() string
+	Sub             func() string
+	Iss             func() string
+	UserType        func() []interface{}
+	UserTypeDefault func() string
 }
 
 type service struct {
@@ -52,6 +50,7 @@ func NewService(
 func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpResponse) {
 	var err error
 	var modelAuth *database.AuthModel
+	var modelUsers *database.UsersModel
 	resp = &SignUpResponse{}
 	errField := rest.ErrFieldResp{
 		Meta: rest.ErrFieldRespMeta{
@@ -77,7 +76,9 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 		Password: req.Password,
 	}
 
-	modelUsers := &database.UsersModel{}
+	modelUsers = &database.UsersModel{
+		Type: req.Type,
+	}
 
 	err = s.db.Users().CreateAuth(modelAuth, modelUsers)
 	if err != nil {

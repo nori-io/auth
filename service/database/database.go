@@ -2,10 +2,9 @@ package database
 
 import (
 	"database/sql"
+	log "github.com/sirupsen/logrus"
+
 	"sync"
-)
-var (
-	userType string
 )
 
 type Database interface {
@@ -45,27 +44,25 @@ var instance *database
 var once sync.Once
 
 // Create Database using singltone pattern
-func DB(db *sql.DB) Database {
+func DB(db *sql.DB, logger *log.Logger) Database {
 	once.Do(func() {
 		instance = &database{
 			db: db,
 			users: &users{
-				db: db,
+				db:  db,
+				log: logger,
 			},
 			authenticationHistory: &authenticationHistory{
-				db: db,
+				db:  db,
+				log: logger,
 			},
 			auth: &auth{
-				db: db,
+				db:  db,
+				log: logger,
 			},
 		}
 	})
 	return instance
-}
-
-func SetUserType(userTypeTemp string) string{
-	userType=userTypeTemp
-	return userType
 }
 
 func (db *database) Users() Users {

@@ -11,7 +11,7 @@ import (
 
 	"github.com/nori-io/auth/service"
 	"github.com/nori-io/auth/service/database"
-	"github.com/nori-io/auth/service/database/sqlScripts"
+	"github.com/nori-io/auth/service/database/sql_scripts"
 )
 
 type plugin struct {
@@ -21,17 +21,20 @@ type plugin struct {
 
 var (
 	Plugin plugin
-	)
+)
 
 func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {
 	configManager.Register(p.Meta())
 
 	cm := configManager.Register(p.Meta())
 	p.config = &service.Config{
-		Sub: cm.String("jwt.sub", "jwt.sub value"),
-		Iss: cm.String("jwt.iss", "jwt.iss value"),
-		UserType:cm.String("user.type","user.type value"),
+		Sub:             cm.String("jwt.sub", "jwt.sub value"),
+		Iss:             cm.String("jwt.iss", "jwt.iss value"),
+		UserType:        cm.Slice("user.type", ",", "no"),
+		UserTypeDefault: cm.String("user.type_default", "user.type_default value"),
 	}
+	log.Println("p.config.UserType is", p.config.UserType())
+	log.Println("p.config.UserTypeDefault is", p.config.UserTypeDefault())
 	return nil
 }
 
@@ -71,10 +74,10 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			session,
 			p.config,
 			registry.Logger(p.Meta()),
-			database.DB(db.GetDB()),
+			database.DB(db.GetDB(), registry.Logger(p.Meta())),
 		)
 		service.Transport(auth, transport, session,
-			http, p.instance, registry.Logger(p.Meta()))
+			http, p.instance, registry.Logger(p.Meta()), p.config.UserType(), p.config.UserTypeDefault())
 
 		sql1, err := registry.Sql()
 		if err != nil {
@@ -89,7 +92,7 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 		}
 
 		_, execErr := tx.Exec(
-			sqlScripts.SetDatabaseSettings)
+			sql_scripts.SetDatabaseSettings)
 		if execErr != nil {
 			_ = tx.Rollback()
 			log.Fatal(execErr)
@@ -97,7 +100,7 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 		}
 
 		_, execErr = tx.Exec(
-			sqlScripts.SetDatabaseStricts)
+			sql_scripts.SetDatabaseStricts)
 		if execErr != nil {
 			_ = tx.Rollback()
 			log.Fatal(execErr)
@@ -105,47 +108,47 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 		}
 
 		_, execErr = tx.Exec(
-			sqlScripts.CreateTableUsers)
+			sql_scripts.CreateTableUsers)
 		if execErr != nil {
 			_ = tx.Rollback()
 			log.Fatal(execErr)
 
 		}
 		_, execErr = tx.Exec(
-			sqlScripts.CreateTableAuth)
+			sql_scripts.CreateTableAuth)
 		if execErr != nil {
 			_ = tx.Rollback()
 			log.Fatal(execErr)
 		}
 		_, execErr = tx.Exec(
-			sqlScripts.CreateTableAuthProviders)
-		if execErr != nil {
-			_ = tx.Rollback()
-			log.Fatal(execErr)
-		}
-
-		_, execErr = tx.Exec(
-			sqlScripts.CreateTableAuthenticationHistory)
+			sql_scripts.CreateTableAuthProviders)
 		if execErr != nil {
 			_ = tx.Rollback()
 			log.Fatal(execErr)
 		}
 
 		_, execErr = tx.Exec(
-			sqlScripts.CreateTableUserMfaPhone)
+			sql_scripts.CreateTableAuthenticationHistory)
 		if execErr != nil {
 			_ = tx.Rollback()
 			log.Fatal(execErr)
 		}
 
 		_, execErr = tx.Exec(
-			sqlScripts.CreateTableUsersMfaCode)
+			sql_scripts.CreateTableUserMfaPhone)
+		if execErr != nil {
+			_ = tx.Rollback()
+			log.Fatal(execErr)
+		}
+
+		_, execErr = tx.Exec(
+			sql_scripts.CreateTableUsersMfaCode)
 		if execErr != nil {
 			_ = tx.Rollback()
 			log.Fatal(execErr)
 		}
 		_, execErr = tx.Exec(
-			sqlScripts.CreateTableUserMfaSecret)
+			sql_scripts.CreateTableUserMfaSecret)
 		if execErr != nil {
 			_ = tx.Rollback()
 			log.Fatal(execErr)
@@ -155,10 +158,8 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			log.Fatal(err)
 		}
 
-		database.SetUserType( p.config.UserType())
-
 		service.Transport(auth, transport, session,
-			http, p.instance, registry.Logger(p.Meta()))
+			http, p.instance, registry.Logger(p.Meta()), p.config.UserType(), p.config.UserTypeDefault())
 	}
 	return nil
 }
@@ -212,7 +213,7 @@ func (p plugin) Install(_ context.Context, registry noriPlugin.Registry) error {
 		return err
 	}
 	db := sql.GetDB()
-	_, err = db.Exec(sqlScripts.CreateTableUsersMfaCode)
+	_, err = db.Exec(sql_scripts.CreateTableUsersMfaCode)
 	return err
 }
 

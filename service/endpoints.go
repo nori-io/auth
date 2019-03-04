@@ -13,7 +13,6 @@ func MakeSignUpEndpoint(s Service) endpoint.Endpoint {
 		return *resp, resp.Error()
 	}
 
-	return nil
 }
 
 func MakeSignInEndpoint(s Service) endpoint.Endpoint {
@@ -23,7 +22,6 @@ func MakeSignInEndpoint(s Service) endpoint.Endpoint {
 		resp := s.SignIn(ctx, req)
 		return *resp, resp.Error()
 	}
-	return nil
 }
 
 func MakeSignOutEndpoint(s Service) endpoint.Endpoint {
@@ -32,5 +30,4 @@ func MakeSignOutEndpoint(s Service) endpoint.Endpoint {
 		resp := s.SignOut(ctx, req)
 		return *resp, resp.Error()
 	}
-	return nil
 }

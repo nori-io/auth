@@ -3,10 +3,13 @@ package database
 import (
 	"database/sql"
 	"errors"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type authenticationHistory struct {
-	db *sql.DB
+	db  *sql.DB
+	log *log.Logger
 }
 
 func (a *authenticationHistory) Create(model *AuthenticationHistoryModel) error {

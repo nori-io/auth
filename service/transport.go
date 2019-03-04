@@ -15,6 +15,8 @@ func Transport(
 	router interfaces.Http,
 	srv Service,
 	logger *logrus.Logger,
+	userType []interface{},
+	userTypeDefault string,
 ) {
 
 	authenticated := func(e endpoint.Endpoint) endpoint.Endpoint {
@@ -23,7 +25,7 @@ func Transport(
 
 	signupHandler := http.NewServer(
 		MakeSignUpEndpoint(srv),
-		DecodeSignUpRequest,
+		DecodeSignUpRequest(userType, userTypeDefault),
 		http.EncodeJSONResponse,
 		logger,
 	)
@@ -45,7 +47,6 @@ func Transport(
 		logger,
 		opts...,
 	)
-
 
 	router.Handle("/auth/signup", signupHandler).Methods("POST")
 	router.Handle("/auth/signin", signinHandler).Methods("POST")

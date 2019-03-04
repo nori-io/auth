@@ -1,4 +1,4 @@
-package sqlScripts
+package sql_scripts
 
 const (
 	SetDatabaseSettings = `SET GLOBAL sql_mode=''`

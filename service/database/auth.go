@@ -3,10 +3,12 @@ package database
 import (
 	"database/sql"
 	"errors"
+	log "github.com/sirupsen/logrus"
 )
 
 type auth struct {
-	db *sql.DB
+	db  *sql.DB
+	log *log.Logger
 }
 
 func (a *auth) Update(model *AuthModel) error {

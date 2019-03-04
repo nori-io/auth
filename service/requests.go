@@ -9,6 +9,7 @@ import (
 type SignUpRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+	Type     string `json:"user_type"`
 }
 
 func (r SignUpRequest) Validate() error {

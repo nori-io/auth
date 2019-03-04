@@ -2,16 +2,16 @@ package database
 
 import (
 	"database/sql"
-	"log"
 	"time"
 
-	"github.com/asaskevich/govalidator"
-	"golang.org/x/net/context"
+	log "github.com/sirupsen/logrus"
 
+	"golang.org/x/net/context"
 )
 
 type users struct {
-	db *sql.DB
+	db  *sql.DB
+	log *log.Logger
 }
 
 func (u *users) CreateAuth(modelAuth *AuthModel, modelUsers *UsersModel) error {
@@ -22,19 +22,19 @@ func (u *users) CreateAuth(modelAuth *AuthModel, modelUsers *UsersModel) error {
 
 	tx, err := u.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	_, execErr := tx.Exec("INSERT INTO users (status_account, type, created, updated, mfa_type) VALUES(?,?,?,?,?)",
-		"active", userType , time.Now(), time.Now(), modelUsers.Mfa_type)
+		"active", modelUsers.Type, time.Now(), time.Now(), modelUsers.Mfa_type)
 	if execErr != nil {
 		_ = tx.Rollback()
-		log.Fatalf("Insert table 'users' error", execErr)
+		return execErr
 	}
 
 	lastId, err := tx.Query("SELECT id FROM users WHERE id = (SELECT MAX(id) FROM users)")
 	if err != nil {
-		log.Fatalf("Select table 'users' error ", err)
+		return err
 	}
 
 	if lastId.Err() != nil {
@@ -52,13 +52,12 @@ func (u *users) CreateAuth(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		lastIdNumber, modelAuth.Phone, modelAuth.Email, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
 	if execErr != nil {
 		_ = tx.Rollback()
-		log.Fatalf("Insert table 'auth' error", execErr.Error())
+		return execErr
 	}
 
 	if err := tx.Commit(); err != nil {
-		log.Fatalf("Commit transaction error", err)
+		return err
 	}
-	log.Println("Type is ", govalidator.IsNull(modelUsers.Type))
 	return nil
 
 }

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -12,11 +13,6 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 	return func(_ context.Context, r *http.Request) (interface{}, error) {
 		var body SignUpRequest
 		var isTypeValid bool
-
-		if body.PhoneNumber==""{
-			err := errors.New("Type '" + body.Type + "' is not valid ")
-			return body, err
-		}
 
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			return body, err
@@ -51,6 +47,8 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 		}
 
 		if ((parameters.UserRegistrationPhoneNumberType)||(parameters.UserRegistrationEmailAddressType))!=true{
+			log.Print(parameters.UserRegistrationPhoneNumberType)
+			log.Println(parameters.UserRegistrationEmailAddressType)
 			err := errors.New(" All user's registration's types sets with 'false' value. Need to set 'true' value")
 			return body, err
 		}

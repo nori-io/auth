@@ -78,6 +78,10 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 		)
 		pluginParameters := service.PluginParameters{UserTypeParameter: p.config.UserType(), UserTypeDefaultParameter: p.config.UserTypeDefault(),
 			UserRegistrationPhoneNumberType:p.config.UserRegistrationPhoneNumber(), UserRegistrationEmailAddressType:p.config.UserRegistrationPhoneNumber()}
+		//log.Print("p.config.UserRegistrationPhoneNumber",p.config.UserRegistrationPhoneNumber())
+	//	log.Print("p.config.UserRegistrationEmailAddress",p.config.UserRegistrationEmailAddress())
+
+
 		service.Transport(auth, transport, session,
 			http, p.instance, registry.Logger(p.Meta()), pluginParameters)
 

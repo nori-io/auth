@@ -8,6 +8,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type PluginParameters struct {
+	UserTypeParameter []interface{}
+	UserTypeDefaultParameter string
+
+}
+
 func Transport(
 	auth interfaces.Auth,
 	transport interfaces.HTTPTransport,
@@ -15,8 +21,8 @@ func Transport(
 	router interfaces.Http,
 	srv Service,
 	logger *logrus.Logger,
-	userType []interface{},
-	userTypeDefault string,
+	config PluginParameters,
+
 ) {
 
 	authenticated := func(e endpoint.Endpoint) endpoint.Endpoint {
@@ -25,7 +31,7 @@ func Transport(
 
 	signupHandler := http.NewServer(
 		MakeSignUpEndpoint(srv),
-		DecodeSignUpRequest(userType, userTypeDefault),
+		DecodeSignUpRequest(PluginParameters{UserTypeParameter:config.UserTypeParameter,UserTypeDefaultParameter:config.UserTypeDefaultParameter}),
 		http.EncodeJSONResponse,
 		logger,
 	)

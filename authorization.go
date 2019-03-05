@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"log"
+	"reflect"
 
 	cfg "github.com/nori-io/nori-common/config"
 	"github.com/nori-io/nori-common/meta"
@@ -19,13 +20,20 @@ type plugin struct {
 	config   *service.Config
 }
 
+type pluginParameters struct {
+	UserTypeParameter []interface{}
+	UserTypeDefaultParameter string
+}
+
+
 var (
 	Plugin plugin
+
 )
 
 func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {
-	configManager.Register(p.Meta())
 
+	configManager.Register(p.Meta())
 	cm := configManager.Register(p.Meta())
 	p.config = &service.Config{
 		Sub:             cm.String("jwt.sub", "jwt.sub value"),
@@ -33,8 +41,6 @@ func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {
 		UserType:        cm.Slice("user.type", ",", "no"),
 		UserTypeDefault: cm.String("user.type_default", "user.type_default value"),
 	}
-	log.Println("p.config.UserType is", p.config.UserType())
-	log.Println("p.config.UserTypeDefault is", p.config.UserTypeDefault())
 	return nil
 }
 
@@ -76,8 +82,11 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			registry.Logger(p.Meta()),
 			database.DB(db.GetDB(), registry.Logger(p.Meta())),
 		)
+		object:=service.PluginParameters{UserTypeParameter:p.config.UserType(),UserTypeDefaultParameter:p.config.UserTypeDefault()}
+		log.Println("Type in main",reflect.TypeOf(object))
+		log.Println(service.PluginParameters{})
 		service.Transport(auth, transport, session,
-			http, p.instance, registry.Logger(p.Meta()), p.config.UserType(), p.config.UserTypeDefault())
+			http, p.instance, registry.Logger(p.Meta()),object)
 
 		sql1, err := registry.Sql()
 		if err != nil {
@@ -157,10 +166,10 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 		if err := tx.Commit(); err != nil {
 			log.Fatal(err)
 		}
-
 		service.Transport(auth, transport, session,
-			http, p.instance, registry.Logger(p.Meta()), p.config.UserType(), p.config.UserTypeDefault())
-	}
+			http, p.instance, registry.Logger(p.Meta()),object)
+		}
+
 	return nil
 }
 

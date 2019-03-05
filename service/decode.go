@@ -8,7 +8,9 @@ import (
 	"net/http"
 )
 
-func DecodeSignUpRequest(types []interface{}, type_default string) func(_ context.Context, r *http.Request) (interface{}, error) {
+
+
+func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r *http.Request) (interface{}, error) {
 	return func(_ context.Context, r *http.Request) (interface{}, error) {
 		var body SignUpRequest
 		var isTypeValid bool
@@ -20,7 +22,7 @@ func DecodeSignUpRequest(types []interface{}, type_default string) func(_ contex
 			return body, err
 		}
 
-		typesSlice := types
+		typesSlice := parameters.UserTypeParameter
 		s := make([]string, len(typesSlice))
 		for i, value := range typesSlice {
 			s[i] = fmt.Sprint(value)
@@ -32,12 +34,12 @@ func DecodeSignUpRequest(types []interface{}, type_default string) func(_ contex
 			}
 		}
 
-		if type_default == body.Type {
+		if parameters.UserTypeDefaultParameter == body.Type {
 			isTypeValid = true
 		}
 
 		if body.Type == "" {
-			body.Type = type_default
+			body.Type = parameters.UserTypeDefaultParameter
 			isTypeValid = true
 		}
 		if isTypeValid == false {

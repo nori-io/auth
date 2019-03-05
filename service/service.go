@@ -21,6 +21,8 @@ type Config struct {
 	Iss             func() string
 	UserType        func() []interface{}
 	UserTypeDefault func() string
+	UserRegistrationPhoneNumber func() bool
+	UserRegistrationEmailAddress func() bool
 }
 
 type service struct {
@@ -63,9 +65,17 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 		return resp
 	}
 
+	if modelAuth, err = s.db.Auth().FindByPhoneNumber(req.PhoneNumber); err != nil {
+		resp.Err = rest.ErrorInternal(err.Error())
+		return resp
+	}
+
 	if modelAuth != nil && modelAuth.Id != 0 {
 		errField.AddError("email", 400, "Email already exists.")
 	}
+
+
+
 	if errField.HasErrors() {
 		resp.Err = errField
 		return resp

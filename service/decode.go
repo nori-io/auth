@@ -13,6 +13,11 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 		var body SignUpRequest
 		var isTypeValid bool
 
+		if body.PhoneNumber==""{
+			err := errors.New("Type '" + body.Type + "' is not valid ")
+			return body, err
+		}
+
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			return body, err
 		}
@@ -45,6 +50,10 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 			return body, err
 		}
 
+		if ((parameters.UserRegistrationPhoneNumberType)||(parameters.UserRegistrationEmailAddressType))!=true{
+			err := errors.New(" All user's registration's types sets with 'false' value. Need to set 'true' value")
+			return body, err
+		}
 		return body, nil
 	}
 

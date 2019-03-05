@@ -11,6 +11,8 @@ import (
 type PluginParameters struct {
 	UserTypeParameter        []interface{}
 	UserTypeDefaultParameter string
+	UserRegistrationPhoneNumberType bool
+	UserRegistrationEmailAddressType bool
 }
 
 func Transport(
@@ -20,7 +22,7 @@ func Transport(
 	router interfaces.Http,
 	srv Service,
 	logger *logrus.Logger,
-	config PluginParameters,
+	parameters PluginParameters,
 
 ) {
 
@@ -30,7 +32,8 @@ func Transport(
 
 	signupHandler := http.NewServer(
 		MakeSignUpEndpoint(srv),
-		DecodeSignUpRequest(PluginParameters{UserTypeParameter: config.UserTypeParameter, UserTypeDefaultParameter: config.UserTypeDefaultParameter}),
+		DecodeSignUpRequest(PluginParameters{UserTypeParameter: parameters.UserTypeParameter, UserTypeDefaultParameter: parameters.UserTypeDefaultParameter,
+			UserRegistrationPhoneNumberType:parameters.UserRegistrationPhoneNumberType, UserRegistrationEmailAddressType:parameters.UserRegistrationEmailAddressType}),
 		http.EncodeJSONResponse,
 		logger,
 	)

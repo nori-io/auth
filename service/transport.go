@@ -9,9 +9,8 @@ import (
 )
 
 type PluginParameters struct {
-	UserTypeParameter []interface{}
+	UserTypeParameter        []interface{}
 	UserTypeDefaultParameter string
-
 }
 
 func Transport(
@@ -31,7 +30,7 @@ func Transport(
 
 	signupHandler := http.NewServer(
 		MakeSignUpEndpoint(srv),
-		DecodeSignUpRequest(PluginParameters{UserTypeParameter:config.UserTypeParameter,UserTypeDefaultParameter:config.UserTypeDefaultParameter}),
+		DecodeSignUpRequest(PluginParameters{UserTypeParameter: config.UserTypeParameter, UserTypeDefaultParameter: config.UserTypeDefaultParameter}),
 		http.EncodeJSONResponse,
 		logger,
 	)

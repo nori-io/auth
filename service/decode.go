@@ -8,8 +8,6 @@ import (
 	"net/http"
 )
 
-
-
 func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r *http.Request) (interface{}, error) {
 	return func(_ context.Context, r *http.Request) (interface{}, error) {
 		var body SignUpRequest

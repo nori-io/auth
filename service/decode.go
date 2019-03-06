@@ -12,6 +12,8 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 	return func(_ context.Context, r *http.Request) (interface{}, error) {
 		var body SignUpRequest
 		var isTypeValid bool
+		var errorText string
+		var errCommon error
 
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			return body, err
@@ -44,27 +46,30 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 			isTypeValid = true
 		}
 		if isTypeValid == false {
-			err := errors.New("Type '" + body.Type + "' is not valid ")
-			return body, err
-		}
+			errorText=errorText+"Type '" + body.Type + "' is not valid \n"
+			errCommon= errors.New(errorText)
+			}
 
 
 		if ((parameters.UserRegistrationPhoneNumberType) || (parameters.UserRegistrationEmailAddressType)) != true {
-			err := errors.New(" All user's registration's types sets with 'false' value. Need to set 'true' value")
-			return body, err
+			errorText=errorText+" All user's registration's types sets with 'false' value. Need to set 'true' value \n "
+			errCommon= errors.New(errorText)
 		}
 
 		if (body.Email=="")&&(body.Phone==""){
-			err := errors.New("fields email or phone are unavailable on frontend")
-			return body, err
+			errorText=errorText+"Fields 'email' and 'phone' are unavailable on frontend \n"
+			errCommon=errors.New(errorText)
 		}
 
 		if (body.Password==""){
-			err := errors.New("field password is unavailable on frontend")
-			return body, err
+			errorText=errorText+"Field 'password' is unavailable on frontend \n"
+			errCommon=errors.New(errorText)
+
 		}
 
-
+		if errorText!=""{
+			return body, errCommon
+		}
 
 		return body, nil
 	}

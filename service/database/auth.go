@@ -42,7 +42,7 @@ func (a *auth) FindByEmail(email string) (model *AuthModel, err error) {
 	return model, nil
 }
 
-func (a *auth) FindByPhoneNumber(phoneNumber string) (model *AuthModel, err error) {
+func (a *auth) FindByPhone(phoneNumber string) (model *AuthModel, err error) {
 	rows, err := a.db.Query("SELECT user_id, phone, email, password, salt, created, updated, is_email_verified, is_phone_verified FROM auth WHERE phone = ? LIMIT 1", phoneNumber)
 	if err != nil {
 		return nil, err

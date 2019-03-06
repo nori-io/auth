@@ -5,9 +5,10 @@ import (
 
 	"github.com/cheebo/gorest"
 	"github.com/cheebo/rand"
-	"github.com/nori-io/auth/service/database"
 	"github.com/nori-io/nori-common/interfaces"
 	"github.com/sirupsen/logrus"
+
+	"github.com/nori-io/auth/service/database"
 )
 
 type Service interface {
@@ -59,19 +60,29 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 			ErrCode: 400,
 		},
 	}
+	if (req.Email=="")&&(req.Phone==""){
+		resp.Err = rest.ErrorInternal(err.Error())
+		logrus.Println("RESP is ")
+		return resp
+	}
 
+    if req.Email!=""{
 	if modelAuth, err = s.db.Auth().FindByEmail(req.Email); err != nil {
 		resp.Err = rest.ErrorInternal(err.Error())
 		return resp
 	}
-
-	if modelAuth, err = s.db.Auth().FindByPhoneNumber(req.PhoneNumber); err != nil {
+		if modelAuth != nil && modelAuth.Id != 0 {
+			errField.AddError("email", 400, "Email already exists.")
+		}
+	}
+    if req.Phone!=""{
+	if modelAuth, err = s.db.Auth().FindByPhone(req.Phone); err != nil {
 		resp.Err = rest.ErrorInternal(err.Error())
 		return resp
 	}
-
-	if modelAuth != nil && modelAuth.Id != 0 {
-		errField.AddError("email", 400, "Email already exists.")
+		if modelAuth != nil && modelAuth.Id != 0 {
+			errField.AddError("phone", 400, "Phone number already exists.")
+		}
 	}
 
 	if errField.HasErrors() {
@@ -82,6 +93,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	modelAuth = &database.AuthModel{
 		Email:    req.Email,
 		Password: req.Password,
+		Phone:req.Phone,
 	}
 
 	modelUsers = &database.UsersModel{
@@ -101,6 +113,8 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	}
 
 	resp.Email = req.Email
+	resp.PhoneNumber=req.Phone
+
 
 	return resp
 }

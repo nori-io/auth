@@ -27,7 +27,7 @@ type Users interface {
 type Auth interface {
 	//	Update(*AuthModel) error
 	FindByEmail(email string) (model *AuthModel, err error)
-	FindByPhoneNumber(phoneNumber string) (model *AuthModel, err error)
+	FindByPhone(phoneNumber string) (model *AuthModel, err error)
 }
 
 type Provider interface {

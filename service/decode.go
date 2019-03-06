@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 )
 
@@ -21,6 +20,8 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 			return body, err
 		}
 
+
+
 		typesSlice := parameters.UserTypeParameter
 		s := make([]string, len(typesSlice))
 		for i, value := range typesSlice {
@@ -32,6 +33,7 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 				isTypeValid = true
 			}
 		}
+
 
 		if parameters.UserTypeDefaultParameter == body.Type {
 			isTypeValid = true
@@ -46,12 +48,24 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 			return body, err
 		}
 
+
 		if ((parameters.UserRegistrationPhoneNumberType) || (parameters.UserRegistrationEmailAddressType)) != true {
-			log.Print(parameters.UserRegistrationPhoneNumberType)
-			log.Println(parameters.UserRegistrationEmailAddressType)
 			err := errors.New(" All user's registration's types sets with 'false' value. Need to set 'true' value")
 			return body, err
 		}
+
+		if (body.Email=="")&&(body.Phone==""){
+			err := errors.New("fields email or phone are unavailable on frontend")
+			return body, err
+		}
+
+		if (body.Password==""){
+			err := errors.New("field password is unavailable on frontend")
+			return body, err
+		}
+
+
+
 		return body, nil
 	}
 

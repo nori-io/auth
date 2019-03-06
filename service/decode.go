@@ -22,8 +22,6 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 			return body, err
 		}
 
-
-
 		typesSlice := parameters.UserTypeParameter
 		s := make([]string, len(typesSlice))
 		for i, value := range typesSlice {
@@ -36,7 +34,6 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 			}
 		}
 
-
 		if parameters.UserTypeDefaultParameter == body.Type {
 			isTypeValid = true
 		}
@@ -46,28 +43,27 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 			isTypeValid = true
 		}
 		if isTypeValid == false {
-			errorText=errorText+"Type '" + body.Type + "' is not valid \n"
-			errCommon= errors.New(errorText)
-			}
-
+			errorText = errorText + "Type '" + body.Type + "' is not valid \n"
+			errCommon = errors.New(errorText)
+		}
 
 		if ((parameters.UserRegistrationPhoneNumberType) || (parameters.UserRegistrationEmailAddressType)) != true {
-			errorText=errorText+" All user's registration's types sets with 'false' value. Need to set 'true' value \n "
-			errCommon= errors.New(errorText)
+			errorText = errorText + " All user's registration's types sets with 'false' value. Need to set 'true' value \n "
+			errCommon = errors.New(errorText)
 		}
 
-		if (body.Email=="")&&(body.Phone==""){
-			errorText=errorText+"Fields 'email' and 'phone' are unavailable on frontend \n"
-			errCommon=errors.New(errorText)
+		if (body.Email == "") && (body.Phone == "") {
+			errorText = errorText + "Fields 'email' and 'phone' are unavailable on frontend \n"
+			errCommon = errors.New(errorText)
 		}
 
-		if (body.Password==""){
-			errorText=errorText+"Field 'password' is unavailable on frontend \n"
-			errCommon=errors.New(errorText)
+		if body.Password == "" {
+			errorText = errorText + "Field 'password' is unavailable on frontend \n"
+			errCommon = errors.New(errorText)
 
 		}
 
-		if errorText!=""{
+		if errorText != "" {
 			return body, errCommon
 		}
 

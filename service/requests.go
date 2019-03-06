@@ -7,10 +7,10 @@ import (
 
 // SignUp Request
 type SignUpRequest struct {
-	Email       string `json:"email"`
-	Phone string `json:"phone"`
-	Password    string `json:"password"`
-	Type        string `json:"user_type"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone"`
+	Password string `json:"password"`
+	Type     string `json:"user_type"`
 }
 
 func (r SignUpRequest) Validate() error {
@@ -20,7 +20,7 @@ func (r SignUpRequest) Validate() error {
 
 // LogIn Request
 type SignInRequest struct {
-	Name    string
+	Name     string
 	Password string
 }
 

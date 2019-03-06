@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"errors"
+
 	log "github.com/sirupsen/logrus"
 )
 
@@ -21,7 +22,6 @@ func (a *auth) Update(model *AuthModel) error {
 }
 
 func (a *auth) FindByEmail(email string) (model *AuthModel, err error) {
-	log.Println("email is", email)
 	rows, err := a.db.Query("SELECT id, email,password FROM auth WHERE email = ? LIMIT 1", email)
 	if err != nil {
 		return nil, err
@@ -31,16 +31,10 @@ func (a *auth) FindByEmail(email string) (model *AuthModel, err error) {
 	defer rows.Close()
 	for rows.Next() {
 		var m AuthModel
-		rows.Scan(&m.Id, &m.Email,&m.Password)
-
-		log.Println("rows are ", rows.Scan(&m.Id, &m.Email))
+		rows.Scan(&m.Id, &m.Email, &m.Password)
 		model.Id = m.Id
 		model.Email = m.Email
-		model.Password=m.Password
-		log.Println("m.Id", m.Id)
-		log.Println("Email", m.Email)
-		log.Println("m.Password", m.Password)
-
+		model.Password = m.Password
 
 	}
 
@@ -48,12 +42,12 @@ func (a *auth) FindByEmail(email string) (model *AuthModel, err error) {
 		return nil, rows.Err()
 	}
 
-
 	return model, nil
 }
 
-func (a *auth) FindByPhone(phoneNumber string) (model *AuthModel, err error) {
-	rows, err := a.db.Query("SELECT user_id, phone, email, password, salt, created, updated, is_email_verified, is_phone_verified FROM auth WHERE phone = ? LIMIT 1", phoneNumber)
+func (a *auth) FindByPhone(phone string) (model *AuthModel, err error) {
+	log.Println("phone is",phone)
+	rows, err := a.db.Query("SELECT id, phone, password FROM auth WHERE phone = ? LIMIT 1", phone)
 	if err != nil {
 		return nil, err
 	}
@@ -62,9 +56,11 @@ func (a *auth) FindByPhone(phoneNumber string) (model *AuthModel, err error) {
 	defer rows.Close()
 	for rows.Next() {
 		var m AuthModel
-		rows.Scan(&m.Id, &m.Phone)
+		rows.Scan(&m.Id, &m.Phone, &m.Password)
 		model.Id = m.Id
 		model.Phone = m.Phone
+		model.Password=m.Password
+		log.Println("m.Password is",m.Password)
 	}
 
 	if rows.Err() != nil {

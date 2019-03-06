@@ -60,26 +60,26 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 			ErrCode: 400,
 		},
 	}
-	if (req.Email=="")&&(req.Phone==""){
+	if (req.Email == "") && (req.Phone == "") {
 		resp.Err = rest.ErrorInternal(err.Error())
 		logrus.Println("RESP is ")
 		return resp
 	}
 
-    if req.Email!=""{
-	if modelAuth, err = s.db.Auth().FindByEmail(req.Email); err != nil {
-		resp.Err = rest.ErrorInternal(err.Error())
-		return resp
-	}
+	if req.Email != "" {
+		if modelAuth, err = s.db.Auth().FindByEmail(req.Email); err != nil {
+			resp.Err = rest.ErrorInternal(err.Error())
+			return resp
+		}
 		if modelAuth != nil && modelAuth.Id != 0 {
 			errField.AddError("email", 400, "Email already exists.")
 		}
 	}
-    if req.Phone!=""{
-	if modelAuth, err = s.db.Auth().FindByPhone(req.Phone); err != nil {
-		resp.Err = rest.ErrorInternal(err.Error())
-		return resp
-	}
+	if req.Phone != "" {
+		if modelAuth, err = s.db.Auth().FindByPhone(req.Phone); err != nil {
+			resp.Err = rest.ErrorInternal(err.Error())
+			return resp
+		}
 		if modelAuth != nil && modelAuth.Id != 0 {
 			errField.AddError("phone", 400, "Phone number already exists.")
 		}
@@ -93,7 +93,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	modelAuth = &database.AuthModel{
 		Email:    req.Email,
 		Password: req.Password,
-		Phone:req.Phone,
+		Phone:    req.Phone,
 	}
 
 	modelUsers = &database.UsersModel{
@@ -113,8 +113,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	}
 
 	resp.Email = req.Email
-	resp.PhoneNumber=req.Phone
-
+	resp.PhoneNumber = req.Phone
 
 	return resp
 }
@@ -128,18 +127,30 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 		resp.Err = rest.ErrorInternal("Internal error")
 		return resp
 	}
-	if model == nil {
+
+	model2, err := s.db.Auth().FindByPhone(req.Name)
+	if err != nil {
+		resp.Err = rest.ErrorInternal("Internal error")
+		return resp
+	}
+
+	if (model == nil)&&(model2==nil) {
 		resp.Err = rest.ErrorNotFound("User not found")
 		return resp
 	}
 
-	if req.Password != model.Password {
-		logrus.Println("model.Email",model.Email)
-		logrus.Println("req.Password", req.Password)
-		logrus.Println("model.Password", model.Password)
+	logrus.Println("model2.Password",model2.Password)
+	logrus.Println("req.Password",req.Password)
+	logrus.Println("req.Password == model2.Password)||(req.Password == model.Password)==false",
+		(req.Password == model2.Password)||(req.Password == model.Password)==false)
+	if ((req.Password == model2.Password)||(req.Password == model.Password))==false {
+
 		resp.Err = rest.ErrorNotFound("Uncorrect Password")
 		return resp
 	}
+
+
+
 
 	sid := rand.RandomAlphaNum(32)
 
@@ -152,7 +163,7 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 		case "raw":
 			return map[string]string{
 				"id":    string(model.Id),
-				"email": model.Email,
+				"name": req.Name,
 			}
 		case "jti":
 			return sid

@@ -120,9 +120,10 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 }
 
 func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInResponse) {
+	logrus.Print("SignInRequest is", req)
 	resp = &SignInResponse{}
 
-	model, err := s.db.Auth().FindByEmail(req.Email)
+	model, err := s.db.Auth().FindByEmail(req.Name)
 	if err != nil {
 		resp.Err = rest.ErrorInternal("Internal error")
 		return resp
@@ -133,7 +134,10 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 	}
 
 	if req.Password != model.Password {
-		resp.Err = rest.ErrorNotFound("User not found")
+		logrus.Println("model.Email",model.Email)
+		logrus.Println("req.Password", req.Password)
+		logrus.Println("model.Password", model.Password)
+		resp.Err = rest.ErrorNotFound("Uncorrect Password")
 		return resp
 	}
 

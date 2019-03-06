@@ -20,7 +20,7 @@ func (r SignUpRequest) Validate() error {
 
 // LogIn Request
 type SignInRequest struct {
-	Email    string
+	Name    string
 	Password string
 }
 

@@ -46,7 +46,7 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 			return body, err
 		}
 
-		if ((parameters.UserRegistrationPhoneNumberType)||(parameters.UserRegistrationEmailAddressType))!=true{
+		if ((parameters.UserRegistrationPhoneNumberType) || (parameters.UserRegistrationEmailAddressType)) != true {
 			log.Print(parameters.UserRegistrationPhoneNumberType)
 			log.Println(parameters.UserRegistrationEmailAddressType)
 			err := errors.New(" All user's registration's types sets with 'false' value. Need to set 'true' value")

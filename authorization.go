@@ -28,12 +28,12 @@ func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {
 	configManager.Register(p.Meta())
 	cm := configManager.Register(p.Meta())
 	p.config = &service.Config{
-		Sub:             cm.String("jwt.sub", "jwt.sub value"),
-		Iss:             cm.String("jwt.iss", "jwt.iss value"),
-		UserType:        cm.Slice("user.type", ",", "no"),
-		UserTypeDefault: cm.String("user.type_default", "user.type_default value"),
-		UserRegistrationPhoneNumber: cm.Bool("user.registration_phone_number", "user.registration_phone_number value"),
-		UserRegistrationEmailAddress:cm.Bool("user.registration_email_address","user.registration_email_address value"),
+		Sub:                          cm.String("jwt.sub", "jwt.sub value"),
+		Iss:                          cm.String("jwt.iss", "jwt.iss value"),
+		UserType:                     cm.Slice("user.type", ",", "no"),
+		UserTypeDefault:              cm.String("user.type_default", "user.type_default value"),
+		UserRegistrationPhoneNumber:  cm.Bool("user.registration_phone_number", "user.registration_phone_number value"),
+		UserRegistrationEmailAddress: cm.Bool("user.registration_email_address", "user.registration_email_address value"),
 	}
 	return nil
 }
@@ -77,10 +77,9 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			database.DB(db.GetDB(), registry.Logger(p.Meta())),
 		)
 		pluginParameters := service.PluginParameters{UserTypeParameter: p.config.UserType(), UserTypeDefaultParameter: p.config.UserTypeDefault(),
-			UserRegistrationPhoneNumberType:p.config.UserRegistrationPhoneNumber(), UserRegistrationEmailAddressType:p.config.UserRegistrationPhoneNumber()}
+			UserRegistrationPhoneNumberType: p.config.UserRegistrationPhoneNumber(), UserRegistrationEmailAddressType: p.config.UserRegistrationPhoneNumber()}
 		//log.Print("p.config.UserRegistrationPhoneNumber",p.config.UserRegistrationPhoneNumber())
-	//	log.Print("p.config.UserRegistrationEmailAddress",p.config.UserRegistrationEmailAddress())
-
+		//	log.Print("p.config.UserRegistrationEmailAddress",p.config.UserRegistrationEmailAddress())
 
 		service.Transport(auth, transport, session,
 			http, p.instance, registry.Logger(p.Meta()), pluginParameters)

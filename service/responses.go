@@ -1,6 +1,8 @@
 package service
 
-import "github.com/nori-io/auth/service/database"
+import (
+	"github.com/nori-io/auth/service/database"
+)
 
 //import "github.com/nori-io/noricms/service/database"
 

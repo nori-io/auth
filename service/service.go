@@ -17,11 +17,11 @@ type Service interface {
 }
 
 type Config struct {
-	Sub             func() string
-	Iss             func() string
-	UserType        func() []interface{}
-	UserTypeDefault func() string
-	UserRegistrationPhoneNumber func() bool
+	Sub                          func() string
+	Iss                          func() string
+	UserType                     func() []interface{}
+	UserTypeDefault              func() string
+	UserRegistrationPhoneNumber  func() bool
 	UserRegistrationEmailAddress func() bool
 }
 
@@ -73,8 +73,6 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	if modelAuth != nil && modelAuth.Id != 0 {
 		errField.AddError("email", 400, "Email already exists.")
 	}
-
-
 
 	if errField.HasErrors() {
 		resp.Err = errField

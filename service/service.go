@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/cheebo/gorest"
+	rest "github.com/cheebo/gorest"
 	"github.com/cheebo/rand"
 	"github.com/nori-io/nori-common/interfaces"
 	"github.com/sirupsen/logrus"
@@ -122,26 +122,53 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 	logrus.Print("SignInRequest is", req)
 	resp = &SignInResponse{}
 
-	model, err := s.db.Auth().FindByEmail(req.Name)
+	modelFindEmail, err := s.db.Auth().FindByEmail(req.Name)
 	if err != nil {
 		resp.Err = rest.ErrorInternal("Internal error")
 		return resp
 	}
 
-	model2, err := s.db.Auth().FindByPhone(req.Name)
+	modelFindPhone, err := s.db.Auth().FindByPhone(req.Name)
 	if err != nil {
 		resp.Err = rest.ErrorInternal("Internal error")
 		return resp
 	}
 
-	if (model == nil) && (model2 == nil) {
+	if (modelFindEmail == nil) && (modelFindPhone == nil) {
 		resp.Err = rest.ErrorNotFound("User not found")
 		return resp
 	}
 
-	if ((req.Password == model2.Password) || (req.Password == model.Password)) == false {
+	if ((req.Password == modelFindEmail.Password) || (req.Password == modelFindPhone.Password)) == false {
 
 		resp.Err = rest.ErrorNotFound("Uncorrect Password")
+		return resp
+	}
+
+	var UserIdTemp uint64
+	if modelFindEmail.Id != 0 {
+
+		UserIdTemp = modelFindEmail.Id
+	}
+
+	if modelFindPhone.Id != 0 {
+		UserIdTemp = modelFindPhone.Id
+
+	}
+
+	modelAuthenticationHistory := &database.AuthenticationHistoryModel{
+		UserId: UserIdTemp,
+	}
+
+	err = s.db.AuthenticationHistory().Create(modelAuthenticationHistory)
+	if err != nil {
+		s.log.Error(err)
+		resp.Err = rest.ErrFieldResp{
+			Meta: rest.ErrFieldRespMeta{
+				ErrCode:    500,
+				ErrMessage: err.Error(),
+			},
+		}
 		return resp
 	}
 
@@ -155,7 +182,7 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 		switch key {
 		case "raw":
 			return map[string]string{
-				"id":   string(model.Id),
+				"id":   string(UserIdTemp),
 				"name": req.Name,
 			}
 		case "jti":
@@ -174,43 +201,25 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 		return resp
 	}
 
-	var UserIdTemp uint64
-	if model != nil {
-
-		UserIdTemp = model.Id
-
-	}
-	if model2 != nil {
-		UserIdTemp = model2.Id
-
-	}
-	modelAuthenticationHistory := &database.AuthenticationHistoryModel{
-		UserId: UserIdTemp,
-	}
-
-	err = s.db.AuthenticationHistory().Create(modelAuthenticationHistory)
-	if err != nil {
-		s.log.Error(err)
-		resp.Err = rest.ErrFieldResp{
-			Meta: rest.ErrFieldRespMeta{
-				ErrCode:    500,
-				ErrMessage: err.Error(),
-			},
-		}
-		return resp
-	}
-
 	s.session.Save([]byte(sid), interfaces.SessionActive, 0)
 
-	resp.Id = uint64(model.Id)
+	resp.Id = uint64(UserIdTemp)
 	resp.Token = token
-	resp.User = *model
+
+	if modelFindEmail.Id != 0 {
+		resp.User = *modelFindEmail
+	}
+
+	if modelFindPhone.Id != 0 {
+		resp.User = *modelFindPhone
+	}
 
 	return resp
 }
 
 func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOutResponse) {
 	resp = &SignOutResponse{}
+
 	s.session.Delete(s.session.SessionId(ctx))
 	return resp
 }

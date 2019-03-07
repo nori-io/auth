@@ -10,7 +10,7 @@ const (
   type VARCHAR(64) NOT NULL,
   created DATETIME NOT NULL,
   updated DATETIME NOT NULL,
-  mfa_type VARCHAR(8) NOT NULL,
+  mfa_type ENUM ('opt', 'phone') NOT NULL,
   PRIMARY KEY (id))
 ENGINE = InnoDB;
 `
@@ -54,7 +54,7 @@ ENGINE = InnoDB;
 `
 
 	CreateTableAuthentificationHistory = ` 
-CREATE TABLE IF NOT EXISTS authentication_history (
+CREATE TABLE IF NOT EXISTS authentification_history (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id INT UNSIGNED NOT NULL,
   logged_in DATETIME NOT NULL,

@@ -25,8 +25,8 @@ func (u *users) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		return err
 	}
 
-	_, execErr := tx.Exec("INSERT INTO users (status_account, type, created, updated, mfa_type) VALUES(?,?,?,?,?)",
-		"active", modelUsers.Type, time.Now(), time.Now(), modelUsers.Mfa_type)
+	_, execErr := tx.Exec("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)",
+		"active", modelUsers.Type, time.Now(), time.Now())
 	if execErr != nil {
 		_ = tx.Rollback()
 		return execErr

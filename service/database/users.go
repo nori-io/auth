@@ -49,7 +49,6 @@ func (u *users) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 	}
 
 	if (modelAuth.Phone == "") && (modelAuth.Email != "") {
-		log.Println("Email add")
 		_, execErr = tx.Exec("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)",
 			lastIdNumber, modelAuth.Email, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
 		if execErr != nil {
@@ -59,7 +58,6 @@ func (u *users) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 	}
 
 	if (modelAuth.Phone != "") && (modelAuth.Email == "") {
-		log.Println("Phone add")
 		_, execErr = tx.Exec("INSERT INTO auth (user_id, phone, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)",
 			lastIdNumber, modelAuth.Phone, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
 		if execErr != nil {

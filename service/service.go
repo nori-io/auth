@@ -174,31 +174,20 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 		return resp
 	}
 
-	logrus.Println("model.UserId", model.Id)
-	logrus.Println("model2.UserId", model2.Id)
-
-
 	var UserIdTemp uint64
-	logrus.Println("model2!=nil", model2!=nil)
-	if model!=nil{
+	if model != nil {
 
-		UserIdTemp=model.Id
-		logrus.Println("UserIdTemp", UserIdTemp)
+		UserIdTemp = model.Id
 
 	}
-	logrus.Println("model!=nil", model!=nil)
-
-	if model2!=nil{
-		UserIdTemp=model2.Id
-		logrus.Println("UserIdTemp", UserIdTemp)
+	if model2 != nil {
+		UserIdTemp = model2.Id
 
 	}
-	logrus.Println("UserIdTemp is", UserIdTemp)
-	modelAuthenticationHistory:= &database.AuthenticationHistoryModel{
+	modelAuthenticationHistory := &database.AuthenticationHistoryModel{
 		UserId: UserIdTemp,
 	}
 
-  logrus.Println("modelAuthenticationHistory is",modelAuthenticationHistory.UserId)
 	err = s.db.AuthenticationHistory().Create(modelAuthenticationHistory)
 	if err != nil {
 		s.log.Error(err)
@@ -211,21 +200,11 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 		return resp
 	}
 
-
-
-
 	s.session.Save([]byte(sid), interfaces.SessionActive, 0)
 
 	resp.Id = uint64(model.Id)
 	resp.Token = token
 	resp.User = *model
-
-
-
-
-
-
-
 
 	return resp
 }

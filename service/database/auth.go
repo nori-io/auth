@@ -46,7 +46,6 @@ func (a *auth) FindByEmail(email string) (model *AuthModel, err error) {
 }
 
 func (a *auth) FindByPhone(phone string) (model *AuthModel, err error) {
-	log.Println("phone is",phone)
 	rows, err := a.db.Query("SELECT id, phone, password FROM auth WHERE phone = ? LIMIT 1", phone)
 	if err != nil {
 		return nil, err
@@ -59,8 +58,7 @@ func (a *auth) FindByPhone(phone string) (model *AuthModel, err error) {
 		rows.Scan(&m.Id, &m.Phone, &m.Password)
 		model.Id = m.Id
 		model.Phone = m.Phone
-		model.Password=m.Password
-		log.Println("m.Password is",m.Password)
+		model.Password = m.Password
 	}
 
 	if rows.Err() != nil {

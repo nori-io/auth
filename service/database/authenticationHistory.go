@@ -13,9 +13,7 @@ type authenticationHistory struct {
 	log *log.Logger
 }
 
-
 func (a *authenticationHistory) Create(model *AuthenticationHistoryModel) error {
-	log.Println("Adding model.IserId", model.UserId)
 	_, err := a.db.Exec("INSERT INTO authentication_history (user_id, logged_in, meta) VALUES(?,?,?)",
 		model.UserId, time.Now(), model.Meta)
 	return err

@@ -100,7 +100,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 		Type: req.Type,
 	}
 
-	err = s.db.Users().CreateAuth(modelAuth, modelUsers)
+	err = s.db.Users().Create(modelAuth, modelUsers)
 	if err != nil {
 		s.log.Error(err)
 		resp.Err = rest.ErrFieldResp{
@@ -134,23 +134,16 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 		return resp
 	}
 
-	if (model == nil)&&(model2==nil) {
+	if (model == nil) && (model2 == nil) {
 		resp.Err = rest.ErrorNotFound("User not found")
 		return resp
 	}
 
-	logrus.Println("model2.Password",model2.Password)
-	logrus.Println("req.Password",req.Password)
-	logrus.Println("req.Password == model2.Password)||(req.Password == model.Password)==false",
-		(req.Password == model2.Password)||(req.Password == model.Password)==false)
-	if ((req.Password == model2.Password)||(req.Password == model.Password))==false {
+	if ((req.Password == model2.Password) || (req.Password == model.Password)) == false {
 
 		resp.Err = rest.ErrorNotFound("Uncorrect Password")
 		return resp
 	}
-
-
-
 
 	sid := rand.RandomAlphaNum(32)
 
@@ -162,7 +155,7 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 		switch key {
 		case "raw":
 			return map[string]string{
-				"id":    string(model.Id),
+				"id":   string(model.Id),
 				"name": req.Name,
 			}
 		case "jti":
@@ -181,11 +174,58 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 		return resp
 	}
 
+	logrus.Println("model.UserId", model.Id)
+	logrus.Println("model2.UserId", model2.Id)
+
+
+	var UserIdTemp uint64
+	logrus.Println("model2!=nil", model2!=nil)
+	if model!=nil{
+
+		UserIdTemp=model.Id
+		logrus.Println("UserIdTemp", UserIdTemp)
+
+	}
+	logrus.Println("model!=nil", model!=nil)
+
+	if model2!=nil{
+		UserIdTemp=model2.Id
+		logrus.Println("UserIdTemp", UserIdTemp)
+
+	}
+	logrus.Println("UserIdTemp is", UserIdTemp)
+	modelAuthenticationHistory:= &database.AuthenticationHistoryModel{
+		UserId: UserIdTemp,
+	}
+
+  logrus.Println("modelAuthenticationHistory is",modelAuthenticationHistory.UserId)
+	err = s.db.AuthenticationHistory().Create(modelAuthenticationHistory)
+	if err != nil {
+		s.log.Error(err)
+		resp.Err = rest.ErrFieldResp{
+			Meta: rest.ErrFieldRespMeta{
+				ErrCode:    500,
+				ErrMessage: err.Error(),
+			},
+		}
+		return resp
+	}
+
+
+
+
 	s.session.Save([]byte(sid), interfaces.SessionActive, 0)
 
 	resp.Id = uint64(model.Id)
 	resp.Token = token
 	resp.User = *model
+
+
+
+
+
+
+
 
 	return resp
 }

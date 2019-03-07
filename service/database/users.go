@@ -14,7 +14,7 @@ type users struct {
 	log *log.Logger
 }
 
-func (u *users) CreateAuth(modelAuth *AuthModel, modelUsers *UsersModel) error {
+func (u *users) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 	var (
 		lastIdNumber uint64
 	)

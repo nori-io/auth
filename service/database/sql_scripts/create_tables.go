@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS auth_providers (
 ENGINE = InnoDB;
 `
 
-	CreateTableAuthenticationHistory = ` 
+	CreateTableAuthentificationHistory = ` 
 CREATE TABLE IF NOT EXISTS authentication_history (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id INT UNSIGNED NOT NULL,
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS authentication_history (
 ENGINE = InnoDB;
 `
 
-	CreateTableUserMfaSecret = `
+	CreateTableUsersMfaSecret = `
 CREATE TABLE IF NOT EXISTS user_mfa_secret (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id INT UNSIGNED NOT NULL,
@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS user_mfa_secret (
 ENGINE = InnoDB;
 `
 
-	CreateTableUserMfaPhone = `
+	CreateTableUsersMfaPhone = `
 CREATE TABLE IF NOT EXISTS user_mfa_phone (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id INT UNSIGNED NOT NULL,

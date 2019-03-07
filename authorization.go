@@ -133,14 +133,14 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 		}
 
 		_, execErr = tx.Exec(
-			sql_scripts.CreateTableAuthenticationHistory)
+			sql_scripts.CreateTableAuthentificationHistory)
 		if execErr != nil {
 			_ = tx.Rollback()
 			log.Fatal(execErr)
 		}
 
 		_, execErr = tx.Exec(
-			sql_scripts.CreateTableUserMfaPhone)
+			sql_scripts.CreateTableUsersMfaPhone)
 		if execErr != nil {
 			_ = tx.Rollback()
 			log.Fatal(execErr)
@@ -153,7 +153,7 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			log.Fatal(execErr)
 		}
 		_, execErr = tx.Exec(
-			sql_scripts.CreateTableUserMfaSecret)
+			sql_scripts.CreateTableUsersMfaSecret)
 		if execErr != nil {
 			_ = tx.Rollback()
 			log.Fatal(execErr)

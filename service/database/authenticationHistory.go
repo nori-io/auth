@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"errors"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -12,9 +13,11 @@ type authenticationHistory struct {
 	log *log.Logger
 }
 
+
 func (a *authenticationHistory) Create(model *AuthenticationHistoryModel) error {
-	_, err := a.db.Exec("INSERT INTO authentication_history (user_id, logged_in, meta, logged_out) VALUES(?,?,?,?)",
-		model.UserId, model.LoggedIn, model.Meta, model.LoggedOut)
+	log.Println("Adding model.IserId", model.UserId)
+	_, err := a.db.Exec("INSERT INTO authentication_history (user_id, logged_in, meta) VALUES(?,?,?)",
+		model.UserId, time.Now(), model.Meta)
 	return err
 }
 

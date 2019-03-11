@@ -24,6 +24,7 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 				},
 			}
 		}
+
 		if err := body.Validate(); err != nil {
 			return body, rest.ErrFieldResp{
 				Meta:rest.ErrFieldRespMeta{
@@ -57,22 +58,24 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 			errCommon = errors.New(errorText)
 		}
 
-		
+
 		if ((parameters.UserRegistrationPhoneNumberType) || (parameters.UserRegistrationEmailAddressType)) != true {
 			errorText = errorText + " All user's registration's types sets with 'false' value. Need to set 'true' value \n "
 			errCommon = errors.New(errorText)
 		}
 
-		if (body.Email == "") && (body.Phone == "") {
-			errorText = errorText + "Fields 'email' and 'phone' are unavailable on frontend \n"
-			errCommon = errors.New(errorText)
-		}
-
-		if body.Password == "" {
-			errorText = errorText + "Field 'password' is unavailable on frontend \n"
-			errCommon = errors.New(errorText)
+		if (parameters.UserRegistrationEmailAddressType==true)&&(parameters.UserRegistrationPhoneNumberType==false){
+			body.ValidateOnlyByMail()
 
 		}
+		if (parameters.UserRegistrationEmailAddressType==true)&&(parameters.UserRegistrationPhoneNumberType==false){
+			body.ValidateOnlyByPhone()
+		}
+
+		if (parameters.UserRegistrationEmailAddressType==true)&&(parameters.UserRegistrationPhoneNumberType==true){
+			body.Validate()
+		}
+
 
 		if errorText != "" {
 			return body, rest.ErrFieldResp{

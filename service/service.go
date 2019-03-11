@@ -62,7 +62,6 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	}
 	if (req.Email == "") && (req.Phone == "") {
 		resp.Err = rest.ErrorInternal(err.Error())
-		logrus.Println("RESP is ")
 		return resp
 	}
 
@@ -119,7 +118,6 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 }
 
 func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInResponse) {
-	logrus.Print("SignInRequest is", req)
 	resp = &SignInResponse{}
 
 	modelFindEmail, err := s.db.Auth().FindByEmail(req.Name)
@@ -219,7 +217,6 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 
 func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOutResponse) {
 	resp = &SignOutResponse{}
-
 	s.session.Delete(s.session.SessionId(ctx))
 	return resp
 }

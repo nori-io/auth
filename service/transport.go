@@ -39,7 +39,7 @@ func Transport(
 	)
 	signinHandler := http.NewServer(
 		MakeSignInEndpoint(srv),
-		DecodeLogInRequest,
+		DecodeSignInRequest,
 		http.EncodeJSONResponse,
 		logger,
 	)
@@ -50,7 +50,7 @@ func Transport(
 
 	signoutHandler := http.NewServer(
 		authenticated(MakeSignOutEndpoint(srv)),
-		DecodeLogOutRequest,
+		DecodeSignOutRequest,
 		http.EncodeJSONResponse,
 		logger,
 		opts...,
@@ -59,5 +59,11 @@ func Transport(
 	router.Handle("/auth/signup", signupHandler).Methods("POST")
 	router.Handle("/auth/signin", signinHandler).Methods("POST")
 	router.Handle("/auth/signout", signoutHandler).Methods("GET")
+
+	//	/auth/verify/(uuid)
+	//	/auth/delete
+	//	/auth/profile
+	// /auth/forgotpassword
+	// /auth/resetpassword/(uuid)
 
 }

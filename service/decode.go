@@ -72,7 +72,7 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 
 }
 
-func DecodeLogInRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func DecodeSignInRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var body SignInRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
@@ -84,7 +84,8 @@ func DecodeLogInRequest(_ context.Context, r *http.Request) (interface{}, error)
 	return body, nil
 }
 
-func DecodeLogOutRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func DecodeSignOutRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var body SignOutRequest
+
 	return body, nil
 }

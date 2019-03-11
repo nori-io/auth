@@ -57,9 +57,9 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS authentification_history (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id INT UNSIGNED NOT NULL,
-  logged_in DATETIME NOT NULL,
+  signin DATETIME NOT NULL,
   meta VARCHAR(255) NOT NULL,
-  logged_out DATETIME NULL,
+  signout DATETIME NULL,
   INDEX user_id_idx (user_id ASC),
   PRIMARY KEY (id),
   CONSTRAINT authentication_history_user_id

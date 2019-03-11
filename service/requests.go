@@ -18,7 +18,7 @@ func (r SignUpRequest) Validate() error {
 	return rest.ValidateResponse(err)
 }
 
-// LogIn Request
+// SignIn Request
 type SignInRequest struct {
 	Name     string
 	Password string
@@ -29,5 +29,5 @@ func (r SignInRequest) Validate() error {
 	return rest.ValidateResponse(err)
 }
 
-// LogOut Request
+// SignOut Request
 type SignOutRequest struct{}

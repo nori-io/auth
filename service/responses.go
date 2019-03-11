@@ -24,7 +24,7 @@ func (d *SignUpResponse) StatusCode() int {
 	return d.HttpStatusCode
 }
 
-// LogInResponse
+// SignInResponse
 type SignInResponse struct {
 	Id             uint64
 	Token          string
@@ -42,7 +42,7 @@ func (d *SignInResponse) StatusCode() int {
 	return d.HttpStatusCode
 }
 
-// LogOut Response
+// SignOut Response
 type SignOutResponse struct {
 	HttpStatusCode int
 	Err            error

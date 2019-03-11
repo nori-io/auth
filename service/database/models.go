@@ -33,11 +33,11 @@ type AuthProvidersModel struct {
 }
 
 type AuthenticationHistoryModel struct {
-	Id        uint64
-	UserId    uint64
-	LoggedIn  time.Time
-	Meta      string
-	LoggedOut time.Time
+	Id      uint64
+	UserId  uint64
+	SignIn  time.Time
+	Meta    string
+	SignOut time.Time
 }
 
 type UserMfaSecretModel struct {

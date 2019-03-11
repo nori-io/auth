@@ -55,11 +55,14 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	var modelAuth *database.AuthModel
 	var modelUsers *database.UsersModel
 	resp = &SignUpResponse{}
+
 	errField := rest.ErrFieldResp{
 		Meta: rest.ErrFieldRespMeta{
 			ErrCode: 400,
 		},
 	}
+
+
 	if (req.Email == "") && (req.Phone == "") {
 		resp.Err = rest.ErrFieldResp{
 			Meta:rest.ErrFieldRespMeta{

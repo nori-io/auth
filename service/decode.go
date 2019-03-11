@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+
+	"github.com/cheebo/gorest"
 )
 
 func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r *http.Request) (interface{}, error) {
@@ -16,10 +18,18 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 		var errCommon error
 
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-			return body, err
+			return body, 	rest.ErrFieldResp{
+				Meta:rest.ErrFieldRespMeta{
+					ErrMessage:"Error of decoding",
+				},
+			}
 		}
 		if err := body.Validate(); err != nil {
-			return body, err
+			return body, rest.ErrFieldResp{
+				Meta:rest.ErrFieldRespMeta{
+					ErrMessage:"Error of body.Validate()",
+				},
+			}
 		}
 
 		typesSlice := parameters.UserTypeParameter
@@ -47,6 +57,7 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 			errCommon = errors.New(errorText)
 		}
 
+		
 		if ((parameters.UserRegistrationPhoneNumberType) || (parameters.UserRegistrationEmailAddressType)) != true {
 			errorText = errorText + " All user's registration's types sets with 'false' value. Need to set 'true' value \n "
 			errCommon = errors.New(errorText)
@@ -64,7 +75,11 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 		}
 
 		if errorText != "" {
-			return body, errCommon
+			return body, rest.ErrFieldResp{
+				Meta:rest.ErrFieldRespMeta{
+					ErrMessage:errCommon.Error(),
+				},
+			}
 		}
 
 		return body, nil

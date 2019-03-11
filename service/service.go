@@ -61,13 +61,22 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 		},
 	}
 	if (req.Email == "") && (req.Phone == "") {
-		resp.Err = rest.ErrorInternal(err.Error())
+		resp.Err = rest.ErrFieldResp{
+			Meta:rest.ErrFieldRespMeta{
+			ErrMessage:"Email and Phone's information is absent",
+			},
+		}
+
 		return resp
 	}
 
 	if req.Email != "" {
 		if modelAuth, err = s.db.Auth().FindByEmail(req.Email); err != nil {
-			resp.Err = rest.ErrorInternal(err.Error())
+			resp.Err = rest.ErrFieldResp{
+				Meta:rest.ErrFieldRespMeta{
+					ErrMessage:err.Error(),
+				},
+			}
 			return resp
 		}
 		if modelAuth != nil && modelAuth.Id != 0 {
@@ -76,7 +85,11 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	}
 	if req.Phone != "" {
 		if modelAuth, err = s.db.Auth().FindByPhone(req.Phone); err != nil {
-			resp.Err = rest.ErrorInternal(err.Error())
+			resp.Err = rest.ErrFieldResp{
+				Meta:rest.ErrFieldRespMeta{
+					ErrMessage:err.Error(),
+				},
+			}
 			return resp
 		}
 		if modelAuth != nil && modelAuth.Id != 0 {

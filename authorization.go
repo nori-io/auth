@@ -203,7 +203,7 @@ func (p plugin) Meta() meta.Meta {
 		Interface: meta.Custom,
 		License: meta.License{
 			Title: "",
-			Type:  "GPLv3",
+			Type:  "LGPLv3",
 			URI:   "https://www.gnu.org/licenses/",
 		},
 		Tags: []string{"cms", "posts", "api"},

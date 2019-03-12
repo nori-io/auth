@@ -16,7 +16,8 @@ type UsersModel struct {
 type AuthModel struct {
 	Id              uint64
 	UserId          uint64
-	Phone           string
+	PhoneCountryCode           string
+	PhoneNumber         string
 	Email           string
 	Password        string
 	Salt            string

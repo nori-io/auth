@@ -1,8 +1,6 @@
 package service
 
 import (
-	"regexp"
-
 	"github.com/asaskevich/govalidator"
 	"github.com/cheebo/gorest"
 )
@@ -10,7 +8,8 @@ import (
 // SignUp Request
 type SignUpRequest struct {
 	Email    string `json,valid:"email"`
-	Phone    string `json,valid:"phone"`
+	PhoneCountryCode    string `json,valid:"phone"`
+	PhoneNumber string `json,valid:"phone_number"`
 	Password string `json,valid:"password"`
 	Type     string `json,valid:"user_type"`
 	Meta     string  `json,valid:"meta"`
@@ -45,10 +44,10 @@ func (r SignUpRequest) ValidateOnlyByMail() error {
 func (r SignUpRequest) ValidateOnlyByPhone() error {
 	_, err := govalidator.ValidateStruct(r)
 
-	re := regexp.MustCompile(`^(?:(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[\-\.\ \\\/]?)?((?:\(?\d{1,}\)?[\-\.\ \\\/]?){0,})(?:[\-\.\ \\\/]?(?:#|ext\.?|extension|x)[\-\.\ \\\/]?(\d+))?$`)
+	//re := regexp.MustCompile(`^(?:(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[\-\.\ \\\/]?)?((?:\(?\d{1,}\)?[\-\.\ \\\/]?){0,})(?:[\-\.\ \\\/]?(?:#|ext\.?|extension|x)[\-\.\ \\\/]?(\d+))?$`)
 
 
-	govalidator.IsEmail(r.Phone)
+	govalidator.IsEmail(r.PhoneCountryCode+r.PhoneNumber)
 	return rest.ValidateResponse(err)
 }
 

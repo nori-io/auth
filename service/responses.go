@@ -11,6 +11,7 @@ type SignUpResponse struct {
 	Id             uint64
 	Name           string
 	Email          string
+	PhoneCountryCode    string
 	PhoneNumber    string
 	HttpStatusCode int
 	Err            error

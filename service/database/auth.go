@@ -55,9 +55,10 @@ func (a *auth) FindByPhone(phone string) (model *AuthModel, err error) {
 	defer rows.Close()
 	for rows.Next() {
 		var m AuthModel
-		rows.Scan(&m.Id, &m.Phone, &m.Password)
+		rows.Scan(&m.Id, &m.PhoneCountryCode,m.PhoneNumber, &m.Password)
 		model.Id = m.Id
-		model.Phone = m.Phone
+		model.PhoneCountryCode = m.PhoneCountryCode
+		model.PhoneNumber=m.PhoneNumber
 		model.Password = m.Password
 	}
 

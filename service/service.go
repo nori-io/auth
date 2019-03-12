@@ -63,7 +63,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	}
 
 
-	if (req.Email == "") && (req.Phone == "") {
+	if (req.Email == "") && (req.PhoneCountryCode+req.PhoneNumber == "") {
 		resp.Err = rest.ErrFieldResp{
 			Meta:rest.ErrFieldRespMeta{
 			ErrMessage:"Email and Phone's information is absent",
@@ -86,8 +86,8 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 			errField.AddError("email", 400, "Email already exists.")
 		}
 	}
-	if req.Phone != "" {
-		if modelAuth, err = s.db.Auth().FindByPhone(req.Phone); err != nil {
+	if req.PhoneCountryCode+req.PhoneNumber != "" {
+		if modelAuth, err = s.db.Auth().FindByPhone(req.PhoneCountryCode+req.PhoneNumber ); err != nil {
 			resp.Err = rest.ErrFieldResp{
 				Meta:rest.ErrFieldRespMeta{
 					ErrMessage:err.Error(),
@@ -108,7 +108,8 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	modelAuth = &database.AuthModel{
 		Email:    req.Email,
 		Password: req.Password,
-		Phone:    req.Phone,
+		PhoneCountryCode:    req.PhoneCountryCode,
+
 	}
 
 	modelUsers = &database.UsersModel{
@@ -128,7 +129,8 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	}
 
 	resp.Email = req.Email
-	resp.PhoneNumber = req.Phone
+	resp.PhoneCountryCode = req.PhoneCountryCode
+	resp.PhoneNumber=req.PhoneNumber
 
 	return resp
 }

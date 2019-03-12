@@ -48,7 +48,7 @@ func (u *users) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		lastIdNumber = m.Id
 	}
 
-	if (modelAuth.Phone == "") && (modelAuth.Email != "") {
+	if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber == "") && (modelAuth.Email != "") {
 		_, execErr = tx.Exec("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)",
 			lastIdNumber, modelAuth.Email, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
 		if execErr != nil {
@@ -57,9 +57,9 @@ func (u *users) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		}
 	}
 
-	if (modelAuth.Phone != "") && (modelAuth.Email == "") {
-		_, execErr = tx.Exec("INSERT INTO auth (user_id, phone, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)",
-			lastIdNumber, modelAuth.Phone, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
+	if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber != "") && (modelAuth.Email == "") {
+		_, execErr = tx.Exec("INSERT INTO auth (user_id, phone_country_code, phone_number, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?,?)",
+			lastIdNumber, modelAuth.PhoneCountryCode,modelAuth.PhoneNumber, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
 		if execErr != nil {
 			_ = tx.Rollback()
 			return execErr

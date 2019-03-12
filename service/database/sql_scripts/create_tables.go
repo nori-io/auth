@@ -16,7 +16,7 @@ ENGINE = InnoDB;
 `
 	CreateTableAuth = `
 CREATE TABLE IF NOT EXISTS auth (
-   id INT UNSIGNED NOT NULL,
+   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
    user_id INT UNSIGNED NOT NULL,
    phone_country_code VARCHAR(8) NULL,
    phone_number VARCHAR(16) NULL,
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS auth (
   UNIQUE INDEX user_id_unique (user_id ASC),
   UNIQUE INDEX phone (phone_country_code ASC, phone_number ASC),
   CONSTRAINT auth_user_id_fk
-    FOREIGN KEY (user_id)
+     FOREIGN KEY (user_id)
     REFERENCES users (id)
     ON DELETE CASCADE
     ON UPDATE CASCADE)

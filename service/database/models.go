@@ -14,17 +14,17 @@ type UsersModel struct {
 }
 
 type AuthModel struct {
-	Id              uint64
-	UserId          uint64
-	PhoneCountryCode           string
-	PhoneNumber         string
-	Email           string
-	Password        string
-	Salt            string
-	Created         time.Time
-	Updated         time.Time
-	IsEmailVerified bool
-	IsPhoneVerified bool
+	Id               uint64
+	UserId           uint64
+	PhoneCountryCode string
+	PhoneNumber      string
+	Email            string
+	Password         string
+	Salt             string
+	Created          time.Time
+	Updated          time.Time
+	IsEmailVerified  bool
+	IsPhoneVerified  bool
 }
 
 type AuthProvidersModel struct {

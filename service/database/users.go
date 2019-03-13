@@ -19,7 +19,6 @@ func (u *users) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		lastIdNumber uint64
 	)
 	ctx := context.Background()
-
 	tx, err := u.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
 	if err != nil {
 		return err
@@ -61,7 +60,7 @@ func (u *users) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 
 	if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber != "") && (modelAuth.Email == "") {
 		_, execErr = tx.Exec("INSERT INTO auth (user_id, phone_country_code, phone_number, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?,?)",
-			lastIdNumber, modelAuth.PhoneCountryCode,modelAuth.PhoneNumber, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
+			lastIdNumber, modelAuth.PhoneCountryCode, modelAuth.PhoneNumber, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
 		if execErr != nil {
 			_ = tx.Rollback()
 			return execErr

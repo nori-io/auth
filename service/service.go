@@ -62,11 +62,10 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 		},
 	}
 
-
 	if (req.Email == "") && (req.PhoneCountryCode+req.PhoneNumber == "") {
 		resp.Err = rest.ErrFieldResp{
-			Meta:rest.ErrFieldRespMeta{
-			ErrMessage:"Email and Phone's information is absent",
+			Meta: rest.ErrFieldRespMeta{
+				ErrMessage: "Email and Phone's information is absent",
 			},
 		}
 
@@ -76,8 +75,8 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	if req.Email != "" {
 		if modelAuth, err = s.db.Auth().FindByEmail(req.Email); err != nil {
 			resp.Err = rest.ErrFieldResp{
-				Meta:rest.ErrFieldRespMeta{
-					ErrMessage:err.Error(),
+				Meta: rest.ErrFieldRespMeta{
+					ErrMessage: err.Error(),
 				},
 			}
 			return resp
@@ -87,10 +86,10 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 		}
 	}
 	if req.PhoneCountryCode+req.PhoneNumber != "" {
-		if modelAuth, err = s.db.Auth().FindByPhone(req.PhoneCountryCode+req.PhoneNumber ); err != nil {
+		if modelAuth, err = s.db.Auth().FindByPhone(req.PhoneCountryCode + req.PhoneNumber); err != nil {
 			resp.Err = rest.ErrFieldResp{
-				Meta:rest.ErrFieldRespMeta{
-					ErrMessage:err.Error(),
+				Meta: rest.ErrFieldRespMeta{
+					ErrMessage: err.Error(),
 				},
 			}
 			return resp
@@ -106,10 +105,9 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	}
 
 	modelAuth = &database.AuthModel{
-		Email:    req.Email,
-		Password: req.Password,
-		PhoneCountryCode:    req.PhoneCountryCode,
-
+		Email:            req.Email,
+		Password:         req.Password,
+		PhoneCountryCode: req.PhoneCountryCode,
 	}
 
 	modelUsers = &database.UsersModel{
@@ -130,7 +128,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 
 	resp.Email = req.Email
 	resp.PhoneCountryCode = req.PhoneCountryCode
-	resp.PhoneNumber=req.PhoneNumber
+	resp.PhoneNumber = req.PhoneNumber
 
 	return resp
 }

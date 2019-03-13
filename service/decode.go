@@ -18,17 +18,17 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 		var errCommon error
 
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-			return body, 	rest.ErrFieldResp{
-				Meta:rest.ErrFieldRespMeta{
-					ErrMessage:"Error of decoding",
+			return body, rest.ErrFieldResp{
+				Meta: rest.ErrFieldRespMeta{
+					ErrMessage: "Error of decoding",
 				},
 			}
 		}
 
 		if err := body.Validate(); err != nil {
 			return body, rest.ErrFieldResp{
-				Meta:rest.ErrFieldRespMeta{
-					ErrMessage:"Error of body.Validate()",
+				Meta: rest.ErrFieldRespMeta{
+					ErrMessage: "Error of body.Validate()",
 				},
 			}
 		}
@@ -58,29 +58,27 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 			errCommon = errors.New(errorText)
 		}
 
-
 		if ((parameters.UserRegistrationPhoneNumberType) || (parameters.UserRegistrationEmailAddressType)) != true {
 			errorText = errorText + " All user's registration's types sets with 'false' value. Need to set 'true' value \n "
 			errCommon = errors.New(errorText)
 		}
 
-		if (parameters.UserRegistrationEmailAddressType==true)&&(parameters.UserRegistrationPhoneNumberType==false){
+		if (parameters.UserRegistrationEmailAddressType == true) && (parameters.UserRegistrationPhoneNumberType == false) {
 			body.ValidateOnlyByMail()
 
 		}
-		if (parameters.UserRegistrationEmailAddressType==true)&&(parameters.UserRegistrationPhoneNumberType==false){
+		if (parameters.UserRegistrationEmailAddressType == true) && (parameters.UserRegistrationPhoneNumberType == false) {
 			body.ValidateOnlyByPhone()
 		}
 
-		if (parameters.UserRegistrationEmailAddressType==true)&&(parameters.UserRegistrationPhoneNumberType==true){
+		if (parameters.UserRegistrationEmailAddressType == true) && (parameters.UserRegistrationPhoneNumberType == true) {
 			body.Validate()
 		}
 
-
 		if errorText != "" {
 			return body, rest.ErrFieldResp{
-				Meta:rest.ErrFieldRespMeta{
-					ErrMessage:errCommon.Error(),
+				Meta: rest.ErrFieldRespMeta{
+					ErrMessage: errCommon.Error(),
 				},
 			}
 		}

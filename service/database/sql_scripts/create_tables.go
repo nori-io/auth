@@ -103,14 +103,14 @@ CREATE TABLE IF NOT EXISTS user_mfa_phone (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 `
-	CreateTableUsersMfaCode = `
-CREATE TABLE IF NOT EXISTS users_mfa_code (
+	CreateTableUserMfaCode = `
+CREATE TABLE IF NOT EXISTS user_mfa_code (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id INT UNSIGNED NOT NULL,
   code VARCHAR(45) NOT NULL,
   PRIMARY KEY (id),
   INDEX user_id_idx (user_id ASC),
-  CONSTRAINT users_mfa_code_user_id_fk
+  CONSTRAINT user_mfa_code_user_id_fk
     FOREIGN KEY (user_id)
     REFERENCES users (id)
     ON DELETE NO ACTION

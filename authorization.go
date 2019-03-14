@@ -83,7 +83,12 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 		service.Transport(auth, transport, session,
 			http, p.instance, registry.Logger(p.Meta()), pluginParameters)
 	}
-   createDatabase(nil,registry)
+
+
+   createTables(nil,registry)
+
+   dropTables(nil,registry)
+
 	return nil
 }
 
@@ -131,24 +136,16 @@ func (p plugin) Meta() meta.Meta {
 }
 
 func (p plugin) Install(_ context.Context, registry noriPlugin.Registry) error {
-	err:=createDatabase(nil,registry)
+	err:=createTables(nil,registry)
 	return err
 }
 
 func (p plugin) UnInstall(_ context.Context, registry noriPlugin.Registry) error {
-	sql, err := registry.Sql()
-	if err != nil {
-		return err
-	}
-	db := sql.GetDB()
-	_, err = db.Exec(` 
-		drop table articles;
-		drop table comments;
-		`)
+	err:=dropTables(nil,registry)
 	return err
 }
 
-func createDatabase(_ context.Context, registry noriPlugin.Registry) error {
+func createTables(_ context.Context, registry noriPlugin.Registry) error {
 	ctx := context.Background()
 
 	sqlObject, err := registry.Sql()
@@ -207,14 +204,14 @@ func createDatabase(_ context.Context, registry noriPlugin.Registry) error {
 	}
 
 	_, execErr = tx.Exec(
-		sql_scripts.CreateTableUsersMfaPhone)
+		sql_scripts.CreateTableUserMfaCode)
 	if execErr != nil {
 		_ = tx.Rollback()
 		log.Fatal(execErr)
 	}
 
 	_, execErr = tx.Exec(
-		sql_scripts.CreateTableUsersMfaCode)
+		sql_scripts.CreateTableUsersMfaPhone)
 	if execErr != nil {
 		_ = tx.Rollback()
 		log.Fatal(execErr)
@@ -224,6 +221,76 @@ func createDatabase(_ context.Context, registry noriPlugin.Registry) error {
 	if execErr != nil {
 		_ = tx.Rollback()
 		log.Fatal(execErr)
+	}
+
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+	return nil
+}
+func dropTables(_ context.Context, registry noriPlugin.Registry)error{
+	ctx := context.Background()
+
+	sqlObject, err := registry.Sql()
+	if err != nil {
+		return err
+	}
+	db := sqlObject.GetDB()
+
+	tx, err := db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, execErr:= tx.Exec(
+		sql_scripts.DropTableAuth)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+
+	}
+
+	_, execErr = tx.Exec(
+		sql_scripts.DropTableAuthProviders)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+
+	}
+	_, execErr = tx.Exec(
+		sql_scripts.DropTableAuthentificationHistory)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+	_, execErr = tx.Exec(
+		sql_scripts.DropTableUserMfaCode)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+
+	_, execErr = tx.Exec(
+		sql_scripts.DropTableUserMfaPhone)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+
+	_, execErr = tx.Exec(
+		sql_scripts.DropTableUserMfaSecret)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+
+	_, execErr = tx.Exec(
+		sql_scripts.DropTableUsers)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+
 	}
 
 	if err := tx.Commit(); err != nil {

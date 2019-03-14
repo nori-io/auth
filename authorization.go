@@ -84,11 +84,6 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			http, p.instance, registry.Logger(p.Meta()), pluginParameters)
 	}
 
-
-   createTables(nil,registry)
-
-   dropTables(nil,registry)
-
 	return nil
 }
 
@@ -136,12 +131,12 @@ func (p plugin) Meta() meta.Meta {
 }
 
 func (p plugin) Install(_ context.Context, registry noriPlugin.Registry) error {
-	err:=createTables(nil,registry)
+	err := createTables(nil, registry)
 	return err
 }
 
 func (p plugin) UnInstall(_ context.Context, registry noriPlugin.Registry) error {
-	err:=dropTables(nil,registry)
+	err := dropTables(nil, registry)
 	return err
 }
 
@@ -228,7 +223,7 @@ func createTables(_ context.Context, registry noriPlugin.Registry) error {
 	}
 	return nil
 }
-func dropTables(_ context.Context, registry noriPlugin.Registry)error{
+func dropTables(_ context.Context, registry noriPlugin.Registry) error {
 	ctx := context.Background()
 
 	sqlObject, err := registry.Sql()
@@ -243,7 +238,7 @@ func dropTables(_ context.Context, registry noriPlugin.Registry)error{
 		log.Fatal(err)
 	}
 
-	_, execErr:= tx.Exec(
+	_, execErr := tx.Exec(
 		sql_scripts.DropTableAuth)
 	if execErr != nil {
 		_ = tx.Rollback()

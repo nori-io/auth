@@ -7,12 +7,12 @@ import (
 
 // SignUp Request
 type SignUpRequest struct {
-	Email            string `json,valid:"email"`
-	PhoneCountryCode string `json,valid:"phone"`
-	PhoneNumber      string `json,valid:"phone_number"`
-	Password         string `json,valid:"password"`
-	Type             string `json,valid:"user_type"`
-	Meta             string `json,valid:"meta"`
+	Email            string `json:"email" validate:"email"`
+	PhoneCountryCode string `json:"phone_country_code" validate:"phone_country_code"`
+	PhoneNumber      string `json:"phone_number" validate:"phone_number"`
+	Password         string `json:"password" validate:"password"`
+	Type             string `json:"user_type" validate:"user_type"`
+	Meta             string `json:"meta" validate:"meta"`
 }
 
 func (r SignUpRequest) Validate() error {
@@ -49,8 +49,8 @@ func (r SignUpRequest) ValidateOnlyByPhone() error {
 
 // SignIn Request
 type SignInRequest struct {
-	Name     string
-	Password string
+	Name     string `json:"name" validate:"name"`
+	Password string `json:"password" validate:"password"`
 }
 
 func (r SignInRequest) Validate() error {

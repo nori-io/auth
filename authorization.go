@@ -40,8 +40,6 @@ func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {
 
 func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 
-	ctx := context.Background()
-
 	if p.instance == nil {
 
 		http, err := registry.Http()
@@ -82,88 +80,10 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 		service.Transport(auth, transport, session,
 			http, p.instance, registry.Logger(p.Meta()), pluginParameters)
 
-		sql1, err := registry.Sql()
-		if err != nil {
-			return err
-		}
-		db1 := sql1.GetDB()
-
-		tx, err := db1.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		_, execErr := tx.Exec(
-			sql_scripts.SetDatabaseSettings)
-		if execErr != nil {
-			_ = tx.Rollback()
-			log.Fatal(execErr)
-
-		}
-
-		_, execErr = tx.Exec(
-			sql_scripts.SetDatabaseStricts)
-		if execErr != nil {
-			_ = tx.Rollback()
-			log.Fatal(execErr)
-
-		}
-
-		_, execErr = tx.Exec(
-			sql_scripts.CreateTableUsers)
-		if execErr != nil {
-			_ = tx.Rollback()
-			log.Fatal(execErr)
-
-		}
-		_, execErr = tx.Exec(
-			sql_scripts.CreateTableAuth)
-		if execErr != nil {
-			_ = tx.Rollback()
-			log.Fatal(execErr)
-		}
-		_, execErr = tx.Exec(
-			sql_scripts.CreateTableAuthProviders)
-		if execErr != nil {
-			_ = tx.Rollback()
-			log.Fatal(execErr)
-		}
-
-		_, execErr = tx.Exec(
-			sql_scripts.CreateTableAuthentificationHistory)
-		if execErr != nil {
-			_ = tx.Rollback()
-			log.Fatal(execErr)
-		}
-
-		_, execErr = tx.Exec(
-			sql_scripts.CreateTableUsersMfaPhone)
-		if execErr != nil {
-			_ = tx.Rollback()
-			log.Fatal(execErr)
-		}
-
-		_, execErr = tx.Exec(
-			sql_scripts.CreateTableUsersMfaCode)
-		if execErr != nil {
-			_ = tx.Rollback()
-			log.Fatal(execErr)
-		}
-		_, execErr = tx.Exec(
-			sql_scripts.CreateTableUsersMfaSecret)
-		if execErr != nil {
-			_ = tx.Rollback()
-			log.Fatal(execErr)
-		}
-
-		if err := tx.Commit(); err != nil {
-			log.Fatal(err)
-		}
 		service.Transport(auth, transport, session,
 			http, p.instance, registry.Logger(p.Meta()), pluginParameters)
 	}
-
+   createDatabase(nil,registry)
 	return nil
 }
 
@@ -211,12 +131,7 @@ func (p plugin) Meta() meta.Meta {
 }
 
 func (p plugin) Install(_ context.Context, registry noriPlugin.Registry) error {
-	sql, err := registry.Sql()
-	if err != nil {
-		return err
-	}
-	db := sql.GetDB()
-	_, err = db.Exec(sql_scripts.CreateTableUsersMfaCode)
+	err:=createDatabase(nil,registry)
 	return err
 }
 
@@ -231,4 +146,88 @@ func (p plugin) UnInstall(_ context.Context, registry noriPlugin.Registry) error
 		drop table comments;
 		`)
 	return err
+}
+
+func createDatabase(_ context.Context, registry noriPlugin.Registry) error {
+	ctx := context.Background()
+
+	sqlObject, err := registry.Sql()
+	if err != nil {
+		return err
+	}
+	db := sqlObject.GetDB()
+
+	tx, err := db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, execErr := tx.Exec(
+		sql_scripts.SetDatabaseSettings)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+
+	}
+
+	_, execErr = tx.Exec(
+		sql_scripts.SetDatabaseStricts)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+
+	}
+
+	_, execErr = tx.Exec(
+		sql_scripts.CreateTableUsers)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+
+	}
+	_, execErr = tx.Exec(
+		sql_scripts.CreateTableAuth)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+	_, execErr = tx.Exec(
+		sql_scripts.CreateTableAuthProviders)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+
+	_, execErr = tx.Exec(
+		sql_scripts.CreateTableAuthentificationHistory)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+
+	_, execErr = tx.Exec(
+		sql_scripts.CreateTableUsersMfaPhone)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+
+	_, execErr = tx.Exec(
+		sql_scripts.CreateTableUsersMfaCode)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+	_, execErr = tx.Exec(
+		sql_scripts.CreateTableUsersMfaSecret)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+	return nil
 }

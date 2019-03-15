@@ -36,7 +36,7 @@ type Provider interface {
 }
 type database struct {
 	db                    *sql.DB
-	users                 *users
+	users                 *Users1
 	authenticationHistory *authenticationHistory
 	auth                  *auth
 }
@@ -49,9 +49,9 @@ func DB(db *sql.DB, logger *log.Logger) Database {
 	once.Do(func() {
 		instance = &database{
 			db: db,
-			users: &users{
-				db:  db,
-				log: logger,
+			users: &Users1{
+				Db:  db,
+				Log: logger,
 			},
 			authenticationHistory: &authenticationHistory{
 				db:  db,

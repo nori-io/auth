@@ -1,25 +1,24 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 	"time"
 
 	log "github.com/sirupsen/logrus"
-
-	"golang.org/x/net/context"
 )
 
-type users struct {
-	db  *sql.DB
-	log *log.Logger
+type Users1 struct {
+	Db  *sql.DB
+	Log *log.Logger
 }
 
-func (u *users) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
+func (u *Users1) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 	var (
-		lastIdNumber uint64
+//		lastIdNumber uint64
 	)
 	ctx := context.Background()
-	tx, err := u.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
+	tx, err := u.Db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
 	if err != nil {
 		return err
 	}
@@ -31,7 +30,10 @@ func (u *users) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		return execErr
 	}
 
-	lastId, err := tx.Query("SELECT id FROM users WHERE id = (SELECT MAX(id) FROM users)")
+/*	x,err:=tx.Query("SELECT * from users")
+	fmt.Println("Users content is",x)*/
+
+/*    lastId, err := tx.Query("SELECT id FROM users WHERE id = (SELECT MAX(id) FROM users)")
 	if err != nil {
 		return err
 	}
@@ -39,15 +41,18 @@ func (u *users) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 	if lastId.Err() != nil {
 		return err
 	}
+	fmt.Println("lastIdNumber ",lastIdNumber)
 
 	defer lastId.Close()
 	for lastId.Next() {
 		var m AuthModel
 		lastId.Scan(&m.Id)
 		lastIdNumber = m.Id
-	}
+	}*/
 
-	if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber == "") && (modelAuth.Email != "") {
+
+
+/*	if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber == "") && (modelAuth.Email != "") {
 		log.Println("Creating user with mail ")
 		log.Println("LAst id number is", lastIdNumber)
 		_, execErr = tx.Exec("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)",
@@ -70,7 +75,7 @@ func (u *users) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 
 	if err := tx.Commit(); err != nil {
 		return err
-	}
+	}*/
 	return nil
 
 }

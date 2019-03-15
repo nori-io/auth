@@ -83,8 +83,7 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 		service.Transport(auth, transport, session,
 			http, p.instance, registry.Logger(p.Meta()), pluginParameters)
 	}
-
-	return nil
+    return nil
 }
 
 func (p *plugin) Stop(_ context.Context, _ noriPlugin.Registry) error {

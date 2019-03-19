@@ -3,6 +3,7 @@ package database_test
 import (
 	"database/sql"
 	"database/sql/driver"
+	"fmt"
 	"log"
 	"testing"
 	"time"
@@ -97,7 +98,48 @@ func TestUsers_Create2(t *testing.T) {
 
 }
 
+func TestUsers_Create3(t *testing.T) {
+	var err error
+	t.Parallel()
 
+
+	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+
+	defer mockDatabase.Close()
+	mock.ExpectExec("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)").
+		WithArgs("active","vendor",AnyTime{}, AnyTime{}).WillReturnResult(sqlmock.NewResult(0,1))
+	mock.ExpectExec("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)").
+		WithArgs(0,"1@mail.ru","pass","",AnyTime{},AnyTime{},0,0)
+
+
+	result, _:= mockDatabase.Exec("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)",
+		"active", "vendor",time.Now(),time.Now())
+
+	lastId:=int64(-1)
+	lastId,_= result.LastInsertId()
+
+	mockDatabase.Exec("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)",
+		lastId,"1@mail.ru","pass","",time.Now(),time.Now(),0,0)
+
+	t.Log(lastId)
+	if err != nil {
+		t.Errorf("error '%s' was not expected, while inserting a row", err)
+	}
+
+	if err = mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+
+	fmt.Println(err)
+
+
+
+
+}
 
 
 func (a AnyTime) Match(v driver.Value) bool {

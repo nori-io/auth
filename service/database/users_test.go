@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"golang.org/x/net/context"
 
 	"github.com/nori-io/auth/service/database"
 	"github.com/nori-io/auth/service/database/sql_scripts"
@@ -19,27 +20,27 @@ type (
 )
 
 func TestUsers_Create(t *testing.T) {
-	type Database interface {
-		Users() database.Users
-		Auth() database.Auth
-	}
-	type Users interface {
-		Create(*database.AuthModel, *database.UsersModel) error
-	}
-
 	var err error
 
 
-	db1, mock, err := sqlmock.New()
+	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-	defer db1.Close()
 
-	type users struct {
-		db  *sql.DB
-		log *log.Logger
-	}
+
+	createTables(mockDatabase)
+
+	testDatabase:=database.DB(mockDatabase,nil)
+	testDatabase.Users()
+
+
+    defer mockDatabase.Close()
+	mock.ExpectBegin()
+	mock.ExpectExec("INSERT INTO users").WithArgs("active","vendor",AnyTime{}, AnyTime{}).WillReturnResult(sqlmock.NewResult(0,1))
+	result := []string{"id"}
+	mock.ExpectQuery("SELECT LAST_INSERT_ID()").WillReturnRows(sqlmock.NewRows(result))
+	mock.ExpectExec("INSERT INTO auth").WithArgs(0,"test@mail.ru","pass","",AnyTime{}, AnyTime{},false,false).WillReturnResult(sqlmock.NewResult(0,1))
 
 	modelUsers:=&database.UsersModel{
 		Type:    "vendor",
@@ -54,67 +55,214 @@ func TestUsers_Create(t *testing.T) {
 		Updated:time.Now(),
 
 	}
-  userObject:=database.Users1{Db:db1, Log:nil}
-	mock.ExpectBegin()
 
-	mock.ExpectExec("INSERT INTO users").WithArgs("active","vendor",AnyTime{}, AnyTime{}).WillReturnResult(sqlmock.NewResult(2,10))
-
-
-  if err = userObject.Create(modelAuth, modelUsers); err != nil {
-		t.Errorf("error was not expected while updating stats: %s", err)
+     if err = testDatabase.Users().Create(modelAuth,modelUsers); err != nil {
+		t.Errorf("error was not expected while updating stats: %s", err.Error())
 	}
-
-
-
-
-}
-func TestUsers_Create2(t *testing.T) {
-
-
-	db, mock, err:= sqlmock.New()
-	db.Query(sql_scripts.SetDatabaseSettings)
-	db.Query(sql_scripts.SetDatabaseStricts)
-	db.Query(sql_scripts.CreateTableUsers)
-
-	defer db.Close()
-
-	mock.ExpectExec("INSERT INTO users").
-		WithArgs(1,"active", "vendor",AnyTime{},AnyTime{}).
-		WillReturnResult(sqlmock.NewResult(1,1))
-
-	_, err = db.Exec("INSERT INTO users(id,status_account,type, created, updated) VALUES (?,?, ?,?,?)", 1,"active","vendor", time.Now(),time.Now())
-	if err != nil {
-		t.Errorf("error '%s' was not expected, while inserting a row", err)
-	}
-	/*lastId, err1:= db.Exec("SELECT id FROM users WHERE id = (SELECT MAX(id) FROM users)")
-	if err1!= nil {
-		log.Println(err1)
-	}
-	t.Log(lastId)
-*/
-	/*if lastId.Err() != nil {
-		log.Println(err1)
-	}
-
-	defer lastId.Close()
-	for lastId.Next() {
-		var m database.UsersModel
-		lastId.Scan(&m.Id)
-		lastIdNumber:= m.Id
-		t.Log("LastNumber is",lastIdNumber)
-	}
-	if err != nil {
-		t.Errorf("an error '%s' was not expected when opening a stub database connection", err)
-	}
-*/
-
 
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
+
+
 }
+func TestUsers_Create2(t *testing.T) {
+	var err error
+	t.Parallel()
+
+
+	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+
+	defer mockDatabase.Close()
+
+	mock.ExpectExec("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)").
+		WithArgs("active","vendor",AnyTime{}, AnyTime{}).WillReturnResult(sqlmock.NewResult(0,1))
+
+  _, err = mockDatabase.Exec("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)",
+  	"active", "vendor",time.Now(),time.Now())
+	if err != nil {
+		t.Errorf("error '%s' was not expected, while inserting a row", err)
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+
+
+
+
+}
+
+
+
 
 func (a AnyTime) Match(v driver.Value) bool {
 	_, ok := v.(time.Time)
 	return ok
+}
+/*func TestUsers_Create2(t *testing.T) {
+	var err error
+
+
+	mockDatabase, mock, err := sqlmock.New()
+	if !assert.Nilf(t,
+		err,
+		"Error on trying to start up a stub database connection") {
+		t.Fatal()
+	}
+	defer mockDatabase.Close()
+
+	testDatabase:=database.DB(mockDatabase,nil)
+
+
+
+	modelUsers:=&database.UsersModel{
+		Type:    "vendor",
+		Created:time.Now(),
+		Updated:time.Now(),
+
+	}
+	modelAuth:= &database.AuthModel{
+		Email:    "test@mail.ru",
+		Password: "pass",
+		Created:time.Now(),
+		Updated:time.Now(),
+
+	}
+
+	t.Run("WantCommitError", func(t *testing.T) {
+		// define sql behavior
+		mock.ExpectBegin()
+
+		testDatabase.Users().Create(modelAuth,modelUsers)
+
+		defer func() {
+			mock.ExpectCommit().
+				WillReturnError(nil)
+
+
+		}()
+
+		mock.ExpectationsWereMet()
+
+	})
+
+
+	if err = testDatabase.Users().Create(modelAuth,modelUsers); err != nil {
+		t.Errorf("error was not expected while updating stats: %s", err.Error())
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+
+
+
+
+}
+*/
+
+func createTables(db *sql.DB) error {
+	ctx := context.Background()
+
+
+	tx, err := db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, execErr := tx.Exec(
+		sql_scripts.SetDatabaseSettings)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+
+	}
+
+	_, execErr= tx.Exec(
+		sql_scripts.SetDatabaseStricts)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+
+	}
+
+	_, execErr= tx.Exec(
+		sql_scripts.CreateTableUsers)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+
+	}
+	_, execErr = tx.Exec(
+		sql_scripts.CreateTableAuth)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+	_, execErr = tx.Exec(
+		sql_scripts.CreateTableAuthProviders)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+
+	_, execErr = tx.Exec(
+		sql_scripts.CreateTableAuthentificationHistory)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+
+	_, execErr = tx.Exec(
+		sql_scripts.CreateTableUserMfaCode)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+
+	_, execErr = tx.Exec(
+		sql_scripts.CreateTableUsersMfaPhone)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+	_, execErr = tx.Exec(
+		sql_scripts.CreateTableUsersMfaSecret)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+	return nil
+}
+
+func TestAnyTimeArgument(t *testing.T) {
+	t.Parallel()
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Errorf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	mock.ExpectExec("INSERT INTO users").
+		WithArgs("john", AnyTime{}).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	_, err = db.Exec("INSERT INTO users(name, created_at) VALUES (?, ?)", "john", time.Now())
+	if err != nil {
+		t.Errorf("error '%s' was not expected, while inserting a row", err)
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
 }

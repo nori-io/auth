@@ -11,6 +11,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"golang.org/x/net/context"
 
+	"github.com/nori-io/auth/service/database"
 	"github.com/nori-io/auth/service/database/sql_scripts"
 )
 
@@ -75,6 +76,51 @@ func TestUsers_Create(t *testing.T) {
 		fmt.Println("got rows error:", rs.Err())
 	}
 }
+func TestUsers_Create11(t *testing.T) {
+
+	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer mockDatabase.Close()
+	createTables(mockDatabase)
+
+	testDatabase:=database.DB(mockDatabase,nil)
+
+	modelUsers:=&database.UsersModel{
+		Type:    "vendor",
+		Created:time.Now(),
+		Updated:time.Now(),
+
+	}
+	modelAuth:= &database.AuthModel{
+		Email:    "test@mail.ru",
+		Password: "pass",
+		Created:time.Now(),
+		Updated:time.Now(),
+
+	}
+
+
+
+	mock.ExpectBegin()
+	mock.ExpectExec("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)").
+		WithArgs("active","vendor",AnyTime{}, AnyTime{}).WillReturnError(nil)
+	mock.ExpectExec("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)").
+		WillReturnError(nil)
+	mock.ExpectCommit()
+
+	if err1:= testDatabase.Users().Create(modelAuth,modelUsers); err1 != nil {
+		t.Errorf("error was not expected while updating stats: %s", err.Error())
+	}
+	// we make sure that all expectations were met
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+
+}
+
+
 func TestUsers_Create2(t *testing.T) {
 	var err error
 	t.Parallel()

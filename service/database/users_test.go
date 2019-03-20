@@ -11,7 +11,6 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"golang.org/x/net/context"
 
-	"github.com/nori-io/auth/service/database"
 	"github.com/nori-io/auth/service/database/sql_scripts"
 )
 
@@ -21,16 +20,16 @@ type (
 )
 
 func TestUsers_Create(t *testing.T) {
-	var err error
 
-	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
-
+    mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
+	/*defer mockDatabase.Close()
 	createTables(mockDatabase)
+
 	testDatabase:=database.DB(mockDatabase,nil)
-    defer mockDatabase.Close()
+
 	modelUsers:=&database.UsersModel{
 		Type:    "vendor",
 		Created:time.Now(),
@@ -45,28 +44,36 @@ func TestUsers_Create(t *testing.T) {
 
 	}
 
-	if err = testDatabase.Users().Create(modelAuth,modelUsers); err != nil {
+
+	if err1:= testDatabase.Users().Create(modelAuth,modelUsers); err1 != nil {
 		t.Errorf("error was not expected while updating stats: %s", err.Error())
+	}*/
+
+  rows := sqlmock.NewRows([]string{"id", "status_account", "type", "created","updated", "mfa_type"}).
+		AddRow(0, "active", "vendor", time.Now(),time.Now(),"")
+
+	mock.ExpectQuery("SELECT").WillReturnRows(rows)
+
+
+	rs,err2:= mockDatabase.Query("SELECT")
+	fmt.Println(rs)
+   if err2!=nil {
+		fmt.Println("failed to match expected query",err2)
+		return
 	}
+	defer rs.Close()
 
 
 
-	_,err=mockDatabase.Query("SELECT * from users")
-
-	rows := sqlmock.NewRows([]string{"id", "status_account", "type", "created","updated", "mfa_type"}).
-		AddRow(0, "active", "vendor",AnyTime{},AnyTime{},"")
-
-mock.ExpectQuery("SELECT * from users").WillReturnRows(rows)
-
-
-
-
-
-     if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
+	for rs.Next() {
+		var id int
+		var status_account string
+		rs.Scan(&id, &status_account)
+		fmt.Println("scanned id:", id, "and status_account:", status_account)
 	}
-
-
+	if rs.Err() != nil {
+		fmt.Println("got rows error:", rs.Err())
+	}
 }
 func TestUsers_Create2(t *testing.T) {
 	var err error
@@ -308,4 +315,35 @@ func TestAnyTimeArgument(t *testing.T) {
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
+}
+
+
+func ExampleRows_rowError() {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		fmt.Println("failed to open sqlmock database:", err)
+	}
+	defer db.Close()
+
+	rows := sqlmock.NewRows([]string{"id", "title"}).
+		AddRow(0, "one").
+		AddRow(1, "two").
+		RowError(1, fmt.Errorf("row error"))
+	mock.ExpectQuery("SELECT").WillReturnRows(rows)
+
+	rs, _ := db.Query("SELECT")
+	defer rs.Close()
+   fmt.Println(rs)
+	for rs.Next() {
+		var id int
+		var title string
+		rs.Scan(&id, &title)
+		fmt.Println("scanned id:", id, "and title:", title)
+	}
+
+	if rs.Err() != nil {
+		fmt.Println("got rows error:", rs.Err())
+	}
+	// Output: scanned id: 0 and title: one
+	// got rows error: row error
 }

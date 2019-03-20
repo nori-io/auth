@@ -23,26 +23,14 @@ type (
 func TestUsers_Create(t *testing.T) {
 	var err error
 
-
 	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-
-
 	createTables(mockDatabase)
-
 	testDatabase:=database.DB(mockDatabase,nil)
-	testDatabase.Users()
-
-
     defer mockDatabase.Close()
-	mock.ExpectBegin()
-	mock.ExpectExec("INSERT INTO users").WithArgs("active","vendor",AnyTime{}, AnyTime{}).WillReturnResult(sqlmock.NewResult(0,1))
-	result := []string{"id"}
-	mock.ExpectQuery("SELECT LAST_INSERT_ID()").WillReturnRows(sqlmock.NewRows(result))
-	mock.ExpectExec("INSERT INTO auth").WithArgs(0,"test@mail.ru","pass","",AnyTime{}, AnyTime{},false,false).WillReturnResult(sqlmock.NewResult(0,1))
-
 	modelUsers:=&database.UsersModel{
 		Type:    "vendor",
 		Created:time.Now(),
@@ -57,11 +45,26 @@ func TestUsers_Create(t *testing.T) {
 
 	}
 
-     if err = testDatabase.Users().Create(modelAuth,modelUsers); err != nil {
+	if err = testDatabase.Users().Create(modelAuth,modelUsers); err != nil {
 		t.Errorf("error was not expected while updating stats: %s", err.Error())
 	}
 
-	if err := mock.ExpectationsWereMet(); err != nil {
+
+
+	_,err=mockDatabase.Query("SELECT * from users")
+
+	  mock.ExpectQuery("SELECT * from users")
+
+	/*rows := sqlmock.NewRows([]string{"id", "status_account", "type", "created","updated", "mfa_type"}).
+		AddRow(0, "active", "vendor",AnyTime{},AnyTime{},"")*/
+
+/*	mock.ExpectQuery("SELECT * from users").WillReturnRows(rows)
+*/
+
+
+
+
+     if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
 

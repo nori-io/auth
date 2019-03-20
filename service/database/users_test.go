@@ -53,13 +53,11 @@ func TestUsers_Create(t *testing.T) {
 
 	_,err=mockDatabase.Query("SELECT * from users")
 
-	  mock.ExpectQuery("SELECT * from users")
+	rows := sqlmock.NewRows([]string{"id", "status_account", "type", "created","updated", "mfa_type"}).
+		AddRow(0, "active", "vendor",AnyTime{},AnyTime{},"")
 
-	/*rows := sqlmock.NewRows([]string{"id", "status_account", "type", "created","updated", "mfa_type"}).
-		AddRow(0, "active", "vendor",AnyTime{},AnyTime{},"")*/
+mock.ExpectQuery("SELECT * from users").WillReturnRows(rows)
 
-/*	mock.ExpectQuery("SELECT * from users").WillReturnRows(rows)
-*/
 
 
 

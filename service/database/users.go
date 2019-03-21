@@ -28,49 +28,45 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 	if execErr != nil {
 		_ = tx.Rollback()
 		return execErr
-	};
+	}
 
-	   /* lastId, err:= tx.Query("SELECT LAST_INSERT_ID();")
-		if err != nil {
-			return err
+	lastId, err := tx.Query("SELECT LAST_INSERT_ID()")
+	if err != nil {
+		return err
+	}
+	if lastId.Err() != nil {
+		return err
+	}
+	defer lastId.Close()
+	for lastId.Next() {
+		var m AuthModel
+		lastId.Scan(&m.Id)
+		lastIdNumber = m.Id
+	}
+	log.Println("Last id number is", lastIdNumber)
+
+	if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber == "") && (modelAuth.Email != "") {
+		_, execErr = tx.Exec("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)",
+			lastIdNumber, modelAuth.Email, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
+		if execErr != nil {
+			_ = tx.Rollback()
+			return execErr
 		}
-		if lastId.Err() != nil {
-			return err
+	}
+
+	if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber != "") && (modelAuth.Email == "") {
+		_, execErr = tx.Exec("INSERT INTO auth (user_id, phone_country_code, phone_number, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?,?)",
+			lastIdNumber, modelAuth.PhoneCountryCode, modelAuth.PhoneNumber, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
+		if execErr != nil {
+			_ = tx.Rollback()
+			return execErr
 		}
-		defer lastId.Close()
-		for lastId.Next() {
-			var m AuthModel
-			lastId.Scan(&m.Id)
-			lastIdNumber = m.Id
-		}*/
-
-lastIdNumber=0
-
-		if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber == "") && (modelAuth.Email != "") {
-			log.Println("Creating user with mail ")
-			log.Println("LAst id number is", lastIdNumber)
-			_, execErr = tx.Exec("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)",
-				lastIdNumber, modelAuth.Email, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
-			if execErr != nil {
-				_ = tx.Rollback()
-				return execErr
-			}
-		}
-
-		if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber != "") && (modelAuth.Email == "") {
-			_, execErr = tx.Exec("INSERT INTO auth (user_id, phone_country_code, phone_number, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?,?)",
-				lastIdNumber, modelAuth.PhoneCountryCode, modelAuth.PhoneNumber, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
-			if execErr != nil {
-				_ = tx.Rollback()
-				return execErr
-			}
-
-		}
-
-		if err := tx.Commit(); err != nil {
-			return err
-		}
-		return nil
 
 	}
 
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+	return nil
+
+}

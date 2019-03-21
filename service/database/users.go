@@ -30,7 +30,7 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		return execErr
 	};
 
-	    lastId, err:= tx.Query("SELECT LAST_INSERT_ID();")
+	   /* lastId, err:= tx.Query("SELECT LAST_INSERT_ID();")
 		if err != nil {
 			return err
 		}
@@ -42,9 +42,9 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 			var m AuthModel
 			lastId.Scan(&m.Id)
 			lastIdNumber = m.Id
-		}
+		}*/
 
-
+lastIdNumber=0
 
 		if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber == "") && (modelAuth.Email != "") {
 			log.Println("Creating user with mail ")

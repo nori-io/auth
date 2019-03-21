@@ -27,7 +27,7 @@ func TestUsers_Create_userCreate(t *testing.T) {
 	defer mockDatabase.Close()
 
 	mock.ExpectBegin()
-	mock.ExpectExec("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)").
+	mock.ExpectExec("INSERT INTO users (status_account, type, created, updated,mfa_type) VALUES(?,?,?,?,?)").
 		WithArgs("active", "vendor", AnyTime{}, AnyTime{}).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	rows := sqlmock.NewRows([]string{"id"}).
@@ -65,67 +65,6 @@ func (a AnyTime) Match(v driver.Value) bool {
 	return ok
 }
 
-/*func TestUsers_Create2(t *testing.T) {
-	var err error
-
-
-	mockDatabase, mock, err := sqlmock.New()
-	if !assert.Nilf(t,
-		err,
-		"Error on trying to start up a stub database connection") {
-		t.Fatal()
-	}
-	defer mockDatabase.Close()
-
-	testDatabase:=database.DB(mockDatabase,nil)
-
-
-
-	modelUsers:=&database.UsersModel{
-		Type:    "vendor",
-		Created:time.Now(),
-		Updated:time.Now(),
-
-	}
-	modelAuth:= &database.AuthModel{
-		Email:    "test@mail.ru",
-		Password: "pass",
-		Created:time.Now(),
-		Updated:time.Now(),
-
-	}
-
-	t.Run("WantCommitError", func(t *testing.T) {
-		// define sql behavior
-		mock.ExpectBegin()
-
-		testDatabase.Users().Create(modelAuth,modelUsers)
-
-		defer func() {
-			mock.ExpectCommit().
-				WillReturnError(nil)
-
-
-		}()
-
-		mock.ExpectationsWereMet()
-
-	})
-
-
-	if err = testDatabase.Users().Create(modelAuth,modelUsers); err != nil {
-		t.Errorf("error was not expected while updating stats: %s", err.Error())
-	}
-
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
-
-
-
-
-}
-*/
 
 func ExampleRows_rowError() {
 	db, mock, err := sqlmock.New()

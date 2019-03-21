@@ -42,19 +42,12 @@ func TestUsers_Create_userCreate(t *testing.T) {
 
 	d := database.DB(mockDatabase, logrus.New())
 	err = d.Users().Create(&database.AuthModel{
-		UserId:          1,
-		Email:           "test@mail.ru",
-		Password:        "pass",
-		Salt:            "salt",
-		Created:         time.Now(),
-		Updated:         time.Now(),
-		IsEmailVerified: true,
-		IsPhoneVerified: true,
+		Email:    "test@mail.ru",
+		Password: "pass",
+		Salt:     "salt",
 	}, &database.UsersModel{
 		Status_account: "active",
 		Type:           "vendor",
-		Created:        time.Now(),
-		Updated:        time.Now(),
 	})
 	if err != nil {
 		t.Error(err)

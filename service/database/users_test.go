@@ -3,7 +3,9 @@ package database_test
 import (
 	"database/sql/driver"
 	"fmt"
-
+	"reflect"
+	"runtime"
+	"runtime/debug"
 	"testing"
 	"time"
 
@@ -19,13 +21,13 @@ type (
 )
 
 func TestUsers_Create_userEmail(t *testing.T) {
-
+t.Parallel()
 	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	defer mockDatabase.Close()
-
+	defer mock.ExpectClose()
 	mock.ExpectBegin()
 	mock.ExpectExec("INSERT INTO users (status_account, type, created, updated,mfa_type) VALUES(?,?,?,?,?)").
 		WithArgs("active", "vendor", AnyTime{}, AnyTime{}).WillReturnResult(sqlmock.NewResult(1, 1))
@@ -37,7 +39,6 @@ func TestUsers_Create_userEmail(t *testing.T) {
 
 	mock.ExpectExec("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)").
 		WithArgs(1, "test@mail.ru", "pass", "salt", AnyTime{}, AnyTime{}, false, false).WillReturnResult(sqlmock.NewResult(1, 1))
-
 	mock.ExpectCommit()
 
 	d := database.DB(mockDatabase, logrus.New())
@@ -57,21 +58,27 @@ func TestUsers_Create_userEmail(t *testing.T) {
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
+	clear(d)
+	d=nil
+	debug.SetGCPercent(1)
+	runtime.GC()
+
 
 }
 
 func TestUsers_Create_userPhone(t *testing.T) {
+	t.Parallel()
 
 	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
+	defer mock.ExpectClose()
 	defer mockDatabase.Close()
 
 	mock.ExpectBegin()
 	mock.ExpectExec("INSERT INTO users (status_account, type, created, updated,mfa_type) VALUES(?,?,?,?,?)").
 		WithArgs("active", "vendor", AnyTime{}, AnyTime{}).WillReturnResult(sqlmock.NewResult(1, 1))
-
 	rows := sqlmock.NewRows([]string{"id"}).
 		AddRow(1).
 		RowError(1, fmt.Errorf("row error"))
@@ -81,7 +88,6 @@ func TestUsers_Create_userPhone(t *testing.T) {
 		WithArgs(1, "8","9191501490", "pass", "salt", AnyTime{}, AnyTime{}, false, false).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	mock.ExpectCommit()
-
 	d := database.DB(mockDatabase, logrus.New())
 	err = d.Users().Create(&database.AuthModel{
 		PhoneCountryCode:"8",
@@ -100,7 +106,8 @@ func TestUsers_Create_userPhone(t *testing.T) {
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
-
+	clear(d)
+	runtime.GC()
 }
 
 
@@ -138,4 +145,9 @@ func ExampleRows_rowError() {
 	}
 	// Output: scanned id: 0 and title: one
 	// got rows error: row error
+}
+
+func clear(v interface{}) {
+	p := reflect.ValueOf(v).Elem()
+	p.Set(reflect.Zero(p.Type()))
 }

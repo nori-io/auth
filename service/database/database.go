@@ -2,9 +2,9 @@ package database
 
 import (
 	"database/sql"
-	log "github.com/sirupsen/logrus"
-
 	"sync"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type Database interface {

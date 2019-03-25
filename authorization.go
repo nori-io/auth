@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
-	"log"
 
 	cfg "github.com/nori-io/nori-common/config"
 	"github.com/nori-io/nori-common/meta"
@@ -11,7 +9,6 @@ import (
 
 	"github.com/nori-io/auth/service"
 	"github.com/nori-io/auth/service/database"
-	"github.com/nori-io/auth/service/database/sql_scripts"
 )
 
 type plugin struct {
@@ -130,165 +127,22 @@ func (p plugin) Meta() meta.Meta {
 }
 
 func (p plugin) Install(_ context.Context, registry noriPlugin.Registry) error {
-	err := createTables(nil, registry)
+	sql, err := registry.Sql()
+	if err != nil {
+		return err
+	}
+	db := database.DB(sql.GetDB(), registry.Logger(p.Meta()))
+	db.CreateTables()
 	return err
 }
 
 func (p plugin) UnInstall(_ context.Context, registry noriPlugin.Registry) error {
-	err := dropTables(nil, registry)
+	sql, err := registry.Sql()
+	if err != nil {
+		return err
+	}
+	db := database.DB(sql.GetDB(), registry.Logger(p.Meta()))
+	db.DropTables()
 	return err
-}
 
-func createTables(_ context.Context, registry noriPlugin.Registry) error {
-	ctx := context.Background()
-
-	sqlObject, err := registry.Sql()
-	if err != nil {
-		return err
-	}
-	db := sqlObject.GetDB()
-
-	tx, err := db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	_, execErr := tx.Exec(
-		sql_scripts.SetDatabaseSettings)
-	if execErr != nil {
-		_ = tx.Rollback()
-		log.Fatal(execErr)
-
-	}
-
-	_, execErr = tx.Exec(
-		sql_scripts.SetDatabaseStricts)
-	if execErr != nil {
-		_ = tx.Rollback()
-		log.Fatal(execErr)
-
-	}
-
-	_, execErr = tx.Exec(
-		sql_scripts.CreateTableUsers)
-	if execErr != nil {
-		_ = tx.Rollback()
-		log.Fatal(execErr)
-
-	}
-	_, execErr = tx.Exec(
-		sql_scripts.CreateTableAuth)
-	if execErr != nil {
-		_ = tx.Rollback()
-		log.Fatal(execErr)
-	}
-	_, execErr = tx.Exec(
-		sql_scripts.CreateTableAuthProviders)
-	if execErr != nil {
-		_ = tx.Rollback()
-		log.Fatal(execErr)
-	}
-
-	_, execErr = tx.Exec(
-		sql_scripts.CreateTableAuthentificationHistory)
-	if execErr != nil {
-		_ = tx.Rollback()
-		log.Fatal(execErr)
-	}
-
-	_, execErr = tx.Exec(
-		sql_scripts.CreateTableUserMfaCode)
-	if execErr != nil {
-		_ = tx.Rollback()
-		log.Fatal(execErr)
-	}
-
-	_, execErr = tx.Exec(
-		sql_scripts.CreateTableUsersMfaPhone)
-	if execErr != nil {
-		_ = tx.Rollback()
-		log.Fatal(execErr)
-	}
-	_, execErr = tx.Exec(
-		sql_scripts.CreateTableUsersMfaSecret)
-	if execErr != nil {
-		_ = tx.Rollback()
-		log.Fatal(execErr)
-	}
-
-	if err := tx.Commit(); err != nil {
-		log.Fatal(err)
-	}
-	return nil
-}
-func dropTables(_ context.Context, registry noriPlugin.Registry) error {
-	ctx := context.Background()
-
-	sqlObject, err := registry.Sql()
-	if err != nil {
-		return err
-	}
-	db := sqlObject.GetDB()
-
-	tx, err := db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	_, execErr := tx.Exec(
-		sql_scripts.DropTableAuth)
-	if execErr != nil {
-		_ = tx.Rollback()
-		log.Fatal(execErr)
-
-	}
-
-	_, execErr = tx.Exec(
-		sql_scripts.DropTableAuthProviders)
-	if execErr != nil {
-		_ = tx.Rollback()
-		log.Fatal(execErr)
-
-	}
-	_, execErr = tx.Exec(
-		sql_scripts.DropTableAuthentificationHistory)
-	if execErr != nil {
-		_ = tx.Rollback()
-		log.Fatal(execErr)
-	}
-	_, execErr = tx.Exec(
-		sql_scripts.DropTableUserMfaCode)
-	if execErr != nil {
-		_ = tx.Rollback()
-		log.Fatal(execErr)
-	}
-
-	_, execErr = tx.Exec(
-		sql_scripts.DropTableUserMfaPhone)
-	if execErr != nil {
-		_ = tx.Rollback()
-		log.Fatal(execErr)
-	}
-
-	_, execErr = tx.Exec(
-		sql_scripts.DropTableUserMfaSecret)
-	if execErr != nil {
-		_ = tx.Rollback()
-		log.Fatal(execErr)
-	}
-
-	_, execErr = tx.Exec(
-		sql_scripts.DropTableUsers)
-	if execErr != nil {
-		_ = tx.Rollback()
-		log.Fatal(execErr)
-
-	}
-
-	if err := tx.Commit(); err != nil {
-		log.Fatal(err)
-	}
-	return nil
 }

@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -28,11 +29,13 @@ func (a *auth) FindByEmail(email string) (model *AuthModel, err error) {
 	}
 	model = &AuthModel{}
 
+	fmt.Println("test")
 	defer rows.Close()
 	for rows.Next() {
 		var m AuthModel
 		rows.Scan(&m.Id, &m.Email, &m.Password)
 		model.Id = m.Id
+
 		model.Email = m.Email
 		model.Password = m.Password
 

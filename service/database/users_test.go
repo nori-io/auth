@@ -13,7 +13,6 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/nori-io/auth/service/database"
-	//"github.com/nori-io/auth/service/database"
 )
 
 type (
@@ -21,7 +20,6 @@ type (
 )
 
 func TestUsers_Create_userEmail(t *testing.T) {
-	t.Parallel()
 	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)

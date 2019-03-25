@@ -1,16 +1,20 @@
 package database
 
 import (
+	"context"
 	"database/sql"
-	"sync"
 
 	log "github.com/sirupsen/logrus"
+
+	"github.com/nori-io/auth/service/database/sql_scripts"
 )
 
 type Database interface {
 	Users() Users
 	AuthenticationHistory() AuthenticationHistory
 	Auth() Auth
+	CreateTables() error
+	DropTables() error
 }
 
 type AuthenticationHistory interface {
@@ -41,29 +45,25 @@ type database struct {
 	auth                  *auth
 }
 
-var instance *database
-var once sync.Once
-
 // Create Database using singltone pattern
 func DB(db *sql.DB, logger *log.Logger) Database {
-	once.Do(func() {
-		instance = &database{
-			db: db,
-			users: &user{
-				db:  db,
-				Log: logger,
-			},
-			authenticationHistory: &authenticationHistory{
-				db:  db,
-				log: logger,
-			},
-			auth: &auth{
-				db:  db,
-				log: logger,
-			},
-		}
-	})
-	return instance
+
+	return &database{
+		db: db,
+		users: &user{
+			db:  db,
+			Log: logger,
+		},
+		authenticationHistory: &authenticationHistory{
+			db:  db,
+			log: logger,
+		},
+		auth: &auth{
+			db:  db,
+			log: logger,
+		},
+	}
+
 }
 
 func (db *database) Users() Users {
@@ -76,4 +76,144 @@ func (db *database) AuthenticationHistory() AuthenticationHistory {
 
 func (db *database) Auth() Auth {
 	return db.auth
+}
+
+func (db *database) CreateTables() error {
+
+	tx, err := db.db.BeginTx(context.Background(), &sql.TxOptions{Isolation: sql.LevelSerializable})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, execErr := tx.Exec(
+		sql_scripts.SetDatabaseSettings)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+
+	}
+
+	_, execErr = tx.Exec(
+		sql_scripts.SetDatabaseStricts)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+
+	}
+
+	_, execErr = tx.Exec(
+		sql_scripts.CreateTableUsers)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+
+	}
+	_, execErr = tx.Exec(
+		sql_scripts.CreateTableAuth)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+	_, execErr = tx.Exec(
+		sql_scripts.CreateTableAuthProviders)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+
+	_, execErr = tx.Exec(
+		sql_scripts.CreateTableAuthentificationHistory)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+
+	_, execErr = tx.Exec(
+		sql_scripts.CreateTableUserMfaCode)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+
+	_, execErr = tx.Exec(
+		sql_scripts.CreateTableUsersMfaPhone)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+	_, execErr = tx.Exec(
+		sql_scripts.CreateTableUsersMfaSecret)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+	return nil
+}
+func (db *database) DropTables() error {
+
+	tx, err := db.db.BeginTx(context.Background(), &sql.TxOptions{Isolation: sql.LevelSerializable})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, execErr := tx.Exec(
+		sql_scripts.DropTableAuth)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+
+	}
+
+	_, execErr = tx.Exec(
+		sql_scripts.DropTableAuthProviders)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+
+	}
+	_, execErr = tx.Exec(
+		sql_scripts.DropTableAuthentificationHistory)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+	_, execErr = tx.Exec(
+		sql_scripts.DropTableUserMfaCode)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+
+	_, execErr = tx.Exec(
+		sql_scripts.DropTableUserMfaPhone)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+
+	_, execErr = tx.Exec(
+		sql_scripts.DropTableUserMfaSecret)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+	}
+
+	_, execErr = tx.Exec(
+		sql_scripts.DropTableUsers)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
+
+	}
+
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+	return nil
 }

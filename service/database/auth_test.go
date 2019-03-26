@@ -15,8 +15,8 @@ func TestAuth_FindByEmail(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-	defer mockDatabase.Close()
-	defer mock.ExpectClose()
+//	defer mockDatabase.Close()
+//	defer mock.ExpectClose()
 
 	mock.ExpectBegin()
 
@@ -31,21 +31,22 @@ func TestAuth_FindByEmail(t *testing.T) {
 	mock.ExpectExec("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)").
 		WithArgs(1, "test@mail.ru", "pass", "salt", AnyTime{}, AnyTime{}, false, false).WillReturnResult(sqlmock.NewResult(1, 1))
     mock.ExpectCommit()
-	mock.ExpectBegin()
 
-	mock.ExpectPrepare("INSERT INTO users (status_account, type, created, updated,mfa_type) VALUES(?,?,?,?,?)").ExpectExec().
+	/*mock.ExpectPrepare("INSERT INTO users (status_account, type, created, updated,mfa_type) VALUES(?,?,?,?,?)").ExpectExec().
 		WithArgs("active", "vendor", AnyTime{}, AnyTime{}).WillReturnResult(sqlmock.NewResult(1, 1))
+
+
+
 
 	mock.ExpectPrepare("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)").ExpectExec().
 		WithArgs(1, "test@mail.ru", "pass", "salt", AnyTime{}, AnyTime{}, false, false).WillReturnResult((sqlmock.NewResult(1, 1)))
-
+*/
 
 	nonEmptyRows := sqlmock.NewRows([]string{"id", "email", "password"}).
 		AddRow(1,"test@mail.ru", "pass")
 
-	mock.ExpectQuery("SELECT FROM auth WHERE email = ? LIMIT 1").WithArgs("test@mail.ru").WillReturnRows(nonEmptyRows)
+	mock.ExpectQuery("SELECT id, email,password FROM auth WHERE email = ? LIMIT 1").WithArgs("test@mail.ru").WillReturnRows(nonEmptyRows)
 
-	mock.ExpectCommit()
     d := database.DB(mockDatabase,logrus.New())
 
 

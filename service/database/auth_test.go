@@ -9,6 +9,35 @@ import (
 	"github.com/nori-io/auth/service/database"
 )
 
+func TestAuth_Update(t *testing.T) {
+	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	mock.ExpectExec("UPDATE auth SET profile_user_id = ?, phone = ?, email = ?, password = ? ,salt = ? ,created =? WHERE id = ? ").WithArgs(1,1,).
+		WillReturnResult(sqlmock.NewResult(1,0))
+
+
+	d := database.DB(mockDatabase, logrus.New())
+
+	err = d.Auth().Update(&database.AuthModel{
+		Id:1,
+		UserId:1,
+		Email:    "test@mail.ru",
+		Password: "pass",
+		Salt:     "salt",
+	})
+
+
+
+	// we make sure that all expectations were met
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+
+}
+
 func TestAuth_FindByEmail(t *testing.T) {
 	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {

@@ -3,7 +3,6 @@ package database_test
 import (
 	"fmt"
 	"testing"
-	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/sirupsen/logrus"
@@ -18,24 +17,51 @@ func TestAuth_FindByEmail(t *testing.T) {
 	}
 	defer mockDatabase.Close()
 	defer mock.ExpectClose()
-	mockDatabase.Exec("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)",
-		1, "test@mail.ru", "pass", "salt", time.Now(), time.Now(), false, false)
 
 	mock.ExpectBegin()
+
+	mock.ExpectExec("INSERT INTO users (status_account, type, created, updated,mfa_type) VALUES(?,?,?,?,?)").
+		WithArgs("active", "vendor", AnyTime{}, AnyTime{}).WillReturnResult(sqlmock.NewResult(1, 1))
+
+	rows := sqlmock.NewRows([]string{"id"}).
+		AddRow(1).
+		RowError(1, fmt.Errorf("row error"))
+	mock.ExpectQuery("SELECT LAST_INSERT_ID()").WillReturnRows(rows)
+
+	mock.ExpectExec("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)").
+		WithArgs(1, "test@mail.ru", "pass", "salt", AnyTime{}, AnyTime{}, false, false).WillReturnResult(sqlmock.NewResult(1, 1))
+    mock.ExpectCommit()
+	mock.ExpectBegin()
+
+	mock.ExpectPrepare("INSERT INTO users (status_account, type, created, updated,mfa_type) VALUES(?,?,?,?,?)").ExpectExec().
+		WithArgs("active", "vendor", AnyTime{}, AnyTime{}).WillReturnResult(sqlmock.NewResult(1, 1))
+
+	mock.ExpectPrepare("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)").ExpectExec().
+		WithArgs(1, "test@mail.ru", "pass", "salt", AnyTime{}, AnyTime{}, false, false).WillReturnResult((sqlmock.NewResult(1, 1)))
+
+
 	nonEmptyRows := sqlmock.NewRows([]string{"id", "email", "password"}).
 		AddRow(1,"test@mail.ru", "pass")
 
 	mock.ExpectQuery("SELECT FROM auth WHERE email = ? LIMIT 1").WithArgs("test@mail.ru").WillReturnRows(nonEmptyRows)
 
 	mock.ExpectCommit()
+    d := database.DB(mockDatabase,logrus.New())
 
-	d := database.DB(mockDatabase, logrus.New())
 
-	model, err:= d.Auth().FindByEmail("test@mail.ru")
+	err = d.Users().Create(&database.AuthModel{
+		Email:    "test@mail.ru",
+		Password: "pass",
+		Salt:     "salt",
+	}, &database.UsersModel{
+		Status_account: "active",
+		Type:           "vendor",
+	})
 	if err != nil {
 		t.Error(err)
 	}
-	fmt.Println("Model",model)
+	_,err = d.Auth().FindByEmail("test@mail.ru")
+
 	// we make sure that all expectations were met
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)

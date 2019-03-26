@@ -48,8 +48,8 @@ func (a *auth) FindByEmail(email string) (model *AuthModel, err error) {
 	return model, nil
 }
 
-func (a *auth) FindByPhone(phone string) (model *AuthModel, err error) {
-	rows, err := a.db.Query("SELECT id, phone, password FROM auth WHERE phone = ? LIMIT 1", phone)
+func (a *auth) FindByPhone(phoneCountryCode, phoneNumber string) (model *AuthModel, err error) {
+	rows, err := a.db.Query("SELECT id, phone_country_code, phone_number, password FROM auth WHERE phone_country_code = ? and phone_number=?  LIMIT 1", phoneCountryCode, phoneNumber)
 	if err != nil {
 		return nil, err
 	}

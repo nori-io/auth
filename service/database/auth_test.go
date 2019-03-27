@@ -15,21 +15,18 @@ func TestAuth_Update(t *testing.T) {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 
-	mock.ExpectExec("UPDATE auth SET profile_user_id = ?, phone = ?, email = ?, password = ? ,salt = ? ,created =? WHERE id = ? ").WithArgs(1,1,).
-		WillReturnResult(sqlmock.NewResult(1,0))
-
+	mock.ExpectExec("UPDATE auth SET profile_user_id = ?, phone = ?, email = ?, password = ? ,salt = ? ,created =? WHERE id = ? ").WithArgs(1, 1).
+		WillReturnResult(sqlmock.NewResult(1, 0))
 
 	d := database.DB(mockDatabase, logrus.New())
 
 	err = d.Auth().Update(&database.AuthModel{
-		Id:1,
-		UserId:1,
-		Email:    "test@mail.ru",
-		Password: "pass",
-		Salt:     "salt",
+		Id:       1,
+		UserId:   1,
+		Email:    "auth_update_@mail.ru",
+		Password: "auth_update_pass",
+		Salt:     "auth_update_salt",
 	})
-
-
 
 	// we make sure that all expectations were met
 	if err := mock.ExpectationsWereMet(); err != nil {
@@ -45,13 +42,13 @@ func TestAuth_FindByEmail(t *testing.T) {
 	}
 
 	nonEmptyRows := sqlmock.NewRows([]string{"id", "email", "password"}).
-		AddRow(1, "test@mail.ru", "pass")
+		AddRow(2, "auth_find_by_email_test@mail.ru", "auth_find_by_email_pass")
 
-	mock.ExpectQuery("SELECT id, email,password FROM auth WHERE email = ? LIMIT 1").WithArgs("test@mail.ru").WillReturnRows(nonEmptyRows)
+	mock.ExpectQuery("SELECT id, email,password FROM auth WHERE email = ? LIMIT 1").WithArgs("auth_find_by_email_test@mail.ru").WillReturnRows(nonEmptyRows)
 
 	d := database.DB(mockDatabase, logrus.New())
 
-	_, err = d.Auth().FindByEmail("test@mail.ru")
+	_, err = d.Auth().FindByEmail("auth_find_by_email_test@mail.ru")
 
 	// we make sure that all expectations were met
 	if err := mock.ExpectationsWereMet(); err != nil {
@@ -67,13 +64,13 @@ func TestAuth_FindByPhone(t *testing.T) {
 	}
 
 	nonEmptyRows := sqlmock.NewRows([]string{"id", "phone_country_code", "phone_number", "password"}).
-		AddRow(1, "8", "9191501490", "pass")
+		AddRow(3, "1", "1111111111", "auth_find_by_phone_pass")
 
-	mock.ExpectQuery("SELECT id, phone_country_code, phone_number, password FROM auth WHERE phone_country_code = ? and phone_number=?  LIMIT 1").WithArgs("8", "9191501490").WillReturnRows(nonEmptyRows)
+	mock.ExpectQuery("SELECT id, phone_country_code, phone_number, password FROM auth WHERE phone_country_code = ? and phone_number=?  LIMIT 1").WithArgs("1", "1111111111").WillReturnRows(nonEmptyRows)
 
 	d := database.DB(mockDatabase, logrus.New())
 
-	_, err = d.Auth().FindByPhone("8", "9191501490")
+	_, err = d.Auth().FindByPhone("1", "1111111111")
 
 	// we make sure that all expectations were met
 	if err := mock.ExpectationsWereMet(); err != nil {

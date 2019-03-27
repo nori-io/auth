@@ -43,7 +43,6 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		lastId.Scan(&m.Id)
 		lastIdNumber = m.Id
 	}
-	log.Println("Last id number is", lastIdNumber)
 
 	if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber == "") && (modelAuth.Email != "") {
 		_, execErr = tx.Exec("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)",

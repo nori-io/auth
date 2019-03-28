@@ -58,7 +58,6 @@ func TestUsers_Create_userEmail(t *testing.T) {
 }
 
 func TestUsers_Create_userPhone(t *testing.T) {
-	t.Parallel()
 
 	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {

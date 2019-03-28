@@ -64,13 +64,13 @@ func TestAuth_FindByPhone(t *testing.T) {
 	}
 
 	nonEmptyRows := sqlmock.NewRows([]string{"id", "phone_country_code", "phone_number", "password"}).
-		AddRow(3, "1", "1111111111", "auth_find_by_phone_pass")
+		AddRow(3, "11111111111", "auth_find_by_phone_pass")
 
-	mock.ExpectQuery("SELECT id, phone_country_code, phone_number, password FROM auth WHERE phone_country_code = ? and phone_number=?  LIMIT 1").WithArgs("1", "1111111111").WillReturnRows(nonEmptyRows)
+	mock.ExpectQuery("SELECT id, phone_country_code, phone_number, password FROM auth WHERE phone_country_code = ? and phone_number=?  LIMIT 1").WithArgs("11111111111").WillReturnRows(nonEmptyRows)
 
 	d := database.DB(mockDatabase, logrus.New())
 
-	_, err = d.Auth().FindByPhone("1", "1111111111")
+	_, err = d.Auth().FindByPhone("11111111111")
 
 	// we make sure that all expectations were met
 	if err := mock.ExpectationsWereMet(); err != nil {

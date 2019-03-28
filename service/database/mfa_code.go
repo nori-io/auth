@@ -3,15 +3,16 @@ package database
 import (
 	"context"
 	"database/sql"
-	"log"
 	"math/rand"
 	"time"
 	"unsafe"
+
+	log "github.com/sirupsen/logrus"
 )
 
-type code struct {
+type mfaCode struct {
 	db  *sql.DB
-	Log *log.Logger
+	log *log.Logger
 }
 
 const (
@@ -22,7 +23,7 @@ const (
 
 var rng = rand.NewSource(time.Now().UnixNano())
 
-func (c *code) Create(userId uint64, modelMfaCode *MfaCodeModel) error {
+func (c *mfaCode) Create(modelMfaCode *MfaCodeModel) error {
 
 	ctx := context.Background()
 	tx, err := c.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
@@ -31,8 +32,8 @@ func (c *code) Create(userId uint64, modelMfaCode *MfaCodeModel) error {
 	}
 
 	for index := 0; index < 10; index++ {
-		_, execErr := tx.Exec("INSERT INTO user_mfa_phone (id, user_id, code) VALUES(?,?)",
-			userId, RandStr(5)+""+RandStr(5))
+		_, execErr := tx.Exec("INSERT INTO user_mfa_phone (user_id, code) VALUES(?,?)",
+			modelMfaCode.UserId, RandStr(5)+""+RandStr(5))
 		if execErr != nil {
 			_ = tx.Rollback()
 			return execErr

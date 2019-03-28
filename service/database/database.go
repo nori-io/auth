@@ -13,6 +13,8 @@ type Database interface {
 	Users() Users
 	AuthenticationHistory() AuthenticationHistory
 	Auth() Auth
+	MfaCode() MfaCode
+
 	CreateTables() error
 	DropTables() error
 }
@@ -34,8 +36,8 @@ type Auth interface {
 	FindByPhone(phoneCountryCodeAndNumber string) (model *AuthModel, err error)
 }
 
-type Provider interface {
-	//	Update(*ProviderModel) error
+type MfaCode interface {
+	Create(modelMfaCode *MfaCodeModel) error
 	//FindBy...
 }
 type database struct {
@@ -43,6 +45,7 @@ type database struct {
 	users                 *user
 	authenticationHistory *authenticationHistory
 	auth                  *auth
+	mfaCode               *mfaCode
 }
 
 // Create Database using singltone pattern
@@ -62,6 +65,10 @@ func DB(db *sql.DB, logger *log.Logger) Database {
 			db:  db,
 			log: logger,
 		},
+		mfaCode: &mfaCode{
+			db:  db,
+			log: logger,
+		},
 	}
 
 }
@@ -76,6 +83,10 @@ func (db *database) AuthenticationHistory() AuthenticationHistory {
 
 func (db *database) Auth() Auth {
 	return db.auth
+}
+
+func (db *database) MfaCode() MfaCode {
+	return db.mfaCode
 }
 
 func (db *database) CreateTables() error {

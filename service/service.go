@@ -15,6 +15,7 @@ type Service interface {
 	SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpResponse)
 	SignIn(ctx context.Context, req SignInRequest) (resp *SignInResponse)
 	SignOut(ctx context.Context, req SignOutRequest) (resp *SignOutResponse)
+	RecoveryCodes(ctx context.Context, req RecoveryCodesRequest) (resp *RecoveryCodesResponse)
 }
 
 type Config struct {
@@ -62,7 +63,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 		},
 	}
 
-	if (req.Email == "") && (req.PhoneCountryCode+req.PhoneNumber == "") {
+	if (req.Email == "") && (req.PhoneCountryCodeWithNumber == "") {
 		resp.Err = rest.ErrFieldResp{
 			Meta: rest.ErrFieldRespMeta{
 				ErrMessage: "Email and Phone's information is absent",
@@ -85,8 +86,8 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 			errField.AddError("email", 400, "Email already exists.")
 		}
 	}
-	if req.PhoneCountryCode+req.PhoneNumber != "" {
-		if modelAuth, err = s.db.Auth().FindByPhone(req.PhoneCountryCode + req.PhoneNumber); err != nil {
+	if req.PhoneCountryCodeWithNumber != "" {
+		if modelAuth, err = s.db.Auth().FindByPhone(req.PhoneCountryCodeWithNumber); err != nil {
 			resp.Err = rest.ErrFieldResp{
 				Meta: rest.ErrFieldRespMeta{
 					ErrMessage: err.Error(),
@@ -107,7 +108,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	modelAuth = &database.AuthModel{
 		Email:            req.Email,
 		Password:         req.Password,
-		PhoneCountryCode: req.PhoneCountryCode,
+		PhoneCountryCode: req.PhoneCountryCodeWithNumber,
 	}
 
 	modelUsers = &database.UsersModel{
@@ -127,8 +128,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	}
 
 	resp.Email = req.Email
-	resp.PhoneCountryCode = req.PhoneCountryCode
-	resp.PhoneNumber = req.PhoneNumber
+	resp.PhoneCountryCodeWithNumber = req.PhoneCountryCodeWithNumber
 
 	return resp
 }
@@ -235,4 +235,8 @@ func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOu
 	resp = &SignOutResponse{}
 	s.session.Delete(s.session.SessionId(ctx))
 	return resp
+}
+
+func (s *service) RecoveryCodes(ctx context.Context, req RecoveryCodesRequest) (resp *RecoveryCodesResponse) {
+	return
 }

@@ -8,13 +8,12 @@ import (
 
 // SignUpResponse
 type SignUpResponse struct {
-	Id               uint64
-	Name             string
-	Email            string
-	PhoneCountryCode string
-	PhoneNumber      string
-	HttpStatusCode   int
-	Err              error
+	Id                         uint64
+	Name                       string
+	Email                      string
+	PhoneCountryCodeWithNumber string
+	HttpStatusCode             int
+	Err                        error
 }
 
 func (d *SignUpResponse) Error() error {
@@ -54,5 +53,21 @@ func (d *SignOutResponse) Error() error {
 }
 
 func (d *SignOutResponse) StatusCode() int {
+	return d.HttpStatusCode
+}
+
+type RecoveryCodesResponse struct {
+	Id             uint64
+	UserId         uint64
+	Code           string
+	HttpStatusCode int
+	Err            error
+}
+
+func (d *RecoveryCodesResponse) Error() error {
+	return d.Err
+}
+
+func (d *RecoveryCodesResponse) StatusCode() int {
 	return d.HttpStatusCode
 }

@@ -28,6 +28,14 @@ func MakeSignOutEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, r interface{}) (interface{}, error) {
 		req := r.(SignOutRequest)
 		resp := s.SignOut(ctx, req)
+		return *resp, resp.Err
+	}
+}
+
+func MakeRecoveryCodesEndpoint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, r interface{}) (interface{}, error) {
+		req := r.(RecoveryCodesRequest)
+		resp := s.RecoveryCodes(ctx, req)
 		return *resp, resp.Error()
 	}
 }

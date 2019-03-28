@@ -56,9 +56,13 @@ func Transport(
 		opts...,
 	)
 
+	recoveryCodesHandler := http.NewServer(nil, nil, nil, nil)
+
 	router.Handle("/auth/signup", signupHandler).Methods("POST")
 	router.Handle("/auth/signin", signinHandler).Methods("POST")
 	router.Handle("/auth/signout", signoutHandler).Methods("GET")
+
+	router.Handle("/auth/settings/two_factor_authentication/recovery_codes", recoveryCodesHandler).Methods("GET")
 
 	//	/auth/verify/(uuid)
 	//	/auth/delete

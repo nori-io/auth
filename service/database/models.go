@@ -41,19 +41,19 @@ type AuthenticationHistoryModel struct {
 	SignOut time.Time
 }
 
-type UserMfaSecretModel struct {
+type MfaSecretModel struct {
 	Id     uint64
 	UserId uint64
 	Secret string
 }
 
-type UserMfaPhoneModel struct {
+type MfaPhoneModel struct {
 	Id     uint64
 	UserId uint64
 	Phone  string
 }
 
-type UsersMfaCodeModel struct {
+type MfaCodeModel struct {
 	Id     uint64
 	UserId uint64
 	code   string

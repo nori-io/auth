@@ -105,3 +105,38 @@ func DecodeSignOutRequest(_ context.Context, r *http.Request) (interface{}, erro
 
 	return body, nil
 }
+
+func DecodeRecoveCodes() func(_ context.Context, r *http.Request) (interface{}, error) {
+	return func(_ context.Context, r *http.Request) (interface{}, error) {
+		var body SignUpRequest
+		var errorText string
+		var errCommon error
+
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			return body, rest.ErrFieldResp{
+				Meta: rest.ErrFieldRespMeta{
+					ErrMessage: "Error of decoding",
+				},
+			}
+		}
+
+		if err := body.Validate(); err != nil {
+			return body, rest.ErrFieldResp{
+				Meta: rest.ErrFieldRespMeta{
+					ErrMessage: "Error of body.Validate()",
+				},
+			}
+		}
+
+		if errorText != "" {
+			return body, rest.ErrFieldResp{
+				Meta: rest.ErrFieldRespMeta{
+					ErrMessage: errCommon.Error(),
+				},
+			}
+		}
+
+		return body, nil
+	}
+
+}

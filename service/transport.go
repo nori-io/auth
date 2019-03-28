@@ -56,7 +56,9 @@ func Transport(
 		opts...,
 	)
 
-	recoveryCodesHandler := http.NewServer(nil, nil, nil, nil)
+	recoveryCodesHandler := http.NewServer(
+		MakeRecoveryCodesEndpoint(srv),
+		DecodeRecoveCodes(), nil, nil)
 
 	router.Handle("/auth/signup", signupHandler).Methods("POST")
 	router.Handle("/auth/signin", signinHandler).Methods("POST")

@@ -50,6 +50,31 @@ func (c *mfaCode) Create(modelMfaCode *MfaCodeModel) error {
 
 }
 
+func (c *mfaCode) Delete(code string) error {
+
+	ctx := context.Background()
+	tx, err := c.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
+	if err != nil {
+		return err
+	}
+
+	_, execErr := tx.Exec("DELETE FROM user_mfa_code WHERE code=?",code)
+
+		if execErr != nil {
+			_ = tx.Rollback()
+			return execErr
+		}
+
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+	return nil
+
+}
+
+
+
 func RandStr(ln int) string {
 	buf := make([]byte, ln)
 	for idx, cache, remain := ln-1, rng.Int63(), 10; idx >= 0; {

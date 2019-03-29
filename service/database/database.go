@@ -38,6 +38,8 @@ type Auth interface {
 
 type MfaCode interface {
 	Create(modelMfaCode *MfaCodeModel) error
+	Delete(code string) error
+
 	//FindBy...
 }
 type database struct {

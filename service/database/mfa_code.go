@@ -31,9 +31,11 @@ func (c *mfaCode) Create(modelMfaCode *MfaCodeModel) error {
 		return err
 	}
 
+	_, execErr := tx.Exec("DELETE FROM user_mfa_code WHERE user_ud=?", modelMfaCode.UserId)
+
 	for index := 0; index < 10; index++ {
 		generatedCode := RandStr(5) + "-" + RandStr(5)
-		_, execErr := tx.Exec("INSERT INTO user_mfa_phone (user_id, code) VALUES(?,?)",
+		_, execErr = tx.Exec("INSERT INTO user_mfa_code (user_id, code) VALUES(?,?)",
 			modelMfaCode.UserId, generatedCode)
 		if execErr != nil {
 			_ = tx.Rollback()

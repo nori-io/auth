@@ -10,6 +10,7 @@ import (
 )
 
 func TestMfaCode_Create(t *testing.T) {
+
 	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -21,7 +22,7 @@ func TestMfaCode_Create(t *testing.T) {
 
 	mock.ExpectBegin()
 	for index := 0; index < 10; index++ {
-		mock.ExpectExec("INSERT INTO user_mfa_phone (user_id, code) VALUES(?,?)").
+		mock.ExpectExec("INSERT INTO user_mfa_code (user_id, code) VALUES(?,?)").
 			WithArgs(1, sqlmock.AnyArg()).WillReturnResult(sqlmock.NewResult(int64(index), 1))
 	}
 	mock.ExpectCommit()

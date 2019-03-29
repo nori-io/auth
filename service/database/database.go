@@ -37,7 +37,7 @@ type Auth interface {
 }
 
 type MfaCode interface {
-	Create(modelMfaCode *MfaCodeModel) error
+	Create(modelMfaCode *MfaCodeModel) ([]string,error)
 	Delete(code string) error
 
 	//FindBy...

@@ -23,12 +23,14 @@ const (
 
 var rng = rand.NewSource(time.Now().UnixNano())
 
-func (c *mfaCode) Create(modelMfaCode *MfaCodeModel) error {
+func (c *mfaCode) Create(modelMfaCode *MfaCodeModel) ([]string, error){
 
 	ctx := context.Background()
 	tx, err := c.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
+
+	var recoveryCodes []string
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	_, execErr := tx.Exec("DELETE FROM user_mfa_code WHERE user_ud=?", modelMfaCode.UserId)
@@ -37,16 +39,17 @@ func (c *mfaCode) Create(modelMfaCode *MfaCodeModel) error {
 		generatedCode := RandStr(5) + "-" + RandStr(5)
 		_, execErr = tx.Exec("INSERT INTO user_mfa_code (user_id, code) VALUES(?,?)",
 			modelMfaCode.UserId, generatedCode)
+		recoveryCodes[index]=generatedCode
 		if execErr != nil {
 			_ = tx.Rollback()
-			return execErr
+			return nil,execErr
 		}
 	}
 
 	if err := tx.Commit(); err != nil {
-		return err
+		return nil,err
 	}
-	return nil
+	return recoveryCodes,nil
 
 }
 

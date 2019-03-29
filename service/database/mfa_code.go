@@ -32,8 +32,9 @@ func (c *mfaCode) Create(modelMfaCode *MfaCodeModel) error {
 	}
 
 	for index := 0; index < 10; index++ {
+		generatedCode := RandStr(5) + "-" + RandStr(5)
 		_, execErr := tx.Exec("INSERT INTO user_mfa_phone (user_id, code) VALUES(?,?)",
-			modelMfaCode.UserId, RandStr(5)+""+RandStr(5))
+			modelMfaCode.UserId, generatedCode)
 		if execErr != nil {
 			_ = tx.Rollback()
 			return execErr

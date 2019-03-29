@@ -20,17 +20,13 @@ func TestMfaCode_Create(t *testing.T) {
 	d := database.DB(mockDatabase, logrus.New())
 
 	mock.ExpectBegin()
-	for index := 1; index <= 10; index++ {
-
+	for index := 0; index < 10; index++ {
 		mock.ExpectExec("INSERT INTO user_mfa_phone (user_id, code) VALUES(?,?)").
-			WithArgs(index, AnyTime{}).WillReturnResult(sqlmock.NewResult(int64(index), 1))
-
+			WithArgs(1, sqlmock.AnyArg()).WillReturnResult(sqlmock.NewResult(int64(index), 1))
 	}
-	for index := 1; index <= 10; index++ {
+	mock.ExpectCommit()
 
-		err = d.MfaCode().Create(&database.MfaCodeModel{UserId: uint64(index)})
-
-	}
+	err = d.MfaCode().Create(&database.MfaCodeModel{UserId: 1})
 
 	if err != nil {
 		t.Error(err)

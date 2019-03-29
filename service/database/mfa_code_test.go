@@ -5,6 +5,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/nori-io/auth/service/database"
 )
@@ -26,9 +27,9 @@ func TestMfaCode_Create(t *testing.T) {
 			WithArgs(1, sqlmock.AnyArg()).WillReturnResult(sqlmock.NewResult(int64(index), 1))
 	}
 	mock.ExpectCommit()
-
-	err = d.MfaCode().Create(&database.MfaCodeModel{UserId: 1})
-
+    var recoveryMfaCodes []string
+	recoveryMfaCodes,err = d.MfaCode().Create(&database.MfaCodeModel{UserId: 1})
+   assert.Equal(t,10,len(recoveryMfaCodes))
 	if err != nil {
 		t.Error(err)
 	}
@@ -52,8 +53,8 @@ func TestMfaCode_Delete(t *testing.T) {
 
 	d := database.DB(mockDatabase, logrus.New())
 
- mock.ExpectBegin()
-		mock.ExpectExec("DELETE FROM user_mfa_code WHERE code=?").WithArgs(sqlmock.AnyArg()).WillReturnResult(sqlmock.NewErrorResult(nil))
+	mock.ExpectBegin()
+	mock.ExpectExec("DELETE FROM user_mfa_code WHERE code=?").WithArgs(sqlmock.AnyArg()).WillReturnResult(sqlmock.NewErrorResult(nil))
 
 	mock.ExpectCommit()
 
@@ -68,4 +69,3 @@ func TestMfaCode_Delete(t *testing.T) {
 	}
 
 }
-

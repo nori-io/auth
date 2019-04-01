@@ -58,13 +58,13 @@ func Transport(
 
 	recoveryCodesHandler := http.NewServer(
 		MakeRecoveryCodesEndpoint(srv),
-		DecodeRecoveCodes(), nil, nil)
+		DecodeRecoveCodes(), http.EncodeJSONResponse, logger)
 
 	router.Handle("/auth/signup", signupHandler).Methods("POST")
 	router.Handle("/auth/signin", signinHandler).Methods("POST")
 	router.Handle("/auth/signout", signoutHandler).Methods("GET")
-
-	router.Handle("/auth/settings/two_factor_authentication/recovery_codes", recoveryCodesHandler).Methods("GET")
+	//router.Handle("/auth/settings/two_factor_authentication/recovery_codes", recoveryCodesHandler).Methods("GET")
+	router.Handle("/auth/settings", recoveryCodesHandler).Methods("GET")
 
 	//	/auth/verify/(uuid)
 	//	/auth/delete

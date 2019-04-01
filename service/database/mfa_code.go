@@ -77,8 +77,6 @@ func (c *mfaCode) Delete(code string) error {
 
 }
 
-
-
 func RandStr(ln int) string {
 	buf := make([]byte, ln)
 	for idx, cache, remain := ln-1, rng.Int63(), 10; idx >= 0; {

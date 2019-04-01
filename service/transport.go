@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/nori-io/nori-common/endpoint"
 	"github.com/nori-io/nori-common/interfaces"
 	"github.com/nori-io/nori-common/transport/http"
@@ -58,13 +60,17 @@ func Transport(
 
 	recoveryCodesHandler := http.NewServer(
 		MakeRecoveryCodesEndpoint(srv),
-		DecodeRecoveCodes(), http.EncodeJSONResponse, logger)
+		DecodeRecoveCodes(),
+		http.EncodeJSONResponse,
+		logger)
+
+	fmt.Print("recoveryCodesHandler ", recoveryCodesHandler)
 
 	router.Handle("/auth/signup", signupHandler).Methods("POST")
 	router.Handle("/auth/signin", signinHandler).Methods("POST")
 	router.Handle("/auth/signout", signoutHandler).Methods("GET")
 	//router.Handle("/auth/settings/two_factor_authentication/recovery_codes", recoveryCodesHandler).Methods("GET")
-	router.Handle("/auth/settings", recoveryCodesHandler).Methods("GET")
+	router.Handle("/auth/settings", recoveryCodesHandler).Methods("POST")
 
 	//	/auth/verify/(uuid)
 	//	/auth/delete

@@ -23,7 +23,7 @@ const (
 
 var rng = rand.NewSource(time.Now().UnixNano())
 
-func (c *mfaCode) Create(modelMfaCode *MfaCodeModel) ([]string, error){
+func (c *mfaCode) Create(modelMfaCode *MfaCodeModel) ([]string, error) {
 
 	ctx := context.Background()
 	tx, err := c.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
@@ -38,19 +38,19 @@ func (c *mfaCode) Create(modelMfaCode *MfaCodeModel) ([]string, error){
 		generatedCode := RandStr(5) + "-" + RandStr(5)
 		_, execErr = tx.Exec("INSERT INTO user_mfa_code (user_id, code) VALUES(?,?)",
 			modelMfaCode.UserId, generatedCode)
-		if generatedCode!="" {
-			recoveryCodes=append(recoveryCodes, generatedCode)
+		if generatedCode != "" {
+			recoveryCodes = append(recoveryCodes, generatedCode)
 		}
 		if execErr != nil {
 			_ = tx.Rollback()
-			return nil,execErr
+			return nil, execErr
 		}
 	}
 
 	if err := tx.Commit(); err != nil {
-		return nil,err
+		return nil, err
 	}
-	return recoveryCodes,nil
+	return recoveryCodes, nil
 
 }
 
@@ -62,13 +62,12 @@ func (c *mfaCode) Delete(code string) error {
 		return err
 	}
 
-	_, execErr := tx.Exec("DELETE FROM user_mfa_code WHERE code=?",code)
+	_, execErr := tx.Exec("DELETE FROM user_mfa_code WHERE code=?", code)
 
 	if execErr != nil {
 		_ = tx.Rollback()
 		return execErr
 	}
-
 
 	if err := tx.Commit(); err != nil {
 		return err

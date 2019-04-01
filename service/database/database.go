@@ -37,10 +37,8 @@ type Auth interface {
 }
 
 type MfaCode interface {
-	Create(modelMfaCode *MfaCodeModel) ([]string,error)
+	Create(modelMfaCode *MfaCodeModel) ([]string, error)
 	Delete(code string) error
-
-	//FindBy...
 }
 type database struct {
 	db                    *sql.DB
@@ -50,7 +48,6 @@ type database struct {
 	mfaCode               *mfaCode
 }
 
-// Create Database using singltone pattern
 func DB(db *sql.DB, logger *log.Logger) Database {
 
 	return &database{

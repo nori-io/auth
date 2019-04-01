@@ -63,6 +63,3 @@ func (r SignInRequest) Validate() error {
 
 // SignOut Request
 type SignOutRequest struct{}
-
-
-

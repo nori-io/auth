@@ -27,9 +27,9 @@ func TestMfaCode_Create(t *testing.T) {
 			WithArgs(1, sqlmock.AnyArg()).WillReturnResult(sqlmock.NewResult(int64(index), 1))
 	}
 	mock.ExpectCommit()
-    var recoveryMfaCodes []string
-	recoveryMfaCodes,err = d.MfaCode().Create(&database.MfaCodeModel{UserId: 1})
-   assert.Equal(t,10,len(recoveryMfaCodes))
+	var recoveryMfaCodes []string
+	recoveryMfaCodes, err = d.MfaCode().Create(&database.MfaCodeModel{UserId: 1})
+	assert.Equal(t, 10, len(recoveryMfaCodes))
 	if err != nil {
 		t.Error(err)
 	}
@@ -40,7 +40,6 @@ func TestMfaCode_Create(t *testing.T) {
 	}
 
 }
-
 
 func TestMfaCode_Delete(t *testing.T) {
 

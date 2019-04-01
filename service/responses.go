@@ -57,9 +57,7 @@ func (d *SignOutResponse) StatusCode() int {
 }
 
 type RecoveryCodesResponse struct {
-	Id             uint64
-	UserId         uint64
-	Code           string
+	Codes          []string
 	HttpStatusCode int
 	Err            error
 }

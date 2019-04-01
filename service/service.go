@@ -238,5 +238,20 @@ func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOu
 }
 
 func (s *service) RecoveryCodes(ctx context.Context, req RecoveryCodesRequest) (resp *RecoveryCodesResponse) {
-	return
+	var modelMfa *database.MfaCodeModel
+	resp = &RecoveryCodesResponse{}
+
+	codes, err := s.db.MfaCode().Create(modelMfa)
+	if err != nil {
+		s.log.Error(err)
+		resp.Err = rest.ErrFieldResp{
+			Meta: rest.ErrFieldRespMeta{
+				ErrCode:    500,
+				ErrMessage: err.Error(),
+			},
+		}
+		return resp
+	}
+	resp.Codes = codes
+	return resp
 }

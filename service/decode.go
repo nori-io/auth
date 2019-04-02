@@ -106,9 +106,9 @@ func DecodeSignOutRequest(_ context.Context, r *http.Request) (interface{}, erro
 	return body, nil
 }
 
-func DecodeRecoveCodes() func(_ context.Context, r *http.Request) (interface{}, error) {
+func DecodeRecoveryCodes() func(_ context.Context, r *http.Request) (interface{}, error) {
 	return func(_ context.Context, r *http.Request) (interface{}, error) {
-		var body SignUpRequest
+		var body RecoveryCodesRequest
 		var errorText string
 		var errCommon error
 
@@ -119,7 +119,6 @@ func DecodeRecoveCodes() func(_ context.Context, r *http.Request) (interface{}, 
 				},
 			}
 		}
-
 		if err := body.Validate(); err != nil {
 			return body, rest.ErrFieldResp{
 				Meta: rest.ErrFieldRespMeta{

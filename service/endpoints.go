@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/nori-io/nori-common/endpoint"
 )
@@ -35,14 +34,8 @@ func MakeSignOutEndpoint(s Service) endpoint.Endpoint {
 
 func MakeRecoveryCodesEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, r interface{}) (interface{}, error) {
-		fmt.Print("HERE!!!!!!!!!!!!!!!!!!!!")
 		req := r.(RecoveryCodesRequest)
-		fmt.Print("REQQQQQQQQ", req)
-
 		resp := s.RecoveryCodes(ctx, req)
-
-		fmt.Print("RESSSSSPPPP", resp)
-
 		return *resp, resp.Error()
 	}
 }

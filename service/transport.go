@@ -58,7 +58,7 @@ func Transport(
 
 	recoveryCodesHandler := http.NewServer(
 		MakeRecoveryCodesEndpoint(srv),
-		DecodeRecoveCodes(),
+		DecodeRecoveryCodes(),
 		http.EncodeJSONResponse,
 		logger)
 

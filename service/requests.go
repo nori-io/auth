@@ -1,8 +1,6 @@
 package service
 
 import (
-	"fmt"
-
 	"github.com/asaskevich/govalidator"
 	"github.com/cheebo/gorest"
 )
@@ -17,7 +15,7 @@ type SignUpRequest struct {
 }
 
 type RecoveryCodesRequest struct {
-	Id uint64 `json:"id" validate:"id"`
+	UserId uint64 `json:"user_id" validate:"user_id"`
 }
 
 func (r SignUpRequest) Validate() error {
@@ -56,8 +54,6 @@ func (r SignInRequest) Validate() error {
 type SignOutRequest struct{}
 
 func (r RecoveryCodesRequest) Validate() error {
-      fmt.Print("!!!RECOVERY CODES")
 	_, err := govalidator.ValidateStruct(r)
 	return rest.ValidateResponse(err)
 }
-

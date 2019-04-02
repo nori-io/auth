@@ -24,7 +24,7 @@ func TestUsers_Create_userEmail(t *testing.T) {
 	defer mockDatabase.Close()
 	defer mock.ExpectClose()
 	mock.ExpectBegin()
-	mock.ExpectExec("INSERT INTO users (status_account, type, created, updated,mfa_type) VALUES(?,?,?,?,?)").
+	mock.ExpectExec("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)").
 		WithArgs("active", "vendor", AnyTime{}, AnyTime{}).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	rows := sqlmock.NewRows([]string{"id"}).

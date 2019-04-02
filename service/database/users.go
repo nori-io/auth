@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -23,7 +24,7 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		return err
 	}
 
-	_, execErr := tx.Exec("INSERT INTO users (status_account, type, created, updated,mfa_type) VALUES(?,?,?,?,?)",
+	_, execErr := tx.Exec("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)",
 		"active", modelUsers.Type, time.Now(), time.Now())
 	if execErr != nil {
 		_ = tx.Rollback()
@@ -43,6 +44,7 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		lastId.Scan(&m.Id)
 		lastIdNumber = m.Id
 	}
+	fmt.Print("Д")
 
 	if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber == "") && (modelAuth.Email != "") {
 		_, execErr = tx.Exec("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)",

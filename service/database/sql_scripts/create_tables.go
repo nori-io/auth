@@ -91,17 +91,19 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS user_mfa_phone (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id INT UNSIGNED NOT NULL,
-  phone VARCHAR(45) NOT NULL,
+  phone_country_code VARCHAR(8) NULL,
+  phone_number VARCHAR(16) NULL,
   PRIMARY KEY (id),
   UNIQUE INDEX user_id_UNIQUE (user_id ASC),
-  UNIQUE INDEX phone_UNIQUE (phone ASC),
+ UNIQUE INDEX phone_mfa (phone_country_code ASC, phone_number ASC),
+
   INDEX user_id_idx (user_id ASC),
   CONSTRAINT user_mfa_phone_user_id
     FOREIGN KEY (user_id)
     REFERENCES users (id)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+ENGINE = InnoDB; 
 `
 	CreateTableUserMfaCode = `
 CREATE TABLE IF NOT EXISTS user_mfa_code (

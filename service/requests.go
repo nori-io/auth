@@ -8,7 +8,7 @@ import (
 // SignUp Request
 type SignUpRequest struct {
 	Email                      string `json:"email" validate:"email"`
-	PhoneCountryCodeWithNumber string `json:"phone_country_code" validate:"phone_country_code"`
+	PhoneCountryCodeWithNumber string `json:"phone_country_code_with_number" validate:"phone_country_code_with_number"`
 	Password                   string `json:"password" validate:"password"`
 	Type                       string `json:"user_type" validate:"user_type"`
 	Meta                       string `json:"meta" validate:"meta"`

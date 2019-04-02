@@ -64,7 +64,7 @@ func TestAuth_FindByPhone(t *testing.T) {
 	}
 
 	nonEmptyRows := sqlmock.NewRows([]string{"id", "phone_country_code", "phone_number", "password"}).
-		AddRow(3,	"1", "1111111111", "auth_find_by_phone_pass")
+		AddRow(3, "1", "1111111111", "auth_find_by_phone_pass")
 
 	mock.ExpectQuery("SELECT id, phone_country_code, phone_number, password FROM auth WHERE (phone_country_code+phone_number)=?  LIMIT 1").WithArgs("11111111111").WillReturnRows(nonEmptyRows)
 

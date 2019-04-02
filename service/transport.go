@@ -1,8 +1,6 @@
 package service
 
 import (
-	"fmt"
-
 	"github.com/nori-io/nori-common/endpoint"
 	"github.com/nori-io/nori-common/interfaces"
 	"github.com/nori-io/nori-common/transport/http"
@@ -63,8 +61,6 @@ func Transport(
 		DecodeRecoveCodes(),
 		http.EncodeJSONResponse,
 		logger)
-
-	fmt.Print("recoveryCodesHandler ", recoveryCodesHandler)
 
 	router.Handle("/auth/signup", signupHandler).Methods("POST")
 	router.Handle("/auth/signin", signinHandler).Methods("POST")

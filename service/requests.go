@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/asaskevich/govalidator"
 	"github.com/cheebo/gorest"
 )
@@ -15,21 +17,10 @@ type SignUpRequest struct {
 }
 
 type RecoveryCodesRequest struct {
-	Id string `json:"id", validate:"id"`
+	Id uint64 `json:"id" validate:"id"`
 }
 
 func (r SignUpRequest) Validate() error {
-
-	/*if (r.Email == "") && (r.Phone == "") {
-		errorText = errorText + "Fields 'email' and 'phone' are unavailable on frontend \n"
-		errCommon = errors.New(errorText)
-	}
-
-	if body.Password == "" {
-		errorText = errorText + "Field 'password' is unavailable on frontend \n"
-		errCommon = errors.New(errorText)
-
-	}*/
 
 	_, err := govalidator.ValidateStruct(r)
 	return rest.ValidateResponse(err)
@@ -63,3 +54,10 @@ func (r SignInRequest) Validate() error {
 
 // SignOut Request
 type SignOutRequest struct{}
+
+func (r RecoveryCodesRequest) Validate() error {
+      fmt.Print("!!!RECOVERY CODES")
+	_, err := govalidator.ValidateStruct(r)
+	return rest.ValidateResponse(err)
+}
+

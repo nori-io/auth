@@ -23,8 +23,13 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		return err
 	}
 
-	_, execErr := tx.Exec("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)",
-		"active", modelUsers.Type, time.Now(), time.Now())
+	stmt, err := tx.Prepare("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+
+	_, execErr := stmt.Exec("active", modelUsers.Type, time.Now(), time.Now())
 	if execErr != nil {
 		_ = tx.Rollback()
 		return execErr
@@ -43,18 +48,30 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		lastId.Scan(&m.Id)
 		lastIdNumber = m.Id
 	}
+
+
 	if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber == "") && (modelAuth.Email != "") {
-		_, execErr = tx.Exec("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)",
-			lastIdNumber, modelAuth.Email, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
+
+		stmt, err := tx.Prepare("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		_, execErr = stmt.Exec(	lastIdNumber, modelAuth.Email, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
 		if execErr != nil {
 			_ = tx.Rollback()
 			return execErr
 		}
 	}
 
+
+	stmt, err = tx.Prepare("INSERT INTO auth (user_id, phone_country_code, phone_number, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?,?)")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber != "") && (modelAuth.Email == "") {
-		_, execErr = tx.Exec("INSERT INTO auth (user_id, phone_country_code, phone_number, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?,?)",
-			lastIdNumber, modelAuth.PhoneCountryCode, modelAuth.PhoneNumber, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
+		_, execErr = stmt.Exec(lastIdNumber, modelAuth.PhoneCountryCode, modelAuth.PhoneNumber, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
 		if execErr != nil {
 			_ = tx.Rollback()
 			return execErr

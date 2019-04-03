@@ -24,8 +24,20 @@ func TestUsers_Create_userEmail(t *testing.T) {
 	defer mockDatabase.Close()
 	defer mock.ExpectClose()
 	mock.ExpectBegin()
-	mock.ExpectExec("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)").
-		WithArgs("active", "vendor", AnyTime{}, AnyTime{}).WillReturnResult(sqlmock.NewResult(1, 1))
+	/*mock.ExpectExec("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)").
+		WithArgs("active", "vendor", AnyTime{}, AnyTime{}).WillReturnResult(sqlmock.NewResult(1, 1))*/
+
+	mock.ExpectPrepare("INSERT INTO").ExpectExec().WithArgs("active", "vendor", AnyTime{}, AnyTime{}).WillReturnResult(sqlmock.NewResult(1, 1))
+
+	stmt, err := mockDatabase.Prepare("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)")
+	if err != nil {
+		panic(err)
+	}
+
+	if _, err := stmt.Exec("active", "vendor", AnyTime{}, AnyTime{}); err != nil {
+		t.Fatal(err)
+	}
+
 
 	rows := sqlmock.NewRows([]string{"id"}).
 		AddRow(20).

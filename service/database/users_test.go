@@ -36,7 +36,8 @@ func TestUsers_Create_userEmail(t *testing.T) {
 	if err != nil {
 		t.Log(err)
 	}
-	if _, err := stmt.Exec("active", "vendor", AnyTime{}, AnyTime{}); err != nil {
+	c:=time.Now()
+	if _, err := stmt.Exec("active", "vendor", c, c); err != nil {
 		mock.ExpectRollback()
 		t.Log(err)
 	}
@@ -47,14 +48,14 @@ func TestUsers_Create_userEmail(t *testing.T) {
 		RowError(1, fmt.Errorf("row error"))
 	mock.ExpectQuery("SELECT LAST_INSERT_ID()").WillReturnRows(rows)
 
-	mock.ExpectPrepare("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)").
+	mock.ExpectPrepare("INSERT INTO").
 		ExpectExec().WithArgs(20, "users_create_email_test@mail.ru", "users_create_email_pass", "users_create_email_salt", AnyTime{}, AnyTime{}, false, false).WillReturnResult(sqlmock.NewResult(20, 1))
 	stmt, err = (mockDatabase.Prepare("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)"))
 	if err != nil {
 		panic(err)
 	}
 
-	if _, err := stmt.Exec(20, "users_create_email_test@mail.ru", "users_create_email_pass", "users_create_email_salt", AnyTime{}, AnyTime{}, false, false); err != nil {
+	if _, err := stmt.Exec(20, "users_create_email_test@mail.ru", "users_create_email_pass", "users_create_email_salt", c, c, false, false); err != nil {
 		t.Fatal(err)
 	}
 

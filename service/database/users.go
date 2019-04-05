@@ -3,7 +3,6 @@ package database
 import (
 	"context"
 	"database/sql"
-	"time"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -15,7 +14,7 @@ type user struct {
 
 func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 	var (
-		lastIdNumber uint64
+//		lastIdNumber uint64
 	)
 	ctx := context.Background()
 
@@ -24,9 +23,9 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		return err
 	}
 
-	stmt, err := tx.Prepare("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)")
+/*	stmt, err := tx.Prepare("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)")
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer stmt.Close()
 
@@ -34,9 +33,9 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 	if execErr != nil {
 		_ = tx.Rollback()
 		return execErr
-	}
+	}*/
 
-	lastId, err := tx.Query("SELECT LAST_INSERT_ID()")
+/*	lastId, err := tx.Query("SELECT LAST_INSERT_ID()")
 	if err != nil {
 		return err
 	}
@@ -48,9 +47,9 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		var m AuthModel
 		lastId.Scan(&m.Id)
 		lastIdNumber = m.Id
-	}
+	}*/
 
-
+  /*lastIdNumber:=20
 	if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber == "") && (modelAuth.Email != "") {
 
 		stmt, err := tx.Prepare("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)")
@@ -58,13 +57,12 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 			log.Fatal(err)
 		}
 
-		_, execErr = stmt.Exec(	lastIdNumber, modelAuth.Email, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
+		_, execErr = stmt.Exec(lastIdNumber, modelAuth.Email, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
 		if execErr != nil {
 			_ = tx.Rollback()
 			return execErr
 		}
 	}
-
 
 	stmt, err = tx.Prepare("INSERT INTO auth (user_id, phone_country_code, phone_number, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?,?)")
 	if err != nil {
@@ -79,7 +77,7 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		}
 
 	}
-
+*/
 	if err := tx.Commit(); err != nil {
 		return err
 	}

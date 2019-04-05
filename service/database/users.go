@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -15,7 +16,7 @@ type user struct {
 
 func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 	var (
-		//lastIdNumber uint64
+		lastIdNumber uint64
 	)
 	ctx := context.Background()
 
@@ -36,7 +37,7 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		return execErr
 	}
 
-	/*lastId, err := tx.Query("SELECT LAST_INSERT_ID()")
+	lastId, err := tx.Query("SELECT LAST_INSERT_ID()")
 	if err != nil {
 		return err
 	}
@@ -48,35 +49,33 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		var m AuthModel
 		lastId.Scan(&m.Id)
 		lastIdNumber = m.Id
-	}*/
+	}
+	fmt.Print(lastIdNumber)
+	if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber == "") && (modelAuth.Email != "") {
 
-/*	if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber == "") && (modelAuth.Email != "") {
-
-		stmt1,err:= tx.Prepare("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)")
+		stmt, err := tx.Prepare("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)")
 		if err != nil {
 			log.Fatal(err)
 		}
-         lastIdNumber:=20
-		_, execErr:= stmt1.Exec(lastIdNumber, modelAuth.Email, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
+		_, execErr := stmt.Exec(lastIdNumber, modelAuth.Email, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
 		if execErr != nil {
 			_ = tx.Rollback()
 			return execErr
 		}
 	}
 
-	stmt, err = tx.Prepare("INSERT INTO auth (user_id, phone_country_code, phone_number, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?,?)")
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber != "") && (modelAuth.Email == "") {
+		stmt, err := tx.Prepare("INSERT INTO auth (user_id, phone_country_code, phone_number, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?,?)")
+		if err != nil {
+			log.Fatal(err)
+		}
 		_, execErr = stmt.Exec(lastIdNumber, modelAuth.PhoneCountryCode, modelAuth.PhoneNumber, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
 		if execErr != nil {
 			_ = tx.Rollback()
 			return execErr
 		}
 
-	}*/
+	}
 
 	if err := tx.Commit(); err != nil {
 		return err

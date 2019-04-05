@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -14,7 +15,7 @@ type user struct {
 
 func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 	var (
-//		lastIdNumber uint64
+		//lastIdNumber uint64
 	)
 	ctx := context.Background()
 
@@ -23,7 +24,7 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		return err
 	}
 
-/*	stmt, err := tx.Prepare("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)")
+	stmt, err := tx.Prepare("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)")
 	if err != nil {
 		return err
 	}
@@ -33,9 +34,9 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 	if execErr != nil {
 		_ = tx.Rollback()
 		return execErr
-	}*/
+	}
 
-/*	lastId, err := tx.Query("SELECT LAST_INSERT_ID()")
+	/*lastId, err := tx.Query("SELECT LAST_INSERT_ID()")
 	if err != nil {
 		return err
 	}
@@ -49,15 +50,14 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		lastIdNumber = m.Id
 	}*/
 
-  /*lastIdNumber:=20
-	if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber == "") && (modelAuth.Email != "") {
+/*	if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber == "") && (modelAuth.Email != "") {
 
-		stmt, err := tx.Prepare("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)")
+		stmt1,err:= tx.Prepare("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)")
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		_, execErr = stmt.Exec(lastIdNumber, modelAuth.Email, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
+         lastIdNumber:=20
+		_, execErr:= stmt1.Exec(lastIdNumber, modelAuth.Email, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
 		if execErr != nil {
 			_ = tx.Rollback()
 			return execErr
@@ -76,8 +76,8 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 			return execErr
 		}
 
-	}
-*/
+	}*/
+
 	if err := tx.Commit(); err != nil {
 		return err
 	}

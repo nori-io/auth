@@ -66,7 +66,7 @@ func Transport(
 	router.Handle("/auth/signin", signinHandler).Methods("POST")
 	router.Handle("/auth/signout", signoutHandler).Methods("GET")
 	//router.Handle("/auth/settings/two_factor_authentication/recovery_codes", recoveryCodesHandler).Methods("GET")
-	router.Handle("/auth/settings", recoveryCodesHandler).Methods("POST")
+	router.Handle("/auth/settings/two_factor_authentication/recovery_codes", recoveryCodesHandler).Methods("POST")
 
 	//	/auth/verify/(uuid)
 	//	/auth/delete

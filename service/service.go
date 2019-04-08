@@ -153,14 +153,24 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 		return resp
 	}
 
-	fmt.Println("Salt is in model",modelFindEmail.Salt)
+    fmt.Println("Salt is",modelFindEmail.Salt)
+    fmt.Println("Password is",  modelFindEmail.Password)
+	fmt.Println("req.Password is",req.Password)
 
-    fmt.Println("Salt is",[]byte(modelFindEmail.Salt))
-    fmt.Println("Password is",  []byte(modelFindEmail.Password))
-	if ok, _ := database.Authenticate([]byte(req.Password), []byte(modelFindEmail.Salt), []byte(modelFindEmail.Password)); !ok {
+	fmt.Println("Salt is",[]byte(modelFindEmail.Salt))
+	fmt.Println("Password is",[]byte ( modelFindEmail.Password))
+
+	fmt.Println("req.Password is",[]byte (req.Password))
+
+	if ok, _ := database.Authenticate([]byte("pass"),[]byte(modelFindEmail.Salt) ,[]byte (req.Password) ); ok {
+		fmt.Println("OK")
+	}
+
+	/*if ok,err1 := database.Authenticate([]byte(req.Password), []byte(modelFindEmail.Salt), []byte(modelFindEmail.Password)); !ok {
+		fmt.Println("Err1 is",err1)
 		resp.Err = rest.ErrorNotFound("Uncorrect Password")
 		return resp
-	}
+	}*/
 
     var UserIdTemp uint64
 	if modelFindEmail.Id != 0 {

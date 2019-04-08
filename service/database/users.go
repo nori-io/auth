@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
@@ -82,4 +83,20 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 	}
 	return nil
 
+}
+
+func (u *user) Update(modelUsers *UsersModel) error {
+	ctx := context.Background()
+
+	tx, err := u.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
+	if err != nil {
+		return err
+	}
+	if modelUsers.Id == 0 {
+		return errors.New("Empty model")
+	}
+	_, err = tx.Exec("UPDATE users SET status_account = ?, updated = ?, mfa_type = ?  WHERE id = ? ",
+		modelUsers.Status_account, time.Now(), modelUsers.Mfa_type)
+	return err
+return nil
 }

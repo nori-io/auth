@@ -26,6 +26,9 @@ type AuthenticationHistory interface {
 
 type Users interface {
 	Create(*AuthModel, *UsersModel) error
+
+	Update(*UsersModel) error
+
 	//	CreateProvider(*ProviderModel, *UsersModel) error
 	//Update(*UsersModel) error
 }

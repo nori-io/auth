@@ -22,7 +22,7 @@ func (a *auth) Update(model *AuthModel) error {
 }
 
 func (a *auth) FindByEmail(email string) (model *AuthModel, err error) {
-	rows, err := a.db.Query("SELECT id, email,password FROM auth WHERE email = ? LIMIT 1", email)
+	rows, err := a.db.Query("SELECT id, email,password,salt FROM auth WHERE email = ? LIMIT 1", email)
 	if err != nil {
 		return nil, err
 	}
@@ -31,11 +31,12 @@ func (a *auth) FindByEmail(email string) (model *AuthModel, err error) {
 	defer rows.Close()
 	for rows.Next() {
 		var m AuthModel
-		rows.Scan(&m.Id, &m.Email, &m.Password)
+		rows.Scan(&m.Id, &m.Email, &m.Password,&m.Salt)
 		model.Id = m.Id
 
 		model.Email = m.Email
 		model.Password = m.Password
+		model.Salt=m.Salt
 
 	}
 

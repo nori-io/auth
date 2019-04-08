@@ -7,7 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/nori-io/auth/service/database"
+	"github.com/nori-io/authorization/service/database"
 )
 
 func TestMfaCode_Create(t *testing.T) {

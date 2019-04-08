@@ -11,10 +11,6 @@ import (
 	"golang.org/x/crypto/scrypt"
 )
 
-var (
-	User     = []byte("zenithar")
-	Password = []byte("mypassw0rd")
-)
 
 const (
 	// scrypt is used for strong keys
@@ -22,16 +18,10 @@ const (
 	scryptN      = 16384
 	scryptR      = 8
 	scryptP      = 1
-	scryptKeyLen = 32
+	scryptKeyLen = 65
 )
 
-type Token struct {
-	Username string `json:"user"`
-	Password string `json:"pwd"`
-	Salt     string `json:"salt"`
-}
-
-func randbytes(count int) ([]byte, error) {
+func Randbytes(count int) ([]byte, error) {
 	// Generate a salt
 	salt := make([]byte, count)
 	_, err := rand.Read(salt)
@@ -52,7 +42,7 @@ func enc_scrypt(in, salt []byte) ([]byte, error) {
 }
 
 func HashPassword(password, salt []byte) ([]byte, error) {
-	peppered, _ := hmac_sha256(Password, []byte(os.Getenv("TS_PEPPER")))
+	peppered, _ := hmac_sha256(password, []byte(os.Getenv("TS_PEPPER")))
 	cur, _ := enc_scrypt(peppered, salt)
 
 	return cur, nil
@@ -60,8 +50,10 @@ func HashPassword(password, salt []byte) ([]byte, error) {
 
 func Authenticate(password, salt, hash []byte) (bool, error) {
 	h, _ := HashPassword(password, salt)
-
+    fmt.Println("h is",h)
+	fmt.Println("hash is",hash)
 	if subtle.ConstantTimeCompare(h, hash) != 1 {
+
 		return false, fmt.Errorf("Invalid username or password")
 	}
 

@@ -54,12 +54,12 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 	fmt.Print(lastIdNumber)
 	if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber == "") && (modelAuth.Email != "") {
 
-		salt, err := randbytes(65)
+		salt, err := Randbytes(65)
 		if err!=nil{
 			return err
 		}
 
-		cur,err  := HashPassword(Password, salt)
+		cur,err  := HashPassword([]byte(modelAuth.Password), salt)
 		if err!=nil{
 			return err
 		}

@@ -2,8 +2,7 @@ package service
 
 import (
 	"context"
-	"reflect"
-	"unsafe"
+	"fmt"
 
 	rest "github.com/cheebo/gorest"
 	"github.com/cheebo/rand"
@@ -137,8 +136,6 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInResponse) {
 	resp = &SignInResponse{}
 
-	b := *(*[]byte)(unsafe.Pointer((*reflect.SliceHeader)(unsafe.Pointer(&req.Password))))
-
 	modelFindEmail, err := s.db.Auth().FindByEmail(req.Name)
 	if err != nil {
 		resp.Err = rest.ErrorInternal("Internal error")
@@ -155,11 +152,12 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 		resp.Err = rest.ErrorNotFound("User not found")
 		return resp
 	}
-	salt := *(*[]byte)(unsafe.Pointer((*reflect.SliceHeader)(unsafe.Pointer(&modelFindEmail.Salt))))
-	cur := *(*[]byte)(unsafe.Pointer((*reflect.SliceHeader)(unsafe.Pointer(&modelFindEmail.Password))))
 
+	fmt.Println("Salt is in model",modelFindEmail.Salt)
 
-	if ok, _ := database.Authenticate(b, salt, cur); !ok {
+    fmt.Println("Salt is",[]byte(modelFindEmail.Salt))
+    fmt.Println("Password is",  []byte(modelFindEmail.Password))
+	if ok, _ := database.Authenticate([]byte(req.Password), []byte(modelFindEmail.Salt), []byte(modelFindEmail.Password)); !ok {
 		resp.Err = rest.ErrorNotFound("Uncorrect Password")
 		return resp
 	}

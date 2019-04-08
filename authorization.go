@@ -7,8 +7,8 @@ import (
 	"github.com/nori-io/nori-common/meta"
 	noriPlugin "github.com/nori-io/nori-common/plugin"
 
-	"github.com/nori-io/auth/service"
-	"github.com/nori-io/auth/service/database"
+	"github.com/nori-io/authorization/service"
+	"github.com/nori-io/authorization/service/database"
 )
 
 type plugin struct {

@@ -6,7 +6,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/nori-io/auth/service/database/sql_scripts"
+	"github.com/nori-io/authorization/service/database/sql_scripts"
 )
 
 type Database interface {

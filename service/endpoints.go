@@ -39,3 +39,4 @@ func MakeRecoveryCodesEndpoint(s Service) endpoint.Endpoint {
 		return *resp, resp.Error()
 	}
 }
+

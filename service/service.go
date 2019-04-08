@@ -8,7 +8,7 @@ import (
 	"github.com/nori-io/nori-common/interfaces"
 	"github.com/sirupsen/logrus"
 
-	"github.com/nori-io/auth/service/database"
+	"github.com/nori-io/authorization/service/database"
 )
 
 type Service interface {

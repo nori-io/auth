@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/nori-io/auth/service/database"
+	"github.com/nori-io/authorization/service/database"
 )
 
 //import "github.com/nori-io/noricms/service/database"

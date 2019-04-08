@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"reflect"
+	"unsafe"
 
 	rest "github.com/cheebo/gorest"
 	"github.com/cheebo/rand"
@@ -69,7 +71,6 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 				ErrMessage: "Email and Phone's information is absent",
 			},
 		}
-
 		return resp
 	}
 
@@ -136,6 +137,8 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInResponse) {
 	resp = &SignInResponse{}
 
+	b := *(*[]byte)(unsafe.Pointer((*reflect.SliceHeader)(unsafe.Pointer(&req.Password))))
+
 	modelFindEmail, err := s.db.Auth().FindByEmail(req.Name)
 	if err != nil {
 		resp.Err = rest.ErrorInternal("Internal error")
@@ -152,14 +155,16 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 		resp.Err = rest.ErrorNotFound("User not found")
 		return resp
 	}
+	salt := *(*[]byte)(unsafe.Pointer((*reflect.SliceHeader)(unsafe.Pointer(&modelFindEmail.Salt))))
+	cur := *(*[]byte)(unsafe.Pointer((*reflect.SliceHeader)(unsafe.Pointer(&modelFindEmail.Password))))
 
-	if ((req.Password == modelFindEmail.Password) || (req.Password == modelFindPhone.Password)) == false {
 
+	if ok, _ := database.Authenticate(b, salt, cur); !ok {
 		resp.Err = rest.ErrorNotFound("Uncorrect Password")
 		return resp
 	}
 
-	var UserIdTemp uint64
+    var UserIdTemp uint64
 	if modelFindEmail.Id != 0 {
 
 		UserIdTemp = modelFindEmail.Id

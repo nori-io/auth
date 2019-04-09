@@ -7,7 +7,7 @@ const (
 	CreateTableUsers = `CREATE TABLE IF NOT EXISTS users (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   status_account ENUM('active', 'locked', 'blocked', 'deleted') NOT NULL,
-  type VARCHAR(64) NOT NULL,
+  type NVARCHAR(64) NOT NULL,
   created DATETIME NOT NULL,
   updated DATETIME NOT NULL,
   mfa_type ENUM ('opt', 'phone') NOT NULL,
@@ -18,11 +18,11 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS auth (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
    user_id INT UNSIGNED NOT NULL,
-   phone_country_code VARCHAR(8) NULL,
-   phone_number VARCHAR(16) NULL,
-   email VARCHAR(255) NULL,
-   password VARCHAR(65) NOT NULL,
-   salt VARCHAR(65) NOT NULL,
+   phone_country_code NVARCHAR(8) NULL,
+   phone_number NVARCHAR(16) NULL,
+   email NVARCHAR(255) NULL,
+   password NVARCHAR(65) NOT NULL,
+   salt NVARCHAR(65) NOT NULL,
    created DATETIME NOT NULL,
    updated DATETIME NOT NULL,
    is_email_verified TINYINT(1) NOT NULL DEFAULT 0,
@@ -41,8 +41,8 @@ ENGINE = InnoDB;
 `
 	CreateTableAuthProviders = `
 CREATE TABLE IF NOT EXISTS auth_providers (
-  provider VARCHAR(64) NOT NULL,
-  provider_user_key VARCHAR(128) NOT NULL,
+  provider NVARCHAR(64) NOT NULL,
+  provider_user_key NVARCHAR(128) NOT NULL,
   user_id INT UNSIGNED NOT NULL,
   PRIMARY KEY (provider, provider_user_key),
   INDEX user_id_idx (user_id ASC),
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS authentification_history (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id INT UNSIGNED NOT NULL,
   signin DATETIME NOT NULL,
-  meta VARCHAR(255) NOT NULL,
+  meta NVARCHAR(255) NOT NULL,
   signout DATETIME NULL,
   INDEX user_id_idx (user_id ASC),
   PRIMARY KEY (id),
@@ -75,7 +75,7 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS user_mfa_secret (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id INT UNSIGNED NOT NULL,
-  secret VARCHAR(255) NOT NULL,
+  secret NVARCHAR(255) NOT NULL,
   PRIMARY KEY (id),
   UNIQUE INDEX user_id_UNIQUE (user_id ASC),
   INDEX user_id_idx (user_id ASC),
@@ -91,8 +91,8 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS user_mfa_phone (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id INT UNSIGNED NOT NULL,
-  phone_country_code VARCHAR(8) NULL,
-  phone_number VARCHAR(16) NULL,
+  phone_country_code NVARCHAR(8) NULL,
+  phone_number NVARCHAR(16) NULL,
   PRIMARY KEY (id),
   UNIQUE INDEX user_id_UNIQUE (user_id ASC),
  UNIQUE INDEX phone_mfa (phone_country_code ASC, phone_number ASC),
@@ -109,7 +109,7 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS user_mfa_code (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id INT UNSIGNED NOT NULL,
-  code VARCHAR(45) NOT NULL,
+  code NVARCHAR(45) NOT NULL,
   PRIMARY KEY (id),
   INDEX user_id_idx (user_id ASC),
   CONSTRAINT user_mfa_code_user_id_fk

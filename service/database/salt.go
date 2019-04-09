@@ -11,7 +11,6 @@ import (
 	"golang.org/x/crypto/scrypt"
 )
 
-
 const (
 	// scrypt is used for strong keys
 	// these are the recommended scrypt parameters
@@ -50,8 +49,7 @@ func HashPassword(password, salt []byte) ([]byte, error) {
 
 func Authenticate(password, salt, hash []byte) (bool, error) {
 	h, _ := HashPassword(password, salt)
-    fmt.Println("h is",h)
-	fmt.Println("hash is",hash)
+
 	if subtle.ConstantTimeCompare(h, hash) != 1 {
 
 		return false, fmt.Errorf("Invalid username or password")

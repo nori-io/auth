@@ -3,9 +3,11 @@ package database
 import (
 	"context"
 	"database/sql"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"time"
+	"unsafe"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -55,20 +57,28 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 	if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber == "") && (modelAuth.Email != "") {
 
 		salt, err := Randbytes(8)
-		if err!=nil{
+		if err != nil {
 			return err
 		}
 
-		cur,err  := HashPassword([]byte(modelAuth.Password), salt)
-		if err!=nil{
+		fmt.Println("ModelAuth.Password is ", modelAuth.Password)
+		password, err := HashPassword([]byte(modelAuth.Password), salt)
+		if err != nil {
 			return err
 		}
+
+		encodedPassword := base64.StdEncoding.EncodeToString(password)
+		encodedSalt := base64.StdEncoding.EncodeToString(salt)
+
+		fmt.Println("encodedSalt is", encodedSalt)
+		fmt.Println("encodedPassword is", encodedPassword)
 
 		stmt, err := tx.Prepare("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)")
 		if err != nil {
 			return err
 		}
-		_, execErr := stmt.Exec(lastIdNumber, modelAuth.Email, cur, salt, time.Now(), time.Now(), false, false)
+
+		_, execErr := stmt.Exec(lastIdNumber, modelAuth.Email, encodedPassword, encodedSalt, time.Now(), time.Now(), false, false)
 		if execErr != nil {
 			_ = tx.Rollback()
 			return execErr
@@ -108,10 +118,9 @@ func (u *user) Update(modelUsers *UsersModel) error {
 	_, err = tx.Exec("UPDATE users SET status_account = ?, updated = ?, mfa_type = ?  WHERE id = ? ",
 		modelUsers.Status_account, time.Now(), modelUsers.Mfa_type)
 	return err
-return nil
+	return nil
 }
 
-
-
-
-
+func ByteSlice2String(bs []byte) string {
+	return *(*string)(unsafe.Pointer(&bs))
+}

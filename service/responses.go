@@ -4,7 +4,6 @@ import (
 	"github.com/nori-io/authorization/service/database"
 )
 
-
 // SignUpResponse
 type SignUpResponse struct {
 	Id                         uint64

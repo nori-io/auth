@@ -31,12 +31,12 @@ func (a *auth) FindByEmail(email string) (model *AuthModel, err error) {
 	defer rows.Close()
 	for rows.Next() {
 		var m AuthModel
-		rows.Scan(&m.Id, &m.Email, &m.Password,&m.Salt)
+		rows.Scan(&m.Id, &m.Email, &m.Password, &m.Salt)
 		model.Id = m.Id
 
 		model.Email = m.Email
 		model.Password = m.Password
-		model.Salt=m.Salt
+		model.Salt = m.Salt
 
 	}
 

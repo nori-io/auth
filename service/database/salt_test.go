@@ -9,14 +9,11 @@ import (
 
 func TestAuthenticate(t *testing.T) {
 
-
-
 	salt, _ := database.Randbytes(8)
-	fmt.Println("salt is",salt)
-    fmt.Println("pass is",[]byte("pass"))
+	fmt.Println("salt is", salt)
+	fmt.Println("pass is", []byte("pass"))
 	cur, _ := database.HashPassword([]byte("pass"), salt)
-fmt.Println("cur is",cur)
-
+	fmt.Println("cur is", cur)
 
 	if ok, _ := database.Authenticate([]byte("pass"), salt, cur); ok {
 		fmt.Println("OK")
@@ -26,29 +23,21 @@ fmt.Println("cur is",cur)
 
 func TestAuthenticate2(t *testing.T) {
 
-
-
 	salt, _ := database.Randbytes(8)
-	fmt.Println("salt is",salt)
-	fmt.Println([]byte("pass"))
-	cur, _ := database.HashPassword([]byte("pass"), salt)
-	fmt.Println("cur is",cur)
+	password, _ := database.HashPassword([]byte("pass"), salt)
+	fmt.Println("salt is", salt)
 
+	fmt.Println("cur is", password)
 
-	var password=[]byte{63, 63, 63, 63, 89, 83, 74, 62}
-	var salt1=[]byte{60, 22, 63, 63, 11, 63}
+	var passwordArray = []byte{208, 148, 33, 206, 1, 82, 149, 86}
+	var salt1 = []byte{29, 93, 90, 157, 70, 73, 81, 122}
+	fmt.Println("Array salt", salt)
+	fmt.Println("Array cur", passwordArray)
 
-	if ok, _ := database.Authenticate([]byte("pass"), salt1, password); ok {
-		fmt.Println("OK")
-	}
+	result, err := database.Authenticate([]byte("pass"), salt1, passwordArray)
+	fmt.Println(result, err)
 
-
-
-
-
-	if ok, _ := database.Authenticate([]byte("pass"), salt, cur); ok {
-		fmt.Println("OK")
-	}
+	result, err = database.Authenticate([]byte("pass"), salt, password)
+	fmt.Println(result, err)
 
 }
-

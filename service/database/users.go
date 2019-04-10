@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"errors"
-	"fmt"
 	"time"
 	"unsafe"
 
@@ -53,7 +52,6 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		lastId.Scan(&m.Id)
 		lastIdNumber = m.Id
 	}
-	fmt.Print(lastIdNumber)
 	if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber == "") && (modelAuth.Email != "") {
 
 		salt, err := Randbytes(8)
@@ -61,7 +59,6 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 			return err
 		}
 
-		fmt.Println("ModelAuth.Password is ", modelAuth.Password)
 		password, err := HashPassword([]byte(modelAuth.Password), salt)
 		if err != nil {
 			return err
@@ -69,9 +66,6 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 
 		encodedPassword := base64.StdEncoding.EncodeToString(password)
 		encodedSalt := base64.StdEncoding.EncodeToString(salt)
-
-		fmt.Println("encodedSalt is", encodedSalt)
-		fmt.Println("encodedPassword is", encodedPassword)
 
 		stmt, err := tx.Prepare("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)")
 		if err != nil {

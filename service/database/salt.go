@@ -57,21 +57,3 @@ func Authenticate(password, salt, hash []byte) (bool, error) {
 
 	return true, nil
 }
-
-/*func main() {
-	salt, _ := randbytes(16)
-	cur, _ := HashPassword(Password, salt)
-
-	t := Token{
-		Username: string(User),
-		Password: base64.StdEncoding.EncodeToString(cur),
-		Salt:     base64.StdEncoding.EncodeToString(salt),
-	}
-
-	if ok, _ := Authenticate(Password, salt, cur); ok {
-		fmt.Println("OK")
-	}
-
-	payload, _ := json.Marshal(t)
-	fmt.Println(string(payload))
-}*/

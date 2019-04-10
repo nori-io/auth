@@ -6,7 +6,6 @@ import (
 
 	rest "github.com/cheebo/gorest"
 	"github.com/cheebo/rand"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/nori-io/nori-common/interfaces"
 	"github.com/sirupsen/logrus"
 
@@ -167,18 +166,11 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 	}
 
 	result, err := database.Authenticate([]byte(req.Password), decodedSalt, decodedPassword)
-	spew.Dump("Result is", result)
-	spew.Dump("err is", err)
+
 	if (result == false) || (err != nil) {
 		resp.Err = rest.ErrorNotFound("Uncorrect Password")
 		return resp
 	}
-
-	/*if ok,err1 := database.Authenticate([]byte(req.Password), []byte(modelFindEmail.Salt), []byte(modelFindEmail.Password)); !ok {
-		fmt.Println("Err1 is",err1)
-		resp.Err = rest.ErrorNotFound("Uncorrect Password")
-		return resp
-	}*/
 
 	var UserIdTemp uint64
 	if modelFindEmail.Id != 0 {

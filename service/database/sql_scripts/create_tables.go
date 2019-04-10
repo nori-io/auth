@@ -10,7 +10,7 @@ const (
   type NVARCHAR(64) NOT NULL,
   created DATETIME NOT NULL,
   updated DATETIME NOT NULL,
-  mfa_type ENUM ('opt', 'phone') NOT NULL,
+  mfa_type ENUM ('otp', 'phone') NOT NULL,
   PRIMARY KEY (id))
 ENGINE = InnoDB;
 `

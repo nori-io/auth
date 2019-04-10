@@ -17,7 +17,7 @@ const (
 	scryptN      = 16384
 	scryptR      = 8
 	scryptP      = 1
-	scryptKeyLen = 8
+	scryptKeyLen = 65
 )
 
 func Randbytes(count int) ([]byte, error) {

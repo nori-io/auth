@@ -26,6 +26,7 @@ type Config struct {
 	UserTypeDefault              func() string
 	UserRegistrationPhoneNumber  func() bool
 	UserRegistrationEmailAddress func() bool
+	UserMfaType func() string
 }
 
 type service struct {
@@ -270,5 +271,9 @@ func (s *service) RecoveryCodes(ctx context.Context, req RecoveryCodesRequest) (
 		return resp
 	}
 	resp.Codes = codes
+	return resp
+}
+
+func (s *service) MakeProfileEndpoint(ctx context.Context,req ProfileRequest)(resp *ProfileRequest){
 	return resp
 }

@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"errors"
 	"time"
-	"unsafe"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -39,6 +38,8 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		return execErr
 	}
 
+
+
 	lastId, err := tx.Query("SELECT LAST_INSERT_ID()")
 	if err != nil {
 		return err
@@ -54,7 +55,7 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 	}
 	if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber == "") && (modelAuth.Email != "") {
 
-		salt, err := Randbytes(8)
+		salt, err := Randbytes(65)
 		if err != nil {
 			return err
 		}
@@ -113,8 +114,4 @@ func (u *user) Update(modelUsers *UsersModel) error {
 		modelUsers.Status_account, time.Now(), modelUsers.Mfa_type)
 	return err
 	return nil
-}
-
-func ByteSlice2String(bs []byte) string {
-	return *(*string)(unsafe.Pointer(&bs))
 }

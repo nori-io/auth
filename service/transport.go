@@ -13,7 +13,7 @@ type PluginParameters struct {
 	UserTypeDefaultParameter         string
 	UserRegistrationPhoneNumberType  bool
 	UserRegistrationEmailAddressType bool
-	UserMfaType string
+	UserMfaTypeParameter             string
 }
 
 func Transport(
@@ -34,12 +34,12 @@ func Transport(
 	signupHandler := http.NewServer(
 		MakeSignUpEndpoint(srv),
 		DecodeSignUpRequest(PluginParameters{
-			UserTypeParameter: parameters.UserTypeParameter,
-			UserTypeDefaultParameter: parameters.UserTypeDefaultParameter,
-			UserRegistrationPhoneNumberType: parameters.UserRegistrationPhoneNumberType,
+			UserTypeParameter:                parameters.UserTypeParameter,
+			UserTypeDefaultParameter:         parameters.UserTypeDefaultParameter,
+			UserRegistrationPhoneNumberType:  parameters.UserRegistrationPhoneNumberType,
 			UserRegistrationEmailAddressType: parameters.UserRegistrationEmailAddressType,
-			UserMfaType:parameters.UserMfaType,
-		    }),
+			UserMfaTypeParameter:             parameters.UserMfaTypeParameter,
+		}),
 		http.EncodeJSONResponse,
 		logger,
 	)
@@ -68,11 +68,11 @@ func Transport(
 		http.EncodeJSONResponse,
 		logger)
 
-	profileHandler:=http.NewServer(
+	/*	profileHandler:=http.NewServer(
 		MakeProfileEndpoint(srv),
 		DecodeProfile(),
 		http.EncodeJSONResponse,
-		logger)
+		logger)*/
 
 	/*
 		verifyHandler:=http.NewServer(
@@ -84,11 +84,9 @@ func Transport(
 	router.Handle("/auth/signup", signupHandler).Methods("POST")
 	router.Handle("/auth/signin", signinHandler).Methods("POST")
 	router.Handle("/auth/signout", signoutHandler).Methods("GET")
-	router.Handle("auth/settings/profile", profileHandler).Methods("POST")
+	//router.Handle("auth/settings/profile", profileHandler).Methods("POST")
 	router.Handle("/auth/settings/two_factor_authentication/recovery_codes", recoveryCodesHandler).Methods("POST")
 
-	/*	router.Handle("/auth/settings/two_factor_authentication/verify",verifyHandler).Methods("POST")
-	 */
 	//	/auth/verify/(uuid)
 	//	/auth/delete
 	//	/auth/profile

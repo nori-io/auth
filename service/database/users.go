@@ -26,19 +26,17 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		return err
 	}
 
-	stmt, err := tx.Prepare("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)")
+	stmt, err := tx.Prepare("INSERT INTO users (status_account, type, created, updated,mfa_type) VALUES(?,?,?,?)")
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
 
-	_, execErr := stmt.Exec("active", modelUsers.Type, time.Now(), time.Now())
+	_, execErr := stmt.Exec("active", modelUsers.Type, time.Now(), time.Now(), modelUsers.Mfa_type)
 	if execErr != nil {
 		_ = tx.Rollback()
 		return execErr
 	}
-
-
 
 	lastId, err := tx.Query("SELECT LAST_INSERT_ID()")
 	if err != nil {

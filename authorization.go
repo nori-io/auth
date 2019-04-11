@@ -31,7 +31,7 @@ func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {
 		UserTypeDefault:              cm.String("user.type_default", "user.type_default value"),
 		UserRegistrationPhoneNumber:  cm.Bool("user.registration_phone_number", "user.registration_phone_number value"),
 		UserRegistrationEmailAddress: cm.Bool("user.registration_email_address", "user.registration_email_address value"),
-		UserMfaType:cm.String("user.mfa_type", "user.mfa_type value"),
+		UserMfaType:                  cm.String("user.mfa_type", "user.mfa_type value"),
 	}
 	return nil
 }
@@ -73,11 +73,11 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			database.DB(db.GetDB(), registry.Logger(p.Meta())),
 		)
 		pluginParameters := service.PluginParameters{
-			UserTypeParameter: p.config.UserType(),
-			UserTypeDefaultParameter: p.config.UserTypeDefault(),
-			UserRegistrationPhoneNumberType: p.config.UserRegistrationPhoneNumber(),
+			UserTypeParameter:                p.config.UserType(),
+			UserTypeDefaultParameter:         p.config.UserTypeDefault(),
+			UserRegistrationPhoneNumberType:  p.config.UserRegistrationPhoneNumber(),
 			UserRegistrationEmailAddressType: p.config.UserRegistrationPhoneNumber(),
-			UserMfaType:p.config.UserMfaType()}
+			UserMfaTypeParameter:             p.config.UserMfaType()}
 
 		service.Transport(auth, transport, session,
 			http, p.instance, registry.Logger(p.Meta()), pluginParameters)

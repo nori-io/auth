@@ -12,6 +12,7 @@ type SignUpRequest struct {
 	Password                   string `json:"password" validate:"password"`
 	Type                       string `json:"user_type" validate:"user_type"`
 	Meta                       string `json:"meta" validate:"meta"`
+	MfaType                    string `json:mfa_type validate:"mfa_type"`
 }
 
 type RecoveryCodesRequest struct {

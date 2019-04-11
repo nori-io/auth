@@ -26,7 +26,7 @@ type Config struct {
 	UserTypeDefault              func() string
 	UserRegistrationPhoneNumber  func() bool
 	UserRegistrationEmailAddress func() bool
-	UserMfaType func() string
+	UserMfaType                  func() string
 }
 
 type service struct {
@@ -113,7 +113,8 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	}
 
 	modelUsers = &database.UsersModel{
-		Type: req.Type,
+		Type:     req.Type,
+		Mfa_type: req.MfaType,
 	}
 
 	err = s.db.Users().Create(modelAuth, modelUsers)
@@ -274,6 +275,6 @@ func (s *service) RecoveryCodes(ctx context.Context, req RecoveryCodesRequest) (
 	return resp
 }
 
-func (s *service) MakeProfileEndpoint(ctx context.Context,req ProfileRequest)(resp *ProfileRequest){
+/*func (s *service) MakeProfileEndpoint(ctx context.Context,req ProfileRequest)(resp *ProfileRequest){
 	return resp
-}
+}*/

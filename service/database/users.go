@@ -26,16 +26,32 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		return err
 	}
 
-	stmt, err := tx.Prepare("INSERT INTO users (status_account, type, created, updated,mfa_type) VALUES(?,?,?,?)")
-	if err != nil {
-		return err
-	}
-	defer stmt.Close()
+	if modelUsers.Mfa_type == "" {
+		stmt, err := tx.Prepare("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)")
+		if err != nil {
+			return err
+		}
+		defer stmt.Close()
 
-	_, execErr := stmt.Exec("active", modelUsers.Type, time.Now(), time.Now(), modelUsers.Mfa_type)
-	if execErr != nil {
-		_ = tx.Rollback()
-		return execErr
+		_, execErr := stmt.Exec("active", modelUsers.Type, time.Now(), time.Now())
+		if execErr != nil {
+			_ = tx.Rollback()
+			return execErr
+		}
+	} else {
+
+		stmt, err := tx.Prepare("INSERT INTO users (status_account, type, created, updated,mfa_type) VALUES(?,?,?,?)")
+		if err != nil {
+			return err
+		}
+		defer stmt.Close()
+
+		_, execErr := stmt.Exec("active", modelUsers.Type, time.Now(), time.Now(), modelUsers.Mfa_type)
+		if execErr != nil {
+			_ = tx.Rollback()
+			return execErr
+		}
+
 	}
 
 	lastId, err := tx.Query("SELECT LAST_INSERT_ID()")
@@ -53,7 +69,7 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 	}
 	if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber == "") && (modelAuth.Email != "") {
 
-		salt, err := Randbytes(65)
+		salt, err := Randbytes(64)
 		if err != nil {
 			return err
 		}
@@ -83,7 +99,7 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		if err != nil {
 			return err
 		}
-		_, execErr = stmt.Exec(lastIdNumber, modelAuth.PhoneCountryCode, modelAuth.PhoneNumber, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
+		_, execErr := stmt.Exec(lastIdNumber, modelAuth.PhoneCountryCode, modelAuth.PhoneNumber, modelAuth.Password, modelAuth.Salt, time.Now(), time.Now(), false, false)
 		if execErr != nil {
 			_ = tx.Rollback()
 			return execErr

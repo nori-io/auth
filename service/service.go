@@ -64,7 +64,6 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 			ErrCode: 400,
 		},
 	}
-
 	if (req.Email == "") && (req.PhoneCountryCodeWithNumber == "") {
 		resp.Err = rest.ErrFieldResp{
 			Meta: rest.ErrFieldRespMeta{

@@ -39,6 +39,18 @@ func (r SignUpRequest) ValidateOnlyByPhone() error {
 	govalidator.IsEmail(r.PhoneCountryCodeWithNumber)
 	return rest.ValidateResponse(err)
 }
+func (r SignUpRequest) ValidateMfaType() error {
+
+	if !((r.MfaType == "otp") || (r.MfaType == "phone") || (r.MfaType == "")) {
+
+		return rest.ErrFieldResp{
+			Meta: rest.ErrFieldRespMeta{
+				ErrMessage: "Uncorrect multifactor authentification type",
+			},
+		}
+	}
+	return nil
+}
 
 // SignIn Request
 type SignInRequest struct {

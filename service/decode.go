@@ -75,6 +75,10 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 			body.Validate()
 		}
 
+		if parameters.UserMfaTypeParameter == "" {
+			body.Validate()
+		}
+
 		if errorText != "" {
 			return body, rest.ErrFieldResp{
 				Meta: rest.ErrFieldRespMeta{

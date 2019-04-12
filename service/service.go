@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"encoding/base64"
 
 	rest "github.com/cheebo/gorest"
 	"github.com/cheebo/rand"
@@ -107,7 +106,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 
 	modelAuth = &database.AuthModel{
 		Email:            req.Email,
-		Password:         req.Password,
+		Password:         []byte(req.Password),
 		PhoneCountryCode: req.PhoneCountryCodeWithNumber,
 	}
 
@@ -154,19 +153,10 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 		return resp
 	}
 
-	decodedPassword, err := base64.StdEncoding.DecodeString(modelFindEmail.Password)
-	if err != nil {
-		resp.Err = rest.ErrorNotFound("decode error:")
-		return resp
-	}
 
-	decodedSalt, err := base64.StdEncoding.DecodeString(modelFindEmail.Salt)
-	if err != nil {
-		resp.Err = rest.ErrorNotFound("decode error:")
-		return resp
-	}
 
-	result, err := database.Authenticate([]byte(req.Password), decodedSalt, decodedPassword)
+
+	result, err := database.Authenticate([]byte(req.Password), modelFindEmail.Salt, modelFindEmail.Password)
 
 	if (result == false) || (err != nil) {
 		resp.Err = rest.ErrorNotFound("Uncorrect Password")

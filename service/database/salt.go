@@ -7,6 +7,7 @@ import (
 	"crypto/subtle"
 	"fmt"
 	"os"
+	"unsafe"
 
 	"golang.org/x/crypto/scrypt"
 )
@@ -17,7 +18,7 @@ const (
 	scryptN      = 16384
 	scryptR      = 8
 	scryptP      = 1
-	scryptKeyLen = 64
+	scryptKeyLen = 32
 )
 
 func Randbytes(count int) ([]byte, error) {
@@ -56,4 +57,7 @@ func Authenticate(password, salt, hash []byte) (bool, error) {
 	}
 
 	return true, nil
+}
+func ByteSlice2String(bs []byte) string {
+	return *(*string)(unsafe.Pointer(&bs))
 }

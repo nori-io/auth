@@ -19,8 +19,8 @@ type AuthModel struct {
 	PhoneCountryCode string
 	PhoneNumber      string
 	Email            string
-	Password         string
-	Salt             string
+	Password         []byte
+	Salt             []byte
 	Created          time.Time
 	Updated          time.Time
 	IsEmailVerified  bool

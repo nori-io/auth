@@ -135,26 +135,24 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 
 func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInResponse) {
 	resp = &SignInResponse{}
+	var modelFindPhone interface{}
 
 	modelFindEmail, err := s.db.Auth().FindByEmail(req.Name)
 	if err != nil {
-		resp.Err = rest.ErrorInternal("Internal error")
-		return resp
-	}
-
-	modelFindPhone, err := s.db.Auth().FindByPhone(req.Name)
-	if err != nil {
-		resp.Err = rest.ErrorInternal("Internal error")
-		return resp
+		if modelFindPhone, err = s.db.Auth().FindByPhone(req.Name); err != nil {
+			if err != nil {
+				resp.Err = rest.ErrorInternal("Internal error")
+				return resp
+			}
+			resp.Err = rest.ErrorInternal("Internal error")
+			return resp
+		}
 	}
 
 	if (modelFindEmail == nil) && (modelFindPhone == nil) {
 		resp.Err = rest.ErrorNotFound("User not found")
 		return resp
 	}
-
-
-
 
 	result, err := database.Authenticate([]byte(req.Password), modelFindEmail.Salt, modelFindEmail.Password)
 
@@ -169,7 +167,7 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 		UserIdTemp = modelFindEmail.Id
 	}
 
-	if modelFindPhone.Id != 0 {
+	if modelFindPhone != 0 {
 		UserIdTemp = modelFindPhone.Id
 
 	}

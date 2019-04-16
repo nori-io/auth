@@ -7,7 +7,6 @@ import (
 	"crypto/subtle"
 	"fmt"
 	"os"
-	"unsafe"
 
 	"golang.org/x/crypto/scrypt"
 )
@@ -57,7 +56,4 @@ func Authenticate(password, salt, hash []byte) (bool, error) {
 	}
 
 	return true, nil
-}
-func ByteSlice2String(bs []byte) string {
-	return *(*string)(unsafe.Pointer(&bs))
 }

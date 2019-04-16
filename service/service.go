@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	rest "github.com/cheebo/gorest"
 	"github.com/cheebo/rand"
@@ -63,13 +64,17 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 			ErrCode: 400,
 		},
 	}
-	if (req.Email == "") && (req.PhoneCountryCodeWithNumber == "") {
+	if (req.Email == "") && (req.PhoneNumber+req.PhoneCountryCode == "") {
 		resp.Err = rest.ErrFieldResp{
 			Meta: rest.ErrFieldRespMeta{
 				ErrMessage: "Email and Phone's information is absent",
 			},
 		}
 		return resp
+	}
+
+	if (req.PhoneNumber == "") || (req.PhoneCountryCode == "") {
+
 	}
 
 	if req.Email != "" {
@@ -85,8 +90,8 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 			errField.AddError("email", 400, "Email already exists.")
 		}
 	}
-	if req.PhoneCountryCodeWithNumber != "" {
-		if modelAuth, err = s.db.Auth().FindByPhone(req.PhoneCountryCodeWithNumber); err != nil {
+	if (req.PhoneCountryCode + req.PhoneCountryCode) != "" {
+		if modelAuth, err = s.db.Auth().FindByPhone(req.PhoneCountryCode, req.PhoneNumber); err != nil {
 			resp.Err = rest.ErrFieldResp{
 				Meta: rest.ErrFieldRespMeta{
 					ErrMessage: err.Error(),
@@ -107,7 +112,8 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	modelAuth = &database.AuthModel{
 		Email:            req.Email,
 		Password:         []byte(req.Password),
-		PhoneCountryCode: req.PhoneCountryCodeWithNumber,
+		PhoneCountryCode: req.PhoneCountryCode,
+		PhoneNumber:      req.PhoneNumber,
 	}
 
 	modelUsers = &database.UsersModel{
@@ -128,55 +134,62 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	}
 
 	resp.Email = req.Email
-	resp.PhoneCountryCodeWithNumber = req.PhoneCountryCodeWithNumber
+	resp.PhoneCountryCode = req.PhoneCountryCode
+	resp.PhoneNumber = req.PhoneNumber
 
 	return resp
 }
 
 func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInResponse) {
 	resp = &SignInResponse{}
-	var modelFindPhone interface{}
 
-	modelFindEmail, err := s.db.Auth().FindByEmail(req.Name)
-	if err != nil {
-		if modelFindPhone, err = s.db.Auth().FindByPhone(req.Name); err != nil {
-			if err != nil {
-				resp.Err = rest.ErrorInternal("Internal error")
-				return resp
-			}
-			resp.Err = rest.ErrorInternal("Internal error")
-			return resp
-		}
-	}
-
-	if (modelFindEmail == nil) && (modelFindPhone == nil) {
-		resp.Err = rest.ErrorNotFound("User not found")
+	modelFindEmail, errFindEmail := s.db.Auth().FindByEmail(req.Name)
+	fmt.Println("Name is", req.Name)
+	modelFindPhone, errFindPhone := s.db.Auth().FindByPhone(req.Name, "")
+	if (errFindEmail != nil) && (errFindPhone != nil) {
+		resp.Err = rest.ErrorInternal("Internal error")
 		return resp
 	}
 
-	result, err := database.Authenticate([]byte(req.Password), modelFindEmail.Salt, modelFindEmail.Password)
-
-	if (result == false) || (err != nil) {
-		resp.Err = rest.ErrorNotFound("Uncorrect Password")
+	if (modelFindEmail.Id == 0) && (modelFindPhone.Id == 0) {
+		resp.Err = rest.ErrorNotFound("User not found")
 		return resp
 	}
 
 	var UserIdTemp uint64
 	if modelFindEmail.Id != 0 {
-
+		fmt.Println("Finding by email")
 		UserIdTemp = modelFindEmail.Id
+		result, err := database.Authenticate([]byte(req.Password), modelFindEmail.Salt, modelFindEmail.Password)
+
+		if (result == false) || (err != nil) {
+			resp.Err = rest.ErrorNotFound("Uncorrect Password")
+			return resp
+		}
+
 	}
 
-	if modelFindPhone != 0 {
+	fmt.Println("modelFindPhone.Id", modelFindPhone.Id)
+	fmt.Println("modelFindPhone.Salt", modelFindPhone.Salt)
+	fmt.Println("modelFindPhone.Password", modelFindPhone.Password)
+
+	if modelFindPhone.Id != 0 {
+
 		UserIdTemp = modelFindPhone.Id
+		result, err := database.Authenticate([]byte(req.Password), modelFindPhone.Salt, modelFindPhone.Password)
+
+		if (result == false) || (err != nil) {
+			resp.Err = rest.ErrorNotFound("Uncorrect Password")
+			return resp
+		}
 
 	}
-
+	fmt.Println("UserIdTemp", UserIdTemp)
 	modelAuthenticationHistory := &database.AuthenticationHistoryModel{
 		UserId: UserIdTemp,
 	}
 
-	err = s.db.AuthenticationHistory().Create(modelAuthenticationHistory)
+	err := s.db.AuthenticationHistory().Create(modelAuthenticationHistory)
 	if err != nil {
 		s.log.Error(err)
 		resp.Err = rest.ErrFieldResp{

@@ -7,12 +7,13 @@ import (
 
 // SignUp Request
 type SignUpRequest struct {
-	Email                      string `json:"email" validate:"email"`
-	PhoneCountryCodeWithNumber string `json:"phone_country_code_with_number" validate:"phone_country_code_with_number"`
-	Password                   string `json:"password" validate:"password"`
-	Type                       string `json:"user_type" validate:"user_type"`
-	Meta                       string `json:"meta" validate:"meta"`
-	MfaType                    string `json:mfa_type validate:"mfa_type"`
+	Email            string `json:"email" validate:"email"`
+	PhoneCountryCode string `json:"phone_country_code"`
+	PhoneNumber      string `json:"phone_number"`
+	Password         string `json:"password" validate:"password"`
+	Type             string `json:"user_type" validate:"user_type"`
+	Meta             string `json:"meta" validate:"meta"`
+	MfaType          string `json:mfa_type validate:"mfa_type"`
 }
 
 type RecoveryCodesRequest struct {
@@ -36,7 +37,7 @@ func (r SignUpRequest) ValidateOnlyByPhone() error {
 
 	//re := regexp.MustCompile(`^(?:(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[\-\.\ \\\/]?)?((?:\(?\d{1,}\)?[\-\.\ \\\/]?){0,})(?:[\-\.\ \\\/]?(?:#|ext\.?|extension|x)[\-\.\ \\\/]?(\d+))?$`)
 
-	govalidator.IsEmail(r.PhoneCountryCodeWithNumber)
+	govalidator.IsEmail(r.PhoneNumber)
 	return rest.ValidateResponse(err)
 }
 func (r SignUpRequest) ValidateMfaType() error {

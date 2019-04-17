@@ -39,6 +39,8 @@ type service struct {
 
 func NewService(
 	auth interfaces.Auth,
+	cache interfaces.Cache,
+	mail interfaces.Mail,
 	session interfaces.Session,
 	cfg *Config,
 	log *logrus.Logger,

@@ -55,6 +55,17 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			return err
 		}
 
+		cache,err:=registry.Cache()
+			if err != nil{
+				return err
+			}
+
+
+		mail,err:=registry.Mail()
+		if err != nil{
+			return err
+		}
+
 		session, err := registry.Session()
 		if err != nil {
 			return err
@@ -67,6 +78,8 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 
 		p.instance = service.NewService(
 			auth,
+			cache,
+			mail,
 			session,
 			p.config,
 			registry.Logger(p.Meta()),
@@ -82,8 +95,7 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 		service.Transport(auth, transport, session,
 			http, p.instance, registry.Logger(p.Meta()), pluginParameters)
 
-		service.Transport(auth, transport, session,
-			http, p.instance, registry.Logger(p.Meta()), pluginParameters)
+
 	}
 	return nil
 }

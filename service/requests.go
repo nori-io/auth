@@ -26,13 +26,13 @@ func (r SignUpRequest) Validate() error {
 	return rest.ValidateResponse(err)
 }
 
-func (r SignUpRequest) ValidateOnlyByMail() error {
+func (r SignUpRequest) ValidateMail() error {
 	_, err := govalidator.ValidateStruct(r)
 	govalidator.IsEmail(r.Email)
 	return rest.ValidateResponse(err)
 }
 
-func (r SignUpRequest) ValidateOnlyByPhone() error {
+func (r SignUpRequest) ValidatePhone() error {
 	 err := isNumber(r.PhoneNumber+r.PhoneCountryCode)
 	 if err!=nil{
 	 	return err
@@ -78,7 +78,7 @@ func isNumber(s string) error {
 		if (r < '0' || r > '9')  {
 			return rest.ErrFieldResp{
 				Meta: rest.ErrFieldRespMeta{
-					ErrMessage: "Uncorrect multifactor authentification type",
+					ErrMessage: "Phone number has non-numeric symbol",
 				},
 			}
 		}

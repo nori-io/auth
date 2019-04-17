@@ -54,39 +54,59 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 			isTypeValid = true
 		}
 		if isTypeValid == false {
-			errorText = errorText + "Type '" + body.Type + "' is not valid \n"
+			errorText = errorText + "Type '" + body.Type + "' is not valid"
 			errCommon = errors.New(errorText)
 		}
 
 		if ((parameters.UserRegistrationPhoneNumberType) || (parameters.UserRegistrationEmailAddressType)) != true {
-			errorText = errorText + " All user's registration's types sets with 'false' value. Need to set 'true' value \n "
+			errorText = errorText + " All user's registration's types sets with 'false' value. Need to set 'true' value "
 			errCommon = errors.New(errorText)
 		}
 
 		if (parameters.UserRegistrationEmailAddressType == true) && (parameters.UserRegistrationPhoneNumberType == false) {
-			body.ValidateOnlyByMail()
+			if body.ValidateMail()!=nil{
+				errorText = errorText + "Mail address' format is uncorrect "
+				errCommon = errors.New(errorText)
+			}
 
 		}
-		if (parameters.UserRegistrationEmailAddressType == true) && (parameters.UserRegistrationPhoneNumberType == false) {
-			body.ValidateOnlyByPhone()
+		if (parameters.UserRegistrationEmailAddressType == false) && (parameters.UserRegistrationPhoneNumberType == true) {
+			if body.ValidatePhone()!=nil{
+				errorText = errorText + "Phone number's format is uncorrect "
+				errCommon = errors.New(errorText)
+			}
 		}
 
 		if (parameters.UserRegistrationEmailAddressType == true) && (parameters.UserRegistrationPhoneNumberType == true) {
-			body.Validate()
+			if (body.ValidateMail()==nil)&&(body.ValidatePhone()==nil){
+				if body.ValidateMail()!=nil{
+					errorText = errorText + "Mail address' format is uncorrect "
+					errCommon = errors.New(errorText)
+				}
+			}
+			if body.ValidatePhone()!=nil{
+				errorText = errorText + "Phone number's format is uncorrect\n"
+				errCommon = errors.New(errorText)
+				errorText = errorText + "Phone number's format is uncorrect"
+				errCommon = errors.New(errorText)
+			}
+
 		}
 
 		if parameters.UserMfaTypeParameter == "" {
 			body.Validate()
 		}
 
-		if errorText != "" {
+		fmt.Println(" NO NIL")
+
+		if errCommon.Error() != "" {
 			return body, rest.ErrFieldResp{
 				Meta: rest.ErrFieldRespMeta{
 					ErrMessage: errCommon.Error(),
 				},
 			}
 		}
-
+        fmt.Println("NIL")
 		return body, nil
 	}
 

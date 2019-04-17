@@ -33,12 +33,12 @@ func (r SignUpRequest) ValidateOnlyByMail() error {
 }
 
 func (r SignUpRequest) ValidateOnlyByPhone() error {
-	_, err := govalidator.ValidateStruct(r)
+	 err := isNumber(r.PhoneNumber+r.PhoneCountryCode)
+	 if err!=nil{
+	 	return err
+	 }
 
-	//re := regexp.MustCompile(`^(?:(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[\-\.\ \\\/]?)?((?:\(?\d{1,}\)?[\-\.\ \\\/]?){0,})(?:[\-\.\ \\\/]?(?:#|ext\.?|extension|x)[\-\.\ \\\/]?(\d+))?$`)
-
-	govalidator.IsEmail(r.PhoneNumber)
-	return rest.ValidateResponse(err)
+	return err
 }
 func (r SignUpRequest) ValidateMfaType() error {
 
@@ -70,4 +70,18 @@ type SignOutRequest struct{}
 func (r RecoveryCodesRequest) Validate() error {
 	_, err := govalidator.ValidateStruct(r)
 	return rest.ValidateResponse(err)
+}
+
+
+func isNumber(s string) error {
+	for _, r := range s {
+		if (r < '0' || r > '9')  {
+			return rest.ErrFieldResp{
+				Meta: rest.ErrFieldRespMeta{
+					ErrMessage: "Uncorrect multifactor authentification type",
+				},
+			}
+		}
+	}
+	return nil
 }

@@ -14,9 +14,8 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 	return func(_ context.Context, r *http.Request) (interface{}, error) {
 		var body SignUpRequest
 		var isTypeValid bool
-		var errorText string
-		var errCommon error
-
+         errorText:=""
+         var errCommon error
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			return body, rest.ErrFieldResp{
 				Meta: rest.ErrFieldRespMeta{
@@ -85,17 +84,20 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 				}
 			}
 			if body.ValidatePhone()!=nil{
-				errorText = errorText + "Phone number's format is uncorrect\n"
+				errorText = errorText + fmt.Sprintf("Phone number's format is uncorrect\n")
 				errCommon = errors.New(errorText)
-				errorText = errorText + "Phone number's format is uncorrect"
+				errorText = errorText + fmt.Sprintf("Phone number's format is uncorrect\n")
 				errCommon = errors.New(errorText)
 			}
 
 		}
 
+		fmt.Println("ErrorCommon is",errCommon			)
+
 		if parameters.UserMfaTypeParameter == "" {
 			body.Validate()
 		}
+
 
 		fmt.Println(" NO NIL")
 
@@ -106,6 +108,7 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 				},
 			}
 		}
+
         fmt.Println("NIL")
 		return body, nil
 	}

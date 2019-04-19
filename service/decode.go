@@ -53,47 +53,36 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 			isTypeValid = true
 		}
 
-		var errorResponse *rest.ErrFieldResp
-		var errorObjects []rest.ErrFieldObject
+		var errorResponse rest.ErrFieldResp
 
 		if isTypeValid == false {
-			errorObject:=rest.ErrFieldObject{Message:"User type isn't valid"}
-			errorObjects=append(errorObjects,errorObject)
-			errorType:=rest.ErrField{Field:"type",Errs:errorObjects}
-			fmt.Println(errorType)
-		//	rest.ErrFieldResp.AddError(errorType,"",0,"")
+
+			errorResponse.AddError("type",0,"User type isn't valid")
 		}
 
 		if ((parameters.UserRegistrationPhoneNumberType) || (parameters.UserRegistrationEmailAddressType)) != true {
-			errorObject:=rest.ErrFieldObject{Message:"All user's registration's types sets with 'false' value. Need to set 'true' value"}
-			errorObjects=append(errorObjects,errorObject)
-			errorRegistrationType:=rest.ErrField{Field:"parameters.UserRegistrationPhoneNumberType or parameters.UserRegistrationEmailAddressType in config file",Errs:errorObjects}
-			rest.ErrFieldResp.AddError(errorRegistrationType,"",0,"")
 
 
-		}
+
+			}
 
 		if (parameters.UserRegistrationEmailAddressType == true) && (parameters.UserRegistrationPhoneNumberType == false) {
 			if body.ValidateMail()!=nil{
-				errorObject:=rest.ErrFieldObject{Message:"Mail address' format is uncorrect"}
-				errorObjects=append(errorObjects,errorObject)
-				errorMailFormat:=rest.ErrField{Field:"email",Errs:errorObjects}
-				rest.ErrFieldResp.AddError(errorMailFormat,"",0,"")
 
-
+				errorResponse.AddError("email",0,
+					"Mail address' format is uncorrect")
 			}
 
 		}
 		if (parameters.UserRegistrationEmailAddressType == false) && (parameters.UserRegistrationPhoneNumberType == true) {
 			if body.ValidatePhone()!=nil{
-				errorObjectCountryCode:=rest.ErrFieldObject{Message:"Country code's format is uncorrect "}
-				errorObjectPhoneNumber:=rest.ErrFieldObject{Message:"Phone number's format is uncorrect "}
 
-				errorObjects=append(errorObjects,errorObjectCountryCode)
-				errorObjects=append(errorObjects,errorObjectPhoneNumber)
+				errorResponse.AddError("phone_country_code",0,
+					"Country code's format is uncorrect")
 
-				errorMailFormat:=rest.ErrField{Field:"phone_country_code and phone_number",Errs:errorObjects}
-				rest.ErrFieldResp.AddError(errorMailFormat,"",0,"")
+				errorResponse.AddError("phone_number",0,
+					"Phone number's format is uncorrect ")
+
 			}
 		}
 /*
@@ -118,9 +107,9 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 			body.Validate()
 		}
 
+       fmt.Println("errorResponse.HasErrors",errorResponse.HasErrors())
 
-
-		if errorResponse.HasErrors() {
+		if errorResponse.HasErrors()==false {
 			return body, errorResponse
 		}
 

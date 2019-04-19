@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 
@@ -14,8 +13,7 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 	return func(_ context.Context, r *http.Request) (interface{}, error) {
 		var body SignUpRequest
 		var isTypeValid bool
-         errorText:=""
-         var errCommon error
+
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			return body, rest.ErrFieldResp{
 				Meta: rest.ErrFieldRespMeta{
@@ -24,6 +22,7 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 			}
 		}
 
+
 		if err := body.Validate(); err != nil {
 			return body, rest.ErrFieldResp{
 				Meta: rest.ErrFieldRespMeta{
@@ -31,6 +30,7 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 				},
 			}
 		}
+
 
 		typesSlice := parameters.UserTypeParameter
 		s := make([]string, len(typesSlice))
@@ -52,64 +52,78 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 			body.Type = parameters.UserTypeDefaultParameter
 			isTypeValid = true
 		}
+
+		var errorResponse *rest.ErrFieldResp
+		var errorObjects []rest.ErrFieldObject
+
 		if isTypeValid == false {
-			errorText = errorText + "Type '" + body.Type + "' is not valid"
-			errCommon = errors.New(errorText)
+			errorObject:=rest.ErrFieldObject{Message:"User type isn't valid"}
+			errorObjects=append(errorObjects,errorObject)
+			errorType:=rest.ErrField{Field:"type",Errs:errorObjects}
+			fmt.Println(errorType)
+		//	rest.ErrFieldResp.AddError(errorType,"",0,"")
 		}
 
 		if ((parameters.UserRegistrationPhoneNumberType) || (parameters.UserRegistrationEmailAddressType)) != true {
-			errorText = errorText + " All user's registration's types sets with 'false' value. Need to set 'true' value "
-			errCommon = errors.New(errorText)
+			errorObject:=rest.ErrFieldObject{Message:"All user's registration's types sets with 'false' value. Need to set 'true' value"}
+			errorObjects=append(errorObjects,errorObject)
+			errorRegistrationType:=rest.ErrField{Field:"parameters.UserRegistrationPhoneNumberType or parameters.UserRegistrationEmailAddressType in config file",Errs:errorObjects}
+			rest.ErrFieldResp.AddError(errorRegistrationType,"",0,"")
+
+
 		}
 
 		if (parameters.UserRegistrationEmailAddressType == true) && (parameters.UserRegistrationPhoneNumberType == false) {
 			if body.ValidateMail()!=nil{
-				errorText = errorText + "Mail address' format is uncorrect "
-				errCommon = errors.New(errorText)
+				errorObject:=rest.ErrFieldObject{Message:"Mail address' format is uncorrect"}
+				errorObjects=append(errorObjects,errorObject)
+				errorMailFormat:=rest.ErrField{Field:"email",Errs:errorObjects}
+				rest.ErrFieldResp.AddError(errorMailFormat,"",0,"")
+
+
 			}
 
 		}
 		if (parameters.UserRegistrationEmailAddressType == false) && (parameters.UserRegistrationPhoneNumberType == true) {
 			if body.ValidatePhone()!=nil{
-				errorText = errorText + "Phone number's format is uncorrect "
-				errCommon = errors.New(errorText)
+				errorObjectCountryCode:=rest.ErrFieldObject{Message:"Country code's format is uncorrect "}
+				errorObjectPhoneNumber:=rest.ErrFieldObject{Message:"Phone number's format is uncorrect "}
+
+				errorObjects=append(errorObjects,errorObjectCountryCode)
+				errorObjects=append(errorObjects,errorObjectPhoneNumber)
+
+				errorMailFormat:=rest.ErrField{Field:"phone_country_code and phone_number",Errs:errorObjects}
+				rest.ErrFieldResp.AddError(errorMailFormat,"",0,"")
 			}
 		}
-
+/*
 		if (parameters.UserRegistrationEmailAddressType == true) && (parameters.UserRegistrationPhoneNumberType == true) {
 			if (body.ValidateMail()==nil)&&(body.ValidatePhone()==nil){
 				if body.ValidateMail()!=nil{
 					errorText = errorText + "Mail address' format is uncorrect "
-					errCommon = errors.New(errorText)
 				}
 			}
 			if body.ValidatePhone()!=nil{
-				errorText = errorText + fmt.Sprintf("Phone number's format is uncorrect\n")
-				errCommon = errors.New(errorText)
-				errorText = errorText + fmt.Sprintf("Phone number's format is uncorrect\n")
-				errCommon = errors.New(errorText)
+				rest.ErrFieldResp.AddError("phone_number",)
+				errorText = errorText + "Phone number's format is uncorrect\n"
+				fmt.Println(errorText)
+
+
+
 			}
 
-		}
-
-		fmt.Println("ErrorCommon is",errCommon			)
+		}*/
 
 		if parameters.UserMfaTypeParameter == "" {
 			body.Validate()
 		}
 
 
-		fmt.Println(" NO NIL")
 
-		if errCommon.Error() != "" {
-			return body, rest.ErrFieldResp{
-				Meta: rest.ErrFieldRespMeta{
-					ErrMessage: errCommon.Error(),
-				},
-			}
+		if errorResponse.HasErrors() {
+			return body, errorResponse
 		}
 
-        fmt.Println("NIL")
 		return body, nil
 	}
 

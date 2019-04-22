@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/asaskevich/govalidator"
 	"github.com/cheebo/gorest"
 )
@@ -34,6 +36,7 @@ func (r SignUpRequest) ValidateMail() error {
 
 func (r SignUpRequest) ValidatePhone() error {
 	 err := isNumber(r.PhoneNumber+r.PhoneCountryCode)
+	 fmt.Print("Err is",err)
 	 if err!=nil{
 	 	return err
 	 }

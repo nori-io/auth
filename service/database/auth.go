@@ -3,7 +3,6 @@ package database
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -54,7 +53,6 @@ func (a *auth) FindByPhone(phoneCountryCode, phoneNumber string) (model *AuthMod
 		return nil, err
 	}
 	model = &AuthModel{}
-	fmt.Println("Auth is")
 	defer rows.Close()
 	for rows.Next() {
 		var m AuthModel
@@ -65,10 +63,6 @@ func (a *auth) FindByPhone(phoneCountryCode, phoneNumber string) (model *AuthMod
 		model.Salt = m.Salt
 		model.Password = m.Password
 	}
-
-	fmt.Println("model.Id ", model.Id)
-	fmt.Println("model.Salt", model.Salt)
-	fmt.Println("model.Password", model.Password)
 
 	if rows.Err() != nil {
 		return nil, rows.Err()

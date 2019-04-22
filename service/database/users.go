@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -83,9 +82,6 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 			return err
 		}
 
-		fmt.Println("Password is", password)
-		fmt.Println("Salt is", salt)
-
 		_, execErr := stmt.Exec(lastIdNumber, modelAuth.Email, password, salt, time.Now(), time.Now(), false, false)
 		if execErr != nil {
 
@@ -99,13 +95,11 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		if err != nil {
 			return err
 		}
-		fmt.Print("1")
 		_, execErr := stmt.Exec(lastIdNumber, modelAuth.PhoneCountryCode, modelAuth.PhoneNumber, password, salt, time.Now(), time.Now(), false, false)
 		if execErr != nil {
 			_ = tx.Rollback()
 			return execErr
 		}
-		fmt.Println("2")
 
 	}
 

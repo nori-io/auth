@@ -1,8 +1,6 @@
 package service
 
 import (
-	"fmt"
-
 	"github.com/asaskevich/govalidator"
 	"github.com/cheebo/gorest"
 )
@@ -28,21 +26,20 @@ func (r SignUpRequest) Validate() error {
 	return rest.ValidateResponse(err)
 }
 
-func (r SignUpRequest) ValidateMail() error {
-	_, err := govalidator.ValidateStruct(r)
-	govalidator.IsEmail(r.Email)
-	return rest.ValidateResponse(err)
+func (r SignUpRequest) ValidateMail() bool {
+	return 	govalidator.IsEmail(r.Email)
+
 }
 
-func (r SignUpRequest) ValidatePhone() error {
-	 err := isNumber(r.PhoneNumber+r.PhoneCountryCode)
-	 fmt.Print("Err is",err)
-	 if err!=nil{
-	 	return err
-	 }
+func (r SignUpRequest) ValidatePhone() (error, error) {
+	errPhoneCountryCode := isNumber(r.PhoneCountryCode)
 
-	return err
+	errPhoneNumber := isNumber(r.PhoneNumber)
+
+	return errPhoneCountryCode,errPhoneNumber
 }
+
+
 func (r SignUpRequest) ValidateMfaType() error {
 
 	if !((r.MfaType == "otp") || (r.MfaType == "phone") || (r.MfaType == "")) {
@@ -75,10 +72,9 @@ func (r RecoveryCodesRequest) Validate() error {
 	return rest.ValidateResponse(err)
 }
 
-
 func isNumber(s string) error {
 	for _, r := range s {
-		if (r < '0' || r > '9')  {
+		if r < '0' || r > '9' {
 			return rest.ErrFieldResp{
 				Meta: rest.ErrFieldRespMeta{
 					ErrMessage: "Phone number has non-numeric symbol",

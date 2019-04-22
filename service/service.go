@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 
 	rest "github.com/cheebo/gorest"
 	"github.com/cheebo/rand"
@@ -146,7 +145,6 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 	resp = &SignInResponse{}
 
 	modelFindEmail, errFindEmail := s.db.Auth().FindByEmail(req.Name)
-	fmt.Println("Name is", req.Name)
 	modelFindPhone, errFindPhone := s.db.Auth().FindByPhone(req.Name, "")
 	if (errFindEmail != nil) && (errFindPhone != nil) {
 		resp.Err = rest.ErrorInternal("Internal error")
@@ -160,7 +158,6 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 
 	var UserIdTemp uint64
 	if modelFindEmail.Id != 0 {
-		fmt.Println("Finding by email")
 		UserIdTemp = modelFindEmail.Id
 		result, err := database.Authenticate([]byte(req.Password), modelFindEmail.Salt, modelFindEmail.Password)
 
@@ -170,10 +167,6 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 		}
 
 	}
-
-	fmt.Println("modelFindPhone.Id", modelFindPhone.Id)
-	fmt.Println("modelFindPhone.Salt", modelFindPhone.Salt)
-	fmt.Println("modelFindPhone.Password", modelFindPhone.Password)
 
 	if modelFindPhone.Id != 0 {
 
@@ -186,7 +179,6 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 		}
 
 	}
-	fmt.Println("UserIdTemp", UserIdTemp)
 	modelAuthenticationHistory := &database.AuthenticationHistoryModel{
 		UserId: UserIdTemp,
 	}

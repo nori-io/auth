@@ -43,3 +43,29 @@ func TestSignUpRequest_ValidatePhone(t *testing.T) {
 
 
 }
+
+
+func TestSignUpRequest_Validate(t *testing.T) {
+	a := assert.New(t)
+	r := service.SignUpRequest{Email: "test@mail.ru", Password: "pass"}
+	a.Equal(r.Validate(), nil)
+
+}
+
+func TestSignUpRequest_ValidateMfaType(t *testing.T) {
+	a:=assert.New(t)
+	r:=service.SignUpRequest{MfaType:""}
+	a.Equal(r.ValidateMfaType(),nil)
+
+	r=service.SignUpRequest{MfaType:"phone"}
+	a.Equal(r.ValidateMfaType(),nil)
+
+	r=service.SignUpRequest{MfaType:"otp"}
+	a.Equal(r.ValidateMfaType(),nil)
+
+	r=service.SignUpRequest{MfaType:"falseType"}
+	a.NotEqual(r.ValidateMfaType(),nil)
+
+
+}
+

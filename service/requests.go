@@ -64,7 +64,9 @@ func (r SignInRequest) Validate() error {
 }
 
 // SignOut Request
-type SignOutRequest struct{}
+type SignOutRequest struct{
+	Name     string `json:"name" validate:"name"`
+}
 
 func (r RecoveryCodesRequest) Validate() error {
 	_, err := govalidator.ValidateStruct(r)

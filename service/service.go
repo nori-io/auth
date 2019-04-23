@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"time"
 
 	rest "github.com/cheebo/gorest"
 	"github.com/cheebo/rand"
@@ -242,6 +243,49 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 
 func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOutResponse) {
 	resp = &SignOutResponse{}
+	req=SignOutRequest{}
+	modelFindEmail, errFindEmail := s.db.Auth().FindByEmail(req.Name)
+	modelFindPhone, errFindPhone := s.db.Auth().FindByPhone(req.Name, "")
+	if (errFindEmail != nil) && (errFindPhone != nil) {
+		resp.Err = rest.ErrorInternal("Internal error")
+		return resp
+	}
+
+	if (modelFindEmail.Id == 0) && (modelFindPhone.Id == 0) {
+		resp.Err = rest.ErrorNotFound("User not found")
+		return resp
+	}
+
+	var UserIdTemp uint64
+	if modelFindEmail.Id != 0 {
+		UserIdTemp = modelFindEmail.Id
+
+
+	}
+
+	if modelFindPhone.Id != 0 {
+
+		UserIdTemp = modelFindPhone.Id
+
+	}
+	modelAuthenticationHistory := &database.AuthenticationHistoryModel{
+		UserId: UserIdTemp,
+	}
+
+	modelAuthenticationHistory.SignOut=time.Now()
+	err := s.db.AuthenticationHistory().Update(modelAuthenticationHistory)
+	if err != nil {
+		s.log.Error(err)
+		resp.Err = rest.ErrFieldResp{
+			Meta: rest.ErrFieldRespMeta{
+				ErrCode:    500,
+				ErrMessage: err.Error(),
+			},
+		}
+		return resp
+	}
+
+
 	s.session.Delete(s.session.SessionId(ctx))
 	return resp
 }

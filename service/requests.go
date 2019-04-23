@@ -21,7 +21,6 @@ type RecoveryCodesRequest struct {
 }
 
 func (r SignUpRequest) Validate() error {
-
 	_, err := govalidator.ValidateStruct(r)
 	return rest.ValidateResponse(err)
 }

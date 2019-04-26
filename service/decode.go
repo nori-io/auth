@@ -91,7 +91,6 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 			errPhoneCountryCode, errPhoneNumber := body.ValidatePhone()
 
 			if body.ValidateMail() != true {
-				fmt.Println("body.Validate.mail.")
 				errorResponse.AddError("email", 0,
 					"Mail address' format is uncorrect")
 			}

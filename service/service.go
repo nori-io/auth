@@ -43,6 +43,7 @@ type service struct {
 type sessionData struct {
 	name string
 }
+
 func NewService(
 	auth interfaces.Auth,
 	cache interfaces.Cache,
@@ -230,8 +231,7 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 		resp.Err = rest.ErrorInternal(err.Error())
 		return resp
 	}
-   fmt.Println("sessionData",sessionData{name:req.Name})
-	s.session.Save([]byte(sid), sessionData{name:req.Name}, 0)
+	s.session.Save([]byte(sid), sessionData{name: req.Name}, 0)
 
 	resp.Id = uint64(UserIdTemp)
 	resp.Token = token
@@ -244,57 +244,39 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 		resp.User = *modelFindPhone
 	}
 
-
 	return resp
 }
 
 func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOutResponse) {
 
-
-
-
 	resp = &SignOutResponse{}
-	//ctx.Value("nori.auth.data")
-    fmt.Println("Dump")
-    //var m map[string]string
-		//spew.Dump(ctx.Value("nori.auth.data")))}
+
 	value := ctx.Value("nori.auth.data")
 
 	xt := reflect.TypeOf(value).Kind()
-
-	fmt.Println("Type is",xt)
-
 
 	bar, err := InterfaceMap(value)
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Println("Error is",err)
-	fmt.Printf("%#v\n", bar.(map[string]interface{}))
+	var name string
 
 	if val, ok := bar.(map[string]interface{})["raw"]; ok {
-		fmt.Println("Value is",val)
-	if	val2, ok2 := val.(map[string]interface{})["name"]; ok2{
-			fmt.Println("Value2 is", val2)
+		if val2, ok2 := val.(map[string]interface{})["name"]; ok2 {
+			name = fmt.Sprint(val2)
 		}
 
 	}
 
-	fmt.Println("DUMP")
-	tempData:=sessionData{}
+	/*tempData:=sessionData{}
 	sessionId:=s.session.SessionId(ctx)
 
-	fmt.Println("sessionId",sessionId)
 	err=s.session.Get(sessionId, &tempData)
-    fmt.Println("&tempData", &tempData)
+	*/
 
-
-
-
-	req=SignOutRequest{}
-	modelFindEmail, errFindEmail := s.db.Auth().FindByEmail(tempData.name)
-	modelFindPhone, errFindPhone := s.db.Auth().FindByPhone(tempData.name, "")
+	req = SignOutRequest{}
+	modelFindEmail, errFindEmail := s.db.Auth().FindByEmail(name)
+	modelFindPhone, errFindPhone := s.db.Auth().FindByPhone(name, "")
 	if (errFindEmail != nil) && (errFindPhone != nil) {
 		resp.Err = rest.ErrorInternal("Internal error")
 		return resp
@@ -309,7 +291,6 @@ func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOu
 	if modelFindEmail.Id != 0 {
 		UserIdTemp = modelFindEmail.Id
 
-
 	}
 
 	if modelFindPhone.Id != 0 {
@@ -318,11 +299,14 @@ func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOu
 
 	}
 	modelAuthenticationHistory := &database.AuthenticationHistoryModel{
+
 		UserId: UserIdTemp,
 	}
 
-	modelAuthenticationHistory.SignOut=time.Now()
-	err = s.db.AuthenticationHistory().Update(modelAuthenticationHistory)
+	if modelFindEmail.Id != 0 {
+		modelAuthenticationHistory.SignOut = time.Now()
+		err = s.db.AuthenticationHistory().Update(modelAuthenticationHistory)
+	}
 	if err != nil {
 		s.log.Error(err)
 		resp.Err = rest.ErrFieldResp{
@@ -333,7 +317,6 @@ func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOu
 		}
 		return resp
 	}
-
 
 	s.session.Delete(s.session.SessionId(ctx))
 
@@ -366,7 +349,6 @@ func (s *service) RecoveryCodes(ctx context.Context, req RecoveryCodesRequest) (
 /*func (s *service) MakeProfileEndpoint(ctx context.Context,req ProfileRequest)(resp *ProfileRequest){
 	return resp
 }*/
-
 
 func InterfaceMap(i interface{}) (interface{}, error) {
 	// Get type

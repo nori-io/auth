@@ -3,7 +3,6 @@ package database
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -24,7 +23,6 @@ func (a *auth) Update(model *AuthModel) error {
 
 func (a *auth) FindByEmail(email string) (model *AuthModel, err error) {
 
-	fmt.Println("Auth", email)
 	rows, err := a.db.Query("SELECT id, email,password,salt FROM auth WHERE email = ? LIMIT 1", email)
 	if err != nil {
 		return nil, err
@@ -40,13 +38,11 @@ func (a *auth) FindByEmail(email string) (model *AuthModel, err error) {
 		model.Email = m.Email
 		model.Password = m.Password
 		model.Salt = m.Salt
-		fmt.Println("m.Id", m.Id)
 	}
 
 	if rows.Err() != nil {
 		return nil, rows.Err()
 	}
-	fmt.Println("modelInAuth", model )
 	return model, nil
 }
 

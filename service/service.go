@@ -2,11 +2,14 @@ package service
 
 import (
 	"context"
+	"fmt"
+	"reflect"
 	"time"
 
 	rest "github.com/cheebo/gorest"
 	"github.com/cheebo/rand"
 	"github.com/nori-io/nori-common/interfaces"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
 	"github.com/nori-io/authorization/service/database"
@@ -37,6 +40,9 @@ type service struct {
 	log     *logrus.Logger
 }
 
+type sessionData struct {
+	name string
+}
 func NewService(
 	auth interfaces.Auth,
 	cache interfaces.Cache,
@@ -224,8 +230,8 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 		resp.Err = rest.ErrorInternal(err.Error())
 		return resp
 	}
-
-	s.session.Save([]byte(sid), interfaces.SessionActive, 0)
+   fmt.Println("sessionData",sessionData{name:req.Name})
+	s.session.Save([]byte(sid), sessionData{name:req.Name}, 0)
 
 	resp.Id = uint64(UserIdTemp)
 	resp.Token = token
@@ -238,14 +244,57 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 		resp.User = *modelFindPhone
 	}
 
+
 	return resp
 }
 
 func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOutResponse) {
+
+
+
+
 	resp = &SignOutResponse{}
+	//ctx.Value("nori.auth.data")
+    fmt.Println("Dump")
+    //var m map[string]string
+		//spew.Dump(ctx.Value("nori.auth.data")))}
+	value := ctx.Value("nori.auth.data")
+
+	xt := reflect.TypeOf(value).Kind()
+
+	fmt.Println("Type is",xt)
+
+
+	bar, err := InterfaceMap(value)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Error is",err)
+	fmt.Printf("%#v\n", bar.(map[string]interface{}))
+
+	if val, ok := bar.(map[string]interface{})["raw"]; ok {
+		fmt.Println("Value is",val)
+	if	val2, ok2 := val.(map[string]interface{})["name"]; ok2{
+			fmt.Println("Value2 is", val2)
+		}
+
+	}
+
+	fmt.Println("DUMP")
+	tempData:=sessionData{}
+	sessionId:=s.session.SessionId(ctx)
+
+	fmt.Println("sessionId",sessionId)
+	err=s.session.Get(sessionId, &tempData)
+    fmt.Println("&tempData", &tempData)
+
+
+
+
 	req=SignOutRequest{}
-	modelFindEmail, errFindEmail := s.db.Auth().FindByEmail(req.Name)
-	modelFindPhone, errFindPhone := s.db.Auth().FindByPhone(req.Name, "")
+	modelFindEmail, errFindEmail := s.db.Auth().FindByEmail(tempData.name)
+	modelFindPhone, errFindPhone := s.db.Auth().FindByPhone(tempData.name, "")
 	if (errFindEmail != nil) && (errFindPhone != nil) {
 		resp.Err = rest.ErrorInternal("Internal error")
 		return resp
@@ -273,7 +322,7 @@ func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOu
 	}
 
 	modelAuthenticationHistory.SignOut=time.Now()
-	err := s.db.AuthenticationHistory().Update(modelAuthenticationHistory)
+	err = s.db.AuthenticationHistory().Update(modelAuthenticationHistory)
 	if err != nil {
 		s.log.Error(err)
 		resp.Err = rest.ErrFieldResp{
@@ -287,6 +336,7 @@ func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOu
 
 
 	s.session.Delete(s.session.SessionId(ctx))
+
 	return resp
 }
 
@@ -316,3 +366,31 @@ func (s *service) RecoveryCodes(ctx context.Context, req RecoveryCodesRequest) (
 /*func (s *service) MakeProfileEndpoint(ctx context.Context,req ProfileRequest)(resp *ProfileRequest){
 	return resp
 }*/
+
+
+func InterfaceMap(i interface{}) (interface{}, error) {
+	// Get type
+	t := reflect.TypeOf(i)
+
+	switch t.Kind() {
+	case reflect.Map:
+		// Get the value of the provided map
+		v := reflect.ValueOf(i)
+
+		// The "only" way of making a reflect.Type with interface{}
+		it := reflect.TypeOf((*interface{})(nil)).Elem()
+
+		// Create the map of the specific type. Key type is t.Key(), and element type is it
+		m := reflect.MakeMap(reflect.MapOf(t.Key(), it))
+
+		// Copy values to new map
+		for _, mk := range v.MapKeys() {
+			m.SetMapIndex(mk, v.MapIndex(mk))
+		}
+
+		return m.Interface(), nil
+
+	}
+
+	return nil, errors.New("Unsupported type")
+}

@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -24,6 +25,8 @@ func (a *authenticationHistory) Update(model *AuthenticationHistoryModel) error 
 	if model.Id == 0 {
 		return errors.New("Empty model")
 	}
+
+	fmt.Println("sdsdsdsds")
 	_, err := a.db.Exec("UPDATE authentification_history SET user_id = ?, signin = ?, meta = ?, signout = ?  WHERE id = ? ",
 		model.UserId, model.SignIn, model.Meta, model.SignOut, model.Id)
 	return err

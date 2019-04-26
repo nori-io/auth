@@ -26,7 +26,7 @@ func (r SignUpRequest) Validate() error {
 }
 
 func (r SignUpRequest) ValidateMail() bool {
-	return 	govalidator.IsEmail(r.Email)
+	return govalidator.IsEmail(r.Email)
 
 }
 
@@ -35,9 +35,8 @@ func (r SignUpRequest) ValidatePhone() (error, error) {
 
 	errPhoneNumber := isNumber(r.PhoneNumber)
 
-	return errPhoneCountryCode,errPhoneNumber
+	return errPhoneCountryCode, errPhoneNumber
 }
-
 
 func (r SignUpRequest) ValidateMfaType() error {
 
@@ -64,8 +63,8 @@ func (r SignInRequest) Validate() error {
 }
 
 // SignOut Request
-type SignOutRequest struct{
-	Name     string `json:"name" validate:"name"`
+type SignOutRequest struct {
+	Name string `json:"name" validate:"name"`
 }
 
 func (r RecoveryCodesRequest) Validate() error {

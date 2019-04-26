@@ -72,9 +72,9 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 		}
 
 		if (parameters.UserRegistrationEmailAddressType == false) && (parameters.UserRegistrationPhoneNumberType == true) {
-		    errPhoneCountryCode,errPhoneNumber:=body.ValidatePhone()
+			errPhoneCountryCode, errPhoneNumber := body.ValidatePhone()
 
-			if errPhoneCountryCode!=nil{
+			if errPhoneCountryCode != nil {
 				errorResponse.AddError("phone_country_code", 0,
 					"Country code's format is uncorrect")
 
@@ -88,17 +88,15 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 		}
 
 		if (parameters.UserRegistrationEmailAddressType == true) && (parameters.UserRegistrationPhoneNumberType == true) {
-			errPhoneCountryCode,errPhoneNumber:=body.ValidatePhone()
-
+			errPhoneCountryCode, errPhoneNumber := body.ValidatePhone()
 
 			if body.ValidateMail() != true {
-             fmt.Println("body.Validate.mail.")
+				fmt.Println("body.Validate.mail.")
 				errorResponse.AddError("email", 0,
 					"Mail address' format is uncorrect")
 			}
 
-
-			if errPhoneCountryCode!=nil{
+			if errPhoneCountryCode != nil {
 				errorResponse.AddError("phone_country_code", 0,
 					"Country code's format is uncorrect")
 
@@ -108,7 +106,6 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 				errorResponse.AddError("phone_number", 0,
 					"Phone number's format is uncorrect ")
 			}
-
 
 		}
 

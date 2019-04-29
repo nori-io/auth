@@ -140,11 +140,11 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 
    if parameters.UserRegistrationEmailAddressType{
 	   modelEmail, errEmailNotFound = s.db.Auth().FindByEmail(req.Name)
-   }
+   } else {if parameters.UserRegistrationPhoneNumberType {
+	   modelPhone, errPhoneNotFound = s.db.Auth().FindByPhone(req.Name, "")
+   }}
 
-	if parameters.UserRegistrationPhoneNumberType {
-		modelPhone, errPhoneNotFound = s.db.Auth().FindByPhone(req.Name, "")
-	}
+
 	if (errEmailNotFound != nil) && (errPhoneNotFound != nil) {
 		resp.Err = rest.ErrorInternal("Database error")
 		return resp

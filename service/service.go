@@ -155,9 +155,9 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 		return resp
 	}
 
-	var UserIdTemp uint64
+	var userId uint64
 	if modelEmail.Id != 0 {
-		UserIdTemp = modelEmail.Id
+		userId = modelEmail.Id
 		result, err := database.Authenticate([]byte(req.Password), modelEmail.Salt, modelEmail.Password)
 
 		if (!result) || (err != nil) {
@@ -169,7 +169,7 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 
 	if modelPhone.Id != 0 {
 
-		UserIdTemp = modelPhone.Id
+		userId = modelPhone.Id
 		result, err := database.Authenticate([]byte(req.Password), modelPhone.Salt, modelPhone.Password)
 
 		if (result == false) || (err != nil) {
@@ -179,7 +179,7 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 
 	}
 	modelAuthenticationHistory := &database.AuthenticationHistoryModel{
-		UserId: UserIdTemp,
+		UserId: userId,
 	}
 
 	err := s.db.AuthenticationHistory().Create(modelAuthenticationHistory)
@@ -204,7 +204,7 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 		switch key {
 		case "raw":
 			return map[string]string{
-				"id":   string(UserIdTemp),
+				"id":   string(userId),
 				"name": req.Name,
 			}
 		case "jti":
@@ -224,7 +224,7 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 	}
 	s.session.Save([]byte(sid), sessionData{name: req.Name}, 0)
 
-	resp.Id = uint64(UserIdTemp)
+	resp.Id = uint64(userId)
 	resp.Token = token
 
 	if modelEmail.Id != 0 {

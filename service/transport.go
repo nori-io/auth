@@ -45,7 +45,7 @@ func Transport(
 	http.ServerErrorLogger(logger)(signupHandler)
 
 	signinHandler := http.NewServer(
-		MakeSignInEndpoint(srv),
+		MakeSignInEndpoint(srv, parameters),
 		DecodeSignInRequest,
 		http.EncodeJSONResponse,
 	)

@@ -16,7 +16,7 @@ import (
 
 type Service interface {
 	SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpResponse)
-	SignIn(ctx context.Context, req SignInRequest) (resp *SignInResponse)
+	SignIn(ctx context.Context, req SignInRequest,parameters PluginParameters) (resp *SignInResponse)
 	SignOut(ctx context.Context, req SignOutRequest) (resp *SignOutResponse)
 	RecoveryCodes(ctx context.Context, req RecoveryCodesRequest) (resp *RecoveryCodesResponse)
 }
@@ -133,13 +133,20 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	return resp
 }
 
-func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInResponse) {
+func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters PluginParameters) (resp *SignInResponse) {
 	resp = &SignInResponse{}
+	var modelFindEmail,modelFindPhone *database.AuthModel
+	var errFindEmail, errFindPhone error
 
-	modelFindEmail, errFindEmail := s.db.Auth().FindByEmail(req.Name)
-	modelFindPhone, errFindPhone := s.db.Auth().FindByPhone(req.Name, "")
+   if parameters.UserRegistrationEmailAddressType{
+	modelFindEmail, errFindEmail = s.db.Auth().FindByEmail(req.Name)
+   }
+
+	if parameters.UserRegistrationPhoneNumberType {
+		modelFindPhone, errFindPhone = s.db.Auth().FindByPhone(req.Name, "")
+	}
 	if (errFindEmail != nil) && (errFindPhone != nil) {
-		resp.Err = rest.ErrorInternal("Internal error")
+		resp.Err = rest.ErrorInternal("Database error")
 		return resp
 	}
 

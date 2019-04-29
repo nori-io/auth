@@ -135,30 +135,30 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 
 func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters PluginParameters) (resp *SignInResponse) {
 	resp = &SignInResponse{}
-	var modelEmail,modelPhone *database.AuthModel
-	var errEmailNotFound, errPhoneNotFound error
+	var model *database.AuthModel
+	var err error
 
    if parameters.UserRegistrationEmailAddressType{
-	   modelEmail, errEmailNotFound = s.db.Auth().FindByEmail(req.Name)
+	   model, err = s.db.Auth().FindByEmail(req.Name)
    } else {if parameters.UserRegistrationPhoneNumberType {
-	   modelPhone, errPhoneNotFound = s.db.Auth().FindByPhone(req.Name, "")
+	   model, err = s.db.Auth().FindByPhone(req.Name, "")
    }}
 
 
-	if (errEmailNotFound != nil) && (errPhoneNotFound != nil) {
+	if (err!= nil) {
 		resp.Err = rest.ErrorInternal("Database error")
 		return resp
 	}
 
-	if (modelEmail == nil) && (modelPhone== nil) {
+	if (model== nil)  {
 		resp.Err = rest.ErrorNotFound("User not found")
 		return resp
 	}
 
 	var userId uint64
-	if modelEmail.Id != 0 {
-		userId = modelEmail.Id
-		result, err := database.Authenticate([]byte(req.Password), modelEmail.Salt, modelEmail.Password)
+	if model.Id != 0 {
+		userId = model.Id
+		result, err := database.Authenticate([]byte(req.Password), model.Salt, model.Password)
 
 		if (!result) || (err != nil) {
 			resp.Err = rest.ErrorNotFound("Uncorrect Password")
@@ -167,22 +167,11 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 
 	}
 
-	if modelPhone.Id != 0 {
-
-		userId = modelPhone.Id
-		result, err := database.Authenticate([]byte(req.Password), modelPhone.Salt, modelPhone.Password)
-
-		if (result == false) || (err != nil) {
-			resp.Err = rest.ErrorNotFound("Uncorrect Password")
-			return resp
-		}
-
-	}
 	modelAuthenticationHistory := &database.AuthenticationHistoryModel{
 		UserId: userId,
 	}
 
-	err := s.db.AuthenticationHistory().Create(modelAuthenticationHistory)
+	err = s.db.AuthenticationHistory().Create(modelAuthenticationHistory)
 	if err != nil {
 		s.log.Error(err)
 		resp.Err = rest.ErrFieldResp{
@@ -227,13 +216,11 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 	resp.Id = uint64(userId)
 	resp.Token = token
 
-	if modelEmail.Id != 0 {
-		resp.User = *modelEmail
+	if model.Id != 0 {
+		resp.User = *model
 	}
 
-	if modelPhone.Id != 0 {
-		resp.User = *modelPhone
-	}
+
 
 	return resp
 }

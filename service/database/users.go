@@ -24,7 +24,7 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 	if err != nil {
 		return err
 	}
-	if modelUsers.Mfa_type == "" {
+	if len(modelUsers.Mfa_type) == 0 {
 		stmt, err := tx.Prepare("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)")
 		if err != nil {
 			return err
@@ -75,7 +75,7 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 	if err != nil {
 		return err
 	}
-	if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber == "") && (modelAuth.Email != "") {
+	if (len(modelAuth.PhoneCountryCode+modelAuth.PhoneNumber) == 0) && (len(modelAuth.Email) != 0) {
 
 		stmt, err := tx.Prepare("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)")
 		if err != nil {
@@ -90,7 +90,7 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		}
 	}
 
-	if (modelAuth.PhoneCountryCode+modelAuth.PhoneNumber != "") && (modelAuth.Email == "") {
+	if (len(modelAuth.PhoneCountryCode+modelAuth.PhoneNumber) != 0) && (len(modelAuth.Email) == 0) {
 		stmt, err := tx.Prepare("INSERT INTO auth (user_id, phone_country_code, phone_number, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?,?)")
 		if err != nil {
 			return err

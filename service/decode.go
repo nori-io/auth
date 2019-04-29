@@ -108,7 +108,7 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 
 		}
 
-		if parameters.UserMfaTypeParameter == "" {
+		if len(parameters.UserMfaTypeParameter) == 0 {
 			body.Validate()
 		}
 
@@ -160,7 +160,7 @@ func DecodeRecoveryCodes() func(_ context.Context, r *http.Request) (interface{}
 			}
 		}
 
-		if errorText != "" {
+		if len(errorText) != 0 {
 			return body, rest.ErrFieldResp{
 				Meta: rest.ErrFieldRespMeta{
 					ErrMessage: errCommon.Error(),

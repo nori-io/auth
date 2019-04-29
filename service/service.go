@@ -72,32 +72,17 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 			ErrCode: 400,
 		},
 	}
-	if (len(req.Email) == 0) && (len(req.PhoneNumber+req.PhoneCountryCode) == 0) {
-		resp.Err = rest.ErrFieldResp{
-			Meta: rest.ErrFieldRespMeta{
-				ErrMessage: "Email and Phone's information is absent",
-			},
-		}
-		return resp
-	}
-
-	if (len(req.PhoneNumber) == 0) || (len(req.PhoneCountryCode) == 0) {
-
-	}
-
 	if len(req.Email) != 0 {
-		if modelAuth, err = s.db.Auth().FindByEmail(req.Email); err != nil {
-			resp.Err = rest.ErrFieldResp{
-				Meta: rest.ErrFieldRespMeta{
-					ErrMessage: err.Error(),
-				},
-			}
-			return resp
-		}
-		if modelAuth != nil && modelAuth.Id != 0 {
-			errField.AddError("email", 400, "Email already exists.")
-		}
+		modelAuth, err = s.db.Auth().FindByEmail(req.Email)
+	} else if len(req.PhoneCountryCode + req.PhoneCountryCode) != 0 {
+		modelAuth, err = s.db.Auth().FindByEmail(req.Email)
 	}
+
+	if modelAuth != nil {
+		errField.AddError("email", 400, "Email already exists.")
+	}
+
+	
 	if len(req.PhoneCountryCode+req.PhoneCountryCode) != 0 {
 		if modelAuth, err = s.db.Auth().FindByPhone(req.PhoneCountryCode, req.PhoneNumber); err != nil {
 			resp.Err = rest.ErrFieldResp{

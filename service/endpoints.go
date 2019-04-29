@@ -15,11 +15,11 @@ func MakeSignUpEndpoint(s Service) endpoint.Endpoint {
 
 }
 
-func MakeSignInEndpoint(s Service,parameters PluginParameters) endpoint.Endpoint {
+func MakeSignInEndpoint(s Service, parameters PluginParameters) endpoint.Endpoint {
 	return func(ctx context.Context, r interface{}) (interface{}, error) {
 
 		req := r.(SignInRequest)
-		resp := s.SignIn(ctx, req,parameters)
+		resp := s.SignIn(ctx, req, parameters)
 		return *resp, resp.Error()
 	}
 }

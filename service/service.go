@@ -16,7 +16,7 @@ import (
 
 type Service interface {
 	SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpResponse)
-	SignIn(ctx context.Context, req SignInRequest,parameters PluginParameters) (resp *SignInResponse)
+	SignIn(ctx context.Context, req SignInRequest, parameters PluginParameters) (resp *SignInResponse)
 	SignOut(ctx context.Context, req SignOutRequest) (resp *SignOutResponse)
 	RecoveryCodes(ctx context.Context, req RecoveryCodesRequest) (resp *RecoveryCodesResponse)
 }
@@ -74,14 +74,13 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	}
 	if len(req.Email) != 0 {
 		modelAuth, err = s.db.Auth().FindByEmail(req.Email)
-	} else if len(req.PhoneCountryCode + req.PhoneCountryCode) != 0 {
+	} else if len(req.PhoneCountryCode+req.PhoneCountryCode) != 0 {
 		modelAuth, err = s.db.Auth().FindByEmail(req.Email)
 	}
 
 	if modelAuth != nil {
 		errField.AddError("email", 400, "Email already exists.")
 	}
-
 
 	if len(req.PhoneCountryCode+req.PhoneCountryCode) != 0 {
 		if modelAuth, err = s.db.Auth().FindByPhone(req.PhoneCountryCode, req.PhoneNumber); err != nil {
@@ -138,19 +137,20 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 	var model *database.AuthModel
 	var err error
 
-   if parameters.UserRegistrationEmailAddressType{
-	   model, err = s.db.Auth().FindByEmail(req.Name)
-   } else {if parameters.UserRegistrationPhoneNumberType {
-	   model, err = s.db.Auth().FindByPhone(req.Name, "")
-   }}
+	if parameters.UserRegistrationEmailAddressType {
+		model, err = s.db.Auth().FindByEmail(req.Name)
+	} else {
+		if parameters.UserRegistrationPhoneNumberType {
+			model, err = s.db.Auth().FindByPhone(req.Name, "")
+		}
+	}
 
-
-	if (err!= nil) {
+	if err != nil {
 		resp.Err = rest.ErrorInternal("Database error")
 		return resp
 	}
 
-	if (model== nil)  {
+	if model == nil {
 		resp.Err = rest.ErrorNotFound("User not found")
 		return resp
 	}
@@ -220,8 +220,6 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 		resp.User = *model
 	}
 
-
-
 	return resp
 }
 
@@ -258,7 +256,7 @@ func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOu
 		return resp
 	}
 
-	if (modelFindEmail == nil) && (modelFindPhone==nil) {
+	if (modelFindEmail == nil) && (modelFindPhone == nil) {
 		resp.Err = rest.ErrorNotFound("User not found")
 		return resp
 	}

@@ -82,7 +82,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 		errField.AddError("email", 400, "Email already exists.")
 	}
 
-	
+
 	if len(req.PhoneCountryCode+req.PhoneCountryCode) != 0 {
 		if modelAuth, err = s.db.Auth().FindByPhone(req.PhoneCountryCode, req.PhoneNumber); err != nil {
 			resp.Err = rest.ErrFieldResp{
@@ -143,7 +143,7 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 		return resp
 	}
 
-	if (modelFindEmail.Id == 0) && (modelFindPhone.Id == 0) {
+	if (modelFindEmail == nil) && (modelFindPhone== nil) {
 		resp.Err = rest.ErrorNotFound("User not found")
 		return resp
 	}
@@ -264,7 +264,7 @@ func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOu
 		return resp
 	}
 
-	if (modelFindEmail.Id == 0) && (modelFindPhone.Id == 0) {
+	if (modelFindEmail == nil) && (modelFindPhone==nil) {
 		resp.Err = rest.ErrorNotFound("User not found")
 		return resp
 	}

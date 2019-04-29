@@ -41,8 +41,9 @@ func (a *auth) FindByEmail(email string) (model *AuthModel, err error) {
 	}
 
 	if rows.Err() != nil {
-		return nil, rows.Err()
+		return nil, errors.New("User not found")
 	}
+
 	return model, nil
 }
 
@@ -64,7 +65,7 @@ func (a *auth) FindByPhone(phoneCountryCode, phoneNumber string) (model *AuthMod
 	}
 
 	if rows.Err() != nil {
-		return nil, rows.Err()
+		return nil, errors.New("User not found")
 	}
 
 	return model, nil

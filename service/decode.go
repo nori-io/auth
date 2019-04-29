@@ -53,17 +53,17 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 
 		var errorResponse rest.ErrFieldResp
 
-		if isTypeValid == false {
+		if !isTypeValid {
 
 			errorResponse.AddError("type", 0, "User type isn't valid")
 		}
 
-		if ((parameters.UserRegistrationPhoneNumberType) || (parameters.UserRegistrationEmailAddressType)) != true {
+		if !((parameters.UserRegistrationPhoneNumberType) || (parameters.UserRegistrationEmailAddressType)) {
 
 		}
 
-		if (parameters.UserRegistrationEmailAddressType == true) && (parameters.UserRegistrationPhoneNumberType == false) {
-			if body.ValidateMail() != true {
+		if (parameters.UserRegistrationEmailAddressType) && (!parameters.UserRegistrationPhoneNumberType) {
+			if !body.ValidateMail() {
 
 				errorResponse.AddError("email", 0,
 					"Mail address' format is uncorrect")
@@ -71,7 +71,7 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 
 		}
 
-		if (parameters.UserRegistrationEmailAddressType == false) && (parameters.UserRegistrationPhoneNumberType == true) {
+		if (!parameters.UserRegistrationEmailAddressType) && (parameters.UserRegistrationPhoneNumberType) {
 			errPhoneCountryCode, errPhoneNumber := body.ValidatePhone()
 
 			if errPhoneCountryCode != nil {
@@ -87,10 +87,10 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 
 		}
 
-		if (parameters.UserRegistrationEmailAddressType == true) && (parameters.UserRegistrationPhoneNumberType == true) {
+		if (parameters.UserRegistrationEmailAddressType) && (parameters.UserRegistrationPhoneNumberType) {
 			errPhoneCountryCode, errPhoneNumber := body.ValidatePhone()
 
-			if body.ValidateMail() != true {
+			if !body.ValidateMail() {
 				errorResponse.AddError("email", 0,
 					"Mail address' format is uncorrect")
 			}
@@ -112,7 +112,7 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 			body.Validate()
 		}
 
-		if errorResponse.HasErrors() == true {
+		if errorResponse.HasErrors() {
 			return body, errorResponse
 		}
 

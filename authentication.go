@@ -7,7 +7,6 @@ import (
 	"github.com/nori-io/nori-common/meta"
 	noriPlugin "github.com/nori-io/nori-common/plugin"
 
-
 	"github.com/nori-io/authentication/service"
 	"github.com/nori-io/authentication/service/database"
 )

@@ -5,7 +5,6 @@ import (
 	"github.com/nori-io/nori-common/interfaces"
 	"github.com/nori-io/nori-common/logger"
 	"github.com/nori-io/nori-common/transport/http"
-
 )
 
 type PluginParameters struct {
@@ -41,7 +40,7 @@ func Transport(
 			UserMfaTypeParameter:             parameters.UserMfaTypeParameter,
 		}),
 		http.EncodeJSONResponse,
-		)
+	)
 
 	http.ServerErrorLogger(logger)(signupHandler)
 
@@ -52,7 +51,6 @@ func Transport(
 	)
 
 	http.ServerErrorLogger(logger)(signinHandler)
-
 
 	opts := []http.ServerOption{
 		http.ServerBefore(transport.ToContext()),
@@ -71,9 +69,8 @@ func Transport(
 		MakeRecoveryCodesEndpoint(srv),
 		DecodeRecoveryCodes(),
 		http.EncodeJSONResponse,
-		)
+	)
 	http.ServerErrorLogger(logger)(recoveryCodesHandler)
-
 
 	/*	profileHandler:=http.NewServer(
 		MakeProfileEndpoint(srv),

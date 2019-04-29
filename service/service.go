@@ -168,7 +168,7 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 		UserIdTemp = modelFindEmail.Id
 		result, err := database.Authenticate([]byte(req.Password), modelFindEmail.Salt, modelFindEmail.Password)
 
-		if (result == false) || (err != nil) {
+		if (!result) || (err != nil) {
 			resp.Err = rest.ErrorNotFound("Uncorrect Password")
 			return resp
 		}

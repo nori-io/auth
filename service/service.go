@@ -135,30 +135,30 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 
 func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters PluginParameters) (resp *SignInResponse) {
 	resp = &SignInResponse{}
-	var modelFindEmail,modelFindPhone *database.AuthModel
-	var errFindEmail, errFindPhone error
+	var modelEmail,modelPhone *database.AuthModel
+	var errEmailNotFound, errPhoneNotFound error
 
    if parameters.UserRegistrationEmailAddressType{
-	modelFindEmail, errFindEmail = s.db.Auth().FindByEmail(req.Name)
+	   modelEmail, errEmailNotFound = s.db.Auth().FindByEmail(req.Name)
    }
 
 	if parameters.UserRegistrationPhoneNumberType {
-		modelFindPhone, errFindPhone = s.db.Auth().FindByPhone(req.Name, "")
+		modelPhone, errPhoneNotFound = s.db.Auth().FindByPhone(req.Name, "")
 	}
-	if (errFindEmail != nil) && (errFindPhone != nil) {
+	if (errEmailNotFound != nil) && (errPhoneNotFound != nil) {
 		resp.Err = rest.ErrorInternal("Database error")
 		return resp
 	}
 
-	if (modelFindEmail == nil) && (modelFindPhone== nil) {
+	if (modelEmail == nil) && (modelPhone== nil) {
 		resp.Err = rest.ErrorNotFound("User not found")
 		return resp
 	}
 
 	var UserIdTemp uint64
-	if modelFindEmail.Id != 0 {
-		UserIdTemp = modelFindEmail.Id
-		result, err := database.Authenticate([]byte(req.Password), modelFindEmail.Salt, modelFindEmail.Password)
+	if modelEmail.Id != 0 {
+		UserIdTemp = modelEmail.Id
+		result, err := database.Authenticate([]byte(req.Password), modelEmail.Salt, modelEmail.Password)
 
 		if (!result) || (err != nil) {
 			resp.Err = rest.ErrorNotFound("Uncorrect Password")
@@ -167,10 +167,10 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 
 	}
 
-	if modelFindPhone.Id != 0 {
+	if modelPhone.Id != 0 {
 
-		UserIdTemp = modelFindPhone.Id
-		result, err := database.Authenticate([]byte(req.Password), modelFindPhone.Salt, modelFindPhone.Password)
+		UserIdTemp = modelPhone.Id
+		result, err := database.Authenticate([]byte(req.Password), modelPhone.Salt, modelPhone.Password)
 
 		if (result == false) || (err != nil) {
 			resp.Err = rest.ErrorNotFound("Uncorrect Password")
@@ -227,12 +227,12 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 	resp.Id = uint64(UserIdTemp)
 	resp.Token = token
 
-	if modelFindEmail.Id != 0 {
-		resp.User = *modelFindEmail
+	if modelEmail.Id != 0 {
+		resp.User = *modelEmail
 	}
 
-	if modelFindPhone.Id != 0 {
-		resp.User = *modelFindPhone
+	if modelPhone.Id != 0 {
+		resp.User = *modelPhone
 	}
 
 	return resp

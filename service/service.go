@@ -10,9 +10,8 @@ import (
 	"github.com/cheebo/rand"
 	"github.com/nori-io/nori-common/interfaces"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 
-	"github.com/nori-io/authorization/service/database"
+	"github.com/nori-io/authentication/service/database"
 )
 
 type Service interface {
@@ -37,7 +36,7 @@ type service struct {
 	db      database.Database
 	session interfaces.Session
 	cfg     *Config
-	log     *logrus.Logger
+	log     interfaces.Logger
 }
 
 type sessionData struct {
@@ -50,7 +49,7 @@ func NewService(
 	mail interfaces.Mail,
 	session interfaces.Session,
 	cfg *Config,
-	log *logrus.Logger,
+	log interfaces.Logger,
 	db database.Database,
 ) Service {
 	return &service{
@@ -252,8 +251,6 @@ func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOu
 	resp = &SignOutResponse{}
 
 	value := ctx.Value("nori.auth.data")
-
-	xt := reflect.TypeOf(value).Kind()
 
 	bar, err := InterfaceMap(value)
 	if err != nil {

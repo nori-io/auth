@@ -4,12 +4,12 @@ import (
 	"database/sql"
 	"errors"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/nori-io/nori-common/interfaces"
 )
 
 type auth struct {
 	db  *sql.DB
-	log *log.Logger
+	log interfaces.Logger
 }
 
 func (a *auth) Update(model *AuthModel) error {

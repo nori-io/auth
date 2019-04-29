@@ -7,12 +7,12 @@ import (
 	"time"
 	"unsafe"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/nori-io/nori-common/interfaces"
 )
 
 type mfaCode struct {
 	db  *sql.DB
-	log *log.Logger
+	log interfaces.Logger
 }
 
 const (

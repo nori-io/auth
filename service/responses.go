@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/nori-io/authorization/service/database"
+	"github.com/nori-io/authentication/service/database"
 )
 
 // SignUpResponse

@@ -3,9 +3,9 @@ package service
 import (
 	"github.com/nori-io/nori-common/endpoint"
 	"github.com/nori-io/nori-common/interfaces"
+	"github.com/nori-io/nori-common/logger"
 	"github.com/nori-io/nori-common/transport/http"
 
-	"github.com/sirupsen/logrus"
 )
 
 type PluginParameters struct {
@@ -22,7 +22,7 @@ func Transport(
 	session interfaces.Session,
 	router interfaces.Http,
 	srv Service,
-	logger *logrus.Logger,
+	logger logger.Writer,
 	parameters PluginParameters,
 
 ) {
@@ -41,14 +41,18 @@ func Transport(
 			UserMfaTypeParameter:             parameters.UserMfaTypeParameter,
 		}),
 		http.EncodeJSONResponse,
-		logger,
-	)
+		)
+
+	http.ServerErrorLogger(logger)(signupHandler)
+
 	signinHandler := http.NewServer(
 		MakeSignInEndpoint(srv),
 		DecodeSignInRequest,
 		http.EncodeJSONResponse,
-		logger,
 	)
+
+	http.ServerErrorLogger(logger)(signinHandler)
+
 
 	opts := []http.ServerOption{
 		http.ServerBefore(transport.ToContext()),
@@ -58,15 +62,18 @@ func Transport(
 		authenticated(MakeSignOutEndpoint(srv)),
 		DecodeSignOutRequest,
 		http.EncodeJSONResponse,
-		logger,
 		opts...,
 	)
+
+	http.ServerErrorLogger(logger)(signoutHandler)
 
 	recoveryCodesHandler := http.NewServer(
 		MakeRecoveryCodesEndpoint(srv),
 		DecodeRecoveryCodes(),
 		http.EncodeJSONResponse,
-		logger)
+		)
+	http.ServerErrorLogger(logger)(recoveryCodesHandler)
+
 
 	/*	profileHandler:=http.NewServer(
 		MakeProfileEndpoint(srv),

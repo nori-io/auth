@@ -4,9 +4,10 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/nori-io/nori-common/interfaces"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/nori-io/authorization/service/database/sql_scripts"
+	"github.com/nori-io/authentication/service/database/sql_scripts"
 )
 
 type Database interface {
@@ -51,7 +52,7 @@ type database struct {
 	mfaCode               *mfaCode
 }
 
-func DB(db *sql.DB, logger *log.Logger) Database {
+func DB(db *sql.DB, logger interfaces.Logger) Database {
 
 	return &database{
 		db: db,

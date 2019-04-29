@@ -5,12 +5,12 @@ import (
 	"errors"
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/nori-io/nori-common/interfaces"
 )
 
 type authenticationHistory struct {
 	db  *sql.DB
-	log *log.Logger
+	log interfaces.Logger
 }
 
 func (a *authenticationHistory) Create(model *AuthenticationHistoryModel) error {

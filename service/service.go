@@ -82,7 +82,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 		errField.AddError("email", 400, "Email already exists.")
 	}
 
-	if len(req.PhoneCountryCode+req.PhoneCountryCode) != 0 {
+	if len(req.PhoneCountryCode+req.PhoneNumber) != 0 {
 		if modelAuth, err = s.db.Auth().FindByPhone(req.PhoneCountryCode, req.PhoneNumber); err != nil {
 			resp.Err = rest.ErrFieldResp{
 				Meta: rest.ErrFieldRespMeta{

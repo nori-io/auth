@@ -32,7 +32,7 @@ func (c *mfaCode) Create(modelMfaCode *MfaCodeModel) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	_, execErr := tx.Exec("DELETE FROM user_mfa_code WHERE user_ud=?", modelMfaCode.UserId)
+	_, execErr := tx.Exec("DELETE FROM user_mfa_code WHERE user_шd=?", modelMfaCode.UserId)
 
 	for index := 0; index < 10; index++ {
 		generatedCode := RandStr(5) + "-" + RandStr(5)

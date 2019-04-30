@@ -72,14 +72,14 @@ ENGINE = InnoDB;
 `
 
 	CreateTableUsersMfaSecret = `
-CREATE TABLE IF NOT EXISTS user_mfa_secret (
+CREATE TABLE IF NOT EXISTS user_mfa_recovery_codes (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id INT UNSIGNED NOT NULL,
   secret NVARCHAR(255) NOT NULL,
   PRIMARY KEY (id),
   UNIQUE INDEX user_id_UNIQUE (user_id ASC),
   INDEX user_id_idx (user_id ASC),
-  CONSTRAINT user_mfa_secret_user_id_fk
+  CONSTRAINT user_mfa_recovery_codes_user_id_fk
     FOREIGN KEY (user_id)
     REFERENCES users (id)
     ON DELETE NO ACTION

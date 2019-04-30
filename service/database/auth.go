@@ -16,7 +16,7 @@ func (a *auth) Update(model *AuthModel) error {
 	if model.Id == 0 {
 		return errors.New("Empty model")
 	}
-	_, err := a.db.Exec("UPDATE auth SET profile_user_id = ?, phone = ?, email = ?, password = ? ,salt = ? ,created =? WHERE id = ? ",
+	_, err := a.db.Exec("UPDATE auth SET user_id = ?, phone_number = ?, phone_country_code, email = ?, password = ? ,salt = ? ,created =?, updated =? WHERE id = ? ",
 		model.UserId, model.Id)
 	return err
 }

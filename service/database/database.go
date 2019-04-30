@@ -198,7 +198,7 @@ func (db *database) DropTables() error {
 		log.Fatal(execErr)
 	}
 	_, execErr = tx.Exec(
-		sql_scripts.DropTableUserMfaCode)
+		sql_scripts.DropTableUserMfaRecoveryCodes)
 	if execErr != nil {
 		_ = tx.Rollback()
 		log.Fatal(execErr)

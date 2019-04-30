@@ -7,5 +7,5 @@ const (
 	DropTableAuthentificationHistory = `drop table authentification_history;`
 	DropTableUserMfaSecret           = `drop table user_mfa_secret;`
 	DropTableUserMfaPhone            = `drop table user_mfa_phone;`
-	DropTableUserMfaCode             = `drop table user_mfa_code;`
+	DropTableUserMfaRecoveryCodes             = `drop table user_mfa_recovery_codes;`
 )

@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"errors"
+	"time"
 
 	"github.com/nori-io/nori-common/interfaces"
 )
@@ -18,6 +19,10 @@ func (a *auth) Update_PhoneNumber_CountryCode(model *AuthModel) error {
 	}
 	_, err := a.db.Exec("UPDATE auth SET phone_number = ?, phone_country_code =? WHERE id = ? ",
 		model.PhoneNumber, model.PhoneCountryCode, model.Id)
+
+	if err==nil{
+		a.Update_Updated(model)
+	}
 	return err
 }
 func (a *auth) Update_Email(model *AuthModel) error {
@@ -26,6 +31,9 @@ func (a *auth) Update_Email(model *AuthModel) error {
 	}
 	_, err := a.db.Exec("UPDATE auth SET email=? WHERE id = ? ",
 		model.Email, model.Id)
+	if err==nil{
+		a.Update_Updated(model)
+	}
 	return err
 }
 
@@ -46,6 +54,21 @@ func (a *auth) Update_Password_Salt(model *AuthModel) error {
 	}
 	_, err = a.db.Exec("UPDATE auth SET password=? , salt=?  WHERE id = ? ",
 		password, salt, model.Id)
+	if err==nil{
+		a.Update_Updated(model)
+	}
+	return err
+}
+
+
+func (a *auth) Update_Updated(model *AuthModel) error {
+	if model.Id == 0 {
+		return errors.New("Empty model")
+	}
+	_, err := a.db.Exec("UPDATE auth SET updated=? WHERE id = ? ",
+		time.Now(), model.Id)
+	
+
 	return err
 }
 

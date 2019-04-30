@@ -139,3 +139,33 @@ func (u *user) Update_Type(modelUsers *UsersModel) error {
 		modelUsers.Type, modelUsers.Id)
 	return err
 }
+
+func (u *user) Update_Updated(modelUsers *UsersModel) error {
+	ctx := context.Background()
+
+	tx, err := u.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
+	if err != nil {
+		return err
+	}
+	if modelUsers.Id == 0 {
+		return errors.New("Empty model")
+	}
+	_, err = tx.Exec("UPDATE users SET updated=? WHERE id = ? ",
+		modelUsers.Updated, modelUsers.Id)
+	return err
+}
+
+func (u *user) Update_MfaType(modelUsers *UsersModel) error {
+	ctx := context.Background()
+
+	tx, err := u.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
+	if err != nil {
+		return err
+	}
+	if modelUsers.Id == 0 {
+		return errors.New("Empty model")
+	}
+	_, err = tx.Exec("UPDATE users SET mfa_type=? WHERE id = ? ",
+		modelUsers.Mfa_type, modelUsers.Id)
+	return err
+}

@@ -30,7 +30,8 @@ type Users interface {
 
 	Update_StatusAccount(modelUsers *UsersModel) error
 	Update_Type(modelUsers *UsersModel) error
-
+	Update_Updated(modelUsers *UsersModel) error
+	Update_MfaType(modelUsers *UsersModel) error
 
 	//	CreateProvider(*ProviderModel, *UsersModel) error
 	//Update(*UsersModel) error

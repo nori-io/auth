@@ -16,8 +16,10 @@ type SignUpRequest struct {
 	MfaType          string `json:mfa_type validate:"mfa_type"`
 }
 
-var mfaTypes = []string{"otp", "phone"}
-
+const (
+	MfaTypeOTP ="otp"
+MfaTypeSMS ="phone"
+)
 type RecoveryCodesRequest struct {
 	UserId uint64 `json:"user_id" validate:"user_id"`
 }
@@ -42,7 +44,7 @@ func (r SignUpRequest) ValidatePhone() (error, error) {
 
 func (r SignUpRequest) ValidateMfaType() error {
 
-	if !((r.MfaType == mfaTypes[0]) || (r.MfaType == mfaTypes[1]) || (r.MfaType == "")) {
+	if !((r.MfaType == MfaTypeOTP) || (r.MfaType == MfaTypeSMS) || (r.MfaType == "")) {
 
 		return rest.ErrFieldResp{
 			Meta: rest.ErrFieldRespMeta{

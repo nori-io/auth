@@ -125,7 +125,7 @@ func (u *user) Update_StatusAccount(modelUsers *UsersModel) error {
 	return err
 }
 
-func (u *user) Update(modelUsers *UsersModel) error {
+func (u *user) Update_Type(modelUsers *UsersModel) error {
 	ctx := context.Background()
 
 	tx, err := u.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
@@ -135,7 +135,7 @@ func (u *user) Update(modelUsers *UsersModel) error {
 	if modelUsers.Id == 0 {
 		return errors.New("Empty model")
 	}
-	_, err = tx.Exec("UPDATE users SET status_account = ?, updated = ?, mfa_type = ?  WHERE id = ? ",
-		modelUsers.Status_account, time.Now(), modelUsers.Mfa_type)
+	_, err = tx.Exec("UPDATE users SET type=? WHERE id = ? ",
+		modelUsers.Type, modelUsers.Id)
 	return err
 }

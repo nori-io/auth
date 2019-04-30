@@ -54,8 +54,8 @@ CREATE TABLE IF NOT EXISTS auth_providers (
 ENGINE = InnoDB;
 `
 
-	CreateTableAuthentificationHistory = ` 
-CREATE TABLE IF NOT EXISTS authentification_history (
+	CreateTableAuthenticationHistory = ` 
+CREATE TABLE IF NOT EXISTS authentication_history (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id INT UNSIGNED NOT NULL,
   signin DATETIME NOT NULL,

@@ -141,7 +141,7 @@ func (db *database) CreateTables() error {
 	}
 
 	_, execErr = tx.Exec(
-		sql_scripts.CreateTableAuthentificationHistory)
+		sql_scripts.CreateTableAuthenticationHistory)
 	if execErr != nil {
 		_ = tx.Rollback()
 		log.Fatal(execErr)
@@ -196,7 +196,7 @@ func (db *database) DropTables() error {
 
 	}
 	_, execErr = tx.Exec(
-		sql_scripts.DropTableAuthentificationHistory)
+		sql_scripts.DropTableAuthenticationHistory)
 	if execErr != nil {
 		_ = tx.Rollback()
 		log.Fatal(execErr)

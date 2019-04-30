@@ -17,7 +17,7 @@ func TestAuthenticationHistory_Create(t *testing.T) {
 	}
 	defer mockDatabase.Close()
 	defer mock.ExpectClose()
-	mock.ExpectExec("INSERT INTO authentification_history (user_id, signin, meta) VALUES(?,?,?)").
+	mock.ExpectExec("INSERT INTO authentication_history (user_id, signin, meta) VALUES(?,?,?)").
 		WithArgs(10, AnyTime{}, "").WillReturnResult(sqlmock.NewResult(10, 1))
 
 	d := database.DB(mockDatabase, logrus.New())
@@ -45,7 +45,7 @@ func TestAuthenticationHistory_Update(t *testing.T) {
 	}
 	defer mockDatabase.Close()
 	defer mock.ExpectClose()
-	mock.ExpectExec("UPDATE authentification_history SET user_id = ?, signin = ?, meta = ?, signout = ?  WHERE id = ? ").
+	mock.ExpectExec("UPDATE authentication_history SET user_id = ?, signin = ?, meta = ?, signout = ?  WHERE id = ? ").
 		WithArgs(11, AnyTime{}, "", AnyTime{}, 11).WillReturnResult(sqlmock.NewResult(11, 0))
 
 	d := database.DB(mockDatabase, logrus.New())

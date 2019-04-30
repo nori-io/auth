@@ -12,7 +12,7 @@ func TestAuthenticate(t *testing.T) {
 
 	salt, _ := database.Randbytes(8)
 
-	cur, _ := database.HashPassword([]byte("pass"), salt)
+	cur, _ := database.Hash([]byte("pass"), salt)
 
 	ok, _ := database.Authenticate([]byte("pass"), salt, cur)
 	assert.Equal(t, ok, true)

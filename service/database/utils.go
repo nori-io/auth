@@ -19,14 +19,14 @@ const (
 	scryptKeyLen = 32
 )
 
-func Randbytes(count int) ([]byte, error) {
+func createSalt() ([]byte, error) {
 	// Generate a salt
-	salt := make([]byte, count)
+	salt := make([]byte, 65)
 	_, err := rand.Read(salt)
 	return salt, err
 }
 
-func hmac_sha256(in, salt []byte) ([]byte, error) {
+func hmacSha256(in, salt []byte) ([]byte, error) {
 	mac := hmac.New(sha256.New, salt)
 	_, err := mac.Write(in)
 	if err != nil {
@@ -35,19 +35,19 @@ func hmac_sha256(in, salt []byte) ([]byte, error) {
 	return mac.Sum(nil), nil
 }
 
-func enc_scrypt(in, salt []byte) ([]byte, error) {
+func createKey(in, salt []byte) ([]byte, error) {
 	return scrypt.Key(in, salt, scryptN, scryptR, scryptP, scryptKeyLen)
 }
 
-func HashPassword(password, salt []byte) ([]byte, error) {
-	bytes,_:=Randbytes(65)
-	peppered, _ := hmac_sha256(password,bytes )
-	cur, _ := enc_scrypt(peppered, salt)
+func Hash(password, salt []byte) ([]byte, error) {
+	bytes,_:=createSalt()
+	peppered, _ := hmacSha256(password,bytes )
+	cur, _ := createKey(peppered, salt)
 	return cur, nil
 }
 
-func Authenticate(password, salt, hash []byte) (bool, error) {
-	h, _ := HashPassword(password, salt)
+func VerifyPassword(password, salt, hash []byte) (bool, error) {
+	h, _ := Hash(password, salt)
 
 	if subtle.ConstantTimeCompare(h, hash) != 1 {
 

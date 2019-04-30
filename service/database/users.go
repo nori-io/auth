@@ -66,12 +66,12 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		lastIdNumber = m.Id
 	}
 
-	salt, err := Randbytes(65)
+	salt, err := createSalt()
 	if err != nil {
 		return err
 	}
 
-	password, err := HashPassword([]byte(modelAuth.Password), salt)
+	password, err := Hash([]byte(modelAuth.Password), salt)
 	if err != nil {
 		return err
 	}

@@ -26,7 +26,7 @@ func (a *authenticationHistory) Update(model *AuthenticationHistoryModel) error 
 		return errors.New("Empty model")
 	}
 
-	_, err := a.db.Exec("UPDATE authentification_history SET  signout = ?  WHERE user_id = ? ",
+	_, err := a.db.Exec("UPDATE authentification_history SET  signout = ?   WHERE user_id = ? ORDER BY id DESC LIMIT 1",
 		model.SignOut, model.UserId)
 	return err
 }

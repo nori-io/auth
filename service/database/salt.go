@@ -6,7 +6,6 @@ import (
 	"crypto/sha256"
 	"crypto/subtle"
 	"fmt"
-	"os"
 
 	"golang.org/x/crypto/scrypt"
 )
@@ -41,9 +40,9 @@ func enc_scrypt(in, salt []byte) ([]byte, error) {
 }
 
 func HashPassword(password, salt []byte) ([]byte, error) {
-	peppered, _ := hmac_sha256(password, []byte(os.Getenv("TS_PEPPER")))
+	bytes,_:=Randbytes(65)
+	peppered, _ := hmac_sha256(password,bytes )
 	cur, _ := enc_scrypt(peppered, salt)
-
 	return cur, nil
 }
 

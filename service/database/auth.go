@@ -29,6 +29,26 @@ func (a *auth) Update_Email(model *AuthModel) error {
 	return err
 }
 
+
+func (a *auth) Update_Password_Salt(model *AuthModel) error {
+	if model.Id == 0 {
+		return errors.New("Empty model")
+	}
+
+	salt, err := createSalt()
+	if err != nil {
+		return err
+	}
+
+	password, err := Hash([]byte(model.Password), salt)
+	if err != nil {
+		return err
+	}
+	_, err = a.db.Exec("UPDATE auth SET password=? , salt=?  WHERE id = ? ",
+		password, salt, model.Id)
+	return err
+}
+
 func (a *auth) FindByEmail(email string) (model *AuthModel, err error) {
 
 	rows, err := a.db.Query("SELECT id, email,password,salt FROM auth WHERE email = ? LIMIT 1", email)

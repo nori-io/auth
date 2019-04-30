@@ -13,13 +13,6 @@ type mfaCode struct {
 	log interfaces.Logger
 }
 
-const (
-	chars    = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	charsLen = len(chars)
-	mask     = 1<<6 - 1
-)
-
-
 func (c *mfaCode) Create(modelMfaCode *MfaCodeModel) ([]string, error) {
 
 	ctx := context.Background()
@@ -72,5 +65,3 @@ func (c *mfaCode) Delete(code string) error {
 	return nil
 
 }
-
-

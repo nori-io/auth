@@ -40,8 +40,8 @@ func createKey(in, salt []byte) ([]byte, error) {
 }
 
 func Hash(password, salt []byte) ([]byte, error) {
-	bytes,_:=createSalt()
-	peppered, _ := hmacSha256(password,bytes )
+	bytes, _ := createSalt()
+	peppered, _ := hmacSha256(password, bytes)
 	cur, _ := createKey(peppered, salt)
 	return cur, nil
 }

@@ -17,7 +17,7 @@ func (a *auth) Update_PhoneNumber_CountryCode(model *AuthModel) error {
 		return errors.New("Empty model")
 	}
 	_, err := a.db.Exec("UPDATE auth SET phone_number = ?, phone_country_code =? WHERE id = ? ",
-		model.PhoneNumber, model.PhoneCountryCode,model.Id)
+		model.PhoneNumber, model.PhoneCountryCode, model.Id)
 	return err
 }
 func (a *auth) Update_Email(model *AuthModel) error {
@@ -25,11 +25,9 @@ func (a *auth) Update_Email(model *AuthModel) error {
 		return errors.New("Empty model")
 	}
 	_, err := a.db.Exec("UPDATE auth SET email=? WHERE id = ? ",
-		model.Email,model.Id)
+		model.Email, model.Id)
 	return err
 }
-
-
 
 func (a *auth) FindByEmail(email string) (model *AuthModel, err error) {
 

@@ -132,7 +132,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	return resp
 }
 
-func (s *service) SignIn(ctx context.Context, req SignInRequest,    parameters PluginParameters) (resp *SignInResponse) {
+func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters PluginParameters) (resp *SignInResponse) {
 	resp = &SignInResponse{}
 	var model *database.AuthModel
 	var err error
@@ -171,18 +171,19 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest,    parameters P
 		UserId: userId,
 	}
 
-	err = s.db.AuthenticationHistory().Create(modelAuthenticationHistory)
-	if err != nil {
-		s.log.Error(err)
-		resp.Err = rest.ErrFieldResp{
-			Meta: rest.ErrFieldRespMeta{
-				ErrCode:    500,
-				ErrMessage: err.Error(),
-			},
+	if model != nil {
+		err = s.db.AuthenticationHistory().Create(modelAuthenticationHistory)
+		if err != nil {
+			s.log.Error(err)
+			resp.Err = rest.ErrFieldResp{
+				Meta: rest.ErrFieldRespMeta{
+					ErrCode:    500,
+					ErrMessage: err.Error(),
+				},
+			}
+			return resp
 		}
-		return resp
 	}
-
 	sid := rand.RandomAlphaNum(32)
 
 	token, err := s.auth.AccessToken(func(op interface{}) interface{} {

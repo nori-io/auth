@@ -8,11 +8,11 @@ import (
 )
 
 type PluginParameters struct {
-	UserTypeParameter                []interface{}
-	UserTypeDefaultParameter         string
-	UserRegistrationPhoneNumberType  bool
-	UserRegistrationEmailAddressType bool
-	UserMfaTypeParameter             string
+	UserTypeParameter              []interface{}
+	UserTypeDefaultParameter       string
+	UserRegistrationByPhoneNumber  bool
+	UserRegistrationByEmailAddress bool
+	UserMfaTypeParameter           string
 }
 
 func Transport(
@@ -33,11 +33,11 @@ func Transport(
 	signupHandler := http.NewServer(
 		MakeSignUpEndpoint(srv),
 		DecodeSignUpRequest(PluginParameters{
-			UserTypeParameter:                parameters.UserTypeParameter,
-			UserTypeDefaultParameter:         parameters.UserTypeDefaultParameter,
-			UserRegistrationPhoneNumberType:  parameters.UserRegistrationPhoneNumberType,
-			UserRegistrationEmailAddressType: parameters.UserRegistrationEmailAddressType,
-			UserMfaTypeParameter:             parameters.UserMfaTypeParameter,
+			UserTypeParameter:              parameters.UserTypeParameter,
+			UserTypeDefaultParameter:       parameters.UserTypeDefaultParameter,
+			UserRegistrationByPhoneNumber:  parameters.UserRegistrationByPhoneNumber,
+			UserRegistrationByEmailAddress: parameters.UserRegistrationByEmailAddress,
+			UserMfaTypeParameter:           parameters.UserMfaTypeParameter,
 		}),
 		http.EncodeJSONResponse,
 	)

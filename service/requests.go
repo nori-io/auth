@@ -17,9 +17,10 @@ type SignUpRequest struct {
 }
 
 const (
-	MfaTypeOTP ="otp"
-MfaTypeSMS ="phone"
+	MfaTypeOTP = "otp"
+	MfaTypeSMS = "phone"
 )
+
 type RecoveryCodesRequest struct {
 	UserId uint64 `json:"user_id" validate:"user_id"`
 }

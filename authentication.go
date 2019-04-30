@@ -25,13 +25,13 @@ func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {
 	configManager.Register(p.Meta())
 	cm := configManager.Register(p.Meta())
 	p.config = &service.Config{
-		Sub:                          cm.String("jwt.sub", "jwt.sub value"),
-		Iss:                          cm.String("jwt.iss", "jwt.iss value"),
-		UserType:                     cm.Slice("user.type", ",", "no"),
-		UserTypeDefault:              cm.String("user.type_default", "user.type_default value"),
-		UserRegistrationPhoneNumber:  cm.Bool("user.registration_phone_number", "user.registration_phone_number value"),
-		UserRegistrationEmailAddress: cm.Bool("user.registration_email_address", "user.registration_email_address value"),
-		UserMfaType:                  cm.String("user.mfa_type", "user.mfa_type value"),
+		Sub:                            cm.String("jwt.sub", "jwt.sub value"),
+		Iss:                            cm.String("jwt.iss", "jwt.iss value"),
+		UserType:                       cm.Slice("user.type", ",", "no"),
+		UserTypeDefault:                cm.String("user.type_default", "user.type_default value"),
+		UserRegistrationByPhoneNumber:  cm.Bool("user.registration_phone_number", "user.registration_phone_number value"),
+		UserRegistrationByEmailAddress: cm.Bool("user.registration_email_address", "user.registration_email_address value"),
+		UserMfaType:                    cm.String("user.mfa_type", "user.mfa_type value"),
 	}
 	return nil
 }
@@ -87,8 +87,8 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 		pluginParameters := service.PluginParameters{
 			UserTypeParameter:                p.config.UserType(),
 			UserTypeDefaultParameter:         p.config.UserTypeDefault(),
-			UserRegistrationPhoneNumberType:  p.config.UserRegistrationPhoneNumber(),
-			UserRegistrationEmailAddressType: p.config.UserRegistrationPhoneNumber(),
+			UserRegistrationByPhoneNumber:    p.config.UserRegistrationByPhoneNumber(),
+			UserRegistrationByEmailAddress: p.config.UserRegistrationByPhoneNumber(),
 			UserMfaTypeParameter:             p.config.UserMfaType()}
 
 		service.Transport(auth, transport, session,

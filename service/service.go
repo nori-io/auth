@@ -22,13 +22,13 @@ type Service interface {
 }
 
 type Config struct {
-	Sub                          func() string
-	Iss                          func() string
-	UserType                     func() []interface{}
-	UserTypeDefault              func() string
-	UserRegistrationPhoneNumber  func() bool
-	UserRegistrationEmailAddress func() bool
-	UserMfaType                  func() string
+	Sub                            func() string
+	Iss                            func() string
+	UserType                       func() []interface{}
+	UserTypeDefault                func() string
+	UserRegistrationByPhoneNumber  func() bool
+	UserRegistrationByEmailAddress func() bool
+	UserMfaType                    func() string
 }
 
 type service struct {
@@ -132,15 +132,15 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	return resp
 }
 
-func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters PluginParameters) (resp *SignInResponse) {
+func (s *service) SignIn(ctx context.Context, req SignInRequest,    parameters PluginParameters) (resp *SignInResponse) {
 	resp = &SignInResponse{}
 	var model *database.AuthModel
 	var err error
 
-	if parameters.UserRegistrationEmailAddressType {
+	if parameters.UserRegistrationByEmailAddress {
 		model, err = s.db.Auth().FindByEmail(req.Name)
 	} else {
-		if parameters.UserRegistrationPhoneNumberType {
+		if parameters.UserRegistrationByPhoneNumber {
 			model, err = s.db.Auth().FindByPhone(req.Name, "")
 		}
 	}

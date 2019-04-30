@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS user_mfa_phone (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB; 
 `
-	CreateTableUserMfaCode = `
+	CreateTableUserMfaRecoveryCodes = `
 CREATE TABLE IF NOT EXISTS user_mfa_recovery_codes (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id INT UNSIGNED NOT NULL,

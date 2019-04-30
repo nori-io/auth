@@ -53,7 +53,7 @@ type MfaPhoneModel struct {
 	Phone  string
 }
 
-type MfaCodeModel struct {
+type MfaRecoveryCodesModel struct {
 	Id     uint64
 	UserId uint64
 	code   string

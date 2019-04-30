@@ -8,12 +8,12 @@ import (
 	"github.com/nori-io/nori-common/interfaces"
 )
 
-type mfaCode struct {
+type mfaRecoveryCodes struct {
 	db  *sql.DB
 	log interfaces.Logger
 }
 
-func (c *mfaCode) Create(modelMfaCode *MfaCodeModel) ([]string, error) {
+func (c *mfaRecoveryCodes) Create(modelMfaRecoveryCodes *MfaRecoveryCodesModel) ([]string, error) {
 
 	ctx := context.Background()
 	tx, err := c.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
@@ -22,12 +22,12 @@ func (c *mfaCode) Create(modelMfaCode *MfaCodeModel) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	_, execErr := tx.Exec("DELETE FROM user_mfa_code WHERE user_id=?", modelMfaCode.UserId)
+	_, execErr := tx.Exec("DELETE FROM user_mfa_code WHERE user_id=?", modelMfaRecoveryCodes.UserId)
 
 	for index := 0; index < 10; index++ {
 		generatedCode := rand.RandomString(5) + "-" + rand.RandomString(5)
 		_, execErr = tx.Exec("INSERT INTO user_mfa_code (user_id, code) VALUES(?,?)",
-			modelMfaCode.UserId, generatedCode)
+			modelMfaRecoveryCodes.UserId, generatedCode)
 		if len(generatedCode) != 0 {
 			recoveryCodes = append(recoveryCodes, generatedCode)
 		}
@@ -44,7 +44,7 @@ func (c *mfaCode) Create(modelMfaCode *MfaCodeModel) ([]string, error) {
 
 }
 
-func (c *mfaCode) Delete(code string) error {
+func (c *mfaRecoveryCodes) Delete(code string) error {
 
 	ctx := context.Background()
 	tx, err := c.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})

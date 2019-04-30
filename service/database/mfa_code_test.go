@@ -7,10 +7,10 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/nori-io/authorization/service/database"
+	"github.com/nori-io/authentication/service/database"
 )
 
-func TestMfaCode_Create(t *testing.T) {
+func TestMfaRecoveryCodes_Create(t *testing.T) {
 
 	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {
@@ -28,7 +28,7 @@ func TestMfaCode_Create(t *testing.T) {
 	}
 	mock.ExpectCommit()
 	var recoveryMfaCodes []string
-	recoveryMfaCodes, err = d.MfaCode().Create(&database.MfaCodeModel{UserId: 1})
+	recoveryMfaCodes, err = d.MfaRecoveryCodes().Create(&database.MfaRecoveryCodesModel{UserId: 1})
 	assert.Equal(t, 10, len(recoveryMfaCodes))
 	if err != nil {
 		t.Error(err)
@@ -41,7 +41,7 @@ func TestMfaCode_Create(t *testing.T) {
 
 }
 
-func TestMfaCode_Delete(t *testing.T) {
+func TestMfaRecoveryCodes_Delete(t *testing.T) {
 
 	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {
@@ -57,7 +57,7 @@ func TestMfaCode_Delete(t *testing.T) {
 
 	mock.ExpectCommit()
 
-	err = d.MfaCode().Delete("12345-67890")
+	err = d.MfaRecoveryCodes().Delete("12345-67890")
 	if err != nil {
 		t.Error(err)
 	}

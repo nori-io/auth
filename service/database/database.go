@@ -14,7 +14,7 @@ type Database interface {
 	Users() Users
 	AuthenticationHistory() AuthenticationHistory
 	Auth() Auth
-	MfaCode() MfaCode
+	MfaRecoveryCodes() MfaRecoveryCodes
 
 	CreateTables() error
 	DropTables() error
@@ -44,8 +44,8 @@ type Auth interface {
 	FindByPhone(phoneCountryCode, phoneNumber string) (model *AuthModel, err error)
 }
 
-type MfaCode interface {
-	Create(modelMfaCode *MfaCodeModel) ([]string, error)
+type MfaRecoveryCodes interface {
+	Create(modelMfaRecoveryCodes *MfaRecoveryCodesModel) ([]string, error)
 	Delete(code string) error
 }
 type database struct {
@@ -53,7 +53,7 @@ type database struct {
 	users                 *user
 	authenticationHistory *authenticationHistory
 	auth                  *auth
-	mfaCode               *mfaCode
+	mfaRecoveryCodes      *mfaRecoveryCodes
 }
 
 func DB(db *sql.DB, logger interfaces.Logger) Database {
@@ -72,7 +72,7 @@ func DB(db *sql.DB, logger interfaces.Logger) Database {
 			db:  db,
 			log: logger,
 		},
-		mfaCode: &mfaCode{
+		mfaRecoveryCodes: &mfaRecoveryCodes{
 			db:  db,
 			log: logger,
 		},
@@ -92,8 +92,8 @@ func (db *database) Auth() Auth {
 	return db.auth
 }
 
-func (db *database) MfaCode() MfaCode {
-	return db.mfaCode
+func (db *database) MfaRecoveryCodes() MfaRecoveryCodes {
+	return db.mfaRecoveryCodes
 }
 
 func (db *database) CreateTables() error {
@@ -148,7 +148,7 @@ func (db *database) CreateTables() error {
 	}
 
 	_, execErr = tx.Exec(
-		sql_scripts.CreateTableUserMfaCode)
+		sql_scripts.CreateTableUserMfaRecoveryCodes)
 	if execErr != nil {
 		_ = tx.Rollback()
 		log.Fatal(execErr)

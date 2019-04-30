@@ -61,13 +61,37 @@ func (a *auth) Update_Password_Salt(model *AuthModel) error {
 }
 
 
+func (a *auth) UpdateIsEmailVerified(model *AuthModel) error {
+	if model.Id == 0 {
+		return errors.New("Empty model")
+	}
+	_, err := a.db.Exec("UPDATE auth SET is_email_verified=? WHERE id = ? ",
+		model.IsEmailVerified, model.Id)
+	if err==nil{
+		a.Update_Updated(model)
+	}
+	return err
+}
+
+func (a *auth) UpdateIsPhoneVerified(model *AuthModel) error {
+	if model.Id == 0 {
+		return errors.New("Empty model")
+	}
+	_, err := a.db.Exec("UPDATE auth SET is_phone_verified=? WHERE id = ? ",
+		model.IsPhoneVerified, model.Id)
+	if err==nil{
+		a.Update_Updated(model)
+	}
+	return err
+}
+
 func (a *auth) Update_Updated(model *AuthModel) error {
 	if model.Id == 0 {
 		return errors.New("Empty model")
 	}
 	_, err := a.db.Exec("UPDATE auth SET updated=? WHERE id = ? ",
 		time.Now(), model.Id)
-	
+
 
 	return err
 }

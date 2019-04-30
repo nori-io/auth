@@ -12,14 +12,24 @@ type auth struct {
 	log interfaces.Logger
 }
 
-func (a *auth) Update(model *AuthModel) error {
+func (a *auth) Update_PhoneNumber_CountryCode(model *AuthModel) error {
 	if model.Id == 0 {
 		return errors.New("Empty model")
 	}
-	_, err := a.db.Exec("UPDATE auth SET user_id = ?, phone_number = ?, phone_country_code, email = ?, password = ? ,salt = ? ,created =?, updated =? WHERE id = ? ",
-		model.UserId, model.Id)
+	_, err := a.db.Exec("UPDATE auth SET phone_number = ?, phone_country_code =? WHERE id = ? ",
+		model.PhoneNumber, model.PhoneCountryCode,model.Id)
 	return err
 }
+func (a *auth) Update_Email(model *AuthModel) error {
+	if model.Id == 0 {
+		return errors.New("Empty model")
+	}
+	_, err := a.db.Exec("UPDATE auth SET email=? WHERE id = ? ",
+		model.Email,model.Id)
+	return err
+}
+
+
 
 func (a *auth) FindByEmail(email string) (model *AuthModel, err error) {
 

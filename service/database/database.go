@@ -38,7 +38,8 @@ type Users interface {
 }
 
 type Auth interface {
-	Update(*AuthModel) error
+	Update_PhoneNumber_CountryCode(model *AuthModel) error
+	Update_Email(model *AuthModel) error
 	FindByEmail(email string) (model *AuthModel, err error)
 	FindByPhone(phoneCountryCode, phoneNumber string) (model *AuthModel, err error)
 }

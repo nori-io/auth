@@ -110,12 +110,12 @@ func (p *plugin) Instance() interface{} {
 func (p plugin) Meta() meta.Meta {
 	return &meta.Data{
 		ID: meta.ID{
-			ID:      "nori/authorization",
+			ID:      "nori/authentication",
 			Version: "1.0.0",
 		},
 		Author: meta.Author{
 			Name: "Nori",
-			URI:  "https://noricms.com",
+			URI:  "https://nori.io",
 		},
 		Core: meta.Core{
 			VersionConstraint: ">=1.0.0, <2.0.0",
@@ -128,8 +128,7 @@ func (p plugin) Meta() meta.Meta {
 			meta.HTTPTransport.Dependency("1.0.0"),
 		},
 		Description: meta.Description{
-			Name:        "NoriCMS Naive Posts Plugin",
-			Description: "Naive Posts Plugin",
+			Name:        "Nori: Authentication Interface",
 		},
 		Interface: meta.Custom,
 		License: meta.License{
@@ -137,7 +136,7 @@ func (p plugin) Meta() meta.Meta {
 			Type:  "LGPLv3",
 			URI:   "https://www.gnu.org/licenses/",
 		},
-		Tags: []string{"cms", "posts", "api"},
+		Tags: []string{"api"},
 	}
 }
 

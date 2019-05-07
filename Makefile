@@ -1,7 +1,7 @@
 GOCMD=go
 GOBUILD=$(GOCMD) build -buildmode=plugin
 GOCLEAN=$(GOCMD) clean
-BINARY_NAME=nori_ authentication.so
+BINARY_NAME=nori_authentication.so
 
 
 ifndef PLUGIN_DIR # to allow PLUGIN_DIR to be given as args (see CI)

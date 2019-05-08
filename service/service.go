@@ -75,26 +75,22 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	if len(req.Email) != 0 {
 		modelAuth, err = s.db.Auth().FindByEmail(req.Email)
 	} else if len(req.PhoneCountryCode+req.PhoneCountryCode) != 0 {
-		modelAuth, err = s.db.Auth().FindByEmail(req.Email)
+		modelAuth, err = s.db.Auth().FindByPhone(req.PhoneCountryCode, req.PhoneNumber)
 	}
 
-	if modelAuth != nil {
-		errField.AddError("email", 400, "Email already exists.")
+	if modelAuth != nil && modelAuth.Id != 0 {
+		errField.AddError("phome,email", 400, "User already exists.")
 	}
 
-	if len(req.PhoneCountryCode+req.PhoneNumber) != 0 {
-		if modelAuth, err = s.db.Auth().FindByPhone(req.PhoneCountryCode, req.PhoneNumber); err != nil {
-			resp.Err = rest.ErrFieldResp{
-				Meta: rest.ErrFieldRespMeta{
-					ErrMessage: err.Error(),
-				},
-			}
-			return resp
+	if err != nil {
+		resp.Err = rest.ErrFieldResp{
+			Meta: rest.ErrFieldRespMeta{
+				ErrMessage: err.Error(),
+			},
 		}
-		if modelAuth != nil && modelAuth.Id != 0 {
-			errField.AddError("phone", 400, "Phone number already exists.")
-		}
+		return resp
 	}
+
 
 	if errField.HasErrors() {
 		resp.Err = errField

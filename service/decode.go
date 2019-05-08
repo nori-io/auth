@@ -89,6 +89,11 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 				"Uncorrect mfa type")
 		}
 
+		if len(body.Meta) == 0 {
+			errorResponse.AddError("meta", 0,
+				"Meta is absent")
+		}
+
 		if errorResponse.HasErrors() {
 			return body, errorResponse
 		}

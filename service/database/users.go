@@ -31,7 +31,7 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		}
 		defer stmt.Close()
 
-		_, execErr := stmt.Exec("active", modelUsers.Type, time.Now(), time.Now())
+		_, execErr := stmt.Exec("locked", modelUsers.Type, time.Now(), time.Now())
 		if execErr != nil {
 			_ = tx.Rollback()
 			return execErr

@@ -12,7 +12,7 @@ import (
 func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r *http.Request) (interface{}, error) {
 	return func(_ context.Context, r *http.Request) (interface{}, error) {
 		var body SignUpRequest
-		var isTypeValid bool
+		var errorResponse rest.ErrFieldResp
 
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			return body, rest.ErrFieldResp{
@@ -29,37 +29,8 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 				},
 			}
 		}
-
-		typesSlice := parameters.UserTypeParameter
-		s := make([]string, len(typesSlice))
-		for i, value := range typesSlice {
-			s[i] = fmt.Sprint(value)
-		}
-
-		for _, value := range s {
-			if value == body.Type {
-				isTypeValid = true
-			}
-		}
-
-		if parameters.UserTypeDefaultParameter == body.Type {
-			isTypeValid = true
-		}
-
-		if body.Type == "" {
-			body.Type = parameters.UserTypeDefaultParameter
-			isTypeValid = true
-		}
-
-		var errorResponse rest.ErrFieldResp
-
-		if !isTypeValid {
-
+		if !userTypeValidate(parameters.UserTypeParameter, parameters.UserTypeDefaultParameter, body.Type) {
 			errorResponse.AddError("type", 0, "User type isn't valid")
-		}
-
-		if !((parameters.UserRegistrationByPhoneNumber) || (parameters.UserRegistrationByEmailAddress)) {
-
 		}
 
 		if (parameters.UserRegistrationByEmailAddress) && (!parameters.UserRegistrationByPhoneNumber) {
@@ -108,8 +79,9 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 
 		}
 
-		if len(parameters.UserMfaTypeParameter) == 0 {
-			body.Validate()
+		if len(body.Password) == 0 {
+			errorResponse.AddError("password", 0,
+				"Password is empty")
 		}
 
 		if errorResponse.HasErrors() {
@@ -171,4 +143,34 @@ func DecodeRecoveryCodes() func(_ context.Context, r *http.Request) (interface{}
 		return body, nil
 	}
 
+}
+
+func userTypeValidate(userType []interface{}, userTypeDefault, bodyType string) bool {
+	var isTypeValid bool
+
+	typesSlice := userType
+	s := make([]string, len(typesSlice))
+	for i, value := range typesSlice {
+		s[i] = fmt.Sprint(value)
+	}
+
+	for _, value := range s {
+		if value == bodyType {
+			isTypeValid = true
+		}
+	}
+
+	if userTypeDefault == bodyType {
+		isTypeValid = true
+	}
+
+	if bodyType == "" {
+		bodyType = userTypeDefault
+		isTypeValid = true
+	}
+	if !isTypeValid {
+
+		return false
+	}
+	return true
 }

@@ -128,7 +128,7 @@ func (p plugin) Meta() meta.Meta {
 			meta.HTTPTransport.Dependency("1.0.0"),
 		},
 		Description: meta.Description{
-			Name:        "Nori: Authentication Interface",
+			Name: "Nori: Authentication Interface",
 		},
 		Interface: meta.Custom,
 		License: meta.License{

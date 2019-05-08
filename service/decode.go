@@ -84,6 +84,11 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 				"Password is empty")
 		}
 
+		if !((parameters.UserMfaTypeParameter == "") || (parameters.UserMfaTypeParameter == MfaTypeSMS) || (parameters.UserMfaTypeParameter == MfaTypeOTP)) {
+			errorResponse.AddError("mfa_type", 0,
+				"Uncorrect mfa type")
+		}
+
 		if errorResponse.HasErrors() {
 			return body, errorResponse
 		}

@@ -91,7 +91,6 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 		return resp
 	}
 
-
 	if errField.HasErrors() {
 		resp.Err = errField
 		return resp

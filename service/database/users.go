@@ -120,8 +120,8 @@ func (u *user) Update_StatusAccount(modelUsers *UsersModel) error {
 	if modelUsers.Id == 0 {
 		return errors.New("Empty model")
 	}
-	_, err = tx.Exec("UPDATE users SET status_account = ?  WHERE id = ? ",
-		modelUsers.Status_account, modelUsers.Id)
+	_, err = tx.Exec("UPDATE users SET status_account = ?, updated=? WHERE id = ? ",
+		modelUsers.Status_account, time.Now(), modelUsers.Id)
 	return err
 }
 
@@ -135,23 +135,8 @@ func (u *user) Update_Type(modelUsers *UsersModel) error {
 	if modelUsers.Id == 0 {
 		return errors.New("Empty model")
 	}
-	_, err = tx.Exec("UPDATE users SET type=? WHERE id = ? ",
-		modelUsers.Type, modelUsers.Id)
-	return err
-}
-
-func (u *user) Update_Updated(modelUsers *UsersModel) error {
-	ctx := context.Background()
-
-	tx, err := u.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
-	if err != nil {
-		return err
-	}
-	if modelUsers.Id == 0 {
-		return errors.New("Empty model")
-	}
-	_, err = tx.Exec("UPDATE users SET updated=? WHERE id = ? ",
-		modelUsers.Updated, modelUsers.Id)
+	_, err = tx.Exec("UPDATE users SET type=?, updated=? WHERE id = ? ",
+		modelUsers.Type, time.Now(), modelUsers.Id)
 	return err
 }
 
@@ -165,7 +150,7 @@ func (u *user) Update_MfaType(modelUsers *UsersModel) error {
 	if modelUsers.Id == 0 {
 		return errors.New("Empty model")
 	}
-	_, err = tx.Exec("UPDATE users SET mfa_type=? WHERE id = ? ",
-		modelUsers.Mfa_type, modelUsers.Id)
+	_, err = tx.Exec("UPDATE users SET mfa_type=? , updated=? WHERE id = ? ",
+		modelUsers.Mfa_type, time.Now(), modelUsers.Id)
 	return err
 }

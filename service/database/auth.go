@@ -17,23 +17,17 @@ func (a *auth) Update_PhoneNumber_CountryCode(model *AuthModel) error {
 	if model.Id == 0 {
 		return errors.New("Empty model")
 	}
-	_, err := a.db.Exec("UPDATE auth SET phone_number = ?, phone_country_code =? WHERE id = ? ",
-		model.PhoneNumber, model.PhoneCountryCode, model.Id)
+	_, err := a.db.Exec("UPDATE auth SET phone_number = ?, phone_country_code =? , updated=? WHERE id = ? ",
+		model.PhoneNumber, model.PhoneCountryCode, time.Now(), model.Id)
 
-	if err == nil {
-		a.Update_Updated(model)
-	}
 	return err
 }
 func (a *auth) Update_Email(model *AuthModel) error {
 	if model.Id == 0 {
 		return errors.New("Empty model")
 	}
-	_, err := a.db.Exec("UPDATE auth SET email=? WHERE id = ? ",
-		model.Email, model.Id)
-	if err == nil {
-		a.Update_Updated(model)
-	}
+	_, err := a.db.Exec("UPDATE auth SET email=? , updated=? WHERE id = ? ",
+		model.Email, time.Now(), model.Id)
 	return err
 }
 
@@ -51,11 +45,8 @@ func (a *auth) Update_Password_Salt(model *AuthModel) error {
 	if err != nil {
 		return err
 	}
-	_, err = a.db.Exec("UPDATE auth SET password=? , salt=?  WHERE id = ? ",
-		password, salt, model.Id)
-	if err == nil {
-		a.Update_Updated(model)
-	}
+	_, err = a.db.Exec("UPDATE auth SET password=? , salt=? , updated=? WHERE id = ? ",
+		password, salt, time.Now(), model.Id)
 	return err
 }
 
@@ -63,11 +54,9 @@ func (a *auth) UpdateIsEmailVerified(model *AuthModel) error {
 	if model.Id == 0 {
 		return errors.New("Empty model")
 	}
-	_, err := a.db.Exec("UPDATE auth SET is_email_verified=? WHERE id = ? ",
-		model.IsEmailVerified, model.Id)
-	if err == nil {
-		a.Update_Updated(model)
-	}
+	_, err := a.db.Exec("UPDATE auth SET is_email_verified=? , updated=? WHERE id = ? ",
+		model.IsEmailVerified, time.Now(), model.Id)
+
 	return err
 }
 
@@ -75,20 +64,8 @@ func (a *auth) UpdateIsPhoneVerified(model *AuthModel) error {
 	if model.Id == 0 {
 		return errors.New("Empty model")
 	}
-	_, err := a.db.Exec("UPDATE auth SET is_phone_verified=? WHERE id = ? ",
-		model.IsPhoneVerified, model.Id)
-	if err == nil {
-		a.Update_Updated(model)
-	}
-	return err
-}
-
-func (a *auth) Update_Updated(model *AuthModel) error {
-	if model.Id == 0 {
-		return errors.New("Empty model")
-	}
-	_, err := a.db.Exec("UPDATE auth SET updated=? WHERE id = ? ",
-		time.Now(), model.Id)
+	_, err := a.db.Exec("UPDATE auth SET is_phone_verified=? , updated=? WHERE id = ? ",
+		model.IsPhoneVerified, time.Now(), model.Id)
 
 	return err
 }

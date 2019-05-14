@@ -40,6 +40,22 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 
 	if p.instance == nil {
 
+		auth, err := registry.Auth()
+		if err != nil {
+			return err
+		}
+
+
+		cache, err := registry.Cache()
+		if err != nil {
+			return err
+		}
+
+		db, err := registry.Sql()
+		if err != nil {
+			return err
+		}
+
 		http, err := registry.Http()
 		if err != nil {
 			return err
@@ -50,15 +66,8 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			return err
 		}
 
-		auth, err := registry.Auth()
-		if err != nil {
-			return err
-		}
 
-		cache, err := registry.Cache()
-		if err != nil {
-			return err
-		}
+
 
 		mail, err := registry.Mail()
 		if err != nil {
@@ -70,19 +79,16 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			return err
 		}
 
-		db, err := registry.Sql()
-		if err != nil {
-			return err
-		}
+
 
 		p.instance = service.NewService(
 			auth,
 			cache,
+			p.config,
+			database.DB(db.GetDB(), registry.Logger(p.Meta())),
+			registry.Logger(p.Meta()),
 			mail,
 			session,
-			p.config,
-			registry.Logger(p.Meta()),
-			database.DB(db.GetDB(), registry.Logger(p.Meta())),
 		)
 		pluginParameters := service.PluginParameters{
 			UserTypeParameter:              p.config.UserType(),

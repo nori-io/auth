@@ -72,23 +72,9 @@ func Transport(
 	)
 	http.ServerErrorLogger(logger)(recoveryCodesHandler)
 
-	/*	profileHandler:=http.NewServer(
-		MakeProfileEndpoint(srv),
-		DecodeProfile(),
-		http.EncodeJSONResponse,
-		logger)*/
-
-	/*
-		verifyHandler:=http.NewServer(
-			MakeVerifyEndpoint(srv),
-			DecodeVerify(),
-			http.EncodeJSONResponse,
-			logger)*/
-
 	router.Handle("/auth/signup", signupHandler).Methods("POST")
 	router.Handle("/auth/signin", signinHandler).Methods("POST")
 	router.Handle("/auth/signout", signoutHandler).Methods("GET")
-	//router.Handle("auth/settings/profile", profileHandler).Methods("POST")
 	router.Handle("/auth/settings/two_factor_authentication/recovery_codes", recoveryCodesHandler).Methods("GET")
 
 	//	/auth/verify/(uuid)

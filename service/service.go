@@ -32,11 +32,13 @@ type Config struct {
 }
 
 type service struct {
-	auth    interfaces.Auth
+	auth  interfaces.Auth
+	cache interfaces.Cache
+	cfg   *Config
 	db      database.Database
-	session interfaces.Session
-	cfg     *Config
 	log     interfaces.Logger
+	mail    interfaces.Mail
+	session interfaces.Session
 }
 
 type sessionData struct {
@@ -46,18 +48,20 @@ type sessionData struct {
 func NewService(
 	auth interfaces.Auth,
 	cache interfaces.Cache,
+	cfg *Config,
+	db database.Database,
+	log interfaces.Logger,
 	mail interfaces.Mail,
 	session interfaces.Session,
-	cfg *Config,
-	log interfaces.Logger,
-	db database.Database,
 ) Service {
 	return &service{
 		auth:    auth,
-		db:      db,
-		session: session,
+		cache:cache,
 		cfg:     cfg,
+		db:      db,
 		log:     log,
+        mail:mail,
+		session: session,
 	}
 }
 
@@ -107,7 +111,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 		Type:     req.Type,
 		Mfa_type: req.MfaType,
 	}
-
+    s.mail.Send("Actication code")
 	err = s.db.Users().Create(modelAuth, modelUsers)
 	if err != nil {
 		s.log.Error(err)

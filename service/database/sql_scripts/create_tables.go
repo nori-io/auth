@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS auth (
    user_id INT UNSIGNED NOT NULL,
    phone_country_code NVARCHAR(8) NULL,
    phone_number NVARCHAR(16) NULL,
-   email NVARCHAR(255) NULL,
+   email NVARCHAR(128) NULL,
    password VARBINARY(65) NOT NULL,
    salt VARBINARY(65) NOT NULL,
    created DATETIME NOT NULL,
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS authentication_history (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id INT UNSIGNED NOT NULL,
   signin DATETIME NOT NULL,
-  meta NVARCHAR(255) NOT NULL,
+  meta NVARCHAR(128) NOT NULL,
   signout DATETIME NULL,
   INDEX user_id_idx (user_id ASC),
   PRIMARY KEY (id),
@@ -72,10 +72,10 @@ ENGINE = InnoDB;
 `
 
 	CreateTableUsersMfaSecret = `
-CREATE TABLE IF NOT EXISTS user_ (
+CREATE TABLE IF NOT EXISTS user_mfa_secret (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id INT UNSIGNED NOT NULL,
-  secret NVARCHAR(255) NOT NULL,
+  secret NVARCHAR(128) NOT NULL,
   PRIMARY KEY (id),
   UNIQUE INDEX user_id_UNIQUE (user_id ASC),
   INDEX user_id_idx (user_id ASC),

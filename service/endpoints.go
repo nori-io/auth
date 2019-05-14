@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/nori-io/nori-common/endpoint"
 )
@@ -10,6 +11,7 @@ func MakeSignUpEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, r interface{}) (interface{}, error) {
 		req := r.(SignUpRequest)
 		resp := s.SignUp(ctx, req)
+		fmt.Println("Resp error is",resp.Err)
 		return *resp, resp.Error()
 	}
 

@@ -29,12 +29,13 @@ type Config struct {
 	UserRegistrationByPhoneNumber  func() bool
 	UserRegistrationByEmailAddress func() bool
 	UserMfaType                    func() string
+	MailActivationTimeMinutes      func() uint
 }
 
 type service struct {
-	auth  interfaces.Auth
-	cache interfaces.Cache
-	cfg   *Config
+	auth    interfaces.Auth
+	cache   interfaces.Cache
+	cfg     *Config
 	db      database.Database
 	log     interfaces.Logger
 	mail    interfaces.Mail
@@ -56,11 +57,11 @@ func NewService(
 ) Service {
 	return &service{
 		auth:    auth,
-		cache:cache,
+		cache:   cache,
 		cfg:     cfg,
 		db:      db,
 		log:     log,
-        mail:mail,
+		mail:    mail,
 		session: session,
 	}
 }
@@ -83,7 +84,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	}
 
 	if modelAuth != nil && modelAuth.Id != 0 {
-		errField.AddError("phome,email", 400, "User already exists.")
+		errField.AddError("phone,email", 400, "User already exists.")
 	}
 
 	if err != nil {
@@ -111,7 +112,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 		Type:     req.Type,
 		Mfa_type: req.MfaType,
 	}
-    s.mail.Send("Actication code")
+	s.mail.Send("Actication code")
 	err = s.db.Users().Create(modelAuth, modelUsers)
 	if err != nil {
 		s.log.Error(err)

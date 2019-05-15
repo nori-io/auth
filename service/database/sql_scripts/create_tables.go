@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS auth (
    updated DATETIME NOT NULL,
    is_email_verified TINYINT(1) NOT NULL DEFAULT 0,
   is_phone_verified TINYINT(1) NOT NULL DEFAULT 0,
+	email_activation_code
   PRIMARY KEY (id),
   INDEX user_id_idx (user_id ASC),
   UNIQUE INDEX email_unique (email ASC),

@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/nori-io/authorization/service"
+	"github.com/nori-io/authentication/service"
 )
 
 func TestSignUpRequest_ValidateMail(t *testing.T) {

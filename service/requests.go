@@ -16,6 +16,10 @@ type SignUpRequest struct {
 	MfaType          string `json:mfa_type validate:"mfa_type"`
 }
 
+type ActivationCodeRequest struct {
+	 ActivationCode []byte `json:"activation_code" validate:"activation_code"`
+}
+
 const (
 	MfaTypeOTP = "otp"
 	MfaTypeSMS = "phone"

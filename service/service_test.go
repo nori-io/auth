@@ -1,6 +1,7 @@
 package service_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/nori-io/nori-common/mocks"
@@ -34,5 +35,11 @@ func TestService_SignUp(t *testing.T) {
 	}
 
 	serviceTest := service.NewService(auth, cache, cfg, nil, new(logrus.Logger), mail, session)
+
+	mail.Send()
+
+	SignUpRequestTest:=service.SignUpRequest{Email:"test@mail.ru", Password:"pass", Meta:"meta", Type:"vendor"}
+
+	serviceTest.SignUp(context.Background(), SignUpRequestTest )
 
 }

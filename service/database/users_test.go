@@ -9,7 +9,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/sirupsen/logrus"
 
-	"github.com/nori-io/authorization/service/database"
+	"github.com/nori-io/authentication/service/database"
 )
 
 type (
@@ -45,8 +45,8 @@ func TestUsers_Create_userEmail(t *testing.T) {
 
 	err = d.Users().Create(&database.AuthModel{
 		Email:    "users_create_email_test@mail.ru",
-		Password: "users_create_email_pass",
-		Salt:     "users_create_email_salt",
+		Password: []byte("users_create_email_pass"),
+		Salt:     []byte("users_create_email_salt"),
 	}, &database.UsersModel{
 		Status_account: "active",
 		Type:           "vendor",
@@ -87,8 +87,8 @@ func TestUsers_Create_userPhone(t *testing.T) {
 	err = d.Users().Create(&database.AuthModel{
 		PhoneCountryCode: "3",
 		PhoneNumber:      "3333333333",
-		Password:         "users_create_phone_pass",
-		Salt:             "users_create_phone_salt",
+		Password:         []byte("users_create_phone_pass"),
+		Salt:             []byte("users_create_phone_salt"),
 	}, &database.UsersModel{
 		Status_account: "active",
 		Type:           "vendor",

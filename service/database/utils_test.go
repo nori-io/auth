@@ -1,36 +1,26 @@
 package database_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/magiconair/properties/assert"
 
-	"github.com/nori-io/authorization/service/database"
+	"github.com/nori-io/authentication/service/database"
 )
 
-func TestAuthenticate(t *testing.T) {
+func TestVerifyPassword(t *testing.T) {
 
-	salt, _ := database.Randbytes(8)
+	salt, _ := database.CreateSalt()
+	fmt.Println("Salt is", salt)
 
 	cur, _ := database.Hash([]byte("pass"), salt)
 
-	ok, _ := database.Authenticate([]byte("pass"), salt, cur)
+	fmt.Println("Cur is", cur)
+
+	ok, _ := database.VerifyPassword([]byte("pass"), salt, cur)
 	assert.Equal(t, ok, true)
 
 }
 
-func TestAuthenticate2(t *testing.T) {
 
-	salt, _ := database.Randbytes(8)
-	password, _ := database.HashPassword([]byte("pass"), salt)
-
-	var passwordArray = []byte{208, 148, 33, 206, 1, 82, 149, 86}
-	var salt1 = []byte{29, 93, 90, 157, 70, 73, 81, 122}
-
-	result, _ := database.Authenticate([]byte("pass"), salt1, passwordArray)
-	assert.Equal(t, result, true)
-
-	result, _ = database.Authenticate([]byte("pass"), salt, password)
-	assert.Equal(t, result, true)
-
-}

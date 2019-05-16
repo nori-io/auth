@@ -32,7 +32,7 @@ func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {
 		UserRegistrationByPhoneNumber:  cm.Bool("user.registration_phone_number", "user.registration_phone_number value"),
 		UserRegistrationByEmailAddress: cm.Bool("user.registration_email_address", "user.registration_email_address value"),
 		UserMfaType:                    cm.String("user.mfa_type", "user.mfa_type value"),
-		MailActivationTimeMinutes:		cm.UInt("mail.activation_time_minutes", "mail.activation_time_minutes value" ),
+		MailActivationTimeMinutes:      cm.UInt("mail.activation_time_minutes", "mail.activation_time_minutes value"),
 	}
 	return nil
 }
@@ -45,7 +45,6 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 		if err != nil {
 			return err
 		}
-
 
 		cache, err := registry.Cache()
 		if err != nil {
@@ -67,9 +66,6 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			return err
 		}
 
-
-
-
 		mail, err := registry.Mail()
 		if err != nil {
 			return err
@@ -79,8 +75,6 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 		if err != nil {
 			return err
 		}
-
-
 
 		p.instance = service.NewService(
 			auth,

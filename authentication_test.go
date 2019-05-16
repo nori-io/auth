@@ -42,10 +42,12 @@ func TestPlugin_Start(t *testing.T) {
 	auth := &mocks.Auth{}
 	auth.On("")
 
+	mail := &mocks.Mail{}
 	//
 	registry := &mocks.Registry{}
-	registry.On("Auth").Return(auth)
+	registry.On("Mail").Return(mail)
 
+	mail.Send()
 	//
 	ctx := context.Background()
 	plugin.Init(ctx, configManager)

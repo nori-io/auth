@@ -84,7 +84,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	}
 
 	if modelAuth != nil && modelAuth.Id != 0 {
-		errField.AddError("phone,email", 400, "User already exists.")
+		errField.AddError("phone, email", 400, "User already exists.")
 	}
 
 	if err != nil {
@@ -218,7 +218,7 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 	resp.Token = token
 
 	if model.Id != 0 {
-		resp.User = *model
+		resp.User = UserResponse{UserName: model.Email}
 	}
 
 	return resp

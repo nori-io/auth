@@ -19,7 +19,7 @@ const (
 	scryptKeyLen = 32
 )
 
-func createSalt() ([]byte, error) {
+func CreateSalt() ([]byte, error) {
 	// Generate a salt
 	salt := make([]byte, 65)
 	_, err := rand.Read(salt)
@@ -40,8 +40,8 @@ func createKey(in, salt []byte) ([]byte, error) {
 }
 
 func Hash(password, salt []byte) ([]byte, error) {
-	bytes, _ := createSalt()
-	peppered, _ := hmacSha256(password, bytes)
+	//	bytes, _ := CreateSalt()
+	peppered, _ := hmacSha256(password, salt)
 	cur, _ := createKey(peppered, salt)
 	return cur, nil
 }

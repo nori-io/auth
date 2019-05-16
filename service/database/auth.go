@@ -36,7 +36,7 @@ func (a *auth) Update_Password_Salt(model *AuthModel) error {
 		return errors.New("Empty model")
 	}
 
-	salt, err := createSalt()
+	salt, err := CreateSalt()
 	if err != nil {
 		return err
 	}

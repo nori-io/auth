@@ -20,12 +20,12 @@ func TestAuth_Update(t *testing.T) {
 
 	d := database.DB(mockDatabase, logrus.New())
 
-	err = d.Auth().Update(&database.AuthModel{
+	err = d.Auth().Update_Email(&database.AuthModel{
 		Id:       1,
 		UserId:   1,
 		Email:    "auth_update_@mail.ru",
-		Password: "auth_update_pass",
-		Salt:     "auth_update_salt",
+		Password: []byte("auth_update_pass"),
+		Salt:     []byte("auth_update_salt"),
 	})
 
 	// we make sure that all expectations were met
@@ -70,7 +70,7 @@ func TestAuth_FindByPhone(t *testing.T) {
 
 	d := database.DB(mockDatabase, logrus.New())
 
-	_, err = d.Auth().FindByPhone("11111111111")
+	_, err = d.Auth().FindByPhone("1", "1111111111")
 
 	// we make sure that all expectations were met
 	if err := mock.ExpectationsWereMet(); err != nil {

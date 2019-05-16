@@ -1,9 +1,5 @@
 package service
 
-import (
-	"github.com/nori-io/authentication/service/database"
-)
-
 // SignUpResponse
 type SignUpResponse struct {
 	Id               uint64
@@ -27,10 +23,14 @@ func (d *SignUpResponse) StatusCode() int {
 type SignInResponse struct {
 	Id             uint64
 	Token          string
-	User           database.AuthModel
+	User           UserResponse
 	MFA            string
 	HttpStatusCode int
 	Err            error
+}
+
+type UserResponse struct {
+	UserName string
 }
 
 func (d *SignInResponse) Error() error {

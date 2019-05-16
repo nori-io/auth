@@ -66,7 +66,7 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		lastIdNumber = m.Id
 	}
 
-	salt, err := createSalt()
+	salt, err := CreateSalt()
 	if err != nil {
 		return err
 	}

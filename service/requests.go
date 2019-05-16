@@ -17,7 +17,7 @@ type SignUpRequest struct {
 }
 
 type ActivationCodeRequest struct {
-	 ActivationCode []byte `json:"activation_code" validate:"activation_code"`
+	ActivationCode []byte `json:"activation_code" validate:"activation_code"`
 }
 
 const (

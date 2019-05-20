@@ -77,21 +77,14 @@ func (a *auth) FindByEmail(email string) (model *AuthModel, err error) {
 		return nil, err
 	}
 
-	if rows == nil {
-		return model, err
-	}
 	model = &AuthModel{}
 
-	defer rows.Close()
-	for rows.Next() {
-		var m AuthModel
-		rows.Scan(&m.Id, &m.Email, &m.Password, &m.Salt)
-		model.Id = m.Id
-
-		model.Email = m.Email
-		model.Password = m.Password
-		model.Salt = m.Salt
-	}
+	var m AuthModel
+	rows.Scan(&m.Id, &m.Email, &m.Password, &m.Salt)
+	model.Id = m.Id
+	model.Email = m.Email
+	model.Password = m.Password
+	model.Salt = m.Salt
 
 	if rows.Err() != nil {
 		return nil, rows.Err()

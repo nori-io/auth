@@ -78,9 +78,9 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 	}
 	if (len(modelAuth.PhoneCountryCode+modelAuth.PhoneNumber) == 0) && (len(modelAuth.Email) != 0) {
 
-		stmt, err := tx.Prepare("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)")
-		if err != nil {
-			return err
+		stmt, errInsertAuth := tx.Prepare("INSERT INTO auth (user_id,  email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)")
+		if errInsertAuth != nil {
+			return errInsertAuth
 		}
 
 		_, execErr := stmt.Exec(lastIdNumber, modelAuth.Email, password, salt, time.Now(), time.Now(), false, false)

@@ -67,6 +67,7 @@ func NewService(
 }
 
 func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpResponse) {
+
 	var err error
 	var modelAuth *database.AuthModel
 	var modelUsers *database.UsersModel
@@ -74,7 +75,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 
 	errField := rest.ErrFieldResp{
 		Meta: rest.ErrFieldRespMeta{
-			ErrCode: 400,
+			ErrCode: 0,
 		},
 	}
 	if len(req.Email) != 0 {
@@ -84,19 +85,23 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	}
 
 	if modelAuth != nil && modelAuth.Id != 0 {
+
 		errField.AddError("phone, email", 400, "User already exists.")
 	}
 
 	if err != nil {
+
 		resp.Err = rest.ErrFieldResp{
 			Meta: rest.ErrFieldRespMeta{
 				ErrMessage: err.Error(),
 			},
 		}
+
 		return resp
 	}
 
 	if errField.HasErrors() {
+
 		resp.Err = errField
 		return resp
 	}
@@ -112,7 +117,6 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 		Type:     req.Type,
 		Mfa_type: req.MfaType,
 	}
-	s.mail.Send("Actication code")
 	err = s.db.Users().Create(modelAuth, modelUsers)
 	if err != nil {
 		s.log.Error(err)
@@ -122,6 +126,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 				ErrMessage: err.Error(),
 			},
 		}
+		fmt.Println("return resp")
 		return resp
 	}
 

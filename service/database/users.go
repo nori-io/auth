@@ -18,6 +18,7 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 	var (
 		lastIdNumber uint64
 	)
+
 	ctx := context.Background()
 
 	tx, err := u.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})

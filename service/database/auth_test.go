@@ -44,7 +44,7 @@ func TestAuth_FindByEmail(t *testing.T) {
 	nonEmptyRows := sqlmock.NewRows([]string{"id", "email", "password"}).
 		AddRow(2, "auth_find_by_email_test@mail.ru", "auth_find_by_email_pass")
 
-	mock.ExpectQuery("SELECT id, email,password FROM auth WHERE email = ? LIMIT 1").WithArgs("auth_find_by_email_test@mail.ru").WillReturnRows(nonEmptyRows)
+	mock.ExpectQuery("SELECT id, email,password, salt FROM auth WHERE email = ? LIMIT 1").WithArgs("auth_find_by_email_test@mail.ru").WillReturnRows(nonEmptyRows)
 
 	d := database.DB(mockDatabase, logrus.New())
 

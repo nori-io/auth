@@ -85,12 +85,13 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	}
 
 	if modelAuth != nil && modelAuth.Id != 0 {
-
+		resp.Email = req.Email
+		resp.PhoneCountryCode = req.PhoneCountryCode
+		resp.PhoneNumber = req.PhoneNumber
 		errField.AddError("phone, email", 400, "User already exists.")
 	}
 
 	if err != nil {
-
 		resp.Err = rest.ErrFieldResp{
 			Meta: rest.ErrFieldRespMeta{
 				ErrMessage: err.Error(),
@@ -126,10 +127,9 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 				ErrMessage: err.Error(),
 			},
 		}
-		fmt.Println("return resp")
+
 		return resp
 	}
-
 	resp.Email = req.Email
 	resp.PhoneCountryCode = req.PhoneCountryCode
 	resp.PhoneNumber = req.PhoneNumber

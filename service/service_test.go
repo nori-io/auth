@@ -59,10 +59,9 @@ func activate(code []byte, salt []byte, codeForSend []byte) string {
 }*/
 
 type AnyTime struct {
-
 }
 
-func TestService_SignUp(t *testing.T) {
+func TestService_SignUp_Email_UserExist(t *testing.T) {
 	auth := &mocks.Auth{}
 
 	cache := &mocks.Cache{}
@@ -79,11 +78,9 @@ func TestService_SignUp(t *testing.T) {
 
 	errField := rest.ErrFieldResp{
 		Meta: rest.ErrFieldRespMeta{
-			ErrCode: 0,
-			ErrMessage:"",
-
+			ErrCode:    0,
+			ErrMessage: "",
 		},
-
 	}
 	errField.AddError("phone, email", 400, "User already exists.")
 
@@ -99,13 +96,7 @@ func TestService_SignUp(t *testing.T) {
 
 	resp := serviceTest.SignUp(context.Background(), signUpRequest)
 
-	respExpected := service.SignUpResponse{Id: 0, Email: "test@mail.ru", PhoneNumber: "", PhoneCountryCode: "", Err:errField, }
+	respExpected := service.SignUpResponse{Id: 0, Email: "test@mail.ru", PhoneNumber: "", PhoneCountryCode: "", Err: errField}
 
 	assert.Equal(t, &respExpected, resp)
 }
-
-
-
-
-
-

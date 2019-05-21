@@ -167,7 +167,10 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 		result, err := database.VerifyPassword([]byte(req.Password), model.Salt, model.Password)
 
 		if (!result) || (err != nil) {
-			resp.Err = rest.ErrorNotFound("Uncorrect Password")
+			resp.Id=userId
+			resp.User.UserName=req.Name
+			resp.Err = rest.ErrResp{Meta:rest.ErrMeta{ErrMessage:"Uncorrect Password", ErrCode:0}}
+
 			return resp
 		}
 

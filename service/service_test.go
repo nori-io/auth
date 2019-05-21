@@ -205,7 +205,7 @@ func TestService_SignIn_Email_UserExist_CorrectPassword(t *testing.T) {
 	signInRequest := service.SignInRequest{Name: "test@mail.ru", Password: "pass"}
 
 
-	respExpected := service.SignInResponse{ User:service.UserResponse{UserName:"test@mail.ru" }, HttpStatusCode:0}
+	respExpected := service.SignInResponse{ Id:1, User:service.UserResponse{UserName:"test@mail.ru" }, HttpStatusCode:0, Token:mock2.Anything}
 
 	salt, err := database.CreateSalt()
 	if err != nil {
@@ -224,6 +224,7 @@ func TestService_SignIn_Email_UserExist_CorrectPassword(t *testing.T) {
 	mock.ExpectExec("INSERT INTO authentication_history (user_id, signin, meta) VALUES(?,?,?)").
 		WithArgs(1, AnyTime{}, "").WillReturnResult(sqlmock.NewResult(1, 1))
 	auth.On("AccessToken", mock2.Anything).Return(mock2.Anything, nil)
+	session.On("Save", mock2.Anything, mock2.Anything, mock2.Anything).Return(nil)
 
 	pluginParamaters:=service.PluginParameters{UserRegistrationByEmailAddress:true, }
 	resp := serviceTest.SignIn(context.Background(), signInRequest, pluginParamaters)

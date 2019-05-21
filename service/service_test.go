@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql/driver"
 	"fmt"
+	"go/types"
 	"testing"
 	"time"
 
@@ -21,6 +22,9 @@ type AnyTime struct {
 }
 
 type AnyByteArray struct {
+}
+
+type AnyPointer struct {
 }
 
 func TestService_SignUp_Email_UserExists(t *testing.T) {
@@ -77,7 +81,10 @@ func TestService_SignUp_Email_UserNotExist(t *testing.T) {
 		mock.ExpectQuery("SELECT id, email,password,salt FROM auth WHERE email = ? LIMIT 1").
 			WithArgs("test@mail.ru").WillReturnRows(nonEmptyRows)*/
 
-	mock.ExpectQuery("SELECT id, email,password,salt FROM auth WHERE email = ? LIMIT 1").WillReturnRows(nil)
+	emptyRows := sqlmock.NewRows([]string{"id", "email", "password", "salt"}).
+		AddRow(nil, nil, nil, nil)
+
+	mock.ExpectQuery("SELECT id, email,password,salt FROM auth WHERE email = ? LIMIT 1").WillReturnRows(emptyRows)
 
 	mock.ExpectBegin()
 	mock.ExpectPrepare("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)").
@@ -163,8 +170,8 @@ func TestService_SignUp_Phone_UserNotExist(t *testing.T) {
 
 	respExpected := service.SignUpResponse{Id: 1, PhoneCountryCode: "1", PhoneNumber: "234567890"}
 
-
-	mock.ExpectQuery("SELECT id, phone_country_code, phone_number, password,salt FROM auth WHERE concat(phone_country_code,phone_number)=? LIMIT 1").WillReturnRows(nil)
+	mock.ExpectQuery("SELECT id, phone_country_code, phone_number, password,salt FROM auth WHERE concat(phone_country_code,phone_number)=? LIMIT 1").
+		WillReturnRows(nil)
 
 	mock.ExpectBegin()
 	mock.ExpectPrepare("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)").
@@ -178,7 +185,7 @@ func TestService_SignUp_Phone_UserNotExist(t *testing.T) {
 
 	mock.ExpectPrepare("INSERT INTO auth (user_id, phone_country_code, phone_number, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?,?)").
 		ExpectExec().
-		WithArgs(1, "1", "234567890", AnyByteArray{}, AnyByteArray{} ,AnyTime{}, AnyTime{}, false, false).
+		WithArgs(1, "1", "234567890", AnyByteArray{}, AnyByteArray{}, AnyTime{}, AnyTime{}, false, false).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	mock.ExpectCommit()
@@ -187,9 +194,6 @@ func TestService_SignUp_Phone_UserNotExist(t *testing.T) {
 
 	assert.Equal(t, &respExpected, resp)
 }
-
-
-
 
 /*func TestService_ActivationCode(t *testing.T) {
 
@@ -242,5 +246,10 @@ func (a AnyTime) Match(v driver.Value) bool {
 
 func (s AnyByteArray) Match(v driver.Value) bool {
 	_, ok := v.([]byte)
+	return ok
+}
+
+func (s AnyPointer) Match(v driver.Value) bool {
+	_, ok := v.(types.Nil)
 	return ok
 }

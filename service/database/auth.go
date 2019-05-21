@@ -77,7 +77,7 @@ func (a *auth) FindByEmail(email string) (model *AuthModel, err error) {
 		return nil, err
 	}
 
-	if rows==nil {
+	if rows == nil {
 		return model, err
 	}
 

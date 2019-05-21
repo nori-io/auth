@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	rest "github.com/cheebo/gorest"
 	"github.com/nori-io/nori-common/interfaces"
 )
 
@@ -86,11 +87,16 @@ func (a *auth) FindByEmail(email string) (model *AuthModel, err error) {
 	defer rows.Close()
 	for rows.Next() {
 		var m AuthModel
+
 		rows.Scan(&m.Id, &m.Email, &m.Password, &m.Salt)
 		model.Id = m.Id
 		model.Email = m.Email
 		model.Password = m.Password
 		model.Salt = m.Salt
+
+	}
+	if model.Id == 0 {
+		return model, rest.ErrResp{Meta: rest.ErrMeta{ErrMessage: "User not found", ErrCode: 0}}
 	}
 
 	if rows.Err() != nil {

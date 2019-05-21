@@ -152,12 +152,15 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 	}
 
 	if err != nil {
-		resp.Err = rest.ErrorInternal("Database error")
+		resp.User.UserName = req.Name
+		resp.Err = err
 		return resp
 	}
 
 	if model == nil {
-		resp.Err = rest.ErrorNotFound("User not found")
+		resp.User.UserName = req.Name
+
+		resp.Err = rest.ErrResp{Meta: rest.ErrMeta{ErrMessage: "User not found Password", ErrCode: 0}}
 		return resp
 	}
 
@@ -167,9 +170,9 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 		result, err := database.VerifyPassword([]byte(req.Password), model.Salt, model.Password)
 
 		if (!result) || (err != nil) {
-			resp.Id=userId
-			resp.User.UserName=req.Name
-			resp.Err = rest.ErrResp{Meta:rest.ErrMeta{ErrMessage:"Uncorrect Password", ErrCode:0}}
+			resp.Id = userId
+			resp.User.UserName = req.Name
+			resp.Err = rest.ErrResp{Meta: rest.ErrMeta{ErrMessage: "Uncorrect Password", ErrCode: 0}}
 
 			return resp
 		}
@@ -180,10 +183,11 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 		UserId: userId,
 	}
 
-	if model != nil {
+	if model.Id != 0 {
 		err = s.db.AuthenticationHistory().Create(modelAuthenticationHistory)
 		if err != nil {
 			s.log.Error(err)
+			resp.User.UserName = req.Name
 			resp.Err = rest.ErrFieldResp{
 				Meta: rest.ErrFieldRespMeta{
 					ErrCode:    500,

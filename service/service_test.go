@@ -26,6 +26,7 @@ type AnyByteArray struct {
 
 type AnyString struct {
 }
+
 func TestService_SignUp_Email_UserExists(t *testing.T) {
 	auth := &mocks.Auth{}
 
@@ -46,7 +47,7 @@ func TestService_SignUp_Email_UserExists(t *testing.T) {
 	}
 	errField.AddError("phone, email", 400, "User already exists.")
 
-	respExpected := service.SignUpResponse{ Email: "test@mail.ru", PhoneNumber: "", PhoneCountryCode: "", Err: errField}
+	respExpected := service.SignUpResponse{Email: "test@mail.ru", PhoneNumber: "", PhoneCountryCode: "", Err: errField}
 
 	nonEmptyRows := sqlmock.NewRows([]string{"id", "email", "password", "salt"}).
 		AddRow(1, "test@mail.ru", "pass", "salt")
@@ -130,7 +131,7 @@ func TestService_SignUp_Phone_UserExists(t *testing.T) {
 
 	//respExcepted.Err = errField
 
-	respExpected := service.SignUpResponse{ Email: "", PhoneCountryCode: "1", PhoneNumber: "234567890", Err: errField}
+	respExpected := service.SignUpResponse{Email: "", PhoneCountryCode: "1", PhoneNumber: "234567890", Err: errField}
 
 	nonEmptyRows := sqlmock.NewRows([]string{"id", "phone_country_code", "phone_number", "password", "salt"}).
 		AddRow(1, "1", "234567890", "pass", "salt")
@@ -138,7 +139,6 @@ func TestService_SignUp_Phone_UserExists(t *testing.T) {
 	mock.ExpectQuery("SELECT id, phone_country_code, phone_number, password,salt FROM auth WHERE concat(phone_country_code,phone_number)=?  LIMIT 1").WithArgs("1234567890").WillReturnRows(nonEmptyRows)
 
 	mock.ExpectBegin()
-
 
 	//mock.ExpectQuery("SELECT id, email,password,salt FROM auth WHERE email = ? LIMIT 1").WillReturnRows(nil)
 
@@ -160,7 +160,7 @@ func TestService_SignUp_Phone_UserNotExist(t *testing.T) {
 	serviceTest := service.NewService(auth, cache, cfg, db, new(logrus.Logger), mail, session)
 	signUpRequest := service.SignUpRequest{PhoneCountryCode: "1", PhoneNumber: "234567890", Password: "pass"}
 
-	respExpected := service.SignUpResponse{ PhoneCountryCode: "1", PhoneNumber: "234567890"}
+	respExpected := service.SignUpResponse{PhoneCountryCode: "1", PhoneNumber: "234567890"}
 
 	emptyRows := sqlmock.NewRows([]string{"id", "phone_country_code", "phone_number", "password", "salt"}).
 		AddRow(nil, nil, nil, nil, nil)
@@ -184,7 +184,6 @@ func TestService_SignUp_Phone_UserNotExist(t *testing.T) {
 
 	mock.ExpectCommit()
 
-
 	resp := serviceTest.SignUp(context.Background(), signUpRequest)
 
 	assert.Equal(t, &respExpected, resp)
@@ -204,8 +203,7 @@ func TestService_SignIn_Email_UserExist_CorrectPassword(t *testing.T) {
 	serviceTest := service.NewService(auth, cache, cfg, db, new(logrus.Logger), mail, session)
 	signInRequest := service.SignInRequest{Name: "test@mail.ru", Password: "pass"}
 
-
-	respExpected := service.SignInResponse{ Id:1, User:service.UserResponse{UserName:"test@mail.ru" }, HttpStatusCode:0, Token:mock2.Anything}
+	respExpected := service.SignInResponse{Id: 1, User: service.UserResponse{UserName: "test@mail.ru"}, HttpStatusCode: 0, Token: mock2.Anything}
 
 	salt, err := database.CreateSalt()
 	if err != nil {
@@ -220,18 +218,15 @@ func TestService_SignIn_Email_UserExist_CorrectPassword(t *testing.T) {
 	mock.ExpectQuery("SELECT id, email,password,salt FROM auth WHERE email = ? LIMIT 1").
 		WithArgs("test@mail.ru").WillReturnRows(nonEmptyRows)
 
-
 	mock.ExpectExec("INSERT INTO authentication_history (user_id, signin, meta) VALUES(?,?,?)").
 		WithArgs(1, AnyTime{}, "").WillReturnResult(sqlmock.NewResult(1, 1))
 	auth.On("AccessToken", mock2.Anything).Return(mock2.Anything, nil)
 	session.On("Save", mock2.Anything, mock2.Anything, mock2.Anything).Return(nil)
 
-	pluginParamaters:=service.PluginParameters{UserRegistrationByEmailAddress:true, }
+	pluginParamaters := service.PluginParameters{UserRegistrationByEmailAddress: true}
 	resp := serviceTest.SignIn(context.Background(), signInRequest, pluginParamaters)
 
 	assert.Equal(t, &respExpected, resp)
-
-
 
 }
 
@@ -247,10 +242,9 @@ func TestService_SignIn_Email_UserExist_UnCorrectPassword(t *testing.T) {
 
 	serviceTest := service.NewService(auth, cache, cfg, db, new(logrus.Logger), mail, session)
 	signInRequest := service.SignInRequest{Name: "test@mail.ru", Password: "pass"}
-	Err:= rest.ErrResp{Meta:rest.ErrMeta{ErrMessage:"Uncorrect Password", ErrCode:0}}
+	Err := rest.ErrResp{Meta: rest.ErrMeta{ErrMessage: "Uncorrect Password", ErrCode: 0}}
 
-
-	respExpected := service.SignInResponse{ Id:1, User:service.UserResponse{UserName:"test@mail.ru" }, HttpStatusCode:0, Err:Err}
+	respExpected := service.SignInResponse{Id: 1, User: service.UserResponse{UserName: "test@mail.ru"}, HttpStatusCode: 0, Err: Err}
 
 	salt, err := database.CreateSalt()
 	if err != nil {
@@ -265,20 +259,39 @@ func TestService_SignIn_Email_UserExist_UnCorrectPassword(t *testing.T) {
 	mock.ExpectQuery("SELECT id, email,password,salt FROM auth WHERE email = ? LIMIT 1").
 		WithArgs("test@mail.ru").WillReturnRows(nonEmptyRows)
 
-
-
-	pluginParamaters:=service.PluginParameters{UserRegistrationByEmailAddress:true, }
+	pluginParamaters := service.PluginParameters{UserRegistrationByEmailAddress: true}
 	resp := serviceTest.SignIn(context.Background(), signInRequest, pluginParamaters)
 
 	assert.Equal(t, &respExpected, resp)
 
-
-
-
-
 }
 
 func TestService_SignIn_Email_UserExist_UnCorrectUserName(t *testing.T) {
+	auth := &mocks.Auth{}
+
+	cache := &mocks.Cache{}
+	cfg := &service.Config{}
+	mockDatabase, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	db := database.DB(mockDatabase, logrus.New())
+	mail := &mocks.Mail{}
+	session := &mocks.Session{}
+
+	serviceTest := service.NewService(auth, cache, cfg, db, new(logrus.Logger), mail, session)
+	signInRequest := service.SignInRequest{Name: "testNot@mail.ru", Password: "pass"}
+
+	Err := rest.ErrResp{Meta: rest.ErrMeta{ErrMessage: "User not found", ErrCode: 0}}
+
+	respExpected := service.SignInResponse{Id: 0, User: service.UserResponse{UserName: "testNot@mail.ru"}, HttpStatusCode: 0, Err: Err}
+
+	emptyRows := sqlmock.NewRows([]string{"id", "email", "password", "salt"}).
+		AddRow(nil, nil, nil, nil)
+
+	mock.ExpectQuery("SELECT id, email,password,salt FROM auth WHERE email = ? LIMIT 1").WillReturnRows(emptyRows)
+
+	pluginParamaters := service.PluginParameters{UserRegistrationByEmailAddress: true}
+	resp := serviceTest.SignIn(context.Background(), signInRequest, pluginParamaters)
+
+	assert.Equal(t, &respExpected, resp)
 }
 
 func TestService_SignIn_Phone_UserExist_CorrectPassword(t *testing.T) {
@@ -289,12 +302,6 @@ func TestService_SignIn_Phone_UserExist_UnCorrectPassword(t *testing.T) {
 
 func TestService_SignIn_Phone_UserExist_UnCorrectUserName(t *testing.T) {
 }
-
-
-
-
-
-
 
 /*func TestService_ActivationCode(t *testing.T) {
 

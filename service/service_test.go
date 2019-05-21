@@ -51,8 +51,6 @@ func TestService_SignUp_Email_UserExists(t *testing.T) {
 	mock.ExpectQuery("SELECT id, email,password,salt FROM auth WHERE email = ? LIMIT 1").
 		WithArgs("test@mail.ru").WillReturnRows(nonEmptyRows)
 
-	//mock.ExpectQuery("SELECT id, email,password,salt FROM auth WHERE email = ? LIMIT 1").WillReturnRows(nil)
-
 	resp := serviceTest.SignUp(context.Background(), signUpRequest)
 
 	assert.Equal(t, &respExpected, resp)
@@ -149,6 +147,49 @@ func TestService_SignUp_Phone_UserExists(t *testing.T) {
 
 	assert.Equal(t, &respExpected, resp)
 }
+
+func TestService_SignUp_Phone_UserNotExist(t *testing.T) {
+	auth := &mocks.Auth{}
+
+	cache := &mocks.Cache{}
+	cfg := &service.Config{}
+	mockDatabase, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	db := database.DB(mockDatabase, logrus.New())
+	mail := &mocks.Mail{}
+	session := &mocks.Session{}
+
+	serviceTest := service.NewService(auth, cache, cfg, db, new(logrus.Logger), mail, session)
+	signUpRequest := service.SignUpRequest{PhoneCountryCode: "1", PhoneNumber: "234567890", Password: "pass"}
+
+	respExpected := service.SignUpResponse{Id: 1, PhoneCountryCode: "1", PhoneNumber: "234567890"}
+
+
+	mock.ExpectQuery("SELECT id, phone_country_code, phone_number, password,salt FROM auth WHERE concat(phone_country_code,phone_number)=? LIMIT 1").WillReturnRows(nil)
+
+	mock.ExpectBegin()
+	mock.ExpectPrepare("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)").
+		ExpectExec().WithArgs("locked", "", AnyTime{}, AnyTime{}).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	rows := sqlmock.NewRows([]string{"id"}).
+		AddRow(1).
+		RowError(1, fmt.Errorf("row error"))
+	mock.ExpectQuery("SELECT LAST_INSERT_ID()").WillReturnRows(rows)
+
+	mock.ExpectPrepare("INSERT INTO auth (user_id, phone_country_code, phone_number, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?,?)").
+		ExpectExec().
+		WithArgs(1, "1", "234567890", AnyByteArray{}, AnyByteArray{} ,AnyTime{}, AnyTime{}, false, false).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	mock.ExpectCommit()
+
+	resp := serviceTest.SignUp(context.Background(), signUpRequest)
+
+	assert.Equal(t, &respExpected, resp)
+}
+
+
+
 
 /*func TestService_ActivationCode(t *testing.T) {
 

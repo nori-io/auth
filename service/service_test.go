@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql/driver"
 	"fmt"
-	"go/types"
 	"testing"
 	"time"
 
@@ -13,6 +12,7 @@ import (
 	"github.com/nori-io/nori-common/mocks"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	mock2 "github.com/stretchr/testify/mock"
 
 	"github.com/nori-io/authentication/service"
 	"github.com/nori-io/authentication/service/database"
@@ -24,9 +24,8 @@ type AnyTime struct {
 type AnyByteArray struct {
 }
 
-type AnyPointer struct {
+type AnyString struct {
 }
-
 func TestService_SignUp_Email_UserExists(t *testing.T) {
 	auth := &mocks.Auth{}
 
@@ -191,6 +190,71 @@ func TestService_SignUp_Phone_UserNotExist(t *testing.T) {
 	assert.Equal(t, &respExpected, resp)
 }
 
+func TestService_SignIn_Email_UserExist_CorrectPassword(t *testing.T) {
+
+	auth := &mocks.Auth{}
+
+	cache := &mocks.Cache{}
+	cfg := &service.Config{}
+	mockDatabase, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	db := database.DB(mockDatabase, logrus.New())
+	mail := &mocks.Mail{}
+	session := &mocks.Session{}
+
+	serviceTest := service.NewService(auth, cache, cfg, db, new(logrus.Logger), mail, session)
+	signInRequest := service.SignInRequest{Name: "test@mail.ru", Password: "pass"}
+
+
+	respExpected := service.SignInResponse{ User:service.UserResponse{UserName:"test@mail.ru" }, HttpStatusCode:0}
+
+	salt, err := database.CreateSalt()
+	if err != nil {
+		t.Log(err)
+	}
+
+	password, err := database.Hash([]byte("pass"), salt)
+
+	nonEmptyRows := sqlmock.NewRows([]string{"id", "email", "password", "salt"}).
+		AddRow(1, "test@mail.ru", password, salt)
+
+	mock.ExpectQuery("SELECT id, email,password,salt FROM auth WHERE email = ? LIMIT 1").
+		WithArgs("test@mail.ru").WillReturnRows(nonEmptyRows)
+
+
+	mock.ExpectExec("INSERT INTO authentication_history (user_id, signin, meta) VALUES(?,?,?)").
+		WithArgs(1, AnyTime{}, "").WillReturnResult(sqlmock.NewResult(1, 1))
+	auth.On("AccessToken", mock2.Anything).Return(mock2.Anything, nil)
+
+	pluginParamaters:=service.PluginParameters{UserRegistrationByEmailAddress:true, }
+	resp := serviceTest.SignIn(context.Background(), signInRequest, pluginParamaters)
+
+	assert.Equal(t, &respExpected, resp)
+
+
+
+}
+
+func TestService_SignIn_Email_UserExist_UnCorrectPassword(t *testing.T) {
+}
+
+func TestService_SignIn_Email_UserExist_UnCorrectUserName(t *testing.T) {
+}
+
+func TestService_SignIn_Phone_UserExist_CorrectPassword(t *testing.T) {
+}
+
+func TestService_SignIn_Phone_UserExist_UnCorrectPassword(t *testing.T) {
+}
+
+func TestService_SignIn_Phone_UserExist_UnCorrectUserName(t *testing.T) {
+}
+
+
+
+
+
+
+
 /*func TestService_ActivationCode(t *testing.T) {
 
 	auth := &mocks.Auth{}
@@ -245,7 +309,7 @@ func (s AnyByteArray) Match(v driver.Value) bool {
 	return ok
 }
 
-func (s AnyPointer) Match(v driver.Value) bool {
-	_, ok := v.(types.Nil)
+func (s AnyString) Match(v driver.Value) bool {
+	_, ok := v.(string)
 	return ok
 }

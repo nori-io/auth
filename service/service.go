@@ -130,6 +130,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 
 		return resp
 	}
+
 	resp.Email = req.Email
 	resp.PhoneCountryCode = req.PhoneCountryCode
 	resp.PhoneNumber = req.PhoneNumber

@@ -2,7 +2,6 @@ package service
 
 // SignUpResponse
 type SignUpResponse struct {
-	Id               uint64
 	Email            string
 	PhoneCountryCode string
 	PhoneNumber      string

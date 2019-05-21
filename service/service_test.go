@@ -47,7 +47,7 @@ func TestService_SignUp_Email_UserExists(t *testing.T) {
 	}
 	errField.AddError("phone, email", 400, "User already exists.")
 
-	respExpected := service.SignUpResponse{Id: 0, Email: "test@mail.ru", PhoneNumber: "", PhoneCountryCode: "", Err: errField}
+	respExpected := service.SignUpResponse{ Email: "test@mail.ru", PhoneNumber: "", PhoneCountryCode: "", Err: errField}
 
 	nonEmptyRows := sqlmock.NewRows([]string{"id", "email", "password", "salt"}).
 		AddRow(1, "test@mail.ru", "pass", "salt")
@@ -73,7 +73,7 @@ func TestService_SignUp_Email_UserNotExist(t *testing.T) {
 	serviceTest := service.NewService(auth, cache, cfg, db, new(logrus.Logger), mail, session)
 	signUpRequest := service.SignUpRequest{Email: "test@mail.ru", Password: "pass"}
 
-	respExpected := service.SignUpResponse{Id: 0, Email: "test@mail.ru", PhoneNumber: "", PhoneCountryCode: "", Err: nil}
+	respExpected := service.SignUpResponse{Email: "test@mail.ru", PhoneNumber: "", PhoneCountryCode: "", Err: nil}
 
 	/*	nonEmptyRows := sqlmock.NewRows([]string{"id", "email", "password", "salt"}).
 			AddRow(1, "test@mail.ru", "pass", "salt")
@@ -131,7 +131,7 @@ func TestService_SignUp_Phone_UserExists(t *testing.T) {
 
 	//respExcepted.Err = errField
 
-	respExpected := service.SignUpResponse{Id: 0, Email: "", PhoneCountryCode: "1", PhoneNumber: "234567890", Err: errField}
+	respExpected := service.SignUpResponse{ Email: "", PhoneCountryCode: "1", PhoneNumber: "234567890", Err: errField}
 
 	nonEmptyRows := sqlmock.NewRows([]string{"id", "phone_country_code", "phone_number", "password", "salt"}).
 		AddRow(1, "1", "234567890", "pass", "salt")
@@ -139,14 +139,7 @@ func TestService_SignUp_Phone_UserExists(t *testing.T) {
 	mock.ExpectQuery("SELECT id, phone_country_code, phone_number, password,salt FROM auth WHERE concat(phone_country_code,phone_number)=?  LIMIT 1").WithArgs("1234567890").WillReturnRows(nonEmptyRows)
 
 	mock.ExpectBegin()
-	db.Users().Create(&database.AuthModel{
-		Email:    "test@mail.ru",
-		Password: []byte("pass"),
-		Salt:     []byte("salt"),
-	}, &database.UsersModel{
-		Status_account: "active",
-		Type:           "vendor",
-	})
+
 
 	//mock.ExpectQuery("SELECT id, email,password,salt FROM auth WHERE email = ? LIMIT 1").WillReturnRows(nil)
 
@@ -168,10 +161,12 @@ func TestService_SignUp_Phone_UserNotExist(t *testing.T) {
 	serviceTest := service.NewService(auth, cache, cfg, db, new(logrus.Logger), mail, session)
 	signUpRequest := service.SignUpRequest{PhoneCountryCode: "1", PhoneNumber: "234567890", Password: "pass"}
 
-	respExpected := service.SignUpResponse{Id: 1, PhoneCountryCode: "1", PhoneNumber: "234567890"}
+	respExpected := service.SignUpResponse{ PhoneCountryCode: "1", PhoneNumber: "234567890"}
 
+	emptyRows := sqlmock.NewRows([]string{"id", "phone_country_code", "phone_number", "password", "salt"}).
+		AddRow(nil, nil, nil, nil, nil)
 	mock.ExpectQuery("SELECT id, phone_country_code, phone_number, password,salt FROM auth WHERE concat(phone_country_code,phone_number)=? LIMIT 1").
-		WillReturnRows(nil)
+		WillReturnRows(emptyRows)
 
 	mock.ExpectBegin()
 	mock.ExpectPrepare("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)").
@@ -189,6 +184,7 @@ func TestService_SignUp_Phone_UserNotExist(t *testing.T) {
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	mock.ExpectCommit()
+
 
 	resp := serviceTest.SignUp(context.Background(), signUpRequest)
 

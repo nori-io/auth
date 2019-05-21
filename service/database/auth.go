@@ -122,6 +122,9 @@ func (a *auth) FindByPhone(phoneCountryCode, phoneNumber string) (model *AuthMod
 		model.Salt = m.Salt
 		model.Password = m.Password
 	}
+	if model.Id == 0 {
+		return model, rest.ErrResp{Meta: rest.ErrMeta{ErrMessage: "User not found", ErrCode: 0}}
+	}
 
 	if rows.Err() != nil {
 		return nil, rows.Err()

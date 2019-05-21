@@ -295,6 +295,45 @@ func TestService_SignIn_Email_UserExist_UnCorrectUserName(t *testing.T) {
 }
 
 func TestService_SignIn_Phone_UserExist_CorrectPassword(t *testing.T) {
+	auth := &mocks.Auth{}
+
+	cache := &mocks.Cache{}
+	cfg := &service.Config{}
+	mockDatabase, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	db := database.DB(mockDatabase, logrus.New())
+	mail := &mocks.Mail{}
+	session := &mocks.Session{}
+
+	serviceTest := service.NewService(auth, cache, cfg, db, new(logrus.Logger), mail, session)
+	signInRequest := service.SignInRequest{Name: "1234567890", Password: "pass"}
+
+	respExpected := service.SignInResponse{Id: 1, User: service.UserResponse{UserName: "1234567890"}, HttpStatusCode: 0, Token: mock2.Anything}
+
+	salt, err := database.CreateSalt()
+	if err != nil {
+		t.Log(err)
+	}
+
+	password, err := database.Hash([]byte("pass"), salt)
+
+
+	nonEmptyRowsPhone := sqlmock.NewRows([]string{"id", "phone_country_code", "phone_number", "password", "salt"}).
+		AddRow(1, "1", "234567890", password, salt)
+
+	mock.ExpectQuery("SELECT id, phone_country_code, phone_number, password,salt FROM auth WHERE concat(phone_country_code,phone_number)=?  LIMIT 1").
+		WithArgs("1234567890").WillReturnRows(nonEmptyRowsPhone)
+
+
+
+	mock.ExpectExec("INSERT INTO authentication_history (user_id, signin, meta) VALUES(?,?,?)").
+		WithArgs(1, AnyTime{}, "").WillReturnResult(sqlmock.NewResult(1, 1))
+	auth.On("AccessToken", mock2.Anything).Return(mock2.Anything, nil)
+	session.On("Save", mock2.Anything, mock2.Anything, mock2.Anything).Return(nil)
+
+	pluginParamaters := service.PluginParameters{UserRegistrationByPhoneNumber: true}
+	resp := serviceTest.SignIn(context.Background(), signInRequest, pluginParamaters)
+
+	assert.Equal(t, &respExpected, resp)
 }
 
 func TestService_SignIn_Phone_UserExist_UnCorrectPassword(t *testing.T) {

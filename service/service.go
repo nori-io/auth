@@ -145,11 +145,12 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 
 	if parameters.UserRegistrationByEmailAddress {
 		model, err = s.db.Auth().FindByEmail(req.Name)
-	} else {
-		if parameters.UserRegistrationByPhoneNumber {
+	}
+
+	if parameters.UserRegistrationByPhoneNumber {
 			model, err = s.db.Auth().FindByPhone(req.Name, "")
 		}
-	}
+
 
 	if err != nil {
 		resp.User.UserName = req.Name
@@ -231,7 +232,7 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 	resp.Token = token
 
 	if model.Id != 0 {
-		resp.User = UserResponse{UserName: model.Email}
+		resp.User = UserResponse{UserName: req.Name}
 	}
 
 	return resp

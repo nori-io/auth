@@ -73,7 +73,7 @@ func TestService_SignUp_Email_UserNotExist(t *testing.T) {
 	serviceTest := service.NewService(auth, cache, cfg, db, new(logrus.Logger), mail, session)
 	signUpRequest := service.SignUpRequest{Email: "test@mail.ru", Password: "pass"}
 
-	respExpected := service.SignUpResponse{Email: "test@mail.ru", PhoneNumber: "", PhoneCountryCode: "", Err: nil}
+	respExpected := service.SignUpResponse{Email: "test@mail.ru", PhoneNumber: "", PhoneCountryCode: "", Err: rest.ErrResp{Meta: rest.ErrMeta{ErrMessage: "User not found", ErrCode: 0}}}
 
 	/*	nonEmptyRows := sqlmock.NewRows([]string{"id", "email", "password", "salt"}).
 			AddRow(1, "test@mail.ru", "pass", "salt")
@@ -160,7 +160,7 @@ func TestService_SignUp_Phone_UserNotExist(t *testing.T) {
 	serviceTest := service.NewService(auth, cache, cfg, db, new(logrus.Logger), mail, session)
 	signUpRequest := service.SignUpRequest{PhoneCountryCode: "1", PhoneNumber: "234567890", Password: "pass"}
 
-	respExpected := service.SignUpResponse{PhoneCountryCode: "1", PhoneNumber: "234567890"}
+	respExpected := service.SignUpResponse{PhoneCountryCode: "1", PhoneNumber: "234567890", Err:rest.ErrResp{Meta:rest.ErrMeta{ErrCode:0, ErrMessage:"User not found"}}}
 
 	emptyRows := sqlmock.NewRows([]string{"id", "phone_country_code", "phone_number", "password", "salt"}).
 		AddRow(nil, nil, nil, nil, nil)

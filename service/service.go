@@ -92,11 +92,10 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	}
 
 	if err != nil {
-		resp.Err = rest.ErrFieldResp{
-			Meta: rest.ErrFieldRespMeta{
-				ErrMessage: err.Error(),
-			},
-		}
+		resp.Err = err
+		resp.Email = req.Email
+		resp.PhoneCountryCode = req.PhoneCountryCode
+		resp.PhoneNumber = req.PhoneNumber
 
 		return resp
 	}

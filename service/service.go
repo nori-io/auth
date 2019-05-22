@@ -139,63 +139,68 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 
 func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters PluginParameters) (resp *SignInResponse) {
 	resp = &SignInResponse{}
-	var model *database.AuthModel
-	var err error
+	var model, modelFindByEmail, modelFindByPhone *database.AuthModel
+	var errFindByEmail, errFindPhone error
 
 	if parameters.UserRegistrationByEmailAddress {
-		model, err = s.db.Auth().FindByEmail(req.Name)
+
+		modelFindByEmail, errFindByEmail = s.db.Auth().FindByEmail(req.Name)
+		if errFindByEmail != nil {
+			resp.User.UserName = req.Name
+			resp.Err = errFindByEmail
+			return resp
+		}
+		if modelFindByEmail.Id!=0 {
+			model = modelFindByEmail
+		}
 	}
 
 	if parameters.UserRegistrationByPhoneNumber {
-		model, err = s.db.Auth().FindByPhone(req.Name, "")
-	}
-
-	if err != nil {
-		resp.User.UserName = req.Name
-		resp.Err = err
-		return resp
+		modelFindByPhone, errFindPhone = s.db.Auth().FindByPhone(req.Name, "")
+		if errFindPhone != nil {
+			resp.User.UserName = req.Name
+			resp.Err = errFindPhone
+			return resp
+		}
+		if modelFindByPhone.Id!=0 {
+			model = modelFindByPhone
+		}
 	}
 
 	if model == nil {
 		resp.User.UserName = req.Name
-
-		resp.Err = rest.ErrResp{Meta: rest.ErrMeta{ErrMessage: "User not found Password", ErrCode: 0}}
+		resp.Err = rest.ErrResp{Meta: rest.ErrMeta{ErrMessage: "User not found", ErrCode: 0}}
 		return resp
 	}
-
 	var userId uint64
-	if model.Id != 0 {
-		userId = model.Id
-		result, err := database.VerifyPassword([]byte(req.Password), model.Salt, model.Password)
+	userId = model.Id
+	result, err := database.VerifyPassword([]byte(req.Password), model.Salt, model.Password)
 
-		if (!result) || (err != nil) {
-			resp.Id = userId
-			resp.User.UserName = req.Name
-			resp.Err = rest.ErrResp{Meta: rest.ErrMeta{ErrMessage: "Uncorrect Password", ErrCode: 0}}
+	if (!result) || (err != nil) {
+		resp.Id = userId
+		resp.User.UserName = req.Name
+		resp.Err = rest.ErrResp{Meta: rest.ErrMeta{ErrMessage: "Uncorrect Password", ErrCode: 0}}
 
-			return resp
-		}
-
+		return resp
 	}
 
 	modelAuthenticationHistory := &database.AuthenticationHistoryModel{
 		UserId: userId,
 	}
 
-	if model.Id != 0 {
-		err = s.db.AuthenticationHistory().Create(modelAuthenticationHistory)
-		if err != nil {
-			s.log.Error(err)
-			resp.User.UserName = req.Name
-			resp.Err = rest.ErrFieldResp{
-				Meta: rest.ErrFieldRespMeta{
-					ErrCode:    500,
-					ErrMessage: err.Error(),
-				},
-			}
-			return resp
+	err = s.db.AuthenticationHistory().Create(modelAuthenticationHistory)
+	if err != nil {
+		s.log.Error(err)
+		resp.User.UserName = req.Name
+		resp.Err = rest.ErrFieldResp{
+			Meta: rest.ErrFieldRespMeta{
+				ErrCode:    500,
+				ErrMessage: err.Error(),
+			},
 		}
+		return resp
 	}
+
 	sid := rand.RandomAlphaNum(32)
 
 	token, err := s.auth.AccessToken(func(op interface{}) interface{} {
@@ -241,6 +246,8 @@ func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOu
 	resp = &SignOutResponse{}
 
 	value := ctx.Value("nori.auth.data")
+
+	fmt.Println("value ", value)
 
 	bar, err := InterfaceMap(value)
 	if err != nil {

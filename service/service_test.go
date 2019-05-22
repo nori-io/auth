@@ -160,7 +160,7 @@ func TestService_SignUp_Phone_UserNotExist(t *testing.T) {
 	serviceTest := service.NewService(auth, cache, cfg, db, new(logrus.Logger), mail, session)
 	signUpRequest := service.SignUpRequest{PhoneCountryCode: "1", PhoneNumber: "234567890", Password: "pass"}
 
-	respExpected := service.SignUpResponse{PhoneCountryCode: "1", PhoneNumber: "234567890", Err:rest.ErrResp{Meta:rest.ErrMeta{ErrCode:0, ErrMessage:"User not found"}}}
+	respExpected := service.SignUpResponse{PhoneCountryCode: "1", PhoneNumber: "234567890", Err: rest.ErrResp{Meta: rest.ErrMeta{ErrCode: 0, ErrMessage: "User not found"}}}
 
 	emptyRows := sqlmock.NewRows([]string{"id", "phone_country_code", "phone_number", "password", "salt"}).
 		AddRow(nil, nil, nil, nil, nil)
@@ -316,14 +316,11 @@ func TestService_SignIn_Phone_UserExist_CorrectPassword(t *testing.T) {
 
 	password, err := database.Hash([]byte("pass"), salt)
 
-
 	nonEmptyRowsPhone := sqlmock.NewRows([]string{"id", "phone_country_code", "phone_number", "password", "salt"}).
 		AddRow(1, "1", "234567890", password, salt)
 
 	mock.ExpectQuery("SELECT id, phone_country_code, phone_number, password,salt FROM auth WHERE concat(phone_country_code,phone_number)=?  LIMIT 1").
 		WithArgs("1234567890").WillReturnRows(nonEmptyRowsPhone)
-
-
 
 	mock.ExpectExec("INSERT INTO authentication_history (user_id, signin, meta) VALUES(?,?,?)").
 		WithArgs(1, AnyTime{}, "").WillReturnResult(sqlmock.NewResult(1, 1))
@@ -370,10 +367,35 @@ func TestService_SignIn_Phone_UserExist_UnCorrectPassword(t *testing.T) {
 
 	assert.Equal(t, &respExpected, resp)
 
-
 }
 
 func TestService_SignIn_Phone_UserExist_UnCorrectUserName(t *testing.T) {
+	auth := &mocks.Auth{}
+
+	cache := &mocks.Cache{}
+	cfg := &service.Config{}
+	mockDatabase, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	db := database.DB(mockDatabase, logrus.New())
+	mail := &mocks.Mail{}
+	session := &mocks.Session{}
+
+	serviceTest := service.NewService(auth, cache, cfg, db, new(logrus.Logger), mail, session)
+	signInRequest := service.SignInRequest{Name: "1234567890", Password: "pass"}
+
+	Err := rest.ErrResp{Meta: rest.ErrMeta{ErrMessage: "User not found", ErrCode: 0}}
+
+	respExpected := service.SignInResponse{Id: 0, User: service.UserResponse{UserName: "1234567890"}, HttpStatusCode: 0, Err: Err}
+
+	emptyRows := sqlmock.NewRows([]string{"id", "phone_country_code", "phone_number", "password", "salt"}).
+		AddRow(nil, nil, nil, nil, nil)
+
+	mock.ExpectQuery("SELECT id, phone_country_code, phone_number, password,salt FROM auth WHERE concat(phone_country_code,phone_number)=?  LIMIT 1").WillReturnRows(emptyRows)
+
+	pluginParamaters := service.PluginParameters{UserRegistrationByPhoneNumber: true}
+	resp := serviceTest.SignIn(context.Background(), signInRequest, pluginParamaters)
+
+	assert.Equal(t, &respExpected, resp)
+
 }
 
 /*func TestService_ActivationCode(t *testing.T) {

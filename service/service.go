@@ -147,9 +147,8 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 	}
 
 	if parameters.UserRegistrationByPhoneNumber {
-			model, err = s.db.Auth().FindByPhone(req.Name, "")
-		}
-
+		model, err = s.db.Auth().FindByPhone(req.Name, "")
+	}
 
 	if err != nil {
 		resp.User.UserName = req.Name

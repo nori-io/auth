@@ -3,13 +3,12 @@ package service
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"time"
 
 	rest "github.com/cheebo/gorest"
 	"github.com/cheebo/rand"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/nori-io/nori-common/interfaces"
-	"github.com/pkg/errors"
 
 	"github.com/nori-io/authentication/service/database"
 )
@@ -150,7 +149,7 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 			resp.Err = errFindByEmail
 			return resp
 		}
-		if modelFindByEmail.Id!=0 {
+		if modelFindByEmail.Id != 0 {
 			model = modelFindByEmail
 		}
 	}
@@ -162,7 +161,7 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 			resp.Err = errFindPhone
 			return resp
 		}
-		if modelFindByPhone.Id!=0 {
+		if modelFindByPhone.Id != 0 {
 			model = modelFindByPhone
 		}
 	}
@@ -247,26 +246,14 @@ func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOu
 
 	value := ctx.Value("nori.auth.data")
 
-	fmt.Println("value ", value)
-
-	bar, err := InterfaceMap(value)
-	if err != nil {
-		panic(err)
-	}
 	var name string
 
-	if val, ok := bar.(map[string]interface{})["raw"]; ok {
+	if val, ok := value.(jwt.MapClaims)["raw"]; ok {
 		if val2, ok2 := val.(map[string]interface{})["name"]; ok2 {
 			name = fmt.Sprint(val2)
 		}
 
 	}
-
-	/*tempData:=sessionData{}
-	sessionId:=s.session.SessionId(ctx)
-
-	err=s.session.Get(sessionId, &tempData)
-	*/
 
 	req = SignOutRequest{}
 	modelFindEmail, errFindEmail := s.db.Auth().FindByEmail(name)
@@ -296,7 +283,7 @@ func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOu
 
 		UserId: UserIdTemp,
 	}
-
+	var err error
 	if modelFindEmail.Id != 0 {
 		modelAuthenticationHistory.SignOut = time.Now()
 		err = s.db.AuthenticationHistory().Update(modelAuthenticationHistory)
@@ -343,30 +330,3 @@ func (s *service) RecoveryCodes(ctx context.Context, req RecoveryCodesRequest) (
 /*func (s *service) MakeProfileEndpoint(ctx context.Context,req ProfileRequest)(resp *ProfileRequest){
 	return resp
 }*/
-
-func InterfaceMap(i interface{}) (interface{}, error) {
-	// Get type
-	t := reflect.TypeOf(i)
-
-	switch t.Kind() {
-	case reflect.Map:
-		// Get the value of the provided map
-		v := reflect.ValueOf(i)
-
-		// The "only" way of making a reflect.Type with interface{}
-		it := reflect.TypeOf((*interface{})(nil)).Elem()
-
-		// Create the map of the specific type. Key type is t.Key(), and element type is it
-		m := reflect.MakeMap(reflect.MapOf(t.Key(), it))
-
-		// Copy values to new map
-		for _, mk := range v.MapKeys() {
-			m.SetMapIndex(mk, v.MapIndex(mk))
-		}
-
-		return m.Interface(), nil
-
-	}
-
-	return nil, errors.New("Unsupported type")
-}

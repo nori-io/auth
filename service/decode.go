@@ -33,7 +33,6 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 			errorResponse.AddError("type", 0, "User type isn't valid")
 		}
 
-
 		if (parameters.UserRegistrationByEmailAddress) && (!parameters.UserRegistrationByPhoneNumber) {
 			if !body.ValidateMail() {
 
@@ -61,18 +60,19 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 
 		if (parameters.UserRegistrationByEmailAddress) && (parameters.UserRegistrationByPhoneNumber) {
 			errPhoneCountryCode, errPhoneNumber := body.ValidatePhone()
-            if body.Email!="" {
+			if body.Email != "" {
 				if !body.ValidateMail() {
 					errorResponse.AddError("email", 0,
 						"Mail address' format is uncorrect")
 				}
 			}
-			if len(body.PhoneCountryCode+body.PhoneNumber)!=0{
-			if errPhoneCountryCode != nil {
-				errorResponse.AddError("phone_country_code", 0,
-					"Country code's format is uncorrect")
+			if len(body.PhoneCountryCode+body.PhoneNumber) != 0 {
+				if errPhoneCountryCode != nil {
+					errorResponse.AddError("phone_country_code", 0,
+						"Country code's format is uncorrect")
 
-			}}
+				}
+			}
 
 			if errPhoneNumber != nil {
 				errorResponse.AddError("phone_number", 0,

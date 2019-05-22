@@ -414,7 +414,6 @@ func TestService_SignOut(t *testing.T) {
 
 	mock.ExpectQuery("SELECT id, phone_country_code, phone_number, password,salt FROM auth WHERE concat(phone_country_code,phone_number)=?  LIMIT 1").WillReturnRows(emptyRows)
 	//map[exp:1.558773859e+09 iat:1.558514659e+09 iss:zeno/api jti:NhT5PDmkMGYyi5m3UoXuPI2n17RclO4n nbf:1.558514659e+09 raw:map[id: name:test6@mail.ru] sub:zeno]
-
 	//ctx:=context.Context.Value("")
 	resp := serviceTest.SignOut(context.Background(), signOutRequest)
 

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"time"
 
 	rest "github.com/cheebo/gorest"
@@ -242,15 +243,15 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 
 func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOutResponse) {
 
-	fmt.Println("ctx is", ctx)
-
 	resp = &SignOutResponse{}
 
 	value := ctx.Value("nori.auth.data")
 
 	var name string
 
+
 	if val, ok := value.(jwt.MapClaims)["raw"]; ok {
+		reflect.TypeOf(val)
 		if val2, ok2 := val.(map[string]interface{})["name"]; ok2 {
 			name = fmt.Sprint(val2)
 		}

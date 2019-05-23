@@ -4,11 +4,13 @@ import (
 	"context"
 	"database/sql/driver"
 	"fmt"
+	"reflect"
 	"testing"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	rest "github.com/cheebo/gorest"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/nori-io/nori-common/mocks"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -412,21 +414,24 @@ func TestService_SignOut(t *testing.T) {
 	emptyRows := sqlmock.NewRows([]string{"id", "phone_country_code", "phone_number", "password", "salt"}).
 		AddRow(nil, nil, nil, nil, nil)
 
+	type mapClaims jwt.MapClaims
+
 	type any interface{}
 
-	contextTest := make(map[interface{}]any)
+
+	contextTest := make(jwt.MapClaims)
 	contextTest["exp"] = 1.558773859e+09
 	contextTest["iat"] = 1.558514659e+09
 	contextTest["iss"] = "zeno/api"
 	contextTest["nbf"] = 1.558514659e+09
-	contextTest["raw"] = map[interface{}]interface{}{
+	contextTest["raw"] =map[string]interface{} {
 		"id":   "",
 		"name": "test@mail.ru",
 	}
 	contextTest["sub"] = "zeno"
 
 
-
+	fmt.Println(reflect.TypeOf(contextTest))
 ctx:=context.WithValue(context.Background(), "nori.auth.data", contextTest)
 
 	mock.ExpectQuery("SELECT id, phone_country_code, phone_number, password,salt FROM auth WHERE concat(phone_country_code,phone_number)=?  LIMIT 1").WillReturnRows(emptyRows)

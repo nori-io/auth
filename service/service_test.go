@@ -426,8 +426,8 @@ func TestService_SignOut(t *testing.T) {
 	contextTest["sub"] = "zeno"
 
 
-    ctx:=context.TODO()
-    ctx.Value(contextTest)
+
+ctx:=context.WithValue(context.Background(), "nori.auth.data", contextTest)
 
 	mock.ExpectQuery("SELECT id, phone_country_code, phone_number, password,salt FROM auth WHERE concat(phone_country_code,phone_number)=?  LIMIT 1").WillReturnRows(emptyRows)
 

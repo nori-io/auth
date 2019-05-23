@@ -45,8 +45,8 @@ func TestAuthenticationHistory_Update(t *testing.T) {
 	}
 	defer mockDatabase.Close()
 	defer mock.ExpectClose()
-	mock.ExpectExec("UPDATE authentication_history SET user_id = ?, signin = ?, meta = ?, signout = ?  WHERE id = ? ").
-		WithArgs(11, AnyTime{}, "", AnyTime{}, 11).WillReturnResult(sqlmock.NewResult(11, 0))
+	mock.ExpectExec("UPDATE authentication_history SET  signout = ?   WHERE user_id = ? ORDER BY id DESC LIMIT 1").
+		WithArgs(AnyTime{}, 11).WillReturnResult(sqlmock.NewResult(11, 0))
 
 	d := database.DB(mockDatabase, logrus.New())
 

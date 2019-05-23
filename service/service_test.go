@@ -411,31 +411,34 @@ func TestService_SignOut(t *testing.T) {
 
 	respExpected := service.SignOutResponse{HttpStatusCode: 0, Err: nil}
 
-	emptyRows := sqlmock.NewRows([]string{"id", "phone_country_code", "phone_number", "password", "salt"}).
-		AddRow(nil, nil, nil, nil, nil)
-
 	type mapClaims jwt.MapClaims
 
 	type any interface{}
-
 
 	contextTest := make(jwt.MapClaims)
 	contextTest["exp"] = 1.558773859e+09
 	contextTest["iat"] = 1.558514659e+09
 	contextTest["iss"] = "zeno/api"
 	contextTest["nbf"] = 1.558514659e+09
-	contextTest["raw"] =map[string]interface{} {
+	contextTest["raw"] = map[string]interface{}{
 		"id":   "",
 		"name": "test@mail.ru",
 	}
 	contextTest["sub"] = "zeno"
 
-
 	fmt.Println(reflect.TypeOf(contextTest))
-ctx:=context.WithValue(context.Background(), "nori.auth.data", contextTest)
+	ctx := context.WithValue(context.Background(), "nori.auth.data", contextTest)
 
-	mock.ExpectQuery("SELECT id, phone_country_code, phone_number, password,salt FROM auth WHERE concat(phone_country_code,phone_number)=?  LIMIT 1").WillReturnRows(emptyRows)
+	nonEmptyRows := sqlmock.NewRows([]string{"id", "email", "password", "salt"}).
+		AddRow(1, "test@mail.ru", "pass", "salt")
 
+	mock.ExpectQuery("SELECT id, email,password,salt FROM auth WHERE email = ? LIMIT 1").
+		WithArgs("test@mail.ru").WillReturnRows(nonEmptyRows)
+
+	mock.ExpectExec("UPDATE authentication_history SET  signout = ?   WHERE user_id = ? ORDER BY id DESC LIMIT 1").
+		WithArgs(AnyTime{}, 1).WillReturnResult(sqlmock.NewResult(1, 0))
+
+	session.On("Save", session.SessionId(ctx))
 	resp := serviceTest.SignOut(ctx, signOutRequest)
 
 	//map[exp:1.558773859e+09 iat:1.558514659e+09 iss:zeno/api jti:NhT5PDmkMGYyi5m3UoXuPI2n17RclO4n nbf:1.558514659e+09 raw:map[id: name:test6@mail.ru] sub:zeno]

@@ -249,7 +249,6 @@ func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOu
 
 	var name string
 
-
 	if val, ok := value.(jwt.MapClaims)["raw"]; ok {
 		reflect.TypeOf(val)
 		if val2, ok2 := val.(map[string]interface{})["name"]; ok2 {
@@ -272,12 +271,12 @@ func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOu
 	}
 
 	var UserIdTemp uint64
-	if modelFindEmail.Id != 0 {
+	if (modelFindEmail != nil) && (modelFindEmail.Id != 0) {
 		UserIdTemp = modelFindEmail.Id
 
 	}
 
-	if modelFindPhone.Id != 0 {
+	if (modelFindPhone != nil) && (modelFindPhone.Id != 0) {
 
 		UserIdTemp = modelFindPhone.Id
 

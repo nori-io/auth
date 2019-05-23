@@ -399,7 +399,7 @@ func TestService_SignOut(t *testing.T) {
 
 	cache := &mocks.Cache{}
 	cfg := &service.Config{}
-	mockDatabase,mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	mockDatabase, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	db := database.DB(mockDatabase, logrus.New())
 	mail := &mocks.Mail{}
 	session := &mocks.Session{}
@@ -414,29 +414,28 @@ func TestService_SignOut(t *testing.T) {
 
 	type any interface{}
 
-	contextTest:=make (map[interface{}]any)
-	contextTest["exp"]=1.558773859e+09
-	contextTest["iat"]=1.558514659e+09
-	contextTest["iss"]="zeno/api"
-	contextTest["nbf"]=1.558514659e+09
-	contextTest["raw"]=map[interface{}]interface{}{
-		"id": "",
+	contextTest := make(map[interface{}]any)
+	contextTest["exp"] = 1.558773859e+09
+	contextTest["iat"] = 1.558514659e+09
+	contextTest["iss"] = "zeno/api"
+	contextTest["nbf"] = 1.558514659e+09
+	contextTest["raw"] = map[interface{}]interface{}{
+		"id":   "",
 		"name": "test@mail.ru",
 	}
-	contextTest["sub"]="zeno"
+	contextTest["sub"] = "zeno"
 
+	var ctx context.Context
 
-
+	ctx.Value(&contextTest)
 
 	mock.ExpectQuery("SELECT id, phone_country_code, phone_number, password,salt FROM auth WHERE concat(phone_country_code,phone_number)=?  LIMIT 1").WillReturnRows(emptyRows)
 
-
-	resp:=serviceTest.SignOut(context.WithValue(context.Background(), contextTest, contextTest), signOutRequest)
+	resp := serviceTest.SignOut(ctx, signOutRequest)
 
 	//map[exp:1.558773859e+09 iat:1.558514659e+09 iss:zeno/api jti:NhT5PDmkMGYyi5m3UoXuPI2n17RclO4n nbf:1.558514659e+09 raw:map[id: name:test6@mail.ru] sub:zeno]
 	//ctx:=context.Context.Value("")
 	assert.Equal(t, respExpected, resp)
-
 
 }
 

@@ -242,6 +242,8 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 
 func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOutResponse) {
 
+	fmt.Println("ctx is", ctx)
+
 	resp = &SignOutResponse{}
 
 	value := ctx.Value("nori.auth.data")

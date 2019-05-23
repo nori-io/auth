@@ -9,6 +9,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	rest "github.com/cheebo/gorest"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/nori-io/nori-common/mocks"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -412,7 +413,29 @@ func TestService_SignOut(t *testing.T) {
 	emptyRows := sqlmock.NewRows([]string{"id", "phone_country_code", "phone_number", "password", "salt"}).
 		AddRow(nil, nil, nil, nil, nil)
 
+	m:=map[string][interface{}]{
+		"exp": 1.558773859e+09,
+		"iat":1.558514659e+09,
+		"iss":"zeno/api",
+		"nbf:"1.558514659e+09,
+		"raw": map[interface{}]interface{}{
+			"id": "",
+			"name": "test@mail.ru",
+		},
+		"sub":"zeno",
+	}
+
+	
+
 	mock.ExpectQuery("SELECT id, phone_country_code, phone_number, password,salt FROM auth WHERE concat(phone_country_code,phone_number)=?  LIMIT 1").WillReturnRows(emptyRows)
+    mapContext= map[jwt.MapClaims]map[string]interface{}
+	if val, ok := value.(jwt.MapClaims)["raw"]; ok {
+		if val2, ok2 := val.(map[string]interface{})["name"]; ok2 {
+			name = fmt.Sprint(val2)
+		}
+
+	}
+    ctx:=new(jwt.MapClaims)
 	//map[exp:1.558773859e+09 iat:1.558514659e+09 iss:zeno/api jti:NhT5PDmkMGYyi5m3UoXuPI2n17RclO4n nbf:1.558514659e+09 raw:map[id: name:test6@mail.ru] sub:zeno]
 	//ctx:=context.Context.Value("")
 	resp := serviceTest.SignOut(context.Background(), signOutRequest)

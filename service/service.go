@@ -303,6 +303,8 @@ func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOu
 
 	s.session.Delete(s.session.SessionId(ctx))
 
+
+
 	return resp
 }
 

@@ -408,7 +408,7 @@ func TestService_SignOut(t *testing.T) {
 	serviceTest := service.NewService(auth, cache, cfg, db, new(logrus.Logger), mail, session)
 	signOutRequest := service.SignOutRequest{Name: "1234567890"}
 
-	respExpected := service.SignOutResponse{HttpStatusCode: 0, Err: nil}
+	respExpected := &service.SignOutResponse{HttpStatusCode: 0, Err: nil}
 
 	type mapClaims jwt.MapClaims
 
@@ -437,12 +437,12 @@ func TestService_SignOut(t *testing.T) {
 	mock.ExpectExec("UPDATE authentication_history SET  signout = ?   WHERE user_id = ? ORDER BY id DESC LIMIT 1").
 		WithArgs(AnyTime{}, 1).WillReturnResult(sqlmock.NewResult(1, 0))
 
-	session.On("Delete",session.On("SessionId", ctx).Return("irf7VYww6w57KzlVELHp6DvzCNiLjgqU")).Return(nil)
+	session.On("Delete", []byte("irf7VYww6w57KzlVELHp6DvzCNiLjgqU")).Return(nil)
+
+	session.On("SessionId", ctx).Return([]byte("irf7VYww6w57KzlVELHp6DvzCNiLjgqU"))
 
 	resp := serviceTest.SignOut(ctx, signOutRequest)
 
-	//map[exp:1.558773859e+09 iat:1.558514659e+09 iss:zeno/api jti:NhT5PDmkMGYyi5m3UoXuPI2n17RclO4n nbf:1.558514659e+09 raw:map[id: name:test6@mail.ru] sub:zeno]
-	//ctx:=context.Context.Value("")
 	assert.Equal(t, respExpected, resp)
 
 }

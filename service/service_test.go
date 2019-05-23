@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql/driver"
 	"fmt"
-	"reflect"
 	"testing"
 	"time"
 
@@ -426,8 +425,8 @@ func TestService_SignOut(t *testing.T) {
 	}
 	contextTest["sub"] = "zeno"
 
-	fmt.Println(reflect.TypeOf(contextTest))
-	ctx := context.WithValue(context.Background(), "nori.auth.data", contextTest)
+	ctxAuthData := context.WithValue(context.Background(), "nori.auth.data", contextTest)
+	ctx:=context.WithValue(ctxAuthData, "nori.session.id","irf7VYww6w57KzlVELHp6DvzCNiLjgqU")
 
 	nonEmptyRows := sqlmock.NewRows([]string{"id", "email", "password", "salt"}).
 		AddRow(1, "test@mail.ru", "pass", "salt")
@@ -438,7 +437,8 @@ func TestService_SignOut(t *testing.T) {
 	mock.ExpectExec("UPDATE authentication_history SET  signout = ?   WHERE user_id = ? ORDER BY id DESC LIMIT 1").
 		WithArgs(AnyTime{}, 1).WillReturnResult(sqlmock.NewResult(1, 0))
 
-	session.On("Save", session.SessionId(ctx))
+	session.On("Delete",session.On("SessionId", ctx).Return("irf7VYww6w57KzlVELHp6DvzCNiLjgqU")).Return(nil)
+
 	resp := serviceTest.SignOut(ctx, signOutRequest)
 
 	//map[exp:1.558773859e+09 iat:1.558514659e+09 iss:zeno/api jti:NhT5PDmkMGYyi5m3UoXuPI2n17RclO4n nbf:1.558514659e+09 raw:map[id: name:test6@mail.ru] sub:zeno]

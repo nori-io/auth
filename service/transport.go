@@ -13,6 +13,8 @@ type PluginParameters struct {
 	UserRegistrationByPhoneNumber  bool
 	UserRegistrationByEmailAddress bool
 	UserMfaTypeParameter           string
+	MailActivationCodeUsingParameter	bool
+	MailActivationTimeMinutes uint
 }
 
 func Transport(
@@ -31,13 +33,17 @@ func Transport(
 	}
 
 	signupHandler := http.NewServer(
-		MakeSignUpEndpoint(srv),
+		MakeSignUpEndpoint(srv, parameters),
 		DecodeSignUpRequest(PluginParameters{
 			UserTypeParameter:              parameters.UserTypeParameter,
 			UserTypeDefaultParameter:       parameters.UserTypeDefaultParameter,
 			UserRegistrationByPhoneNumber:  parameters.UserRegistrationByPhoneNumber,
 			UserRegistrationByEmailAddress: parameters.UserRegistrationByEmailAddress,
 			UserMfaTypeParameter:           parameters.UserMfaTypeParameter,
+			MailActivationCodeUsingParameter: parameters.MailActivationCodeUsingParameter,
+			MailActivationTimeMinutes:parameters.MailActivationTimeMinutes,
+
+
 		}),
 		http.EncodeJSONResponse,
 	)

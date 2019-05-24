@@ -26,7 +26,7 @@ func TestUsers_Create_userEmail(t *testing.T) {
 	mock.ExpectBegin()
 
 	mock.ExpectPrepare("INSERT INTO").
-		ExpectExec().WithArgs("active", "vendor", AnyTime{}, AnyTime{}).
+		ExpectExec().WithArgs("locked", "vendor", AnyTime{}, AnyTime{}).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	rows := sqlmock.NewRows([]string{"id"}).

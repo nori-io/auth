@@ -33,6 +33,7 @@ func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {
 		UserRegistrationByEmailAddress: cm.Bool("user.registration_email_address", "user.registration_email_address value"),
 		UserMfaType:                    cm.String("user.mfa_type", "user.mfa_type value"),
 		MailActivationTimeMinutes:      cm.UInt("mail.activation_time_minutes", "mail.activation_time_minutes value"),
+		MailActivationCodeUsing:cm.Bool("mail.actication_code_using", "mail.actication_code_using"),
 	}
 	return nil
 }

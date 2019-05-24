@@ -15,7 +15,7 @@ import (
 )
 
 type Service interface {
-	SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpResponse)
+	SignUp(ctx context.Context, req SignUpRequest, parameters PluginParameters) (resp *SignUpResponse)
 	SignIn(ctx context.Context, req SignInRequest, parameters PluginParameters) (resp *SignInResponse)
 	SignOut(ctx context.Context, req SignOutRequest) (resp *SignOutResponse)
 	RecoveryCodes(ctx context.Context, req RecoveryCodesRequest) (resp *RecoveryCodesResponse)
@@ -30,6 +30,7 @@ type Config struct {
 	UserRegistrationByEmailAddress func() bool
 	UserMfaType                    func() string
 	MailActivationTimeMinutes      func() uint
+	MailActivationCodeUsing			   func() bool
 }
 
 type service struct {
@@ -66,7 +67,7 @@ func NewService(
 	}
 }
 
-func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpResponse) {
+func (s *service) SignUp(ctx context.Context, req SignUpRequest, parameters PluginParameters) (resp *SignUpResponse) {
 
 	var err error
 	var modelAuth *database.AuthModel
@@ -113,6 +114,11 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 		PhoneNumber:      req.PhoneNumber,
 	}
 
+	if parameters.MailActivationCodeUsingParameter==true{
+		modelUsers.Status_account="locked"
+	}else{
+		modelUsers.Status_account="active"
+	}
 	modelUsers = &database.UsersModel{
 		Type:     req.Type,
 		Mfa_type: req.MfaType,

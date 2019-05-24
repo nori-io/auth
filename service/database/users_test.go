@@ -36,7 +36,7 @@ func TestUsers_Create_userEmail(t *testing.T) {
 
 	mock.ExpectPrepare("INSERT INTO").
 		ExpectExec().
-		WithArgs(20, "users_create_email_test@mail.ru", "users_create_email_pass", "users_create_email_salt", AnyTime{}, AnyTime{}, false, false).
+		WithArgs(20, "users_create_email_test@example.com", "users_create_email_pass", "users_create_email_salt", AnyTime{}, AnyTime{}, false, false).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	mock.ExpectCommit()
@@ -44,7 +44,7 @@ func TestUsers_Create_userEmail(t *testing.T) {
 	d := database.DB(mockDatabase, logrus.New())
 
 	err = d.Users().Create(&database.AuthModel{
-		Email:    "users_create_email_test@mail.ru",
+		Email:    "users_create_email_test@example.com",
 		Password: []byte("users_create_email_pass"),
 		Salt:     []byte("users_create_email_salt"),
 	}, &database.UsersModel{

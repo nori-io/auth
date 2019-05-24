@@ -13,7 +13,7 @@ func TestSignUpRequest_ValidateMail(t *testing.T) {
 	r := service.SignUpRequest{Email: "a"}
 	a.Equal(r.ValidateMail(), false)
 
-	r = service.SignUpRequest{Email: "test@mail.ru"}
+	r = service.SignUpRequest{Email: "test@example.com"}
 	a.Equal(r.ValidateMail(), true)
 
 }
@@ -44,7 +44,7 @@ func TestSignUpRequest_ValidatePhone(t *testing.T) {
 
 func TestSignUpRequest_Validate(t *testing.T) {
 	a := assert.New(t)
-	r := service.SignUpRequest{Email: "test@mail.ru", Password: "pass"}
+	r := service.SignUpRequest{Email: "test@example.com", Password: "pass"}
 	a.Equal(r.Validate(), nil)
 
 }

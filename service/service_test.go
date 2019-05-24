@@ -39,7 +39,7 @@ func TestService_SignUp_Email_UserExists(t *testing.T) {
 	session := &mocks.Session{}
 
 	serviceTest := service.NewService(auth, cache, cfg, db, new(logrus.Logger), mail, session)
-	signUpRequest := service.SignUpRequest{Email: "test@mail.ru", Password: "pass"}
+	signUpRequest := service.SignUpRequest{Email: "test@example.com", Password: "pass"}
 	errField := rest.ErrFieldResp{
 		Meta: rest.ErrFieldRespMeta{
 			ErrCode:    0,
@@ -48,13 +48,13 @@ func TestService_SignUp_Email_UserExists(t *testing.T) {
 	}
 	errField.AddError("phone, email", 400, "User already exists.")
 
-	respExpected := service.SignUpResponse{Email: "test@mail.ru", PhoneNumber: "", PhoneCountryCode: "", Err: errField}
+	respExpected := service.SignUpResponse{Email: "test@example.com", PhoneNumber: "", PhoneCountryCode: "", Err: errField}
 
 	nonEmptyRows := sqlmock.NewRows([]string{"id", "email", "password", "salt"}).
-		AddRow(1, "test@mail.ru", "pass", "salt")
+		AddRow(1, "test@example.com", "pass", "salt")
 
 	mock.ExpectQuery("SELECT id, email,password,salt FROM auth WHERE email = ? LIMIT 1").
-		WithArgs("test@mail.ru").WillReturnRows(nonEmptyRows)
+		WithArgs("test@example.com").WillReturnRows(nonEmptyRows)
 
 	resp := serviceTest.SignUp(context.Background(), signUpRequest)
 
@@ -72,9 +72,9 @@ func TestService_SignUp_Email_UserNotExist(t *testing.T) {
 	session := &mocks.Session{}
 
 	serviceTest := service.NewService(auth, cache, cfg, db, new(logrus.Logger), mail, session)
-	signUpRequest := service.SignUpRequest{Email: "test@mail.ru", Password: "pass"}
+	signUpRequest := service.SignUpRequest{Email: "test@example.com", Password: "pass"}
 
-	respExpected := service.SignUpResponse{Email: "test@mail.ru", PhoneNumber: "", PhoneCountryCode: "", Err: nil}
+	respExpected := service.SignUpResponse{Email: "test@example.com", PhoneNumber: "", PhoneCountryCode: "", Err: nil}
 
 	emptyRows := sqlmock.NewRows([]string{"id", "email", "password", "salt"}).
 		AddRow(nil, nil, nil, nil)
@@ -93,7 +93,7 @@ func TestService_SignUp_Email_UserNotExist(t *testing.T) {
 
 	mock.ExpectPrepare("INSERT INTO auth (user_id, email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?)").
 		ExpectExec().
-		WithArgs(1, "test@mail.ru", AnyByteArray{}, AnyByteArray{}, AnyTime{}, AnyTime{}, false, false).
+		WithArgs(1, "test@example.com", AnyByteArray{}, AnyByteArray{}, AnyTime{}, AnyTime{}, false, false).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	mock.ExpectCommit()
@@ -196,9 +196,9 @@ func TestService_SignIn_Email_UserExist_CorrectPassword(t *testing.T) {
 	session := &mocks.Session{}
 
 	serviceTest := service.NewService(auth, cache, cfg, db, new(logrus.Logger), mail, session)
-	signInRequest := service.SignInRequest{Name: "test@mail.ru", Password: "pass"}
+	signInRequest := service.SignInRequest{Name: "test@example.com", Password: "pass"}
 
-	respExpected := service.SignInResponse{Id: 1, User: service.UserResponse{UserName: "test@mail.ru"}, HttpStatusCode: 0, Token: mock2.Anything}
+	respExpected := service.SignInResponse{Id: 1, User: service.UserResponse{UserName: "test@example.com"}, HttpStatusCode: 0, Token: mock2.Anything}
 
 	salt, err := database.CreateSalt()
 	if err != nil {
@@ -208,10 +208,10 @@ func TestService_SignIn_Email_UserExist_CorrectPassword(t *testing.T) {
 	password, err := database.Hash([]byte("pass"), salt)
 
 	nonEmptyRows := sqlmock.NewRows([]string{"id", "email", "password", "salt"}).
-		AddRow(1, "test@mail.ru", password, salt)
+		AddRow(1, "test@example.com", password, salt)
 
 	mock.ExpectQuery("SELECT id, email,password,salt FROM auth WHERE email = ? LIMIT 1").
-		WithArgs("test@mail.ru").WillReturnRows(nonEmptyRows)
+		WithArgs("test@example.com").WillReturnRows(nonEmptyRows)
 
 	mock.ExpectExec("INSERT INTO authentication_history (user_id, signin, meta) VALUES(?,?,?)").
 		WithArgs(1, AnyTime{}, "").WillReturnResult(sqlmock.NewResult(1, 1))
@@ -225,7 +225,7 @@ func TestService_SignIn_Email_UserExist_CorrectPassword(t *testing.T) {
 
 }
 
-func TestService_SignIn_Email_UserExist_UnCorrectPassword(t *testing.T) {
+func TestService_SignIn_Email_UserExist_IncorrectPassword(t *testing.T) {
 	auth := &mocks.Auth{}
 
 	cache := &mocks.Cache{}
@@ -236,10 +236,10 @@ func TestService_SignIn_Email_UserExist_UnCorrectPassword(t *testing.T) {
 	session := &mocks.Session{}
 
 	serviceTest := service.NewService(auth, cache, cfg, db, new(logrus.Logger), mail, session)
-	signInRequest := service.SignInRequest{Name: "test@mail.ru", Password: "pass"}
-	Err := rest.ErrResp{Meta: rest.ErrMeta{ErrMessage: "Uncorrect Password", ErrCode: 0}}
+	signInRequest := service.SignInRequest{Name: "test@example.com", Password: "pass"}
+	Err := rest.ErrResp{Meta: rest.ErrMeta{ErrMessage: "Incorrect Password", ErrCode: 0}}
 
-	respExpected := service.SignInResponse{Id: 1, User: service.UserResponse{UserName: "test@mail.ru"}, HttpStatusCode: 0, Err: Err}
+	respExpected := service.SignInResponse{Id: 1, User: service.UserResponse{UserName: "test@example.com"}, HttpStatusCode: 0, Err: Err}
 
 	salt, err := database.CreateSalt()
 	if err != nil {
@@ -249,10 +249,10 @@ func TestService_SignIn_Email_UserExist_UnCorrectPassword(t *testing.T) {
 	password, err := database.Hash([]byte("pass1"), salt)
 
 	nonEmptyRows := sqlmock.NewRows([]string{"id", "email", "password", "salt"}).
-		AddRow(1, "test@mail.ru", password, salt)
+		AddRow(1, "test@example.com", password, salt)
 
 	mock.ExpectQuery("SELECT id, email,password,salt FROM auth WHERE email = ? LIMIT 1").
-		WithArgs("test@mail.ru").WillReturnRows(nonEmptyRows)
+		WithArgs("test@example.com").WillReturnRows(nonEmptyRows)
 
 	pluginParamaters := service.PluginParameters{UserRegistrationByEmailAddress: true}
 	resp := serviceTest.SignIn(context.Background(), signInRequest, pluginParamaters)
@@ -261,7 +261,7 @@ func TestService_SignIn_Email_UserExist_UnCorrectPassword(t *testing.T) {
 
 }
 
-func TestService_SignIn_Email_UserExist_UnCorrectUserName(t *testing.T) {
+func TestService_SignIn_Email_UserExist_IncorrectUserName(t *testing.T) {
 	auth := &mocks.Auth{}
 
 	cache := &mocks.Cache{}
@@ -272,11 +272,11 @@ func TestService_SignIn_Email_UserExist_UnCorrectUserName(t *testing.T) {
 	session := &mocks.Session{}
 
 	serviceTest := service.NewService(auth, cache, cfg, db, new(logrus.Logger), mail, session)
-	signInRequest := service.SignInRequest{Name: "testNot@mail.ru", Password: "pass"}
+	signInRequest := service.SignInRequest{Name: "testNot@example.com", Password: "pass"}
 
 	Err := rest.ErrResp{Meta: rest.ErrMeta{ErrMessage: "User not found", ErrCode: 0}}
 
-	respExpected := service.SignInResponse{Id: 0, User: service.UserResponse{UserName: "testNot@mail.ru"}, HttpStatusCode: 0, Err: Err}
+	respExpected := service.SignInResponse{Id: 0, User: service.UserResponse{UserName: "testNot@example.com"}, HttpStatusCode: 0, Err: Err}
 
 	emptyRows := sqlmock.NewRows([]string{"id", "email", "password", "salt"}).
 		AddRow(nil, nil, nil, nil)
@@ -328,7 +328,7 @@ func TestService_SignIn_Phone_UserExist_CorrectPassword(t *testing.T) {
 	assert.Equal(t, &respExpected, resp)
 }
 
-func TestService_SignIn_Phone_UserExist_UnCorrectPassword(t *testing.T) {
+func TestService_SignIn_Phone_UserExist_IncorrectPassword(t *testing.T) {
 	auth := &mocks.Auth{}
 
 	cache := &mocks.Cache{}
@@ -340,7 +340,7 @@ func TestService_SignIn_Phone_UserExist_UnCorrectPassword(t *testing.T) {
 
 	serviceTest := service.NewService(auth, cache, cfg, db, new(logrus.Logger), mail, session)
 	signInRequest := service.SignInRequest{Name: "1234567890", Password: "pass"}
-	Err := rest.ErrResp{Meta: rest.ErrMeta{ErrMessage: "Uncorrect Password", ErrCode: 0}}
+	Err := rest.ErrResp{Meta: rest.ErrMeta{ErrMessage: "Incorrect Password", ErrCode: 0}}
 
 	respExpected := service.SignInResponse{Id: 1, User: service.UserResponse{UserName: "1234567890"}, HttpStatusCode: 0, Err: Err}
 
@@ -364,7 +364,7 @@ func TestService_SignIn_Phone_UserExist_UnCorrectPassword(t *testing.T) {
 
 }
 
-func TestService_SignIn_Phone_UserExist_UnCorrectUserName(t *testing.T) {
+func TestService_SignIn_Phone_UserExist_IncorrectUserName(t *testing.T) {
 	auth := &mocks.Auth{}
 
 	cache := &mocks.Cache{}
@@ -415,24 +415,24 @@ func TestService_SignOut(t *testing.T) {
 	type any interface{}
 
 	contextTest := make(jwt.MapClaims)
-	contextTest["exp"] = 1.558773859e+09
-	contextTest["iat"] = 1.558514659e+09
-	contextTest["iss"] = "zeno/api"
-	contextTest["nbf"] = 1.558514659e+09
+	contextTest["exp"] = time.Now().Hour() + time.Now().Minute() + time.Now().Second()
+	contextTest["iat"] = time.Now().Hour() + time.Now().Minute() + time.Now().Second()
+	contextTest["iss"] = "nori/api"
+	contextTest["nbf"] = time.Now().Hour() + time.Now().Minute() + time.Now().Second()
 	contextTest["raw"] = map[string]interface{}{
 		"id":   "",
-		"name": "test@mail.ru",
+		"name": "test@example.com",
 	}
-	contextTest["sub"] = "zeno"
+	contextTest["sub"] = "nori"
 
 	ctxAuthData := context.WithValue(context.Background(), "nori.auth.data", contextTest)
-	ctx:=context.WithValue(ctxAuthData, "nori.session.id","irf7VYww6w57KzlVELHp6DvzCNiLjgqU")
+	ctx := context.WithValue(ctxAuthData, "nori.session.id", "irf7VYww6w57KzlVELHp6DvzCNiLjgqU")
 
 	nonEmptyRows := sqlmock.NewRows([]string{"id", "email", "password", "salt"}).
-		AddRow(1, "test@mail.ru", "pass", "salt")
+		AddRow(1, "test@example.com", "pass", "salt")
 
 	mock.ExpectQuery("SELECT id, email,password,salt FROM auth WHERE email = ? LIMIT 1").
-		WithArgs("test@mail.ru").WillReturnRows(nonEmptyRows)
+		WithArgs("test@example.com").WillReturnRows(nonEmptyRows)
 
 	mock.ExpectExec("UPDATE authentication_history SET  signout = ?   WHERE user_id = ? ORDER BY id DESC LIMIT 1").
 		WithArgs(AnyTime{}, 1).WillReturnResult(sqlmock.NewResult(1, 0))
@@ -462,7 +462,7 @@ func TestService_SignOut(t *testing.T) {
 
 	//serviceTest := service.NewService(auth, cache, cfg, db, new(logrus.Logger), mail, session)
 
-	//SignUpRequest:=service.SignUpRequest{Email:"test@mail.ru", Password:"pass", Type:"vendor"}
+	//SignUpRequest:=service.SignUpRequest{Email:"test@example.com", Password:"pass", Type:"vendor"}
 
 	//serviceTest.SignUp(context.Background(), SignUpRequest)
 

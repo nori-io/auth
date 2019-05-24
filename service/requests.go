@@ -53,7 +53,7 @@ func (r SignUpRequest) ValidateMfaType() error {
 
 		return rest.ErrFieldResp{
 			Meta: rest.ErrFieldRespMeta{
-				ErrMessage: "Uncorrect multifactor authentication type",
+				ErrMessage: "Incorrect multifactor authentication type",
 			},
 		}
 	}

@@ -37,7 +37,7 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 			if !body.ValidateMail() {
 
 				errorResponse.AddError("email", 0,
-					"Mail address' format is uncorrect")
+					"Mail address' format is Incorrect")
 			}
 
 		}
@@ -47,13 +47,13 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 
 			if errPhoneCountryCode != nil {
 				errorResponse.AddError("phone_country_code", 0,
-					"Country code's format is uncorrect")
+					"Country code's format is Incorrect")
 
 			}
 
 			if errPhoneNumber != nil {
 				errorResponse.AddError("phone_number", 0,
-					"Phone number's format is uncorrect ")
+					"Phone number's format is Incorrect ")
 			}
 
 		}
@@ -63,20 +63,20 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 			if body.Email != "" {
 				if !body.ValidateMail() {
 					errorResponse.AddError("email", 0,
-						"Mail address' format is uncorrect")
+						"Mail address' format is Incorrect")
 				}
 			}
 			if len(body.PhoneCountryCode+body.PhoneNumber) != 0 {
 				if errPhoneCountryCode != nil {
 					errorResponse.AddError("phone_country_code", 0,
-						"Country code's format is uncorrect")
+						"Country code's format is Incorrect")
 
 				}
 			}
 
 			if errPhoneNumber != nil {
 				errorResponse.AddError("phone_number", 0,
-					"Phone number's format is uncorrect ")
+					"Phone number's format is Incorrect ")
 			}
 
 		}
@@ -88,7 +88,7 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 
 		if !((parameters.UserMfaTypeParameter == "") || (parameters.UserMfaTypeParameter == MfaTypeSMS) || (parameters.UserMfaTypeParameter == MfaTypeOTP)) {
 			errorResponse.AddError("mfa_type", 0,
-				"Uncorrect mfa type")
+				"Incorrect mfa type")
 		}
 
 		if len(body.Meta) == 0 {

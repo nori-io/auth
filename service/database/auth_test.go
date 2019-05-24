@@ -23,7 +23,7 @@ func TestAuth_Update(t *testing.T) {
 	err = d.Auth().Update_Email(&database.AuthModel{
 		Id:       1,
 		UserId:   1,
-		Email:    "auth_update_@mail.ru",
+		Email:    "auth_update_@example.com",
 		Password: []byte("auth_update_pass"),
 		Salt:     []byte("auth_update_salt"),
 	})
@@ -42,13 +42,13 @@ func TestAuth_FindByEmail(t *testing.T) {
 	}
 
 	nonEmptyRows := sqlmock.NewRows([]string{"id", "email", "password"}).
-		AddRow(2, "auth_find_by_email_test@mail.ru", "auth_find_by_email_pass")
+		AddRow(2, "auth_find_by_email_test@example.com", "auth_find_by_email_pass")
 
-	mock.ExpectQuery("SELECT id, email,password, salt FROM auth WHERE email = ? LIMIT 1").WithArgs("auth_find_by_email_test@mail.ru").WillReturnRows(nonEmptyRows)
+	mock.ExpectQuery("SELECT id, email,password, salt FROM auth WHERE email = ? LIMIT 1").WithArgs("auth_find_by_email_test@example.com").WillReturnRows(nonEmptyRows)
 
 	d := database.DB(mockDatabase, logrus.New())
 
-	_, err = d.Auth().FindByEmail("auth_find_by_email_test@mail.ru")
+	_, err = d.Auth().FindByEmail("auth_find_by_email_test@example.com")
 
 	// we make sure that all expectations were met
 	if err := mock.ExpectationsWereMet(); err != nil {

@@ -179,7 +179,7 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 	if (!result) || (err != nil) {
 		resp.Id = userId
 		resp.User.UserName = req.Name
-		resp.Err = rest.ErrResp{Meta: rest.ErrMeta{ErrMessage: "Uncorrect Password", ErrCode: 0}}
+		resp.Err = rest.ErrResp{Meta: rest.ErrMeta{ErrMessage: "Incorrect Password", ErrCode: 0}}
 
 		return resp
 	}
@@ -302,8 +302,6 @@ func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOu
 	}
 
 	s.session.Delete(s.session.SessionId(ctx))
-
-
 
 	return resp
 }

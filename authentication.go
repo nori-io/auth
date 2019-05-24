@@ -25,15 +25,15 @@ func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {
 	configManager.Register(p.Meta())
 	cm := configManager.Register(p.Meta())
 	p.config = &service.Config{
-		Sub:                            cm.String("jwt.sub", "jwt.sub value"),
-		Iss:                            cm.String("jwt.iss", "jwt.iss value"),
-		UserType:                       cm.Slice("user.type", ",", "no"),
-		UserTypeDefault:                cm.String("user.type_default", "user.type_default value"),
-		UserRegistrationByPhoneNumber:  cm.Bool("user.registration_phone_number", "user.registration_phone_number value"),
-		UserRegistrationByEmailAddress: cm.Bool("user.registration_email_address", "user.registration_email_address value"),
-		UserMfaType:                    cm.String("user.mfa_type", "user.mfa_type value"),
-		MailActivationTimeMinutes:      cm.UInt("mail.activation_time_minutes", "mail.activation_time_minutes value"),
-		MailActivationCodeUsing:cm.Bool("mail.actication_code_using", "mail.actication_code_using"),
+		Sub:                                cm.String("jwt.sub", "jwt.sub value"),
+		Iss:                                cm.String("jwt.iss", "jwt.iss value"),
+		UserType:                           cm.Slice("user.type", ",", "no"),
+		UserTypeDefault:                    cm.String("user.type_default", "user.type_default value"),
+		UserRegistrationByPhoneNumber:      cm.Bool("user.registration_phone_number", "user.registration_phone_number value"),
+		UserRegistrationByEmailAddress:     cm.Bool("user.registration_email_address", "user.registration_email_address value"),
+		UserMfaType:                        cm.String("user.mfa_type", "user.mfa_type value"),
+		ActivationTimeForActivationMinutes: cm.UInt("activation.time_for_activation_minutes", "activation.time_for_activation_minutes value"),
+		ActivationCode:                     cm.Bool("actication.code", "actication.code value"),
 	}
 	return nil
 }

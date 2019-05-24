@@ -22,15 +22,15 @@ type Service interface {
 }
 
 type Config struct {
-	Sub                            func() string
-	Iss                            func() string
-	UserType                       func() []interface{}
-	UserTypeDefault                func() string
-	UserRegistrationByPhoneNumber  func() bool
-	UserRegistrationByEmailAddress func() bool
-	UserMfaType                    func() string
-	MailActivationTimeMinutes      func() uint
-	MailActivationCodeUsing			   func() bool
+	Sub                                func() string
+	Iss                                func() string
+	UserType                           func() []interface{}
+	UserTypeDefault                    func() string
+	UserRegistrationByPhoneNumber      func() bool
+	UserRegistrationByEmailAddress     func() bool
+	UserMfaType                        func() string
+	ActivationTimeForActivationMinutes func() uint
+	ActivationCode                     func() bool
 }
 
 type service struct {
@@ -114,14 +114,14 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest, parameters Plug
 		PhoneNumber:      req.PhoneNumber,
 	}
 
-	if parameters.MailActivationCodeUsingParameter==true{
-		modelUsers.Status_account="locked"
-	}else{
-		modelUsers.Status_account="active"
-	}
 	modelUsers = &database.UsersModel{
 		Type:     req.Type,
 		Mfa_type: req.MfaType,
+	}
+	if parameters.ActivationCode {
+		modelUsers.Status_account = "locked"
+	} else {
+		modelUsers.Status_account = "active"
 	}
 	err = s.db.Users().Create(modelAuth, modelUsers)
 	if err != nil {

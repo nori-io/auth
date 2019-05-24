@@ -32,7 +32,7 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		}
 		defer stmt.Close()
 
-		_, execErr := stmt.Exec("locked", modelUsers.Type, time.Now(), time.Now())
+		_, execErr := stmt.Exec(modelUsers.Status_account, modelUsers.Type, time.Now(), time.Now())
 		if execErr != nil {
 			_ = tx.Rollback()
 			return execErr
@@ -45,7 +45,7 @@ func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {
 		}
 		defer stmt.Close()
 
-		_, execErr := stmt.Exec("active", modelUsers.Type, time.Now(), time.Now(), modelUsers.Mfa_type)
+		_, execErr := stmt.Exec(modelUsers.Status_account, modelUsers.Type, time.Now(), time.Now(), modelUsers.Mfa_type)
 		if execErr != nil {
 			_ = tx.Rollback()
 			return execErr

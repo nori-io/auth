@@ -14,6 +14,8 @@ import (
 
 type (
 	AnyTime struct{}
+	AnyByteArray struct {
+	}
 )
 
 func TestUsers_Create_userEmail(t *testing.T) {
@@ -24,19 +26,18 @@ func TestUsers_Create_userEmail(t *testing.T) {
 	}
 
 	mock.ExpectBegin()
-
 	mock.ExpectPrepare("INSERT INTO").
-		ExpectExec().WithArgs("locked", "vendor", AnyTime{}, AnyTime{}).
+		ExpectExec().WithArgs("locked","vendor",  AnyTime{}, AnyTime{}).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	rows := sqlmock.NewRows([]string{"id"}).
-		AddRow(20).
+		AddRow(1).
 		RowError(1, fmt.Errorf("row error"))
 	mock.ExpectQuery("SELECT LAST_INSERT_ID()").WillReturnRows(rows)
 
 	mock.ExpectPrepare("INSERT INTO").
 		ExpectExec().
-		WithArgs(20, "users_create_email_test@example.com", "users_create_email_pass", "users_create_email_salt", AnyTime{}, AnyTime{}, false, false).
+		WithArgs(1, "test@example.com", AnyByteArray{}, AnyByteArray{}, AnyTime{}, AnyTime{}, false, false).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	mock.ExpectCommit()
@@ -44,11 +45,11 @@ func TestUsers_Create_userEmail(t *testing.T) {
 	d := database.DB(mockDatabase, logrus.New())
 
 	err = d.Users().Create(&database.AuthModel{
-		Email:    "users_create_email_test@example.com",
-		Password: []byte("users_create_email_pass"),
-		Salt:     []byte("users_create_email_salt"),
+		Email:    "test@example.com",
+		Password: []byte("pass"),
+		Salt:     []byte("salt"),
 	}, &database.UsersModel{
-		Status_account: "active",
+		Status_account: "locked",
 		Type:           "vendor",
 	})
 	if err != nil {
@@ -64,23 +65,23 @@ func TestUsers_Create_userEmail(t *testing.T) {
 
 func TestUsers_Create_userPhone(t *testing.T) {
 
-	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	mockDatabase, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-	defer mock.ExpectClose()
-	defer mockDatabase.Close()
 
-	//	mock.ExpectBegin()
-	mock.ExpectExec("INSERT INTO users (status_account, type, created, updated,mfa_type) VALUES(?,?,?,?,?)").
-		WithArgs("active", "vendor", AnyTime{}, AnyTime{}).WillReturnResult(sqlmock.NewResult(30, 1))
+	mock.ExpectBegin()
+	mock.ExpectPrepare("INSERT INTO").
+		ExpectExec().WithArgs("active","vendor",  AnyTime{}, AnyTime{}).
+		WillReturnResult(sqlmock.NewResult(30, 1))
+
 	rows := sqlmock.NewRows([]string{"id"}).
 		AddRow(30).
 		RowError(1, fmt.Errorf("row error"))
 	mock.ExpectQuery("SELECT LAST_INSERT_ID()").WillReturnRows(rows)
 
-	mock.ExpectExec("INSERT INTO auth (user_id, phone_country_code, phone_number, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES(?,?,?,?,?,?,?,?,?)").
-		WithArgs(30, "3", "3333333333", "users_create_phone_pass", "users_create_phone_salt", AnyTime{}, AnyTime{}, false, false).WillReturnResult(sqlmock.NewResult(30, 1))
+	mock.ExpectPrepare("INSERT INTO").
+		ExpectExec().WithArgs(30, "3", "3333333333", AnyByteArray{}, AnyByteArray{}, AnyTime{}, AnyTime{}, false, false).WillReturnResult(sqlmock.NewResult(30, 1))
 
 	mock.ExpectCommit()
 	d := database.DB(mockDatabase, logrus.New())
@@ -108,3 +109,9 @@ func (a AnyTime) Match(v driver.Value) bool {
 	_, ok := v.(time.Time)
 	return ok
 }
+
+func (s AnyByteArray) Match(v driver.Value) bool {
+	_, ok := v.([]byte)
+	return ok
+}
+

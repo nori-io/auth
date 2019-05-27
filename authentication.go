@@ -33,8 +33,8 @@ func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {
 		UserRegistrationByEmailAddress:     cm.Bool("user.registration_email_address", "user.registration_email_address value"),
 		UserMfaType:                        cm.String("user.mfa_type", "user.mfa_type value"),
 		ActivationTimeForActivationMinutes: cm.UInt("activation.time_for_activation_minutes", "activation.time_for_activation_minutes value"),
-		ActivationCode:                     cm.Bool("actication.code", "actication.code value"),
-	}
+		ActivationCode:                     cm.Bool("activation.code", "activation.code value")}
+
 	return nil
 }
 
@@ -87,11 +87,14 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			session,
 		)
 		pluginParameters := service.PluginParameters{
-			UserTypeParameter:              p.config.UserType(),
-			UserTypeDefaultParameter:       p.config.UserTypeDefault(),
-			UserRegistrationByPhoneNumber:  p.config.UserRegistrationByPhoneNumber(),
-			UserRegistrationByEmailAddress: p.config.UserRegistrationByPhoneNumber(),
-			UserMfaTypeParameter:           p.config.UserMfaType()}
+			UserTypeParameter:                  p.config.UserType(),
+			UserTypeDefaultParameter:           p.config.UserTypeDefault(),
+			UserRegistrationByPhoneNumber:      p.config.UserRegistrationByPhoneNumber(),
+			UserRegistrationByEmailAddress:     p.config.UserRegistrationByPhoneNumber(),
+			UserMfaTypeParameter:               p.config.UserMfaType(),
+			ActivationCode:                     p.config.ActivationCode(),
+			ActivationTimeForActivationMinutes: p.config.ActivationTimeForActivationMinutes(),
+		}
 
 		service.Transport(auth, transport, session,
 			http, p.instance, registry.Logger(p.Meta()), pluginParameters)

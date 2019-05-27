@@ -118,6 +118,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest, parameters Plug
 		Type:     req.Type,
 		Mfa_type: req.MfaType,
 	}
+
 	if parameters.ActivationCode {
 		modelUsers.Status_account = "locked"
 	} else {

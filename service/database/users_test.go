@@ -105,6 +105,10 @@ func TestUsers_Create_userPhone(t *testing.T) {
 
 }
 
+func TestUser_Update_StatusAccount(t *testing.T) {
+
+}
+
 func (a AnyTime) Match(v driver.Value) bool {
 	_, ok := v.(time.Time)
 	return ok

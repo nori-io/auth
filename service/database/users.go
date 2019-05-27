@@ -123,6 +123,7 @@ func (u *user) Update_StatusAccount(modelUsers *UsersModel) error {
 	}
 	_, err = tx.Exec("UPDATE users SET status_account = ?, updated=? WHERE id = ? ",
 		modelUsers.Status_account, time.Now(), modelUsers.Id)
+
 	return err
 }
 
@@ -138,6 +139,8 @@ func (u *user) Update_Type(modelUsers *UsersModel) error {
 	}
 	_, err = tx.Exec("UPDATE users SET type=?, updated=? WHERE id = ? ",
 		modelUsers.Type, time.Now(), modelUsers.Id)
+	tx.Commit()
+
 	return err
 }
 

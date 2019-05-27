@@ -106,7 +106,28 @@ func TestUsers_Create_userPhone(t *testing.T) {
 }
 
 func TestUser_Update_StatusAccount(t *testing.T) {
+	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
 
+	mock.ExpectBegin()
+
+	mock.ExpectExec("UPDATE users SET status_account = ?, updated=? WHERE id = ?").WithArgs("active", AnyTime{},1).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	d := database.DB(mockDatabase, logrus.New())
+
+
+	err = d.Users().Update_StatusAccount(&database.UsersModel{
+		Id:       1,
+		Status_account:"active",
+	})
+
+	// we make sure that all expectations were met
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
 }
 
 func (a AnyTime) Match(v driver.Value) bool {

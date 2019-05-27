@@ -16,16 +16,12 @@ func TestAuth_Update(t *testing.T) {
 	}
 
 	mock.ExpectExec("UPDATE auth SET profile_user_id = ?, phone = ?, email = ?, password = ? ,salt = ? ,created =? WHERE id = ? ").WithArgs(1, 1).
-		WillReturnResult(sqlmock.NewResult(1, 0))
+		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	d := database.DB(mockDatabase, logrus.New())
 
-	err = d.Auth().Update_Email(&database.AuthModel{
+	err = d.Users().Update_StatusAccount(&database.UsersModel{
 		Id:       1,
-		UserId:   1,
-		Email:    "auth_update_@example.com",
-		Password: []byte("auth_update_pass"),
-		Salt:     []byte("auth_update_salt"),
 	})
 
 	// we make sure that all expectations were met

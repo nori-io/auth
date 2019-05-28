@@ -124,16 +124,18 @@ func TestAuth_UpdateIsPhoneVerified(t *testing.T) {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
 }
+
 func TestAuth_FindByEmail(t *testing.T) {
 	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 
-	nonEmptyRows := sqlmock.NewRows([]string{"id", "email", "password"}).
-		AddRow(2, "auth_find_by_email_test@example.com", "auth_find_by_email_pass")
+	nonEmptyRows := sqlmock.NewRows([]string{"id", "email", "password", "salt"}).
+		AddRow(1, "auth_find_by_email_test@example.com", "auth_find_by_email_pass", "auth_find_by_email_salt")
 
-	mock.ExpectQuery("SELECT id, email,password, salt FROM auth WHERE email = ? LIMIT 1").WithArgs("auth_find_by_email_test@example.com").WillReturnRows(nonEmptyRows)
+	mock.ExpectQuery("SELECT id, email,password,salt FROM auth WHERE email = ? LIMIT 1").
+		WithArgs("auth_find_by_email_test@example.com").WillReturnRows(nonEmptyRows)
 
 	d := database.DB(mockDatabase, logrus.New())
 
@@ -152,10 +154,10 @@ func TestAuth_FindByPhone(t *testing.T) {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 
-	nonEmptyRows := sqlmock.NewRows([]string{"id", "phone_country_code", "phone_number", "password"}).
-		AddRow(3, "1", "1111111111", "auth_find_by_phone_pass")
+	nonEmptyRows := sqlmock.NewRows([]string{"id", "phone_country_code", "phone_number", "password", "salt"}).
+		AddRow(3, "1", "1111111111", "auth_find_by_phone_pass", "auth_find_by_phone_salt")
 
-	mock.ExpectQuery("SELECT id, phone_country_code, phone_number, password FROM auth WHERE (phone_country_code+phone_number)=?  LIMIT 1").WithArgs("11111111111").WillReturnRows(nonEmptyRows)
+	mock.ExpectQuery("SELECT id, phone_country_code, phone_number, password,salt FROM auth WHERE concat(phone_country_code,phone_number)=?  LIMIT 1").WithArgs("11111111111").WillReturnRows(nonEmptyRows)
 
 	d := database.DB(mockDatabase, logrus.New())
 

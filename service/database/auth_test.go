@@ -9,19 +9,20 @@ import (
 	"github.com/nori-io/authentication/service/database"
 )
 
-func TestAuth_Update(t *testing.T) {
+func TestAuth_Update_Email(t *testing.T) {
 	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 
-	mock.ExpectExec("UPDATE auth SET profile_user_id = ?, phone = ?, email = ?, password = ? ,salt = ? ,created =? WHERE id = ? ").WithArgs(1, 1).
+	mock.ExpectExec("UPDATE auth SET email=? , updated=? WHERE id = ?").WithArgs("test@example.com", AnyTime{}, 1).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	d := database.DB(mockDatabase, logrus.New())
 
-	err = d.Users().Update_StatusAccount(&database.UsersModel{
-		Id:       1,
+	err = d.Auth().Update_Email(&database.AuthModel{
+		Id:    1,
+		Email: "test@example.com",
 	})
 
 	// we make sure that all expectations were met
@@ -31,6 +32,98 @@ func TestAuth_Update(t *testing.T) {
 
 }
 
+func TestAuth_Update_PhoneNumber_CountryCode(t *testing.T) {
+	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	mock.ExpectExec("UPDATE auth SET  phone_country_code =? , phone_number = ?, updated=? WHERE id = ?").WithArgs("1", "234567890", AnyTime{}, 1).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	d := database.DB(mockDatabase, logrus.New())
+
+	err = d.Auth().Update_PhoneNumber_CountryCode(&database.AuthModel{
+		Id:               1,
+		PhoneCountryCode: "1",
+		PhoneNumber:      "234567890",
+	})
+
+	// we make sure that all expectations were met
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+
+}
+
+func TestAuth_Update_Password_Salt(t *testing.T) {
+	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	mock.ExpectExec("UPDATE auth SET password=? , salt=? , updated=? WHERE id = ?").WithArgs(AnyByteArray{}, AnyByteArray{}, AnyTime{}, 1).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	d := database.DB(mockDatabase, logrus.New())
+
+	err = d.Auth().Update_Password_Salt(&database.AuthModel{
+		Id:       1,
+		Password: []byte("pass"),
+	})
+
+	// we make sure that all expectations were met
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+
+}
+
+func TestAuth_UpdateIsEmailVerified(t *testing.T) {
+
+	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	mock.ExpectExec("UPDATE auth SET is_email_verified=? , updated=? WHERE id = ? ").WithArgs(true, AnyTime{}, 1).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	d := database.DB(mockDatabase, logrus.New())
+
+	err = d.Auth().Update_IsEmailVerified(&database.AuthModel{
+		Id:              1,
+		IsEmailVerified: true,
+	})
+
+	// we make sure that all expectations were met
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+
+}
+
+func TestAuth_UpdateIsPhoneVerified(t *testing.T) {
+	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	mock.ExpectExec("UPDATE auth SET is_phone_verified=? , updated=? WHERE id = ? ").WithArgs(true, AnyTime{}, 1).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	d := database.DB(mockDatabase, logrus.New())
+
+	err = d.Auth().Update_IsPhoneVerified(&database.AuthModel{
+		Id:              1,
+		IsPhoneVerified: true,
+	})
+
+	// we make sure that all expectations were met
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+}
 func TestAuth_FindByEmail(t *testing.T) {
 	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {

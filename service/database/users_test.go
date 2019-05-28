@@ -13,7 +13,7 @@ import (
 )
 
 type (
-	AnyTime struct{}
+	AnyTime      struct{}
 	AnyByteArray struct {
 	}
 )
@@ -27,7 +27,7 @@ func TestUsers_Create_userEmail(t *testing.T) {
 
 	mock.ExpectBegin()
 	mock.ExpectPrepare("INSERT INTO").
-		ExpectExec().WithArgs("locked","vendor",  AnyTime{}, AnyTime{}).
+		ExpectExec().WithArgs("locked", "vendor", AnyTime{}, AnyTime{}).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	rows := sqlmock.NewRows([]string{"id"}).
@@ -72,7 +72,7 @@ func TestUsers_Create_userPhone(t *testing.T) {
 
 	mock.ExpectBegin()
 	mock.ExpectPrepare("INSERT INTO").
-		ExpectExec().WithArgs("active","vendor",  AnyTime{}, AnyTime{}).
+		ExpectExec().WithArgs("active", "vendor", AnyTime{}, AnyTime{}).
 		WillReturnResult(sqlmock.NewResult(30, 1))
 
 	rows := sqlmock.NewRows([]string{"id"}).
@@ -113,15 +113,14 @@ func TestUser_Update_StatusAccount(t *testing.T) {
 
 	mock.ExpectBegin()
 
-	mock.ExpectExec("UPDATE users SET status_account = ?, updated=? WHERE id = ?").WithArgs("active", AnyTime{},1).
+	mock.ExpectExec("UPDATE users SET status_account = ?, updated=? WHERE id = ?").WithArgs("active", AnyTime{}, 1).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	d := database.DB(mockDatabase, logrus.New())
 
-
 	err = d.Users().Update_StatusAccount(&database.UsersModel{
-		Id:       1,
-		Status_account:"active",
+		Id:             1,
+		Status_account: "active",
 	})
 
 	// we make sure that all expectations were met
@@ -138,15 +137,14 @@ func TestUser_Update_Type(t *testing.T) {
 
 	mock.ExpectBegin()
 
-	mock.ExpectExec("UPDATE users SET type=?, updated=? WHERE id = ? ").WithArgs("vendor", AnyTime{},1).
+	mock.ExpectExec("UPDATE users SET type=?, updated=? WHERE id = ? ").WithArgs("vendor", AnyTime{}, 1).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	d := database.DB(mockDatabase, logrus.New())
 
-
 	err = d.Users().Update_Type(&database.UsersModel{
-		Id:       1,
-		Type:"vendor",
+		Id:   1,
+		Type: "vendor",
 	})
 
 	// we make sure that all expectations were met
@@ -154,7 +152,6 @@ func TestUser_Update_Type(t *testing.T) {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
 }
-
 
 func TestUser_Update_MfaType(t *testing.T) {
 	mockDatabase, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
@@ -164,15 +161,14 @@ func TestUser_Update_MfaType(t *testing.T) {
 
 	mock.ExpectBegin()
 
-	mock.ExpectExec("UPDATE users SET mfa_type=? , updated=? WHERE id = ?").WithArgs("opt", AnyTime{},1).
+	mock.ExpectExec("UPDATE users SET mfa_type=? , updated=? WHERE id = ?").WithArgs("opt", AnyTime{}, 1).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	d := database.DB(mockDatabase, logrus.New())
 
-
 	err = d.Users().Update_MfaType(&database.UsersModel{
 		Id:       1,
-		Mfa_type:"opt",
+		Mfa_type: "opt",
 	})
 
 	// we make sure that all expectations were met
@@ -180,8 +176,6 @@ func TestUser_Update_MfaType(t *testing.T) {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
 }
-
-
 
 func (a AnyTime) Match(v driver.Value) bool {
 	_, ok := v.(time.Time)
@@ -192,4 +186,3 @@ func (s AnyByteArray) Match(v driver.Value) bool {
 	_, ok := v.([]byte)
 	return ok
 }
-

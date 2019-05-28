@@ -13,21 +13,22 @@ type auth struct {
 	log interfaces.Logger
 }
 
-func (a *auth) Update_PhoneNumber_CountryCode(model *AuthModel) error {
-	if model.Id == 0 {
-		return errors.New("Empty model")
-	}
-	_, err := a.db.Exec("UPDATE auth SET phone_number = ?, phone_country_code =? , updated=? WHERE id = ? ",
-		model.PhoneNumber, model.PhoneCountryCode, time.Now(), model.Id)
-
-	return err
-}
 func (a *auth) Update_Email(model *AuthModel) error {
 	if model.Id == 0 {
 		return errors.New("Empty model")
 	}
 	_, err := a.db.Exec("UPDATE auth SET email=? , updated=? WHERE id = ? ",
 		model.Email, time.Now(), model.Id)
+	return err
+}
+
+func (a *auth) Update_PhoneNumber_CountryCode(model *AuthModel) error {
+	if model.Id == 0 {
+		return errors.New("Empty model")
+	}
+	_, err := a.db.Exec("UPDATE auth SET  phone_country_code =? , phone_number = ?, updated=? WHERE id = ?",
+		model.PhoneCountryCode, model.PhoneNumber, time.Now(), model.Id)
+
 	return err
 }
 
@@ -50,7 +51,7 @@ func (a *auth) Update_Password_Salt(model *AuthModel) error {
 	return err
 }
 
-func (a *auth) UpdateIsEmailVerified(model *AuthModel) error {
+func (a *auth) Update_IsEmailVerified(model *AuthModel) error {
 	if model.Id == 0 {
 		return errors.New("Empty model")
 	}
@@ -60,7 +61,7 @@ func (a *auth) UpdateIsEmailVerified(model *AuthModel) error {
 	return err
 }
 
-func (a *auth) UpdateIsPhoneVerified(model *AuthModel) error {
+func (a *auth) Update_IsPhoneVerified(model *AuthModel) error {
 	if model.Id == 0 {
 		return errors.New("Empty model")
 	}

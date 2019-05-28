@@ -154,12 +154,13 @@ func (u *user) Update_MfaType(modelUsers *UsersModel) error {
 	if modelUsers.Id == 0 {
 		return errors.New("Empty model")
 	}
-	if modelUsers.Mfa_type==""{
+	if modelUsers.Mfa_type == "" {
 		_, err = tx.Exec("UPDATE users SET mfa_type=? , updated=? WHERE id = ?",
 			sql.NullString{}, time.Now(), modelUsers.Id)
-	}else{
+	} else {
 
-	_, err = tx.Exec("UPDATE users SET mfa_type=? , updated=? WHERE id = ?",
-		modelUsers.Mfa_type, time.Now(), modelUsers.Id)}
+		_, err = tx.Exec("UPDATE users SET mfa_type=? , updated=? WHERE id = ?",
+			modelUsers.Mfa_type, time.Now(), modelUsers.Id)
+	}
 	return err
 }

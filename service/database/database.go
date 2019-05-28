@@ -40,8 +40,8 @@ type Auth interface {
 	Update_PhoneNumber_CountryCode(model *AuthModel) error
 	Update_Email(model *AuthModel) error
 	Update_Password_Salt(model *AuthModel) error
-	UpdateIsEmailVerified(model *AuthModel) error
-	UpdateIsPhoneVerified(model *AuthModel) error
+	Update_IsEmailVerified(model *AuthModel) error
+	Update_IsPhoneVerified(model *AuthModel) error
 	FindByEmail(email string) (model *AuthModel, err error)
 	FindByPhone(phoneCountryCode, phoneNumber string) (model *AuthModel, err error)
 }

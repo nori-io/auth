@@ -338,5 +338,5 @@ func (s *service) RecoveryCodes(ctx context.Context, req RecoveryCodesRequest) (
 }
 
 /*func (s *service) MakeProfileEndpoint(ctx context.Context,req ProfileRequest)(resp *ProfileRequest){
-	return resp
+	return respe
 }*/

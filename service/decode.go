@@ -16,7 +16,7 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			return body, rest.ErrFieldResp{
-				Meta: rest.ErrFieldRespMeta{
+				Meta: rest.ErrMeta{
 					ErrMessage: "Error of decoding",
 				},
 			}
@@ -24,7 +24,7 @@ func DecodeSignUpRequest(parameters PluginParameters) func(_ context.Context, r 
 
 		if err := body.Validate(); err != nil {
 			return body, rest.ErrFieldResp{
-				Meta: rest.ErrFieldRespMeta{
+				Meta: rest.ErrMeta{
 					ErrMessage: "Error of body.Validate()",
 				},
 			}
@@ -131,14 +131,14 @@ func DecodeRecoveryCodes() func(_ context.Context, r *http.Request) (interface{}
 
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			return body, rest.ErrFieldResp{
-				Meta: rest.ErrFieldRespMeta{
+				Meta: rest.ErrMeta{
 					ErrMessage: "Error of decoding",
 				},
 			}
 		}
 		if err := body.Validate(); err != nil {
 			return body, rest.ErrFieldResp{
-				Meta: rest.ErrFieldRespMeta{
+				Meta: rest.ErrMeta{
 					ErrMessage: "Error of body.Validate()",
 				},
 			}
@@ -146,7 +146,7 @@ func DecodeRecoveryCodes() func(_ context.Context, r *http.Request) (interface{}
 
 		if len(errorText) != 0 {
 			return body, rest.ErrFieldResp{
-				Meta: rest.ErrFieldRespMeta{
+				Meta: rest.ErrMeta{
 					ErrMessage: errCommon.Error(),
 				},
 			}

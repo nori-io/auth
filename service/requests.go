@@ -31,7 +31,7 @@ type RecoveryCodesRequest struct {
 
 func (r SignUpRequest) Validate() error {
 	_, err := govalidator.ValidateStruct(r)
-	return rest.ValidateResponse(err)
+	return rest.ValidateResponse(err,400)
 }
 
 func (r SignUpRequest) ValidateMail() bool {
@@ -52,7 +52,7 @@ func (r SignUpRequest) ValidateMfaType() error {
 	if !((r.MfaType == MfaTypeOTP) || (r.MfaType == MfaTypeSMS) || (r.MfaType == "")) {
 
 		return rest.ErrFieldResp{
-			Meta: rest.ErrFieldRespMeta{
+			Meta: rest.ErrMeta{
 				ErrMessage: "Incorrect multifactor authentication type",
 			},
 		}
@@ -68,7 +68,7 @@ type SignInRequest struct {
 
 func (r SignInRequest) Validate() error {
 	_, err := govalidator.ValidateStruct(r)
-	return rest.ValidateResponse(err)
+	return rest.ValidateResponse(err,400)
 }
 
 // SignOut Request
@@ -78,14 +78,14 @@ type SignOutRequest struct {
 
 func (r RecoveryCodesRequest) Validate() error {
 	_, err := govalidator.ValidateStruct(r)
-	return rest.ValidateResponse(err)
+	return rest.ValidateResponse(err,400)
 }
 
 func isNumber(s string) error {
 	for _, r := range s {
 		if r < '0' || r > '9' {
 			return rest.ErrFieldResp{
-				Meta: rest.ErrFieldRespMeta{
+				Meta: rest.ErrMeta{
 					ErrMessage: "Phone number has non-numeric symbol",
 				},
 			}

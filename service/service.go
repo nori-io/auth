@@ -76,7 +76,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest, parameters Plug
 	resp = &SignUpResponse{}
 
 	errField := rest.ErrFieldResp{
-		Meta: rest.ErrFieldRespMeta{
+		Meta: rest.ErrMeta{
 			ErrCode: 0,
 		},
 	}
@@ -129,7 +129,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest, parameters Plug
 	if err != nil {
 		s.log.Error(err)
 		resp.Err = rest.ErrFieldResp{
-			Meta: rest.ErrFieldRespMeta{
+			Meta: rest.ErrMeta{
 				ErrCode:    500,
 				ErrMessage: err.Error(),
 			},
@@ -201,7 +201,7 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 		s.log.Error(err)
 		resp.User.UserName = req.Name
 		resp.Err = rest.ErrFieldResp{
-			Meta: rest.ErrFieldRespMeta{
+			Meta: rest.ErrMeta{
 				ErrCode:    500,
 				ErrMessage: err.Error(),
 			},
@@ -301,7 +301,7 @@ func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOu
 	if err != nil {
 		s.log.Error(err)
 		resp.Err = rest.ErrFieldResp{
-			Meta: rest.ErrFieldRespMeta{
+			Meta: rest.ErrMeta{
 				ErrCode:    500,
 				ErrMessage: err.Error(),
 			},
@@ -326,7 +326,7 @@ func (s *service) RecoveryCodes(ctx context.Context, req RecoveryCodesRequest) (
 	if err != nil {
 		s.log.Error(err)
 		resp.Err = rest.ErrFieldResp{
-			Meta: rest.ErrFieldRespMeta{
+			Meta: rest.ErrMeta{
 				ErrCode:    500,
 				ErrMessage: err.Error(),
 			},

@@ -5,12 +5,12 @@ import (
 	"database/sql"
 
 	"github.com/cheebo/rand"
-	"github.com/nori-io/nori-common/interfaces"
+	"github.com/nori-io/nori-common/logger"
 )
 
 type mfaRecoveryCodes struct {
 	db  *sql.DB
-	log interfaces.Logger
+	log logger.Writer
 }
 
 func (c *mfaRecoveryCodes) Create(modelMfaRecoveryCodes *MfaRecoveryCodesModel) ([]string, error) {

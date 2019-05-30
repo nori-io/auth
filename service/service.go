@@ -9,7 +9,8 @@ import (
 	rest "github.com/cheebo/gorest"
 	"github.com/cheebo/rand"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/nori-io/nori-common/interfaces"
+	"github.com/nori-io/nori-common/logger"
+	"github.com/nori-io/nori-interfaces/interfaces"
 
 	"github.com/nori-io/authentication/service/database"
 )
@@ -38,7 +39,7 @@ type service struct {
 	cache   interfaces.Cache
 	cfg     *Config
 	db      database.Database
-	log     interfaces.Logger
+	log     logger.Writer
 	mail    interfaces.Mail
 	session interfaces.Session
 }
@@ -52,7 +53,7 @@ func NewService(
 	cache interfaces.Cache,
 	cfg *Config,
 	db database.Database,
-	log interfaces.Logger,
+	log logger.Writer,
 	mail interfaces.Mail,
 	session interfaces.Session,
 ) Service {

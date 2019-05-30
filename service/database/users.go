@@ -6,12 +6,12 @@ import (
 	"errors"
 	"time"
 
-	"github.com/nori-io/nori-common/interfaces"
+	"github.com/nori-io/nori-common/logger"
 )
 
 type user struct {
 	db  *sql.DB
-	Log interfaces.Logger
+	Log logger.Writer
 }
 
 func (u *user) Create(modelAuth *AuthModel, modelUsers *UsersModel) error {

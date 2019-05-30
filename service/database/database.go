@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/nori-io/nori-common/interfaces"
+	"github.com/nori-io/nori-common/logger"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/nori-io/authentication/service/database/sql_scripts"
@@ -58,7 +58,7 @@ type database struct {
 	mfaRecoveryCodes      *mfaRecoveryCodes
 }
 
-func DB(db *sql.DB, logger interfaces.Logger) Database {
+func DB(db *sql.DB, logger logger.Writer) Database {
 
 	return &database{
 		db: db,

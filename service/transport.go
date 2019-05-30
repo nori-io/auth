@@ -2,9 +2,9 @@ package service
 
 import (
 	"github.com/nori-io/nori-common/endpoint"
-	"github.com/nori-io/nori-common/interfaces"
 	"github.com/nori-io/nori-common/logger"
-	"github.com/nori-io/nori-common/transport/http"
+	"github.com/nori-io/nori-interfaces/interfaces"
+	"github.com/nori-io/nori-interfaces/transport/http"
 )
 
 type PluginParameters struct {

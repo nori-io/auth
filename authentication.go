@@ -6,6 +6,7 @@ import (
 	cfg "github.com/nori-io/nori-common/config"
 	"github.com/nori-io/nori-common/meta"
 	noriPlugin "github.com/nori-io/nori-common/plugin"
+	"github.com/nori-io/nori-interfaces/interfaces"
 
 	"github.com/nori-io/authentication/service"
 	"github.com/nori-io/authentication/service/database"
@@ -33,7 +34,7 @@ func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {
 		UserRegistrationByEmailAddress:     cm.Bool("user.registration_email_address", "user.registration_email_address value"),
 		UserMfaType:                        cm.String("user.mfa_type", "user.mfa_type value"),
 		ActivationTimeForActivationMinutes: cm.UInt("activation.time_for_activation_minutes", "activation.time_for_activation_minutes value"),
-		ActivationCode:                     cm.Bool("activation.code", "activation.code value")}
+		ActivationCode:                     cm.Bool("activation.code", "activation.code value"),}
 
 	return nil
 }
@@ -42,40 +43,42 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 
 	if p.instance == nil {
 
-		auth, err := registry.Auth()
+		auth, err := interfaces.GetAuth(registry)
 		if err != nil {
 			return err
 		}
 
-		cache, err := registry.Cache()
+
+		cache, err := interfaces.GetCache(registry)
 		if err != nil {
 			return err
 		}
 
-		db, err := registry.Sql()
+		db, err := interfaces.GetSQL(registry)
 		if err != nil {
 			return err
 		}
 
-		http, err := registry.Http()
+		http, err :=interfaces.GetHttp(registry)
 		if err != nil {
 			return err
 		}
 
-		transport, err := registry.HTTPTransport()
+		transport, err := interfaces.GetHttpTransport(registry)
 		if err != nil {
 			return err
 		}
 
-		mail, err := registry.Mail()
+		mail, err := interfaces.GetMail(registry)
 		if err != nil {
 			return err
 		}
 
-		session, err := registry.Session()
+		session, err := interfaces.GetSession(registry)
 		if err != nil {
 			return err
 		}
+
 
 		p.instance = service.NewService(
 			auth,
@@ -87,14 +90,14 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			session,
 		)
 		pluginParameters := service.PluginParameters{
-			UserTypeParameter:                  p.config.UserType(),
-			UserTypeDefaultParameter:           p.config.UserTypeDefault(),
-			UserRegistrationByPhoneNumber:      p.config.UserRegistrationByPhoneNumber(),
-			UserRegistrationByEmailAddress:     p.config.UserRegistrationByPhoneNumber(),
-			UserMfaTypeParameter:               p.config.UserMfaType(),
-			ActivationCode:                     p.config.ActivationCode(),
+			UserTypeParameter:              p.config.UserType(),
+			UserTypeDefaultParameter:       p.config.UserTypeDefault(),
+			UserRegistrationByPhoneNumber:  p.config.UserRegistrationByPhoneNumber(),
+			UserRegistrationByEmailAddress: p.config.UserRegistrationByPhoneNumber(),
+			UserMfaTypeParameter:           p.config.UserMfaType(),
+			ActivationCode:	p.config.ActivationCode(),
 			ActivationTimeForActivationMinutes: p.config.ActivationTimeForActivationMinutes(),
-		}
+		    }
 
 		service.Transport(auth, transport, session,
 			http, p.instance, registry.Logger(p.Meta()), pluginParameters)
@@ -126,16 +129,16 @@ func (p plugin) Meta() meta.Meta {
 			VersionConstraint: ">=1.0.0, <2.0.0",
 		},
 		Dependencies: []meta.Dependency{
-			meta.Auth.Dependency("1.0.0"),
-			meta.HTTP.Dependency("1.0.0"),
-			meta.SQL.Dependency("1.0.0"),
-			meta.Mail.Dependency("1.0.0"),
-			meta.HTTPTransport.Dependency("1.0.0"),
+			meta.Dependency{Interface:"Auth", Constraint:"1.0.0"},
+			meta.Dependency{Interface:"Http", Constraint:"1.0.0"},
+			meta.Dependency{Interface:"Sql", Constraint:"1.0.0"},
+			meta.Dependency{Interface:"Mail", Constraint:"1.0.0"},
+			meta.Dependency{Interface:"HTTPTransport",Constraint:"1.0.0"},
 		},
 		Description: meta.Description{
 			Name: "Nori: Authentication Interface",
 		},
-		Interface: meta.Custom,
+		Interface: meta.Interface("Custom"),
 		License: meta.License{
 			Title: "",
 			Type:  "LGPLv3",
@@ -146,7 +149,7 @@ func (p plugin) Meta() meta.Meta {
 }
 
 func (p plugin) Install(_ context.Context, registry noriPlugin.Registry) error {
-	sql, err := registry.Sql()
+	sql, err := interfaces.GetSQL(registry)
 	if err != nil {
 		return err
 	}
@@ -156,7 +159,7 @@ func (p plugin) Install(_ context.Context, registry noriPlugin.Registry) error {
 }
 
 func (p plugin) UnInstall(_ context.Context, registry noriPlugin.Registry) error {
-	sql, err := registry.Sql()
+	sql, err := interfaces.GetSQL(registry)
 	if err != nil {
 		return err
 	}

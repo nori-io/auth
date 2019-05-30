@@ -5,12 +5,12 @@ import (
 	"errors"
 	"time"
 
-	"github.com/nori-io/nori-common/interfaces"
+	"github.com/nori-io/nori-common/logger"
 )
 
 type auth struct {
 	db  *sql.DB
-	log interfaces.Logger
+	log logger.Writer
 }
 
 func (a *auth) Update_Email(model *AuthModel) error {

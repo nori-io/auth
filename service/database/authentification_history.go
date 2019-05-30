@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/nori-io/nori-common/logger"
-	
 )
 
 type authenticationHistory struct {

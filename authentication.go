@@ -34,7 +34,7 @@ func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {
 		UserRegistrationByEmailAddress:     cm.Bool("user.registration_email_address", "user.registration_email_address value"),
 		UserMfaType:                        cm.String("user.mfa_type", "user.mfa_type value"),
 		ActivationTimeForActivationMinutes: cm.UInt("activation.time_for_activation_minutes", "activation.time_for_activation_minutes value"),
-		ActivationCode:                     cm.Bool("activation.code", "activation.code value"),}
+		ActivationCode:                     cm.Bool("activation.code", "activation.code value")}
 
 	return nil
 }
@@ -48,7 +48,6 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			return err
 		}
 
-
 		cache, err := interfaces.GetCache(registry)
 		if err != nil {
 			return err
@@ -59,7 +58,7 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			return err
 		}
 
-		http, err :=interfaces.GetHttp(registry)
+		http, err := interfaces.GetHttp(registry)
 		if err != nil {
 			return err
 		}
@@ -79,7 +78,6 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			return err
 		}
 
-
 		p.instance = service.NewService(
 			auth,
 			cache,
@@ -90,14 +88,14 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			session,
 		)
 		pluginParameters := service.PluginParameters{
-			UserTypeParameter:              p.config.UserType(),
-			UserTypeDefaultParameter:       p.config.UserTypeDefault(),
-			UserRegistrationByPhoneNumber:  p.config.UserRegistrationByPhoneNumber(),
-			UserRegistrationByEmailAddress: p.config.UserRegistrationByPhoneNumber(),
-			UserMfaTypeParameter:           p.config.UserMfaType(),
-			ActivationCode:	p.config.ActivationCode(),
+			UserTypeParameter:                  p.config.UserType(),
+			UserTypeDefaultParameter:           p.config.UserTypeDefault(),
+			UserRegistrationByPhoneNumber:      p.config.UserRegistrationByPhoneNumber(),
+			UserRegistrationByEmailAddress:     p.config.UserRegistrationByPhoneNumber(),
+			UserMfaTypeParameter:               p.config.UserMfaType(),
+			ActivationCode:                     p.config.ActivationCode(),
 			ActivationTimeForActivationMinutes: p.config.ActivationTimeForActivationMinutes(),
-		    }
+		}
 
 		service.Transport(auth, transport, session,
 			http, p.instance, registry.Logger(p.Meta()), pluginParameters)
@@ -129,11 +127,11 @@ func (p plugin) Meta() meta.Meta {
 			VersionConstraint: ">=1.0.0, <2.0.0",
 		},
 		Dependencies: []meta.Dependency{
-			meta.Dependency{Interface:"Auth", Constraint:"1.0.0"},
-			meta.Dependency{Interface:"Http", Constraint:"1.0.0"},
-			meta.Dependency{Interface:"Sql", Constraint:"1.0.0"},
-			meta.Dependency{Interface:"Mail", Constraint:"1.0.0"},
-			meta.Dependency{Interface:"HTTPTransport",Constraint:"1.0.0"},
+			interfaces.AuthInterface.Dependency("1.0.0"),
+			interfaces.HttpInterface.Dependency("1.0.0"),
+			interfaces.SQLInterface.Dependency("1.0.0"),
+			interfaces.MailInterface.Dependency("1.0.0"),
+			interfaces.HttpTransportInterface.Dependency("1.0.0"),
 		},
 		Description: meta.Description{
 			Name: "Nori: Authentication Interface",

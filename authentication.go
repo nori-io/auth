@@ -128,10 +128,12 @@ func (p plugin) Meta() meta.Meta {
 		},
 		Dependencies: []meta.Dependency{
 			interfaces.AuthInterface.Dependency("1.0.0"),
-			interfaces.HttpInterface.Dependency("1.0.0"),
-			interfaces.SQLInterface.Dependency("1.0.0"),
 			interfaces.MailInterface.Dependency("1.0.0"),
+			interfaces.CacheInterface.Dependency("1.0.0"),
+			interfaces.HttpInterface.Dependency("1.0.0"),
 			interfaces.HttpTransportInterface.Dependency("1.0.0"),
+			interfaces.SQLInterface.Dependency("1.0.0"),
+			interfaces.SessionInterface.Dependency("1.0.0"),
 		},
 		Description: meta.Description{
 			Name: "Nori: Authentication Interface",

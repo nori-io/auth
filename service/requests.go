@@ -31,7 +31,7 @@ type RecoveryCodesRequest struct {
 
 func (r SignUpRequest) Validate() error {
 	_, err := govalidator.ValidateStruct(r)
-	return rest.ValidateResponse(err,400)
+	return rest.ValidateResponse(err, 400)
 }
 
 func (r SignUpRequest) ValidateMail() bool {
@@ -68,7 +68,7 @@ type SignInRequest struct {
 
 func (r SignInRequest) Validate() error {
 	_, err := govalidator.ValidateStruct(r)
-	return rest.ValidateResponse(err,400)
+	return rest.ValidateResponse(err, 400)
 }
 
 // SignOut Request
@@ -78,7 +78,7 @@ type SignOutRequest struct {
 
 func (r RecoveryCodesRequest) Validate() error {
 	_, err := govalidator.ValidateStruct(r)
-	return rest.ValidateResponse(err,400)
+	return rest.ValidateResponse(err, 400)
 }
 
 func isNumber(s string) error {

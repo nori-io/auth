@@ -3,6 +3,7 @@ package service_test
 import (
 	"testing"
 
+	rest "github.com/cheebo/gorest"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/nori-io/authentication/service"
@@ -45,7 +46,13 @@ func TestSignUpRequest_ValidatePhone(t *testing.T) {
 func TestSignUpRequest_Validate(t *testing.T) {
 	a := assert.New(t)
 	r := service.SignUpRequest{Email: "test@example.com", Password: "pass"}
-	a.Equal(r.Validate(), nil)
+	errResponse := rest.ErrFieldResp{
+		Meta: rest.ErrMeta{
+			ErrCode: 400,
+		},
+		Fields: []rest.ErrField{},
+	}
+	a.Equal(r.Validate(), rest.ValidateResponse(errResponse, 400))
 
 }
 

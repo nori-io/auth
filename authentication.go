@@ -47,7 +47,6 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 		if err != nil {
 			return err
 		}
-
 		cache, err := interfaces.GetCache(registry)
 		if err != nil {
 			return err

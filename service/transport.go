@@ -141,7 +141,7 @@ func Transport(
 	router.HandleFunc("/auth/{provider}", func(res httpNet.ResponseWriter, req *httpNet.Request) {
 		// try to get the user without re-authenticating
 		if gothUser, err := gothic.CompleteUserAuth(res, req); err == nil {
-			t, _ := template.New("foo").Parse("")
+			t, _ := template.New("foo").Parse(userTemplate)
 			t.Execute(res, gothUser)
 		} else {
 			gothic.BeginAuthHandler(res, req)
@@ -155,7 +155,7 @@ func Transport(
 			fmt.Fprintln(res, err)
 			return
 		}
-		t, _ := template.New("foo").Parse("")
+		t, _ := template.New("foo").Parse(userTemplate)
 		t.Execute(res, user)
 	}).Methods("GET")
 
@@ -165,3 +165,22 @@ func Transport(
 		res.WriteHeader(httpNet.StatusTemporaryRedirect)
 	}).Methods("GET")
 }
+
+
+var indexTemplate = `{{range $key,$value:=.Providers}}
+    <p><a href="/auth/{{$value}}">Log in with {{index $.ProvidersMap $value}}</a></p>
+{{end}}`
+
+var userTemplate = `
+<p><a href="/logout/{{.Provider}}">logout</a></p>
+<p>Name: {{.Name}} [{{.LastName}}, {{.FirstName}}]</p>
+<p>Email: {{.Email}}</p>
+<p>NickName: {{.NickName}}</p>
+<p>Location: {{.Location}}</p>
+<p>AvatarURL: {{.AvatarURL}} <img src="{{.AvatarURL}}"></p>
+<p>Description: {{.Description}}</p>
+<p>UserID: {{.UserID}}</p>
+<p>AccessToken: {{.AccessToken}}</p>
+<p>ExpiresAt: {{.ExpiresAt}}</p>
+<p>RefreshToken: {{.RefreshToken}}</p>
+`

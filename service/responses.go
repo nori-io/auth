@@ -66,6 +66,7 @@ func (d *RecoveryCodesResponse) Error() error {
 func (d *RecoveryCodesResponse) StatusCode() int {
 	return d.HttpStatusCode
 }
+
 type SignInSocialResponse struct {
 	Id             uint64
 	Token          string
@@ -74,7 +75,6 @@ type SignInSocialResponse struct {
 	HttpStatusCode int
 	Err            error
 }
-
 
 func (d *SignInSocialResponse) Error() error {
 	return d.Err

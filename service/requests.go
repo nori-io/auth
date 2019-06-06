@@ -72,10 +72,7 @@ func (r SignInRequest) Validate() error {
 }
 
 type SignInSocialRequest struct {
-
 }
-
-
 
 // SignOut Request
 type SignOutRequest struct {

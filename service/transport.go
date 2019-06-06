@@ -2,11 +2,14 @@ package service
 
 import (
 	"context"
-	http3 "net/http"
+	"fmt"
+	"html/template"
+	httpNet "net/http"
 	"os"
+	"sort"
 
 	"github.com/markbates/goth"
-	"github.com/markbates/goth/providers/openidConnect"
+	"github.com/markbates/goth/gothic"
 	"github.com/markbates/goth/providers/vk"
 	"github.com/nori-io/nori-common/endpoint"
 	"github.com/nori-io/nori-common/logger"
@@ -22,9 +25,9 @@ type PluginParameters struct {
 	UserMfaTypeParameter               string
 	ActivationCode                     bool
 	ActivationTimeForActivationMinutes uint
-	Oath2ProvidersVKClientKey string
-	Oath2ProvidersVKClientSecret string
-	Oath2ProvidersVKRedirectUrl string
+	Oath2ProvidersVKClientKey          string
+	Oath2ProvidersVKClientSecret       string
+	Oath2ProvidersVKRedirectUrl        string
 }
 
 func Transport(
@@ -38,18 +41,32 @@ func Transport(
 
 ) {
 
-
-	if (len(parameters.Oath2ProvidersVKClientKey)==0)&&(len(parameters.Oath2ProvidersVKClientSecret)==0){
-		goth.UseProviders(
-			vk.New(os.Getenv("VK_KEY"), os.Getenv("VK_SECRET"), "http://localhost:3000/auth/vk/callback"))
-		}
-
-	openidConnect, _ := openidConnect.New(os.Getenv("OPENID_CONNECT_KEY"), os.Getenv("OPENID_CONNECT_SECRET"), "http://localhost:3000/auth/openid-connect/callback", os.Getenv("OPENID_CONNECT_DISCOVERY_URL"))
-	if openidConnect != nil {
-		goth.UseProviders(openidConnect)
+	type ProviderIndex struct {
+		Providers    []string
+		ProvidersMap map[string]string
 	}
 
+	if (len(parameters.Oath2ProvidersVKClientKey) == 0) && (len(parameters.Oath2ProvidersVKClientSecret) == 0) {
+		goth.UseProviders(
+			vk.New(os.Getenv("VK_KEY"), os.Getenv("VK_SECRET"), "http://localhost:3000/auth/vk/callback"))
+	}
 
+	m := make(map[string]string)
+
+	/*	openidConnect, _ := openidConnect.New(os.Getenv("OPENID_CONNECT_KEY"), os.Getenv("OPENID_CONNECT_SECRET"), "http://localhost:3000/auth/openid-connect/callback", os.Getenv("OPENID_CONNECT_DISCOVERY_URL"))
+		if openidConnect != nil {
+			goth.UseProviders(openidConnect)
+		}*/
+
+	var keys []string
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	m["vk"] = "VK"
+	sort.Strings(keys)
+
+	providerIndex := &ProviderIndex{Providers: keys, ProvidersMap: m}
 
 	authenticated := func(e endpoint.Endpoint) endpoint.Endpoint {
 		return auth.Authenticated()(session.Verify()(e))
@@ -99,49 +116,52 @@ func Transport(
 	)
 	http.ServerErrorLogger(logger)(recoveryCodesHandler)
 
-
-	signInSocialHandler:=http.NewServer(
+	signInSocialHandler := http.NewServer(
 		MakeSignInSocialEndpoint(srv, parameters),
 		DecodeSignInSocial(PluginParameters{
-			Oath2ProvidersVKClientSecret:parameters.Oath2ProvidersVKClientSecret,
-			Oath2ProvidersVKClientKey:parameters.Oath2ProvidersVKClientKey,
-			Oath2ProvidersVKRedirectUrl:parameters.Oath2ProvidersVKRedirectUrl,
+			Oath2ProvidersVKClientSecret: parameters.Oath2ProvidersVKClientSecret,
+			Oath2ProvidersVKClientKey:    parameters.Oath2ProvidersVKClientKey,
+			Oath2ProvidersVKRedirectUrl:  parameters.Oath2ProvidersVKRedirectUrl,
 		}),
 		http.EncodeJSONResponse,
-		)
+	)
 	//http.ServerErrorHandler(logger)(signInSocialHandler)
 
-	signOutSocialHandler:=http.NewServer(
+	signOutSocialHandler := http.NewServer(
 		MakeSignOutSocial(srv),
 		DecodeSignOutSocial(),
-		http.EncodeJSONResponse,)
+		http.EncodeJSONResponse)
 	//http.ServerErrorHandler(logger)(signOutSocialHandler)
-
-
-
 
 	router.Handle("/auth/signup", signupHandler).Methods("POST")
 	router.Handle("/auth/signin", signinHandler).Methods("POST")
 	router.Handle("/auth/signout", signoutHandler).Methods("GET")
 	router.Handle("/auth/settings/two_factor_authentication/recovery_codes", recoveryCodesHandler).Methods("GET")
 
-	router.HandleFunc("auth/{provider}/signin", func(res http3.ResponseWriter, req *http3.Request) {
-		srv.SignOutSocial(res, req)
+	router.HandleFunc("/auth/{provider}", func(res httpNet.ResponseWriter, req *httpNet.Request) {
+		// try to get the user without re-authenticating
+		if gothUser, err := gothic.CompleteUserAuth(res, req); err == nil {
+			t, _ := template.New("foo").Parse("")
+			t.Execute(res, gothUser)
+		} else {
+			gothic.BeginAuthHandler(res, req)
+		}
 	}).Methods("GET")
 
+	router.HandleFunc("/auth/{provider}/callback", func(res httpNet.ResponseWriter, req *httpNet.Request) {
 
-	router.HandleFunc("auth/{provider}/signout", func(res http3.ResponseWriter, req *http3.Request) {
-		srv.SignInSocial(context.Background(), req, parameters)
-	}).Methods("POST")
+		user, err := gothic.CompleteUserAuth(res, req)
+		if err != nil {
+			fmt.Fprintln(res, err)
+			return
+		}
+		t, _ := template.New("foo").Parse("")
+		t.Execute(res, user)
+	}).Methods("GET")
 
-	/*/auth/{provider}
-	/auth/{provider}/callback
-	/logout/{provider}*/
-
-	//	/auth/verify/(uuid)
-	//	/auth/delete
-	//	/auth/profile
-	// /auth/forgotpassword
-	// /auth/resetpassword/(uuid)
-
+	router.HandleFunc("/logout/{provider}", func(res httpNet.ResponseWriter, req *httpNet.Request) {
+		gothic.Logout(res, req)
+		res.Header().Set("Location", "/")
+		res.WriteHeader(httpNet.StatusTemporaryRedirect)
+	}).Methods("GET")
 }

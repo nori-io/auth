@@ -25,8 +25,6 @@ type Service interface {
 	RecoveryCodes(ctx context.Context, req RecoveryCodesRequest) (resp *RecoveryCodesResponse)
 	SignInSocial(ctx context.Context, req http.Request, parameters PluginParameters) (resp *SignInSocialResponse)
 	SignOutSocial(res http.ResponseWriter, req *http.Request)
-
-
 }
 
 type Config struct {
@@ -39,9 +37,9 @@ type Config struct {
 	UserMfaType                        func() string
 	ActivationTimeForActivationMinutes func() uint
 	ActivationCode                     func() bool
-	Oath2ProvidersVKClientKey		   func() string
-	Oath2ProvidersVKClientSecret	   func() string
-	Oath2ProvidersVKRedirectURL		   func() string
+	Oath2ProvidersVKClientKey          func() string
+	Oath2ProvidersVKClientSecret       func() string
+	Oath2ProvidersVKRedirectURL        func() string
 }
 
 type service struct {
@@ -347,7 +345,7 @@ func (s *service) RecoveryCodes(ctx context.Context, req RecoveryCodesRequest) (
 	return resp
 }
 
-func (s *service) SignInSocial()  {
+func (s *service) SignInSocial() {
 
 }
 

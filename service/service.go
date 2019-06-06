@@ -23,8 +23,8 @@ type Service interface {
 	SignIn(ctx context.Context, req SignInRequest, parameters PluginParameters) (resp *SignInResponse)
 	SignOut(ctx context.Context, req SignOutRequest) (resp *SignOutResponse)
 	RecoveryCodes(ctx context.Context, req RecoveryCodesRequest) (resp *RecoveryCodesResponse)
-	SignInSocial(ctx context.Context, req http.Request, parameters PluginParameters) (resp *SignInSocialResponse)
-	SignOutSocial(res http.ResponseWriter, req *http.Request)
+	/*SignInSocial(ctx context.Context, req http.Request, parameters PluginParameters) (resp *SignInSocialResponse)
+	SignOutSocial(res http.ResponseWriter, req *http.Request)*/
 }
 
 type Config struct {
@@ -39,7 +39,7 @@ type Config struct {
 	ActivationCode                     func() bool
 	Oath2ProvidersVKClientKey          func() string
 	Oath2ProvidersVKClientSecret       func() string
-	Oath2ProvidersVKRedirectURL        func() string
+	Oath2ProvidersVKRedirectUrl       func() string
 }
 
 type service struct {

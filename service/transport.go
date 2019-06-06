@@ -1,11 +1,9 @@
 package service
 
 import (
-	"context"
 	"fmt"
 	"html/template"
 	httpNet "net/http"
-	"os"
 	"sort"
 
 	"github.com/markbates/goth"
@@ -48,7 +46,7 @@ func Transport(
 
 	if (len(parameters.Oath2ProvidersVKClientKey) == 0) && (len(parameters.Oath2ProvidersVKClientSecret) == 0) {
 		goth.UseProviders(
-			vk.New(os.Getenv("VK_KEY"), os.Getenv("VK_SECRET"), "http://localhost:3000/auth/vk/callback"))
+			vk.New(parameters.Oath2ProvidersVKClientKey, parameters.Oath2ProvidersVKClientSecret, parameters.Oath2ProvidersVKRedirectUrl))
 	}
 
 	m := make(map[string]string)
@@ -116,7 +114,7 @@ func Transport(
 	)
 	http.ServerErrorLogger(logger)(recoveryCodesHandler)
 
-	signInSocialHandler := http.NewServer(
+	/*signInSocialHandler := http.NewServer(
 		MakeSignInSocialEndpoint(srv, parameters),
 		DecodeSignInSocial(PluginParameters{
 			Oath2ProvidersVKClientSecret: parameters.Oath2ProvidersVKClientSecret,
@@ -131,7 +129,7 @@ func Transport(
 		MakeSignOutSocial(srv),
 		DecodeSignOutSocial(),
 		http.EncodeJSONResponse)
-	//http.ServerErrorHandler(logger)(signOutSocialHandler)
+	//http.ServerErrorHandler(logger)(signOutSocialHandler)*/
 
 	router.Handle("/auth/signup", signupHandler).Methods("POST")
 	router.Handle("/auth/signin", signinHandler).Methods("POST")
@@ -164,6 +162,15 @@ func Transport(
 		res.Header().Set("Location", "/")
 		res.WriteHeader(httpNet.StatusTemporaryRedirect)
 	}).Methods("GET")
+
+
+	router.HandleFunc("/", func(res httpNet.ResponseWriter, req *httpNet.Request) {
+		t, _ := template.New("foo").Parse(indexTemplate)
+		t.Execute(res, providerIndex)
+	}).Methods("GET")
+	logger.Println("listening on localhost:8080")
+	logger.Error(httpNet.ListenAndServe(":8080 error", signinHandler))
+
 }
 
 

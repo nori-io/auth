@@ -34,13 +34,11 @@ func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {
 		UserRegistrationByEmailAddress:     cm.Bool("user.registration_email_address", "user.registration_email_address value"),
 		UserMfaType:                        cm.String("user.mfa_type", "user.mfa_type value"),
 		ActivationTimeForActivationMinutes: cm.UInt("activation.time_for_activation_minutes", "activation.time_for_activation_minutes value"),
-		ActivationCode:                     cm.Bool("activation.code", "activation.code value")}
-Oath2ProvidersVKClientKey:
-	cm.String("oath2.providers.vk.client_key", "oath2.providers.vk.client_key value")
-Oath2ProvidersVKClientSecret:
-	cm.String("oath2.providers.vk.client_secret", "oath2.providers.vk.client_secret value")
-Oath2ProvidersVKRedirectUrl:
-	cm.String("oath2.providers.vk.redirect_url", "oath2.providers.vk.client_redirect_url")
+		ActivationCode:                     cm.Bool("activation.code", "activation.code value"),
+		Oath2ProvidersVKClientKey:          cm.String("oath2.providers.vk.client_key", "oath2.providers.vk.client_key value"),
+		Oath2ProvidersVKClientSecret:       cm.String("oath2.providers.vk.client_secret", "oath2.providers.vk.client_secret value"),
+		Oath2ProvidersVKRedirectUrl:        cm.String("oath2.providers.vk.redirect_url", "oath2.providers.vk.client_redirect_url"),
+	}
 	return nil
 }
 
@@ -99,6 +97,10 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			UserMfaTypeParameter:               p.config.UserMfaType(),
 			ActivationCode:                     p.config.ActivationCode(),
 			ActivationTimeForActivationMinutes: p.config.ActivationTimeForActivationMinutes(),
+			Oath2ProvidersVKClientKey: 			p.config.Oath2ProvidersVKClientKey(),
+			Oath2ProvidersVKClientSecret: 		p.config.Oath2ProvidersVKClientSecret(),
+			Oath2ProvidersVKRedirectUrl: 		p.config.Oath2ProvidersVKRedirectUrl(),
+
 		}
 
 		service.Transport(auth, transport, session,

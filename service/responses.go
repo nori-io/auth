@@ -66,3 +66,20 @@ func (d *RecoveryCodesResponse) Error() error {
 func (d *RecoveryCodesResponse) StatusCode() int {
 	return d.HttpStatusCode
 }
+type SignInSocialResponse struct {
+	Id             uint64
+	Token          string
+	User           UserResponse
+	MFA            string
+	HttpStatusCode int
+	Err            error
+}
+
+
+func (d *SignInSocialResponse) Error() error {
+	return d.Err
+}
+
+func (d *SignInSocialResponse) StatusCode() int {
+	return d.HttpStatusCode
+}

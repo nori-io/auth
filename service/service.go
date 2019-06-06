@@ -3,12 +3,15 @@ package service
 import (
 	"context"
 	"fmt"
+	"html/template"
+	"net/http"
 	"reflect"
 	"time"
 
 	rest "github.com/cheebo/gorest"
 	"github.com/cheebo/rand"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/markbates/goth/gothic"
 	"github.com/nori-io/nori-common/logger"
 	"github.com/nori-io/nori-interfaces/interfaces"
 
@@ -20,6 +23,10 @@ type Service interface {
 	SignIn(ctx context.Context, req SignInRequest, parameters PluginParameters) (resp *SignInResponse)
 	SignOut(ctx context.Context, req SignOutRequest) (resp *SignOutResponse)
 	RecoveryCodes(ctx context.Context, req RecoveryCodesRequest) (resp *RecoveryCodesResponse)
+	SignInSocial(ctx context.Context, req http.Request, parameters PluginParameters) (resp *SignInSocialResponse)
+	SignOutSocial(res http.ResponseWriter, req *http.Request)
+
+
 }
 
 type Config struct {
@@ -32,6 +39,9 @@ type Config struct {
 	UserMfaType                        func() string
 	ActivationTimeForActivationMinutes func() uint
 	ActivationCode                     func() bool
+	Oath2ProvidersVKClientKey		   func() string
+	Oath2ProvidersVKClientSecret	   func() string
+	Oath2ProvidersVKRedirectURL		   func() string
 }
 
 type service struct {
@@ -335,6 +345,17 @@ func (s *service) RecoveryCodes(ctx context.Context, req RecoveryCodesRequest) (
 	}
 	resp.Codes = codes
 	return resp
+}
+
+func (s *service) SignInSocial()  {
+
+}
+
+func (s *service) SignOutSocial(res http.ResponseWriter, req *http.Request) {
+	if gothUser, err := gothic.CompleteUserAuth(res, req); err == nil {
+		t, _ := template.New("User").Parse("userTemplate")
+		t.Execute(res, gothUser)
+	}
 }
 
 /*func (s *service) MakeProfileEndpoint(ctx context.Context,req ProfileRequest)(resp *ProfileRequest){

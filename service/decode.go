@@ -123,6 +123,19 @@ func DecodeSignOutRequest(_ context.Context, r *http.Request) (interface{}, erro
 	return body, nil
 }
 
+func DecodeSocialSignOutRequest(_ context.Context, r *http.Request) (interface{}, error) {
+
+
+	type SocialSighOut struct {
+		Write http.ResponseWriter
+		Req http.Request
+	}
+
+	return SocialSighOut{}, nil
+}
+
+
+
 func DecodeRecoveryCodes() func(_ context.Context, r *http.Request) (interface{}, error) {
 	return func(_ context.Context, r *http.Request) (interface{}, error) {
 		var body RecoveryCodesRequest

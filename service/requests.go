@@ -71,6 +71,12 @@ func (r SignInRequest) Validate() error {
 	return rest.ValidateResponse(err, 400)
 }
 
+type SignInSocialRequest struct {
+
+}
+
+
+
 // SignOut Request
 type SignOutRequest struct {
 	Name string `json:"name" validate:"name"`

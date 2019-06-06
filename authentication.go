@@ -35,7 +35,9 @@ func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {
 		UserMfaType:                        cm.String("user.mfa_type", "user.mfa_type value"),
 		ActivationTimeForActivationMinutes: cm.UInt("activation.time_for_activation_minutes", "activation.time_for_activation_minutes value"),
 		ActivationCode:                     cm.Bool("activation.code", "activation.code value")}
-
+		Oath2ProvidersVKClientKey:          cm.String("oath2.providers.vk.client_key", "oath2.providers.vk.client_key value")
+		Oath2ProvidersVKClientSecret:		cm.String("oath2.providers.vk.client_secret", "oath2.providers.vk.client_secret value")
+		Oath2ProvidersVKRedirectUrl:		cm.String("oath2.providers.vk.redirect_url", "oath2.providers.vk.client_redirect_url")
 	return nil
 }
 

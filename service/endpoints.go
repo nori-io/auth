@@ -39,3 +39,11 @@ func MakeRecoveryCodesEndpoint(s Service) endpoint.Endpoint {
 		return *resp, resp.Error()
 	}
 }
+
+func MakeSignInSocialEndpoint(s Service, parameters PluginParameters) endpoint.Endpoint {
+	return func(ctx context.Context, r interface{}) (interface{}, error) {
+		req := r.(SignInSocialRequest)
+		resp := s.SignInSocial(ctx, req, parameters)
+		return *resp, resp.Error()
+	}
+}

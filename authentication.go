@@ -97,10 +97,9 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			UserMfaTypeParameter:               p.config.UserMfaType(),
 			ActivationCode:                     p.config.ActivationCode(),
 			ActivationTimeForActivationMinutes: p.config.ActivationTimeForActivationMinutes(),
-			Oath2ProvidersVKClientKey: 			p.config.Oath2ProvidersVKClientKey(),
-			Oath2ProvidersVKClientSecret: 		p.config.Oath2ProvidersVKClientSecret(),
-			Oath2ProvidersVKRedirectUrl: 		p.config.Oath2ProvidersVKRedirectUrl(),
-
+			Oath2ProvidersVKClientKey:          p.config.Oath2ProvidersVKClientKey(),
+			Oath2ProvidersVKClientSecret:       p.config.Oath2ProvidersVKClientSecret(),
+			Oath2ProvidersVKRedirectUrl:        p.config.Oath2ProvidersVKRedirectUrl(),
 		}
 
 		service.Transport(auth, transport, session,

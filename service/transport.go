@@ -163,7 +163,6 @@ func Transport(
 		res.WriteHeader(httpNet.StatusTemporaryRedirect)
 	}).Methods("GET")
 
-
 	router.HandleFunc("/", func(res httpNet.ResponseWriter, req *httpNet.Request) {
 		t, _ := template.New("foo").Parse(indexTemplate)
 		t.Execute(res, providerIndex)
@@ -172,7 +171,6 @@ func Transport(
 	logger.Error(httpNet.ListenAndServe(":8080 error", signinHandler))
 
 }
-
 
 var indexTemplate = `{{range $key,$value:=.Providers}}
     <p><a href="/auth/{{$value}}">Log in with {{index $.ProvidersMap $value}}</a></p>

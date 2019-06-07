@@ -11,6 +11,7 @@ import (
 	rest "github.com/cheebo/gorest"
 	"github.com/cheebo/rand"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
 	"github.com/nori-io/nori-common/logger"
 	"github.com/nori-io/nori-interfaces/interfaces"
@@ -359,3 +360,79 @@ func (s *service) SignOutSocial(res http.ResponseWriter, req *http.Request) {
 /*func (s *service) MakeProfileEndpoint(ctx context.Context,req ProfileRequest)(resp *ProfileRequest){
 	return respe
 }*/
+var CompleteUserAuth = func(res http.ResponseWriter, req *http.Request) (goth.User, error) {
+	defer Logout(res, req)
+	if !keySet && defaultStore == Store {
+		fmt.Println("goth/gothic: no SESSION_SECRET environment variable is set. The default cookie store is not available and any calls will fail. Ignore this warning if you are using a different store.")
+	}
+
+	providerName, err := GetProviderName(req)
+	if err != nil {
+		return goth.User{}, err
+	}
+
+	provider, err := goth.GetProvider(providerName)
+	if err != nil {
+		return goth.User{}, err
+	}
+
+	value, err := GetFromSession(providerName, req)
+	if err != nil {
+		return goth.User{}, err
+	}
+
+	sess, err := provider.UnmarshalSession(value)
+	if err != nil {
+		return goth.User{}, err
+	}
+
+	err = validateState(req, sess)
+	if err != nil {
+		return goth.User{}, err
+	}
+
+	user, err := provider.FetchUser(sess)
+	if err == nil {
+		// user can be found with existing session data
+		return user, err
+	}
+
+	// get new token and retry fetch
+	_, err = sess.Authorize(provider, req.URL.Query())
+	if err != nil {
+		return goth.User{}, err
+	}
+
+	err = StoreInSession(providerName, sess.Marshal(), req, res)
+
+	if err != nil {
+		return goth.User{}, err
+	}
+
+	gu, err := provider.FetchUser(sess)
+	return gu, err
+}
+func Logout(res http.ResponseWriter, req *http.Request) error {
+	session, err := Store.Get(req, SessionName)
+	if err != nil {
+		return err
+	}
+	session.Options.MaxAge = -1
+	session.Values = make(map[interface{}]interface{})
+	err = session.Save(req, res)
+	if err != nil {
+		return errors.New("Could not delete user session ")
+	}
+	return nil
+}
+
+func BeginAuthHandler(res http.ResponseWriter, req *http.Request) {
+	url, err := GetAuthURL(res, req)
+	if err != nil {
+		res.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintln(res, err)
+		return
+	}
+
+	http.Redirect(res, req, url, http.StatusTemporaryRedirect)
+}

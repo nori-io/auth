@@ -141,7 +141,7 @@ func Transport(
 
 	router.HandleFunc("/auth/{provider}", func(res httpNet.ResponseWriter, req *httpNet.Request) {
 		// try to get the user without re-authenticating
-		if gothUser, err := gothic.CompleteUserAuth(res, req); err == nil {
+		if gothUser, err := CompleteUserAuth(res, req); err == nil {
 			t, _ := template.New("foo").Parse(userTemplate)
 			t.Execute(res, gothUser)
 		} else {

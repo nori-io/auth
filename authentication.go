@@ -38,6 +38,7 @@ func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {
 		Oath2ProvidersVKClientKey:          cm.String("oath2.providers.vk.client_key", "oath2.providers.vk.client_key value"),
 		Oath2ProvidersVKClientSecret:       cm.String("oath2.providers.vk.client_secret", "oath2.providers.vk.client_secret value"),
 		Oath2ProvidersVKRedirectUrl:        cm.String("oath2.providers.vk.redirect_url", "oath2.providers.vk.client_redirect_url"),
+		Oath2SessionSecret:                 cm.String("oath2.session_secret", "oath2.session_secret"),
 	}
 	return nil
 }
@@ -100,6 +101,7 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			Oath2ProvidersVKClientKey:          p.config.Oath2ProvidersVKClientKey(),
 			Oath2ProvidersVKClientSecret:       p.config.Oath2ProvidersVKClientSecret(),
 			Oath2ProvidersVKRedirectUrl:        p.config.Oath2ProvidersVKRedirectUrl(),
+			Oath2SessionSecret:                 p.config.Oath2SessionSecret(),
 		}
 
 		service.Transport(auth, transport, session,

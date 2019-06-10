@@ -10,7 +10,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -28,7 +27,8 @@ var defaultStore sessions.Store
 var keySet = false
 
 func init() {
-	key := []byte(os.Getenv("SESSION_SECRET"))
+
+	key := []byte(Oath2SessionSecret)
 	keySet = len(key) != 0
 
 	cookieStore := sessions.NewCookieStore([]byte(key))

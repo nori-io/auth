@@ -39,6 +39,7 @@ type Config struct {
 	Oath2ProvidersVKClientKey          func() string
 	Oath2ProvidersVKClientSecret       func() string
 	Oath2ProvidersVKRedirectUrl        func() string
+	Oath2SessionSecret                 func() string
 }
 
 type service struct {
@@ -349,11 +350,9 @@ func (s *service) SignInSocial() {
 }
 
 func (s *service) SignOutSocial(res http.ResponseWriter, req *http.Request) {
-	
+
 }
 
 /*func (s *service) MakeProfileEndpoint(ctx context.Context,req ProfileRequest)(resp *ProfileRequest){
 	return respe
 }*/
-
-

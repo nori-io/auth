@@ -26,7 +26,10 @@ type PluginParameters struct {
 	Oath2ProvidersVKClientKey          string
 	Oath2ProvidersVKClientSecret       string
 	Oath2ProvidersVKRedirectUrl        string
+	Oath2SessionSecret                 string
 }
+
+var Oath2SessionSecret string
 
 func Transport(
 	auth interfaces.Auth,
@@ -55,7 +58,7 @@ func Transport(
 		if openidConnect != nil {
 			goth.UseProviders(openidConnect)
 		}*/
-
+	Oath2SessionSecret = parameters.Oath2SessionSecret
 	var keys []string
 	for k := range m {
 		keys = append(keys, k)

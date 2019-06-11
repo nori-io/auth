@@ -26,7 +26,6 @@ type Service interface {
 	SignInSocial(res http.ResponseWriter, req http.Request) (resp *SignInSocialResponse)
 	SignOutSocial(res http.ResponseWriter, req http.Request) (resp *SignOutSocialResponse)
 
-
 	/*SignInSocial(ctx context.Context, req http.Request, parameters PluginParameters) (resp *SignInSocialResponse)
 	SignOutSocial(res http.ResponseWriter, req *http.Request)*/
 }
@@ -353,19 +352,19 @@ func (s *service) RecoveryCodes(ctx context.Context, req RecoveryCodesRequest) (
 func (s *service) SignInSocial(res http.ResponseWriter, req http.Request) (resp *SignInSocialResponse) {
 
 	// try to get the user without re-authenticating
-		if gothUser, err := CompleteUserAuth(res, &req); err == nil {
-			t, _ :=template.New("foo").Parse(userTemplate)
-			t.Execute(res, gothUser)
-		} else {
-			BeginAuthHandler(res, &req)
-			return nil
-		}
+	if gothUser, err := CompleteUserAuth(res, &req); err == nil {
+		t, _ := template.New("foo").Parse(userTemplate)
+		t.Execute(res, gothUser)
+	} else {
+		BeginAuthHandler(res, &req)
+		return nil
+	}
 
-		return resp
+	return resp
 }
 
 func (s *service) SignOutSocial(res http.ResponseWriter, req http.Request) (resp *SignOutSocialResponse) {
-return nil
+	return nil
 }
 
 var indexTemplate = `{{range $key,$value:=.Providers}}
@@ -385,4 +384,3 @@ var userTemplate = `
 <p>ExpiresAt: {{.ExpiresAt}}</p>
 <p>RefreshToken: {{.RefreshToken}}</p>
 `
-

@@ -49,13 +49,12 @@ func MakeSignInSocialEndpoint(s Service, parameters PluginParameters) endpoint.E
 	return nil
 }
 
-func MakeSignOutSocial(s Service) endpoint.Endpoint  {
+func MakeSignOutSocial(s Service) endpoint.Endpoint {
 	return nil
 }
 
-	/*return func(ctx context.Context, r interface{}) (interface{}, error) {
-		req := r.(SignInSocialRequest)
-	resp := s.SignInSocial(ctx, req, parameters)
-		return *resp, resp.Error()
-	}*/
-
+/*return func(ctx context.Context, r interface{}) (interface{}, error) {
+	req := r.(SignInSocialRequest)
+resp := s.SignInSocial(ctx, req, parameters)
+	return *resp, resp.Error()
+}*/

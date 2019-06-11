@@ -26,7 +26,7 @@ var defaultStore sessions.Store
 
 var keySet = false
 
-func init() {
+func Init(Oath2SessionSecret string) {
 
 	key := []byte(Oath2SessionSecret)
 	keySet = len(key) != 0

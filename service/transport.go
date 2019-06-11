@@ -59,6 +59,7 @@ func Transport(
 			goth.UseProviders(openidConnect)
 		}*/
 	Oath2SessionSecret = parameters.Oath2SessionSecret
+	Init(Oath2SessionSecret)
 	var keys []string
 	for k := range m {
 		keys = append(keys, k)
@@ -117,25 +118,26 @@ func Transport(
 	)
 	http.ServerErrorLogger(logger)(recoveryCodesHandler)
 
-/*	signInSocialHandler := http.NewServer(
-		MakeSignInSocialEndpoint(srv, parameters),
-		DecodeSignInSocial,
-		http.EncodeJSONResponse,
-	)
-	http.ServerErrorHandler(logger)(signInSocialHandler)
+	/*	signInSocialHandler := http.NewServer(
+			MakeSignInSocialEndpoint(srv, parameters),
+			DecodeSignInSocial,
+			http.EncodeJSONResponse,
+		)
+		http.ServerErrorHandler(logger)(signInSocialHandler)
 
-	signOutSocialHandler := http.NewServer(
-		MakeSignOutSocial(srv),
-		DecodeSocialSignOut,
-		http.EncodeJSONResponse)
-	http.ServerErrorHandler(logger)(signOutSocialHandler)*/
+		signOutSocialHandler := http.NewServer(
+			MakeSignOutSocial(srv),
+			DecodeSocialSignOut,
+			http.EncodeJSONResponse)
+		http.ServerErrorHandler(logger)(signOutSocialHandler)*/
 
 	router.Handle("/auth/signup", signupHandler).Methods("POST")
 	router.Handle("/auth/signin", signinHandler).Methods("POST")
 	router.Handle("/auth/signout", signoutHandler).Methods("GET")
 	router.Handle("/auth/settings/two_factor_authentication/recovery_codes", recoveryCodesHandler).Methods("GET")
 
-	router.HandleFunc("/auth/{provider}", func(res httpNet.ResponseWriter, req *httpNet.Request){
+	router.HandleFunc("/auth/{provider}", func(res httpNet.ResponseWriter, req *httpNet.Request) {
+
 		srv.SignInSocial(res, *req)
 	}).Methods("GET")
 
@@ -164,5 +166,3 @@ func Transport(
 	logger.Error(httpNet.ListenAndServe(":8080 error", signinHandler))
 
 }
-
-

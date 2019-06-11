@@ -123,12 +123,10 @@ func DecodeSignOutRequest(_ context.Context, r *http.Request) (interface{}, erro
 	return body, nil
 }
 
-func DecodeSignInSocial(_ context.Context, r *http.Request) (interface{}, error)  {
+func DecodeSignInSocial(_ context.Context, r *http.Request) (interface{}, error) {
 
-
-	return nil,nil
+	return nil, nil
 }
-
 
 func DecodeSocialSignOut(_ context.Context, r *http.Request) (interface{}, error) {
 

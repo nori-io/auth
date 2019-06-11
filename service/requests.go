@@ -98,5 +98,4 @@ func isNumber(s string) error {
 }
 
 type SignOutSocialRequest struct {
-
 }

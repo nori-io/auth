@@ -96,4 +96,3 @@ func (d *SignOutSocialResponse) Error() error {
 func (d *SignOutSocialResponse) StatusCode() int {
 	return d.HttpStatusCode
 }
-

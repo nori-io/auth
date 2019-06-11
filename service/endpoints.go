@@ -40,10 +40,22 @@ func MakeRecoveryCodesEndpoint(s Service) endpoint.Endpoint {
 	}
 }
 
-//func MakeSignInSocialEndpoint(s Service, parameters PluginParameters) endpoint.Endpoint {
-//	return func(ctx context.Context, r interface{}) (interface{}, error) {
-//		req := r.(SignInSocialRequest)
-//		resp := s.SignInSocial(ctx, req, parameters)
-//		return *resp, resp.Error()
-//	}
-//}
+func MakeSignInSocialEndpoint(s Service, parameters PluginParameters) endpoint.Endpoint {
+	/*return func(ctx context.Context, r interface{}) (interface{}, error) {
+		req := r.(SignInSocialRequest)
+		resp := s.SignInSocial(ctx, req)
+		return *resp, resp.Error()
+	}*/
+	return nil
+}
+
+func MakeSignOutSocial(s Service) endpoint.Endpoint  {
+	return nil
+}
+
+	/*return func(ctx context.Context, r interface{}) (interface{}, error) {
+		req := r.(SignInSocialRequest)
+	resp := s.SignInSocial(ctx, req, parameters)
+		return *resp, resp.Error()
+	}*/
+

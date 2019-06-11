@@ -123,7 +123,14 @@ func DecodeSignOutRequest(_ context.Context, r *http.Request) (interface{}, erro
 	return body, nil
 }
 
-func DecodeSocialSignOutRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func DecodeSignInSocial(_ context.Context, r *http.Request) (interface{}, error)  {
+
+
+	return nil,nil
+}
+
+
+func DecodeSocialSignOut(_ context.Context, r *http.Request) (interface{}, error) {
 
 	type SocialSighOut struct {
 		Write http.ResponseWriter

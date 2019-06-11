@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"html/template"
 	"net/http"
 	"reflect"
 	"time"
@@ -22,6 +23,10 @@ type Service interface {
 	SignIn(ctx context.Context, req SignInRequest, parameters PluginParameters) (resp *SignInResponse)
 	SignOut(ctx context.Context, req SignOutRequest) (resp *SignOutResponse)
 	RecoveryCodes(ctx context.Context, req RecoveryCodesRequest) (resp *RecoveryCodesResponse)
+	SignInSocial(res http.ResponseWriter, req http.Request) (resp *SignInSocialResponse)
+	SignOutSocial(res http.ResponseWriter, req http.Request) (resp *SignOutSocialResponse)
+
+
 	/*SignInSocial(ctx context.Context, req http.Request, parameters PluginParameters) (resp *SignInSocialResponse)
 	SignOutSocial(res http.ResponseWriter, req *http.Request)*/
 }
@@ -345,14 +350,39 @@ func (s *service) RecoveryCodes(ctx context.Context, req RecoveryCodesRequest) (
 	return resp
 }
 
-func (s *service) SignInSocial() {
+func (s *service) SignInSocial(res http.ResponseWriter, req http.Request) (resp *SignInSocialResponse) {
 
+	// try to get the user without re-authenticating
+		if gothUser, err := CompleteUserAuth(res, &req); err == nil {
+			t, _ :=template.New("foo").Parse(userTemplate)
+			t.Execute(res, gothUser)
+		} else {
+			BeginAuthHandler(res, &req)
+			return nil
+		}
+
+		return resp
 }
 
-func (s *service) SignOutSocial(res http.ResponseWriter, req *http.Request) {
-
+func (s *service) SignOutSocial(res http.ResponseWriter, req http.Request) (resp *SignOutSocialResponse) {
+return nil
 }
 
-/*func (s *service) MakeProfileEndpoint(ctx context.Context,req ProfileRequest)(resp *ProfileRequest){
-	return respe
-}*/
+var indexTemplate = `{{range $key,$value:=.Providers}}
+    <p><a href="/auth/{{$value}}">Log in with {{index $.ProvidersMap $value}}</a></p>
+{{end}}`
+
+var userTemplate = `
+<p><a href="/logout/{{.Provider}}">logout</a></p>
+<p>Name: {{.Name}} [{{.LastName}}, {{.FirstName}}]</p>
+<p>Email: {{.Email}}</p>
+<p>NickName: {{.NickName}}</p>
+<p>Location: {{.Location}}</p>
+<p>AvatarURL: {{.AvatarURL}} <img src="{{.AvatarURL}}"></p>
+<p>Description: {{.Description}}</p>
+<p>UserID: {{.UserID}}</p>
+<p>AccessToken: {{.AccessToken}}</p>
+<p>ExpiresAt: {{.ExpiresAt}}</p>
+<p>RefreshToken: {{.RefreshToken}}</p>
+`
+

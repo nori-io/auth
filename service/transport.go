@@ -117,41 +117,31 @@ func Transport(
 	)
 	http.ServerErrorLogger(logger)(recoveryCodesHandler)
 
-	/*signInSocialHandler := http.NewServer(
+/*	signInSocialHandler := http.NewServer(
 		MakeSignInSocialEndpoint(srv, parameters),
-		DecodeSignInSocial(PluginParameters{
-			Oath2ProvidersVKClientSecret: parameters.Oath2ProvidersVKClientSecret,
-			Oath2ProvidersVKClientKey:    parameters.Oath2ProvidersVKClientKey,
-			Oath2ProvidersVKRedirectUrl:  parameters.Oath2ProvidersVKRedirectUrl,
-		}),
+		DecodeSignInSocial,
 		http.EncodeJSONResponse,
 	)
-	//http.ServerErrorHandler(logger)(signInSocialHandler)
+	http.ServerErrorHandler(logger)(signInSocialHandler)
 
 	signOutSocialHandler := http.NewServer(
 		MakeSignOutSocial(srv),
-		DecodeSignOutSocial(),
+		DecodeSocialSignOut,
 		http.EncodeJSONResponse)
-	//http.ServerErrorHandler(logger)(signOutSocialHandler)*/
+	http.ServerErrorHandler(logger)(signOutSocialHandler)*/
 
 	router.Handle("/auth/signup", signupHandler).Methods("POST")
 	router.Handle("/auth/signin", signinHandler).Methods("POST")
 	router.Handle("/auth/signout", signoutHandler).Methods("GET")
 	router.Handle("/auth/settings/two_factor_authentication/recovery_codes", recoveryCodesHandler).Methods("GET")
 
-	router.HandleFunc("/auth/{provider}", func(res httpNet.ResponseWriter, req *httpNet.Request) {
-		// try to get the user without re-authenticating
-		if gothUser, err := CompleteUserAuth(res, req); err == nil {
-			t, _ := template.New("foo").Parse(userTemplate)
-			t.Execute(res, gothUser)
-		} else {
-			gothic.BeginAuthHandler(res, req)
-		}
+	router.HandleFunc("/auth/{provider}", func(res httpNet.ResponseWriter, req *httpNet.Request){
+		srv.SignInSocial(res, *req)
 	}).Methods("GET")
 
 	router.HandleFunc("/auth/{provider}/callback", func(res httpNet.ResponseWriter, req *httpNet.Request) {
 
-		user, err := gothic.CompleteUserAuth(res, req)
+		user, err := CompleteUserAuth(res, req)
 		if err != nil {
 			fmt.Fprintln(res, err)
 			return
@@ -175,20 +165,4 @@ func Transport(
 
 }
 
-var indexTemplate = `{{range $key,$value:=.Providers}}
-    <p><a href="/auth/{{$value}}">Log in with {{index $.ProvidersMap $value}}</a></p>
-{{end}}`
 
-var userTemplate = `
-<p><a href="/logout/{{.Provider}}">logout</a></p>
-<p>Name: {{.Name}} [{{.LastName}}, {{.FirstName}}]</p>
-<p>Email: {{.Email}}</p>
-<p>NickName: {{.NickName}}</p>
-<p>Location: {{.Location}}</p>
-<p>AvatarURL: {{.AvatarURL}} <img src="{{.AvatarURL}}"></p>
-<p>Description: {{.Description}}</p>
-<p>UserID: {{.UserID}}</p>
-<p>AccessToken: {{.AccessToken}}</p>
-<p>ExpiresAt: {{.ExpiresAt}}</p>
-<p>RefreshToken: {{.RefreshToken}}</p>
-`

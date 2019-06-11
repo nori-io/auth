@@ -83,3 +83,17 @@ func (d *SignInSocialResponse) Error() error {
 func (d *SignInSocialResponse) StatusCode() int {
 	return d.HttpStatusCode
 }
+
+type SignOutSocialResponse struct {
+	HttpStatusCode int
+	Err            error
+}
+
+func (d *SignOutSocialResponse) Error() error {
+	return d.Err
+}
+
+func (d *SignOutSocialResponse) StatusCode() int {
+	return d.HttpStatusCode
+}
+

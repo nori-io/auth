@@ -96,3 +96,7 @@ func isNumber(s string) error {
 	}
 	return nil
 }
+
+type SignOutSocialRequest struct {
+
+}

@@ -37,9 +37,10 @@ func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {
 		ActivationCode:                     cm.Bool("activation.code", "activation.code value"),
 		Oath2ProvidersVKClientKey:          cm.String("oath2.providers.vk.client_key", "oath2.providers.vk.client_key value"),
 		Oath2ProvidersVKClientSecret:       cm.String("oath2.providers.vk.client_secret", "oath2.providers.vk.client_secret value"),
-		Oath2ProvidersVKRedirectUrl:        cm.String("oath2.providers.vk.redirect_url", "oath2.providers.vk.client_redirect_url"),
-		Oath2SessionSecret:                 cm.String("oath2.session_secret", "oath2.session_secret"),
+		Oath2ProvidersVKRedirectUrl:        cm.String("oath2.providers.vk.redirect_url", "oath2.providers.vk.client_redirect_url value"),
+		Oath2SessionSecret:                 cm.String("oath2.session_secret", "oath2.session_secret value"),
 	}
+
 	return nil
 }
 

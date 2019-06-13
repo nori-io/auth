@@ -29,6 +29,7 @@ var keySet = false
 func Init(Oath2SessionSecret string) {
 
 	key := []byte(Oath2SessionSecret)
+
 	keySet = len(key) != 0
 
 	cookieStore := sessions.NewCookieStore([]byte(key))

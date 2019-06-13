@@ -136,8 +136,10 @@ func Transport(
 	router.Handle("/auth/signout", signoutHandler).Methods("GET")
 	router.Handle("/auth/settings/two_factor_authentication/recovery_codes", recoveryCodesHandler).Methods("GET")
 
-	router.HandleFunc("/auth/{provider}", func(res httpNet.ResponseWriter, req *httpNet.Request) {
-
+	router.HandleFunc("/auth/vk", func(res httpNet.ResponseWriter, req *httpNet.Request) {
+		fmt.Println("/auth/{provider}", "here")
+		Oath2SessionSecret := parameters.Oath2SessionSecret
+		Init(Oath2SessionSecret)
 		srv.SignInSocial(res, *req)
 	}).Methods("GET")
 

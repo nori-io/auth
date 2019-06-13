@@ -42,7 +42,7 @@ func Transport(
 
 ) {
 
-	if (len(parameters.Oath2ProvidersVKClientKey) == 0) && (len(parameters.Oath2ProvidersVKClientSecret) == 0) {
+	if (len(parameters.Oath2ProvidersVKClientKey) > 0) && (len(parameters.Oath2ProvidersVKClientSecret) > 0) {
 		goth.UseProviders(
 			vk.New(parameters.Oath2ProvidersVKClientKey, parameters.Oath2ProvidersVKClientSecret, parameters.Oath2ProvidersVKRedirectUrl))
 	}

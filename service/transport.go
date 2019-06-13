@@ -7,7 +7,6 @@ import (
 	"sort"
 
 	"github.com/markbates/goth"
-	"github.com/markbates/goth/gothic"
 	"github.com/markbates/goth/providers/vk"
 	"github.com/nori-io/nori-common/endpoint"
 	"github.com/nori-io/nori-common/logger"
@@ -147,7 +146,7 @@ func Transport(
 	}).Methods("GET")
 
 	router.HandleFunc("/logout/{provider}", func(res httpNet.ResponseWriter, req *httpNet.Request) {
-		gothic.Logout(res, req)
+		Logout(res, req)
 		res.Header().Set("Location", "/")
 		res.WriteHeader(httpNet.StatusTemporaryRedirect)
 	}).Methods("GET")

@@ -42,30 +42,24 @@ func Transport(
 
 ) {
 
-	type ProviderIndex struct {
-		Providers    []string
-		ProvidersMap map[string]string
-	}
-
 	if (len(parameters.Oath2ProvidersVKClientKey) == 0) && (len(parameters.Oath2ProvidersVKClientSecret) == 0) {
 		goth.UseProviders(
 			vk.New(parameters.Oath2ProvidersVKClientKey, parameters.Oath2ProvidersVKClientSecret, parameters.Oath2ProvidersVKRedirectUrl))
 	}
 
-	m := make(map[string]string)
-
-	/*	openidConnect, _ := openidConnect.New(os.Getenv("OPENID_CONNECT_KEY"), os.Getenv("OPENID_CONNECT_SECRET"), "http://localhost:3000/auth/openid-connect/callback", os.Getenv("OPENID_CONNECT_DISCOVERY_URL"))
-		if openidConnect != nil {
-			goth.UseProviders(openidConnect)
-		}*/
 	Oath2SessionSecret = parameters.Oath2SessionSecret
 	Init(Oath2SessionSecret)
+
+	type ProviderIndex struct {
+		Providers    []string
+		ProvidersMap map[string]string
+	}
+	m := make(map[string]string)
+	m["vk"] = "VK"
 	var keys []string
 	for k := range m {
 		keys = append(keys, k)
 	}
-	sort.Strings(keys)
-	m["vk"] = "VK"
 	sort.Strings(keys)
 
 	providerIndex := &ProviderIndex{Providers: keys, ProvidersMap: m}
@@ -136,10 +130,8 @@ func Transport(
 	router.Handle("/auth/signout", signoutHandler).Methods("GET")
 	router.Handle("/auth/settings/two_factor_authentication/recovery_codes", recoveryCodesHandler).Methods("GET")
 
-	router.HandleFunc("/auth/vk", func(res httpNet.ResponseWriter, req *httpNet.Request) {
+	router.HandleFunc("/auth/{provider}", func(res httpNet.ResponseWriter, req *httpNet.Request) {
 		fmt.Println("/auth/{provider}", "here")
-		Oath2SessionSecret := parameters.Oath2SessionSecret
-		Init(Oath2SessionSecret)
 		srv.SignInSocial(res, *req)
 	}).Methods("GET")
 

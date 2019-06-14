@@ -145,26 +145,35 @@ var CompleteUserAuth = func(res http.ResponseWriter, req *http.Request) (goth.Us
 	if err != nil {
 		return goth.User{}, err
 	}
+	fmt.Println("Provide name is", providerName)
 
 	provider, err := goth.GetProvider(providerName)
 	if err != nil {
 		return goth.User{}, err
 	}
 
+	fmt.Println("Provide is", provider)
+
 	value, err := GetFromSession(providerName, req)
 	if err != nil {
 		return goth.User{}, err
 	}
+
+	fmt.Println("Value from session", value)
 
 	sess, err := provider.UnmarshalSession(value)
 	if err != nil {
 		return goth.User{}, err
 	}
 
+	fmt.Println("Session with unmarshall", sess, "  ", err)
+
 	err = validateState(req, sess)
 	if err != nil {
 		return goth.User{}, err
 	}
+
+	fmt.Println("validateState", err)
 
 	user, err := provider.FetchUser(sess)
 	if err == nil {
@@ -178,16 +187,103 @@ var CompleteUserAuth = func(res http.ResponseWriter, req *http.Request) (goth.Us
 		return goth.User{}, err
 	}
 
+	fmt.Println("sess.Authorize", err)
+
 	err = StoreInSession(providerName, sess.Marshal(), req, res)
+	fmt.Println("StoreInSession", err)
 
 	if err != nil {
 		return goth.User{}, err
 	}
 
 	gu, err := provider.FetchUser(sess)
+
+	fmt.Println("provider.FetchUser", gu, "     ", err)
+	type sessionData struct {
+		name string
+	}
+
 	return gu, err
 }
 
+/*var CompleteUserAuth = func(res http.ResponseWriter, req *http.Request) (goth.User, error) {
+	defer Logout(res, req)
+	if !keySet && defaultStore == Store {
+		fmt.Println("goth/gothic: no SESSION_SECRET environment variable is set. The default cookie store is not available and any calls will fail. Ignore this warning if you are using a different store.")
+	}
+
+	providerName, err := GetProviderName(req)
+	if err != nil {
+		return goth.User{}, err
+	}
+	fmt.Println("Provide name is", providerName)
+
+	provider, err := goth.GetProvider(providerName)
+	if err != nil {
+		return goth.User{}, err
+	}
+
+	fmt.Println("Provide is", provider)
+
+
+	value, err := GetFromSession(providerName, req)
+	if err != nil {
+		return goth.User{}, err
+	}
+
+	fmt.Println("Value from session", value)
+
+
+	sess, err := provider.UnmarshalSession(value)
+	if err != nil {
+		return goth.User{}, err
+	}
+
+	fmt.Println("Session with unmarshall", sess, "  ", err)
+
+
+
+	err = validateState(req, sess)
+	if err != nil {
+		return goth.User{}, err
+	}
+
+	fmt.Println("validateState", err)
+
+
+	user, err := provider.FetchUser(sess)
+	if err == nil {
+		// user can be found with existing session data
+		return user, err
+	}
+
+	fmt.Println("user", user)
+
+
+
+	// get new token and retry fetch
+	_, err = sess.Authorize(provider, req.URL.Query())
+	if err != nil {
+		return goth.User{}, err
+	}
+
+	fmt.Println("sess.Authorize", err)
+
+	err = StoreInSession(providerName, sess.Marshal(), req, res)
+	fmt.Println("StoreInSession", err)
+
+
+	if err != nil {
+		return goth.User{}, err
+	}
+
+	gu, err := provider.FetchUser(sess)
+
+	fmt.Println("provider.FetchUser", gu, "     ", err)
+
+	return gu, err
+}
+*/
 // validateState ensures that the state token param from the original
 // AuthURL matches the one included in the current (callback) request.
 func validateState(req *http.Request, sess goth.Session) error {

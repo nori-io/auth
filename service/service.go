@@ -11,7 +11,6 @@ import (
 	rest "github.com/cheebo/gorest"
 	"github.com/cheebo/rand"
 	"github.com/dgrijalva/jwt-go"
-
 	"github.com/nori-io/nori-common/logger"
 	"github.com/nori-io/nori-interfaces/interfaces"
 
@@ -352,13 +351,17 @@ func (s *service) RecoveryCodes(ctx context.Context, req RecoveryCodesRequest) (
 func (s *service) SignInSocial(res http.ResponseWriter, req http.Request) (resp *SignInSocialResponse) {
 
 	// try to get the user without re-authenticating
-	if gothUser, err := CompleteUserAuth(res, &req); err == nil {
+	gothUser, err := CompleteUserAuth(res, &req)
+	if err == nil {
 		t, _ := template.New("foo").Parse(userTemplate)
 		t.Execute(res, gothUser)
 	} else {
 		BeginAuthHandler(res, &req)
 		return nil
 	}
+	s.session.Save([]byte(gothUser.AccessToken), sessionData{name: gothUser.Email}, 0)
+
+	fmt.Println("session.Get", s.session.Get([]byte("zT6hfj3DshfF4ewehgwLsd91412dsW4F"), sessionData{}))
 
 	return resp
 }

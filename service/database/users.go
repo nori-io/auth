@@ -164,3 +164,73 @@ func (u *user) Update_MfaType(modelUsers *UsersModel) error {
 	}
 	return err
 }
+
+func (u *user) CreateAuthProvider(modelAuthProvider *AuthProvidersModel, modelUsers *UsersModel) error {
+	var (
+		lastIdNumber uint64
+	)
+
+	ctx := context.Background()
+
+	tx, err := u.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
+	if err != nil {
+		return err
+	}
+	if len(modelUsers.Mfa_type) == 0 {
+		stmt, err := tx.Prepare("INSERT INTO users (status_account, type, created, updated) VALUES(?,?,?,?)")
+		if err != nil {
+			return err
+		}
+		defer stmt.Close()
+
+		_, execErr := stmt.Exec(modelUsers.Status_account, modelUsers.Type, time.Now(), time.Now())
+		if execErr != nil {
+			_ = tx.Rollback()
+			return execErr
+		}
+	} else {
+
+		stmt, err := tx.Prepare("INSERT INTO users (status_account, type, created, updated,mfa_type) VALUES(?,?,?,?)")
+		if err != nil {
+			return err
+		}
+		defer stmt.Close()
+
+		_, execErr := stmt.Exec(modelUsers.Status_account, modelUsers.Type, time.Now(), time.Now(), modelUsers.Mfa_type)
+		if execErr != nil {
+			_ = tx.Rollback()
+			return execErr
+		}
+
+	}
+
+	lastId, err := tx.Query("SELECT LAST_INSERT_ID()")
+	if err != nil {
+		return err
+	}
+	if lastId.Err() != nil {
+		return err
+	}
+	defer lastId.Close()
+	for lastId.Next() {
+		var m AuthModel
+		lastId.Scan(&m.Id)
+		lastIdNumber = m.Id
+	}
+
+	stmt, err := tx.Prepare("INSERT INTO auth_providers (provider, provider_user_key,user_id) VALUES(?,?,?,?,?,?,?,?,?)")
+	if err != nil {
+		return err
+	}
+	_, execErr := stmt.Exec(modelAuthProvider.Provider, modelAuthProvider.ProviderUserKey, lastIdNumber)
+	if execErr != nil {
+		_ = tx.Rollback()
+		return execErr
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+	return nil
+
+}

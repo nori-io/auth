@@ -136,7 +136,7 @@ func Transport(
 
 	router.HandleFunc("/auth/{provider}/callback", func(res httpNet.ResponseWriter, req *httpNet.Request) {
 
-		user, err := CompleteUserAuth(res, req, session)
+		user, err := CompleteUserAuth(res, req)
 		if err != nil {
 			fmt.Fprintln(res, err)
 			return

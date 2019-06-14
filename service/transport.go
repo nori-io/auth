@@ -147,8 +147,7 @@ func Transport(
 
 	router.HandleFunc("/logout/{provider}", func(res httpNet.ResponseWriter, req *httpNet.Request) {
 		Logout(res, req)
-		res.Header().Set("Location", "/")
-		res.WriteHeader(httpNet.StatusTemporaryRedirect)
+
 	}).Methods("GET")
 
 	router.HandleFunc("/", func(res httpNet.ResponseWriter, req *httpNet.Request) {

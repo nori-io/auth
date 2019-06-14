@@ -367,6 +367,8 @@ func (s *service) SignInSocial(res http.ResponseWriter, req http.Request) (resp 
 }
 
 func (s *service) SignOutSocial(res http.ResponseWriter, req http.Request) (resp *SignOutSocialResponse) {
+	res.Header().Set("Location", "/")
+	res.WriteHeader(http.StatusTemporaryRedirect)
 	return nil
 }
 

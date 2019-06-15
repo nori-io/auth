@@ -111,19 +111,6 @@ func Transport(
 	)
 	http.ServerErrorLogger(logger)(recoveryCodesHandler)
 
-	/*	signInSocialHandler := http.NewServer(
-			MakeSignInSocialEndpoint(srv, parameters),
-			DecodeSignInSocial,
-			http.EncodeJSONResponse,
-		)
-		http.ServerErrorHandler(logger)(signInSocialHandler)
-
-		signOutSocialHandler := http.NewServer(
-			MakeSignOutSocial(srv),
-			DecodeSocialSignOut,
-			http.EncodeJSONResponse)
-		http.ServerErrorHandler(logger)(signOutSocialHandler)*/
-
 	router.Handle("/auth/signup", signupHandler).Methods("POST")
 	router.Handle("/auth/signin", signinHandler).Methods("POST")
 	router.Handle("/auth/signout", signoutHandler).Methods("GET")
@@ -136,7 +123,7 @@ func Transport(
 
 	router.HandleFunc("/auth/{provider}/callback", func(res httpNet.ResponseWriter, req *httpNet.Request) {
 
-		user, err := CompleteUserAuth(res, req)
+		user, err := CompleteUserAuth(res, req, session)
 		if err != nil {
 			fmt.Fprintln(res, err)
 			return
@@ -146,7 +133,7 @@ func Transport(
 	}).Methods("GET")
 
 	router.HandleFunc("/logout/{provider}", func(res httpNet.ResponseWriter, req *httpNet.Request) {
-		Logout(res, req)
+		Logout(res, req, session)
 
 	}).Methods("GET")
 

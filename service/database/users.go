@@ -234,4 +234,3 @@ func (u *user) CreateAuthProvider(modelAuthProvider *AuthProvidersModel, modelUs
 	return nil
 
 }
-

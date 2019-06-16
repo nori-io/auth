@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 
+	rand2 "github.com/cheebo/rand"
 	"github.com/gorilla/mux"
 	"github.com/markbates/goth"
 	"github.com/nori-io/nori-interfaces/interfaces"
@@ -138,19 +139,27 @@ var CompleteUserAuth = func(res http.ResponseWriter, req *http.Request, session 
 	if err != nil {
 		return goth.User{}, err
 	}
-
-	fmt.Println("Provide is", provider)
+    fmt.Println("provider is", provider)
+	sid := rand2.RandomAlphaNum(32)
 
 	var sd sessionData
 
-	err = session.Get([]byte(providerName), &sd)
+	session.Save([]byte(sid), sessionData{provider:providerName}, 0)
+
+	err=session.Get([]byte(sid), &sd)
+    fmt.Println(err)
+	fmt.Println("sd.provider", sd.provider)
+
+
+
+	err = session.Get([]byte(sid), &sd)
 	if err != nil {
 		return goth.User{}, err
 	}
 
 	fmt.Println("Value from session", sd)
 
-	sess, err := provider.UnmarshalSession(sd.name)
+	sess, err := provider.UnmarshalSession(sid)
 	if err != nil {
 		return goth.User{}, err
 	}

@@ -57,6 +57,7 @@ type service struct {
 
 type sessionData struct {
 	name string
+	provider string
 }
 
 func NewService(
@@ -351,6 +352,8 @@ func (s *service) RecoveryCodes(ctx context.Context, req RecoveryCodesRequest) (
 func (s *service) SignInSocial(res http.ResponseWriter, req http.Request) (resp *SignInSocialResponse) {
 
 	// try to get the user without re-authenticating
+
+	fmt.Println("s.session is", s.session)
 	gothUser, err := CompleteUserAuth(res, &req, s.session)
 	fmt.Println("err is", err)
 	if err == nil {
@@ -361,11 +364,7 @@ func (s *service) SignInSocial(res http.ResponseWriter, req http.Request) (resp 
 		return nil
 	}
 
-	s.session.Save([]byte(gothUser.AccessToken), sessionData{name: gothUser.Email}, 0)
 
-	var sd sessionData
-	fmt.Println("session.Get", s.session.Get([]byte("zT6hfj3DshfF4ewehgwLsd91412dsW4F"), &sd))
-	fmt.Println("sd.name", sd.name)
 
 	return resp
 }

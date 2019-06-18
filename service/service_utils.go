@@ -1,21 +1,22 @@
 package service
 
 import (
+	"compress/gzip"
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
-	"net/url"
+	"strings"
 
-	rand2 "github.com/cheebo/rand"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 	"github.com/markbates/goth"
 	"github.com/nori-io/nori-interfaces/interfaces"
 	"github.com/pkg/errors"
 )
-
-const SessionName = "_gothic_session"
 
 var keySet = false
 
@@ -34,8 +35,8 @@ BeginAuthHandler will redirect the user to the appropriate authentication end-po
 for the requested provider.
 See https://github.com/markbates/goth/examples/main.go to see this in action.
 */
-func BeginAuthHandler(res http.ResponseWriter, req *http.Request, session interfaces.Session) {
-	url, err := GetAuthURL(res, req, session)
+func BeginAuthHandler(res http.ResponseWriter, req *http.Request, session interfaces.Session, sid string) {
+	url, err := GetAuthURL(res, req, session, sid)
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintln(res, err)
@@ -83,12 +84,12 @@ as either "provider" or ":provider".
 I would recommend using the BeginAuthHandler instead of doing all of these steps
 yourself, but that's entirely up to you.
 */
-func GetAuthURL(res http.ResponseWriter, req *http.Request, session interfaces.Session) (string, error) {
+func GetAuthURL(res http.ResponseWriter, req *http.Request, session interfaces.Session, sid string) (string, error) {
 	if !keySet {
 		fmt.Println("goth/gothic: no SESSION_SECRET environment variable is set. The default cookie store is not available and any calls will fail. Ignore this warning if you are using a different store.")
 	}
 
-	providerName, err := GetProviderName(req, session )
+	providerName, err := GetProviderName(req, session, sid )
 	if err != nil {
 		return "", err
 	}
@@ -123,55 +124,61 @@ It expects to be able to get the name of the provider from the query parameters
 as either "provider" or ":provider".
 See https://github.com/markbates/goth/examples/main.go to see this in action.
 */
-var CompleteUserAuth = func(res http.ResponseWriter, req *http.Request, session interfaces.Session) (goth.User, error) {
-	defer Logout(res, req, session)
+var CompleteUserAuth = func(res http.ResponseWriter, req *http.Request, session interfaces.Session, sid string) (goth.User, error) {
+	defer Logout(res, req, session, sid)
 	if !keySet {
 		fmt.Println("goth/gothic: no SESSION_SECRET environment variable is set. The default cookie store is not available and any calls will fail. Ignore this warning if you are using a different store.")
 	}
 
-	providerName, err := GetProviderName(req, session)
+	providerName, err := GetProviderName(req, session, sid)
 	if err != nil {
 		return goth.User{}, err
 	}
-	fmt.Println("Provide name is", providerName)
+	fmt.Println("#1.1. Provide name is", providerName)
+	fmt.Println("#1.10 Req is", req.Body)
 
 	provider, err := goth.GetProvider(providerName)
 	if err != nil {
 		return goth.User{}, err
 	}
-    fmt.Println("provider is", provider)
-	sid := rand2.RandomAlphaNum(32)
+    fmt.Println("#1.2 Provider is", provider)
 
 	var sd sessionData
 
-	session.Save([]byte(sid), sessionData{provider:providerName}, 0)
-
-	err=session.Get([]byte(sid), &sd)
-    fmt.Println(err)
-	fmt.Println("sd.provider", sd.provider)
+	session.Save([]byte(sid), sessionData{Provider:providerName}, 0)
 
 
+
+    fmt.Println("#1.30 err", err)
+	fmt.Println("#1.31 Sd.provider", sd.Provider)
+	fmt.Println("#1.32 Sid is", sid)
 
 	err = session.Get([]byte(sid), &sd)
 	if err != nil {
 		return goth.User{}, err
 	}
 
-	fmt.Println("Value from session", sd)
+	fmt.Println("#1.4 Value from session", sd)
 
-	sess, err := provider.UnmarshalSession(sid)
+
+	value, err := GetFromSession(providerName, req, session)
 	if err != nil {
 		return goth.User{}, err
 	}
 
-	fmt.Println("Session with unmarshall", sess, "  ", err)
-
-	err = validateState(req, sess)
+	sess, err := provider.UnmarshalSession(value)
 	if err != nil {
 		return goth.User{}, err
 	}
 
-	fmt.Println("validateState", err)
+	fmt.Println("#1.5 Session with unmarshall", sess, "  ", err)
+
+/*	err = validateState(req, session)
+	if err != nil {
+		return goth.User{}, err
+	}*/
+
+	fmt.Println("#1.6 validateState", err)
 
 	user, err := provider.FetchUser(sess)
 	if err == nil {
@@ -185,7 +192,7 @@ var CompleteUserAuth = func(res http.ResponseWriter, req *http.Request, session 
 		return goth.User{}, err
 	}
 
-	fmt.Println("sess.Authorize", err)
+	fmt.Println("#1.7 sess.Authorize", err)
 
 	/*err = StoreInSession(providerName, sess.Marshal(), req, res)
 	fmt.Println("StoreInSession", err)
@@ -284,8 +291,8 @@ var CompleteUserAuth = func(res http.ResponseWriter, req *http.Request, session 
 */
 // validateState ensures that the state token param from the original
 // AuthURL matches the one included in the current (callback) request.
-func validateState(req *http.Request, sess goth.Session) error {
-	rawAuthURL, err := sess.GetAuthURL()
+/*func validateState(req *http.Request, session interfaces.Session) error {
+	rawAuthURL, err := session.GetAuthURL()
 	if err != nil {
 		return err
 	}
@@ -301,16 +308,16 @@ func validateState(req *http.Request, sess goth.Session) error {
 	}
 
 	return nil
-}
+}*/
 
 // Logout invalidates a user session.
-func Logout(res http.ResponseWriter, req *http.Request, session interfaces.Session) error {
-	err := session.Get([]byte("1"), SessionName)
+func Logout(res http.ResponseWriter, req *http.Request, session interfaces.Session, sid string) error {
+	err := session.Get([]byte(sid), session)
 	if err != nil {
 		return err
 	}
 
-	err = session.Delete([]byte("1"))
+	err = session.Delete([]byte(sid))
 	if err != nil {
 		return errors.New("Could not delete user session ")
 	}
@@ -324,7 +331,7 @@ func Logout(res http.ResponseWriter, req *http.Request, session interfaces.Sessi
 // name for your request.
 var GetProviderName = getProviderName
 
-func getProviderName(req *http.Request, session interfaces.Session) (string, error) {
+func getProviderName(req *http.Request, session interfaces.Session, sid string) (string, error) {
 
 	// get all the used providers
 	providers := goth.GetProviders()
@@ -332,7 +339,7 @@ func getProviderName(req *http.Request, session interfaces.Session) (string, err
 	// loop over the used providers, if we already have a valid session for any provider (ie. user is already logged-in with a provider), then return that provider name
 	for _, provider := range providers {
 		p := provider.Name()
-		session.Get([]byte("1"), p+SessionName)
+		session.Get([]byte(sid), p)
 
 	}
 
@@ -361,3 +368,37 @@ func getProviderName(req *http.Request, session interfaces.Session) (string, err
 }
 
 
+// UnmarshalSession will unmarshal a JSON string into a session.
+func  UnmarshalSessionVK(session interfaces.Session, data string) (interfaces.Session, error) {
+	err := json.NewDecoder(strings.NewReader(data)).Decode(&session)
+	return session, err
+}
+
+func GetFromSession(key string, req *http.Request, session interfaces.Session) (string, error) {
+	session, _ := Store.Get(req, SessionName)
+	value, err := getSessionValue(session, key)
+	if err != nil {
+		return "", errors.New("could not find a matching session for this request")
+	}
+
+	return value, nil
+}
+
+func getSessionValue(session *sessions.Session, key string) (string, error) {
+	value := session.Values[key]
+	if value == nil {
+		return "", fmt.Errorf("could not find a matching session for this request")
+	}
+
+	rdata := strings.NewReader(value.(string))
+	r, err := gzip.NewReader(rdata)
+	if err != nil {
+		return "", err
+	}
+	s, err := ioutil.ReadAll(r)
+	if err != nil {
+		return "", err
+	}
+
+	return string(s), nil
+}

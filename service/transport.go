@@ -123,7 +123,7 @@ func Transport(
 
 	router.HandleFunc("/auth/{provider}/callback", func(res httpNet.ResponseWriter, req *httpNet.Request) {
 
-		user, err := CompleteUserAuth(res, req, session)
+		user, err := CompleteUserAuth(res, req, session, "")
 		if err != nil {
 			fmt.Fprintln(res, err)
 			return
@@ -133,7 +133,7 @@ func Transport(
 	}).Methods("GET")
 
 	router.HandleFunc("/logout/{provider}", func(res httpNet.ResponseWriter, req *httpNet.Request) {
-		Logout(res, req, session)
+		Logout(res, req, session, "")
 
 	}).Methods("GET")
 

@@ -56,8 +56,8 @@ type service struct {
 }
 
 type sessionData struct {
-	name string
-	provider string
+	Name string
+	Provider string
 }
 
 func NewService(
@@ -249,7 +249,7 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest, parameters Plug
 		resp.Err = rest.ErrorInternal(err.Error())
 		return resp
 	}
-	s.session.Save([]byte(sid), sessionData{name: req.Name}, 0)
+	s.session.Save([]byte(sid), sessionData{Name: req.Name}, 0)
 
 	resp.Id = uint64(userId)
 	resp.Token = token
@@ -352,15 +352,16 @@ func (s *service) RecoveryCodes(ctx context.Context, req RecoveryCodesRequest) (
 func (s *service) SignInSocial(res http.ResponseWriter, req http.Request) (resp *SignInSocialResponse) {
 
 	// try to get the user without re-authenticating
+	sid:= rand.RandomAlphaNum(32)
 
 	fmt.Println("s.session is", s.session)
-	gothUser, err := CompleteUserAuth(res, &req, s.session)
+	gothUser, err := CompleteUserAuth(res, &req, s.session, sid)
 	fmt.Println("err is", err)
 	if err == nil {
 		t, _ := template.New("foo").Parse(userTemplate)
 		t.Execute(res, gothUser)
 	} else {
-		BeginAuthHandler(res, &req, s.session)
+		BeginAuthHandler(res, &req, s.session, sid)
 		return nil
 	}
 

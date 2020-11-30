@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/nori-io/nori-common/endpoint"
+	"github.com/nori-io/common/v3/endpoint"
 )
 
 func MakeSignUpEndpoint(s Service) endpoint.Endpoint {

@@ -1,55 +1,84 @@
 package main
 
 import (
-"context"
-"database/sql"
-"log"
-
-cfg "github.com/nori-io/nori-common/config"
-"github.com/nori-io/nori-common/meta"
-noriPlugin "github.com/nori-io/nori-common/plugin"
-
-"github.com/nori-io/auth/service"
-"github.com/nori-io/auth/service/database"
-"github.com/nori-io/auth/service/database/sqlScripts"
+	"context"
+	"github.com/jinzhu/gorm"
+	"github.com/nori-io/common/v3/pkg/domain/logger"
+	"github.com/nori-io/common/v3/pkg/domain/meta"
+	"github.com/nori-io/common/v3/pkg/domain/registry"
+	noriGorm "github.com/nori-io/interfaces/public/sql/gorm"
+	m "github.com/nori-io/common/v3/pkg/meta"
+	p "github.com/nori-io/common/v3/pkg/domain/plugin"
+	"github.com/nori-io/common/v3/pkg/domain/config"
 )
+var (
+	Plugin p.Plugin = plugin{}
+)
+
 
 type plugin struct {
-	instance service.Service
-	config   *service.Config
+	db *gorm.DB
+	config conf
+
 }
 
-var (
-	Plugin plugin
-	ctx= context.Background()
-)
+type conf struct {
+	Sub config.String
+	Iss config.String
 
-func (p *plugin) Init(_ context.Context, configManager cfg.Manager) error {
-	configManager.Register(p.Meta())
+}
 
-	cm := configManager.Register(p.Meta())
-	p.config = &service.Config{
-		Sub: cm.String("jwt.sub", "jwt.sub value"),
-		Iss: cm.String("jwt.iss", "jwt.iss value"),
+func (p plugin) Meta() meta.Meta {
+	return m.Meta{
+		ID: meta.ID{
+			ID:      "nori/authorization",
+			Version: "1.0.0",
+		},
+		Author: meta.Author{
+			Name: "Nori",
+			URI:  "https://noricms.com",
+		},
+		Core: meta.Core{
+			VersionConstraint: ">=1.0.0, <2.0.0",
+		},
+		Dependencies: []meta.Dependency{
+			meta.HTTP.Dependency("1.0.0"),
+			meta.SQL.Dependency("1.0.0"),
+		},
+		Description: meta.Description{
+			Name:        "NoriCMS Naive Posts Plugin",
+			Description: "Naive Posts Plugin",
+		},
+		Interface: meta.Custom,
+		License: meta.License{
+			Title: "",
+			Type:  "GPLv3",
+			URI:   "https://www.gnu.org/licenses/",
+		},
+		Tags: []string{"cms", "posts", "api"},
+	}
+}
+
+func (p plugin) Instance() interface{} {
+	return p.db
+}
+
+
+func (p plugin) Init(ctx context.Context, config config.Config, log logger.FieldLogger) error {
+	p.config = conf{
+		Sub: config.String("jwt.sub", "jwt.sub value"),
+		Iss: config.String("jwt.iss", "jwt.iss value"),
 	}
 	return nil
 }
 
-func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
+func (p plugin) Start(ctx context.Context, registry registry.Registry) error {
 
-	if p.instance == nil {
+	p.db, err := noriGorm.GetGorm(registry)
+
+	/*if p.instance == nil {
 
 		http, err := registry.Http()
-		if err != nil {
-			return err
-		}
-
-		transport, err := registry.HTTPTransport()
-		if err != nil {
-			return err
-		}
-
-		auth, err := registry.Auth()
 		if err != nil {
 			return err
 		}
@@ -62,9 +91,9 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 		db, err := registry.Sql()
 		if err != nil {
 			return err
-		}
+		}*/
 
-		p.instance = service.NewService(
+		/*p.instance = service.NewService(
 			auth,
 			session,
 			p.config,
@@ -72,9 +101,9 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			database.DB(db.GetDB()),
 		)
 		service.Transport(auth, transport, session,
-			http, p.instance, registry.Logger(p.Meta()))
+			http, p.instance, registry.Logger(p.Meta()))*/
 
-		sql1, err := registry.Sql()
+/*		sql1, err := registry.Sql()
 		if err != nil {
 			return err
 		}
@@ -136,52 +165,18 @@ func (p *plugin) Start(_ context.Context, registry noriPlugin.Registry) error {
 			log.Fatal(err)
 		}
 
-		service.Transport(auth, transport, session,
-			http, p.instance, registry.Logger(p.Meta()))
-	}
+		/*service.Transport(auth, transport, session,
+			http, p.instance, registry.Logger(p.Meta()))*/
+	//}
 	return nil
 }
 
-func (p *plugin) Stop(_ context.Context, _ noriPlugin.Registry) error {
-	p.instance = nil
+func (p plugin) Stop(ctx context.Context, registry registry.Registry) error {
 	return nil
 }
 
-func (p *plugin) Instance() interface{} {
-	return p.instance
-}
 
-func (p plugin) Meta() meta.Meta {
-	return &meta.Data{
-		ID: meta.ID{
-			ID:      "nori/authorization",
-			Version: "1.0.0",
-		},
-		Author: meta.Author{
-			Name: "Nori",
-			URI:  "https://noricms.com",
-		},
-		Core: meta.Core{
-			VersionConstraint: ">=1.0.0, <2.0.0",
-		},
-		Dependencies: []meta.Dependency{
-			meta.HTTP.Dependency("1.0.0"),
-			meta.SQL.Dependency("1.0.0"),
-		},
-		Description: meta.Description{
-			Name:        "NoriCMS Naive Posts Plugin",
-			Description: "Naive Posts Plugin",
-		},
-		Interface: meta.Custom,
-		License: meta.License{
-			Title: "",
-			Type:  "GPLv3",
-			URI:   "https://www.gnu.org/licenses/",
-		},
-		Tags: []string{"cms", "posts", "api"},
-	}
-}
-
+/*
 func (p plugin) Install(_ context.Context, registry noriPlugin.Registry) error {
 	sql, err := registry.Sql()
 	if err != nil {
@@ -204,3 +199,4 @@ func (p plugin) UnInstall(_ context.Context, registry noriPlugin.Registry) error
 		`)
 	return err
 }
+*/

@@ -8,9 +8,8 @@ import (
 	"strconv"
 )
 
-var(
-	ctx= context.Background()
-
+var (
+	ctx = context.Background()
 )
 
 type auth struct {
@@ -24,30 +23,30 @@ func (a *auth) Create(model *AuthModel) error {
 		log.Fatal(err)
 	}
 
-	_, execErr:= tx.Exec ("INSERT INTO users (kind, status_id, type, created, updated, mfa_type) VALUES(?,?,?,?,?,?)",
+	_, execErr := tx.Exec("INSERT INTO users (kind, status_id, type, created, updated, mfa_type) VALUES(?,?,?,?,?,?)",
 		model.Kind_Users, model.StatusId_Users, model.Type_Users, model.Created_Users, model.Updated_Users, model.Mfa_type_Users)
 	if execErr != nil {
 		_ = tx.Rollback()
-		log.Fatalf("Insert table 'users' error",execErr)
+		log.Fatalf("Insert table 'users' error", execErr)
 	}
 
-    lastid,err:=a.db.Exec("select * from users where id = (select max(id) from users")
+	lastid, err := a.db.Exec("select * from users where id = (select max(id) from users")
 	if err != nil {
-		log.Fatalf("Select table 'users' error ",err)
+		log.Fatalf("Select table 'users' error ", err)
 	}
-	number,err:=lastid.LastInsertId()
+	number, err := lastid.LastInsertId()
 	if err != nil {
-		log.Fatalf("LastInsertId() taking error",err)
+		log.Fatalf("LastInsertId() taking error", err)
 	}
-	_, execErr = tx.Exec("INSERT INTO auth (user_id, phone, email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES("+(strconv.FormatInt(number,10))+",?,?,?,?,?,?,?,?)",
+	_, execErr = tx.Exec("INSERT INTO auth (user_id, phone, email, password, salt, created, updated, is_email_verified, is_phone_verified) VALUES("+(strconv.FormatInt(number, 10))+",?,?,?,?,?,?,?,?)",
 		model.UserId_Auth, model.Phone_Auth, model.Email_Auth, model.Password_Auth, model.Salt_Auth, model.Created_Auth, model.Updated_Auth, model.IsEmailVerified_Auth, model.IsPhoneVerified_Auth)
 	if execErr != nil {
 		_ = tx.Rollback()
-		log.Fatalf("Insert table 'auth' error",execErr)
+		log.Fatalf("Insert table 'auth' error", execErr)
 	}
 
 	if err := tx.Commit(); err != nil {
-		log.Fatalf("Commit transaction error",err)
+		log.Fatalf("Commit transaction error", err)
 	}
 
 	return nil

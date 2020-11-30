@@ -5,8 +5,6 @@ import (
 	"github.com/nori-io/authentication/internal/domain/entity"
 )
 
-
-
 type UserRepository interface {
 	Create(ctx context.Context, e *entity.User) (*entity.User, error)
 	Get(ctx context.Context, id uint64) (*entity.User, error)
@@ -26,4 +24,3 @@ func GetTaskRepository() UserRepository {
 func InitTaskRepository(r UserRepository) {
 	userRepository = r
 }
-

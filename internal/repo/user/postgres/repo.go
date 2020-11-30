@@ -19,7 +19,7 @@ func (r *UserRepository) Create(ctx context.Context, e *entity.User) (*entity.Us
 	lastRecord := new(User)
 
 	err := r.Db.Create(model).Scan(&lastRecord).Error
-	l:=lastRecord.Convert()
+	l := lastRecord.Convert()
 	if err != nil {
 		return nil, err
 	}

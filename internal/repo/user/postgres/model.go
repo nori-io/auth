@@ -5,18 +5,16 @@ import (
 	"time"
 )
 
-
 type User struct {
-	Id            uint64  `gorm:"column:id; PRIMARY_KEY; type:bigserial" json:"id"`
-	Email         string  `gorm:"column:email; type: VARCHAR(64)" json:"email"`
-	Password	  string  `gorm:"column:email; type: VARCHAR(64)" json:"email"`
-	ProfileTypeId int64   `gorm:"column:user_id; type:bigint" json:"user_id"`
-	StatusId      int64	  `gorm:"column:user_id; type:bigint" json:"user_id"`
-	Kind          string	`gorm:"column:status; type: VARCHAR(16)" json:"status"`
+	Id            uint64    `gorm:"column:id; PRIMARY_KEY; type:bigserial" json:"id"`
+	Email         string    `gorm:"column:email; type: VARCHAR(64)" json:"email"`
+	Password      string    `gorm:"column:email; type: VARCHAR(64)" json:"email"`
+	ProfileTypeId int64     `gorm:"column:user_id; type:bigint" json:"user_id"`
+	StatusId      int64     `gorm:"column:user_id; type:bigint" json:"user_id"`
+	Kind          string    `gorm:"column:status; type: VARCHAR(16)" json:"status"`
 	Created       time.Time `gorm:"column:created_at; type: TIMESTAMP" json:"created_at"`
-	Updated       time.Time	`gorm:"column:updated_at; type: TIMESTAMP" json:"updated_at"`
+	Updated       time.Time `gorm:"column:updated_at; type: TIMESTAMP" json:"updated_at"`
 }
-
 
 func (u *User) Convert() *entity.User {
 	return &entity.User{
@@ -48,4 +46,3 @@ func NewModel(e *entity.User) (*User, error) {
 func (User) TableName() string {
 	return "users"
 }
-

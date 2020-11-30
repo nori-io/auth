@@ -1,17 +1,17 @@
 package main
 
 import (
-	"context"
-	"database/sql"
-	"log"
+"context"
+"database/sql"
+"log"
 
-	cfg "github.com/nori-io/nori-common/config"
-	"github.com/nori-io/nori-common/meta"
-	noriPlugin "github.com/nori-io/nori-common/plugin"
+cfg "github.com/nori-io/nori-common/config"
+"github.com/nori-io/nori-common/meta"
+noriPlugin "github.com/nori-io/nori-common/plugin"
 
-	"github.com/nori-io/auth/service"
-	"github.com/nori-io/auth/service/database"
-	"github.com/nori-io/auth/service/database/sqlScripts"
+"github.com/nori-io/auth/service"
+"github.com/nori-io/auth/service/database"
+"github.com/nori-io/auth/service/database/sqlScripts"
 )
 
 type plugin struct {
@@ -165,11 +165,8 @@ func (p plugin) Meta() meta.Meta {
 			VersionConstraint: ">=1.0.0, <2.0.0",
 		},
 		Dependencies: []meta.Dependency{
-			meta.Auth.Dependency("1.0.0"),
 			meta.HTTP.Dependency("1.0.0"),
 			meta.SQL.Dependency("1.0.0"),
-			meta.Mail.Dependency("1.0.0"),
-			meta.HTTPTransport.Dependency("1.0.0"),
 		},
 		Description: meta.Description{
 			Name:        "NoriCMS Naive Posts Plugin",

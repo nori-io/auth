@@ -1,4 +1,4 @@
-package sqlScripts
+package sql
 
 const (
 	CreateTableUsers = `CREATE TABLE IF NOT EXISTS users (

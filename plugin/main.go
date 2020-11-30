@@ -6,6 +6,8 @@ import (
 	"github.com/nori-io/authentication/pkg"
 
 	"github.com/jinzhu/gorm"
+	em "github.com/nori-io/common/v3/pkg/domain/enum/meta"
+
 	"github.com/nori-io/common/v3/pkg/domain/config"
 	"github.com/nori-io/common/v3/pkg/domain/logger"
 	"github.com/nori-io/common/v3/pkg/domain/meta"
@@ -44,8 +46,11 @@ func (p plugin) Meta() meta.Meta {
 		Interface:    pkg.AuthenticationInterface,
 		License:      nil,
 		Links:        nil,
-		Repository:   nil,
-		Tags:         nil,
+		Repository: m.Repository{
+			Type: em.Git,
+			URL:  "github.com/nori-io/http",
+		},
+		Tags: nil,
 	}
 }
 

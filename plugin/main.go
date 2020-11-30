@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 
+	"github.com/nori-io/authentication/pkg"
+
 	"github.com/jinzhu/gorm"
 	"github.com/nori-io/common/v3/pkg/domain/config"
 	"github.com/nori-io/common/v3/pkg/domain/logger"
@@ -33,10 +35,13 @@ func (p plugin) Meta() meta.Meta {
 			ID:      "",
 			Version: "",
 		},
-		Author:       nil,
-		Dependencies: nil,
+		Author: m.Author{
+			Name: "",
+			URL:  "",
+		},
+		Dependencies: []meta.Dependency{},
 		Description:  nil,
-		Interface:    "",
+		Interface:    pkg.AuthenticationInterface,
 		License:      nil,
 		Links:        nil,
 		Repository:   nil,

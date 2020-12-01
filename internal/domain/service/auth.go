@@ -1,9 +1,15 @@
 package service
 
+import (
+	"context"
+
+	"github.com/nori-io/authentication/internal/domain/entity"
+)
+
 type AuthenticationService interface {
 	SignUp(ctx context.Context, data SignUpData) (*entity.User, error)
 	SignIn(ctx context.Context, data SignInData) (*entity.Session, error)
-	SignOut(ctx context.Context, *entity.Session) error
+	SignOut(ctx context.Context, data *entity.Session) error
 }
 
 type SignUpData struct {
@@ -15,7 +21,6 @@ type SignInData struct {
 	Email    string
 	Password string
 }
-
 
 func (d SignUpData) Validate() error {
 	return nil

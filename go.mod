@@ -12,7 +12,8 @@ require (
 	github.com/nori-io/auth v0.0.0-20190227115903-f05893a2bd77
 	github.com/nori-io/common/v3 v3.0.0-20201201061338-be5c0cbe7d28
 	github.com/nori-io/interfaces v0.0.0-20200811115735-7613f0517380 // indirect
-	github.com/nori-io/interfaces/nori/session v0.0.0-20201201062946-9abc1bf72ed5 // indirect
+	github.com/nori-io/interfaces/nori/http v0.0.0-20201201113953-f0922c6438fe // indirect
+	github.com/nori-io/interfaces/nori/session v0.0.0-20201201062946-9abc1bf72ed5
 	github.com/nori-io/interfaces/public/sql/gorm v0.0.0-20201130125416-7dd1f3b4d383
 	github.com/nori-io/nori-common v1.1.0 // indirect
 	github.com/sirupsen/logrus v1.7.0

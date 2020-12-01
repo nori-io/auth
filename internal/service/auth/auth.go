@@ -1,25 +1,31 @@
-package authentication
+package auth
 
 import (
 	"context"
+
+	"github.com/nori-io/authentication/internal/domain/repository"
+
 	rest "github.com/cheebo/gorest"
 	"github.com/cheebo/rand"
-	"github.com/nori-io/auth/service"
+	serv "github.com/nori-io/authentication/internal/domain/service"
+	"github.com/nori-io/authentication/internal/domain/service/database"
+	h "github.com/nori-io/interfaces/nori/http"
 	s "github.com/nori-io/interfaces/nori/session"
-	)
+)
 
-func New(s s.Session, /*repository of Users, cfg *Config,*/ ) (AuthenticationService) {
+func New(sessionInstance s.Session, httpInstance h.Transport, dbInstance repository.UserRepository /*cfg Config,*/) serv.AuthenticationService {
 
-/*	type service struct {
-		session
-
+	type service struct {
+		session s.Session
+		http    h.Transport
+		db      repository.UserRepository
 	}
 
-	s:=service{}
-
 	return service{
-	session,
-	}*/
+		session: sessionInstance,
+		http:    httpInstance,
+		db:      dbInstance,
+	}
 
 }
 

@@ -3,6 +3,10 @@ package main
 import (
 	"context"
 
+	"github.com/nori-io/authentication/internal/repository/user"
+
+	"github.com/nori-io/authentication/internal/service/auth"
+
 	"github.com/jinzhu/gorm"
 	"github.com/nori-io/auth/service"
 	"github.com/nori-io/authentication/pkg"
@@ -14,7 +18,9 @@ import (
 	p "github.com/nori-io/common/v3/pkg/domain/plugin"
 	"github.com/nori-io/common/v3/pkg/domain/registry"
 	m "github.com/nori-io/common/v3/pkg/meta"
+	h "github.com/nori-io/interfaces/nori/http"
 	s "github.com/nori-io/interfaces/nori/session"
+
 	noriGorm "github.com/nori-io/interfaces/public/sql/gorm"
 )
 
@@ -56,19 +62,16 @@ func (p plugin) Instance() interface{} {
 }
 
 func (p plugin) Init(ctx context.Context, config config.Config, log logger.FieldLogger) error {
-	p.config = conf{
-		Sub: config.String("jwt.sub", "jwt.sub value"),
-		Iss: config.String("jwt.iss", "jwt.iss value"),
-	}
 	return nil
 }
 
 func (p plugin) Start(ctx context.Context, registry registry.Registry) error {
 
 	db, _ := noriGorm.GetGorm(registry)
-
+	httpServer, _ := h.GetTransport(registry)
 	s, _ := s.GetSession(registry)
-	p.instance = a.New(s)
+	userRepo := user.New(db)
+	p.instance = auth.New(s, httpServer, userRepo)
 
 	/*if p.instance == nil {
 

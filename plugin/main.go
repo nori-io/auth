@@ -3,17 +3,19 @@ package main
 import (
 	"context"
 
-	"github.com/nori-io/authentication/pkg"
-
 	"github.com/jinzhu/gorm"
+	"github.com/nori-io/auth/service"
+	"github.com/nori-io/authentication/pkg"
 	em "github.com/nori-io/common/v3/pkg/domain/enum/meta"
 
+	a "github.com/nori-io/authentication/internal/service/auth"
 	"github.com/nori-io/common/v3/pkg/domain/config"
 	"github.com/nori-io/common/v3/pkg/domain/logger"
 	"github.com/nori-io/common/v3/pkg/domain/meta"
 	p "github.com/nori-io/common/v3/pkg/domain/plugin"
 	"github.com/nori-io/common/v3/pkg/domain/registry"
 	m "github.com/nori-io/common/v3/pkg/meta"
+	s "github.com/nori-io/interfaces/nori/session"
 	noriGorm "github.com/nori-io/interfaces/public/sql/gorm"
 )
 
@@ -22,7 +24,8 @@ var (
 )
 
 type plugin struct {
-	db *gorm.DB
+	db       *gorm.DB
+	instance service.Service
 	//TODO instance of session
 }
 
@@ -50,7 +53,7 @@ func (p plugin) Meta() meta.Meta {
 }
 
 func (p plugin) Instance() interface{} {
-	return p.db
+	return p.instance
 }
 
 func (p plugin) Init(ctx context.Context, config config.Config, log logger.FieldLogger) error {
@@ -63,7 +66,10 @@ func (p plugin) Init(ctx context.Context, config config.Config, log logger.Field
 
 func (p plugin) Start(ctx context.Context, registry registry.Registry) error {
 
-	p.db, _ = noriGorm.GetGorm(registry)
+	db, _ := noriGorm.GetGorm(registry)
+
+	s, _ := s.GetSession(registry)
+	p.instance = a.New(s)
 
 	/*if p.instance == nil {
 

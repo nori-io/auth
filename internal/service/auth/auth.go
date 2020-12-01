@@ -1,13 +1,21 @@
 package authentication
 
+import (
+	"context"
+
+	"github.com/cheebo/rand"
+	"github.com/nori-io/authentication/internal/domain/service"
+	"github.com/nori-io/authentication/internal/domain/service/database"
+)
 
 func New(
-	//	session interfaces.Session,
+	session interfaces.Session,
 	// repository of Users
 	cfg *Config,
 ) service.AuthenticationService {
 	return service
-		{}
+	{
+	}
 
 }
 

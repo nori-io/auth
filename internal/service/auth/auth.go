@@ -3,6 +3,8 @@ package auth
 import (
 	"context"
 
+	"github.com/nori-io/authentication/internal/domain/entity"
+
 	"github.com/nori-io/authentication/internal/domain/repository"
 
 	rest "github.com/cheebo/gorest"
@@ -13,23 +15,22 @@ import (
 	s "github.com/nori-io/interfaces/nori/session"
 )
 
+type service struct {
+	session s.Session
+	http    h.Transport
+	db      repository.UserRepository
+}
+
 func New(sessionInstance s.Session, httpInstance h.Transport, dbInstance repository.UserRepository /*cfg Config,*/) serv.AuthenticationService {
 
-	type service struct {
-		session s.Session
-		http    h.Transport
-		db      repository.UserRepository
-	}
-
-	return service{
+	return &service{
 		session: sessionInstance,
 		http:    httpInstance,
 		db:      dbInstance,
 	}
 
 }
-
-func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpResponse) {
+func (s *service) SignUp(ctx context.Context, data serv.SignUpData) (*entity.User, error) {
 	var err error
 	var model *database.AuthModel
 	resp = &SignUpResponse{}
@@ -74,7 +75,7 @@ func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpRe
 	return resp
 }
 
-func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInResponse) {
+func (s *service) SignIn(ctx context.Context, data serv.SignInData) (*entity.Session, error) {
 	resp = &SignInResponse{}
 
 	model, err := s.db.Auth().FindByEmail(req.Email)
@@ -130,7 +131,7 @@ func (s *service) SignIn(ctx context.Context, req SignInRequest) (resp *SignInRe
 	return resp
 }
 
-func (s *service) SignOut(ctx context.Context, req SignOutRequest) (resp *SignOutResponse) {
+func (s *service) SignOut(ctx context.Context, data *entity.Session) error {
 	resp = &SignOutResponse{}
 	//s.session.Delete(s.session.SessionId(ctx))
 	return resp

@@ -3,12 +3,14 @@ package main
 import (
 	"context"
 
+	"github.com/nori-io/authentication/internal/domain/service"
+
 	"github.com/nori-io/authentication/internal/repository/user"
 
 	"github.com/nori-io/authentication/internal/service/auth"
 
 	"github.com/jinzhu/gorm"
-	"github.com/nori-io/auth/service"
+
 	"github.com/nori-io/authentication/pkg"
 	em "github.com/nori-io/common/v3/pkg/domain/enum/meta"
 
@@ -30,8 +32,7 @@ var (
 
 type plugin struct {
 	db       *gorm.DB
-	instance service.Service
-	//TODO instance of session
+	instance service.AuthenticationService
 }
 
 func (p plugin) Meta() meta.Meta {

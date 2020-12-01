@@ -8,7 +8,6 @@ import (
 	"github.com/nori-io/authentication/pkg"
 	em "github.com/nori-io/common/v3/pkg/domain/enum/meta"
 
-	a "github.com/nori-io/authentication/internal/service/auth"
 	"github.com/nori-io/common/v3/pkg/domain/config"
 	"github.com/nori-io/common/v3/pkg/domain/logger"
 	"github.com/nori-io/common/v3/pkg/domain/meta"

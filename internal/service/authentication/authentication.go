@@ -2,20 +2,24 @@ package authentication
 
 import (
 	"context"
-
+	rest "github.com/cheebo/gorest"
 	"github.com/cheebo/rand"
-	"github.com/nori-io/authentication/internal/domain/service"
-	"github.com/nori-io/authentication/internal/domain/service/database"
-)
+	"github.com/nori-io/auth/service"
+	s "github.com/nori-io/interfaces/nori/session"
+	)
 
-func New(
-	session interfaces.Session,
-	// repository of Users
-	cfg *Config,
-) service.AuthenticationService {
-	return service
-	{
+func New(s s.Session, /*repository of Users, cfg *Config,*/ ) (AuthenticationService) {
+
+/*	type service struct {
+		session
+
 	}
+
+	s:=service{}
+
+	return service{
+	session,
+	}*/
 
 }
 

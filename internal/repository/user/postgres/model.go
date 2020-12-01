@@ -13,20 +13,18 @@ type User struct {
 	ProfileTypeId int64     `gorm:"column:user_id; type:bigint"`
 	StatusId      int64     `gorm:"column:user_id; type:bigint"`
 	Kind          string    `gorm:"column:status; type: VARCHAR(16)"`
-	Created       time.Time `gorm:"column:created_at; type: TIMESTAMP"`
-	Updated       time.Time `gorm:"column:updated_at; type: TIMESTAMP"`
+	CreatedAt     time.Time `gorm:"column:created_at; type: TIMESTAMP"`
+	UpdatedAt     time.Time `gorm:"column:updated_at; type: TIMESTAMP"`
 }
 
 func (u *User) Convert() *entity.User {
 	return &entity.User{
-		Id:            u.Id,
-		Email:         u.Email,
-		Password:      u.Password,
-		ProfileTypeId: u.ProfileTypeId,
-		StatusId:      u.StatusId,
-		Kind:          u.Kind,
-		Created:       u.Created,
-		Updated:       u.Updated,
+		Id:        u.Id,
+		Email:     u.Email,
+		Password:  u.Password,
+		Status:    0,
+		CreatedAt: u.CreatedAt,
+		UpdatedAt: u.UpdatedAt,
 	}
 }
 

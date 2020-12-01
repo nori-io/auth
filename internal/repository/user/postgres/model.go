@@ -1,19 +1,20 @@
 package postgres
 
 import (
-	"github.com/nori-io/authentication/internal/domain/entity"
 	"time"
+
+	"github.com/nori-io/authentication/internal/domain/entity"
 )
 
 type User struct {
-	Id            uint64    `gorm:"column:id; PRIMARY_KEY; type:bigserial" json:"id"`
-	Email         string    `gorm:"column:email; type: VARCHAR(64)" json:"email"`
-	Password      string    `gorm:"column:email; type: VARCHAR(64)" json:"email"`
-	ProfileTypeId int64     `gorm:"column:user_id; type:bigint" json:"user_id"`
-	StatusId      int64     `gorm:"column:user_id; type:bigint" json:"user_id"`
-	Kind          string    `gorm:"column:status; type: VARCHAR(16)" json:"status"`
-	Created       time.Time `gorm:"column:created_at; type: TIMESTAMP" json:"created_at"`
-	Updated       time.Time `gorm:"column:updated_at; type: TIMESTAMP" json:"updated_at"`
+	Id            uint64    `gorm:"column:id; PRIMARY_KEY; type:bigserial"`
+	Email         string    `gorm:"column:email; type: VARCHAR(64)"`
+	Password      string    `gorm:"column:email; type: VARCHAR(64)"`
+	ProfileTypeId int64     `gorm:"column:user_id; type:bigint"`
+	StatusId      int64     `gorm:"column:user_id; type:bigint"`
+	Kind          string    `gorm:"column:status; type: VARCHAR(16)"`
+	Created       time.Time `gorm:"column:created_at; type: TIMESTAMP"`
+	Updated       time.Time `gorm:"column:updated_at; type: TIMESTAMP"`
 }
 
 func (u *User) Convert() *entity.User {

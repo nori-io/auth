@@ -1,8 +1,8 @@
-package service
+package http
 
 import (
 	"github.com/asaskevich/govalidator"
-	"github.com/cheebo/gorest"
+	rest "github.com/cheebo/gorest"
 )
 
 // SignUp Request

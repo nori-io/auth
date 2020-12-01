@@ -22,13 +22,8 @@ var (
 )
 
 type plugin struct {
-	db     *gorm.DB
-	config conf
-}
-
-type conf struct {
-	Sub config.String
-	Iss config.String
+	db *gorm.DB
+	//TODO instance of session
 }
 
 func (p plugin) Meta() meta.Meta {

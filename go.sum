@@ -42,6 +42,8 @@ github.com/nori-io/auth v0.0.0-20190227115903-f05893a2bd77/go.mod h1:rtcBxmWSyhT
 github.com/nori-io/common v1.1.0 h1:jJRMXKz3PFyKRjZJFr0oqoLB0Kywz7upr5IGah0QDes=
 github.com/nori-io/common/v3 v3.0.0-20201124183231-795113bbd474 h1:x706sUojg1Rv+d35FyBvWr/aCkutGkjX5pir4fAPKxk=
 github.com/nori-io/common/v3 v3.0.0-20201124183231-795113bbd474/go.mod h1:a/ICgA6b3A3x8HlNDSe9z6HCNiFvuvZJhZP78rzX0ME=
+github.com/nori-io/common/v3 v3.0.0-20201201061338-be5c0cbe7d28 h1:7qLHgsyMPYVV5OraboCV34vtt4Fr88DOkPNGZJEb08g=
+github.com/nori-io/common/v3 v3.0.0-20201201061338-be5c0cbe7d28/go.mod h1:a/ICgA6b3A3x8HlNDSe9z6HCNiFvuvZJhZP78rzX0ME=
 github.com/nori-io/common/v3 v3.0.0 h1:5Qa40t9EL1tqD1j8RgK9fOI/ydMqhVoZYZZVGFo64I8=
 github.com/nori-io/common/v3 v3.0.0/go.mod h1:xWpo27B7goqoWOSIEt/FZnxDaWhBkzowQ625/whGT80=
 github.com/nori-io/interfaces v0.0.0-20200803062810-31472548ebb9 h1:AjN6m4nN8Sc/G8+t2Wr5pVgOOIxqh/G4BU+NudBYzeQ=
@@ -49,6 +51,10 @@ github.com/nori-io/interfaces v0.0.0-20200806063219-4ee7b9c342e7 h1:0L1SaUJBv4Ic
 github.com/nori-io/interfaces v0.0.0-20200811115735-7613f0517380 h1:Q+rvay0N8hlY24u2RBZR6XD4m3tn4Md8PzLMjWNa9Go=
 github.com/nori-io/interfaces v0.0.0-20200811115735-7613f0517380/go.mod h1:B7yAZybAgh78Fbe/+tFtQ3FTpOhq7ALtXTN3tihHcMg=
 github.com/nori-io/interfaces v0.0.0-20201130125416-7dd1f3b4d383 h1:cO3E1w9dDgoxfXal1GP5QM3tt5lmlfZcQijDNrb3NxA=
+github.com/nori-io/interfaces/nori/session v0.0.0-20201130125416-7dd1f3b4d383 h1:pgjco+lykhjxbOalLXjlQ2etspdaU5AUH8OfI3aLa3k=
+github.com/nori-io/interfaces/nori/session v0.0.0-20201130125416-7dd1f3b4d383/go.mod h1:1xGZ/EprUhu7ipQs4FMWf66NWedIsnqM7POBIwmvVs8=
+github.com/nori-io/interfaces/nori/session v0.0.0-20201201062946-9abc1bf72ed5 h1:LzBTRaTLPMWLjdLKU0iSdh5xhev+jizumL/hTFXeh94=
+github.com/nori-io/interfaces/nori/session v0.0.0-20201201062946-9abc1bf72ed5/go.mod h1:LaHPjTfuRxnugthCz2jov1aRZ4BGAKkCn7tLBCaKDQ4=
 github.com/nori-io/interfaces/public/sql/gorm v0.0.0-20200806063219-4ee7b9c342e7 h1:hdCG+ngmottGjsYAXLAHiAp08L6/K4pkZt26SteezeQ=
 github.com/nori-io/interfaces/public/sql/gorm v0.0.0-20200806063219-4ee7b9c342e7/go.mod h1:QT6u+AsI2XoQ4ZJscRMyG9yofLXqV1vbshVzrsXPmyg=
 github.com/nori-io/interfaces/public/sql/gorm v0.0.0-20200811115735-7613f0517380 h1:ZEMzZbcqci7aRarTIvJNz4jU3Eynezi1G5W339iRQCw=

@@ -1,4 +1,4 @@
-package service
+package http
 
 import (
 	"github.com/nori-io/common/v3/endpoint"

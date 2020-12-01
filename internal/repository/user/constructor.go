@@ -5,7 +5,7 @@ import (
 
 	interfaceUser "github.com/nori-io/authentication/internal/domain/repository"
 
-	"github.com/nori-io/authentication/internal/repo/user/postgres"
+	"github.com/nori-io/authentication/internal/repository/user/postgres"
 )
 
 func New(db *gorm.DB) interfaceUser.UserRepository {

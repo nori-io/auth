@@ -1,50 +1,14 @@
-package service
+package authentication
 
-import (
-	"context"
 
-	rest "github.com/cheebo/gorest"
-	"github.com/cheebo/rand"
-
-	"github.com/nori-io/auth/service/database"
-	//"github.com/cheebo/gorest"
-	//	"github.com/cheebo/rand"
-	"github.com/sirupsen/logrus"
-)
-
-type Service interface {
-	SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpResponse)
-	SignIn(ctx context.Context, req SignInRequest) (resp *SignInResponse)
-	SignOut(ctx context.Context, req SignOutRequest) (resp *SignOutResponse)
-}
-
-type Config struct {
-	Sub func() string
-	Iss func() string
-}
-
-type service struct {
-	//auth    interfaces.Auth
-	db database.Database
-	//session interfaces.Session
-	cfg *Config
-	log *logrus.Logger
-}
-
-func NewService(
-	//	auth interfaces.Auth,
+func New(
 	//	session interfaces.Session,
+	// repository of Users
 	cfg *Config,
-	log *logrus.Logger,
-	db database.Database,
-) Service {
-	return &service{
-		//	auth:    auth,
-		db: db,
-		//	session: session,
-		cfg: cfg,
-		log: log,
-	}
+) service.AuthenticationService {
+	return service
+		{}
+
 }
 
 func (s *service) SignUp(ctx context.Context, req SignUpRequest) (resp *SignUpResponse) {

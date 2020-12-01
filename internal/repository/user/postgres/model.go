@@ -7,14 +7,12 @@ import (
 )
 
 type User struct {
-	Id            uint64    `gorm:"column:id; PRIMARY_KEY; type:bigserial"`
-	Email         string    `gorm:"column:email; type: VARCHAR(64)"`
-	Password      string    `gorm:"column:email; type: VARCHAR(64)"`
-	ProfileTypeId int64     `gorm:"column:user_id; type:bigint"`
-	StatusId      int64     `gorm:"column:user_id; type:bigint"`
-	Kind          string    `gorm:"column:status; type: VARCHAR(16)"`
-	CreatedAt     time.Time `gorm:"column:created_at; type: TIMESTAMP"`
-	UpdatedAt     time.Time `gorm:"column:updated_at; type: TIMESTAMP"`
+	Id        uint64    `gorm:"column:id; PRIMARY_KEY; type:bigserial"`
+	Email     string    `gorm:"column:email; type: VARCHAR(64)"`
+	Password  string    `gorm:"column:email; type: VARCHAR(64)"`
+	Status    uint8     `gorm:"column:user_id; type:bigint"`
+	CreatedAt time.Time `gorm:"column:created_at; type: TIMESTAMP"`
+	UpdatedAt time.Time `gorm:"column:updated_at; type: TIMESTAMP"`
 }
 
 func (u *User) Convert() *entity.User {
@@ -22,7 +20,7 @@ func (u *User) Convert() *entity.User {
 		Id:        u.Id,
 		Email:     u.Email,
 		Password:  u.Password,
-		Status:    0,
+		Status:    entity.UserStatus(u.Status),
 		CreatedAt: u.CreatedAt,
 		UpdatedAt: u.UpdatedAt,
 	}
@@ -30,14 +28,12 @@ func (u *User) Convert() *entity.User {
 
 func NewModel(e *entity.User) (*User, error) {
 	return &User{
-		Id:            e.Id,
-		Email:         e.Email,
-		Password:      e.Password,
-		ProfileTypeId: e.ProfileTypeId,
-		StatusId:      e.StatusId,
-		Kind:          e.Kind,
-		Created:       e.Created,
-		Updated:       e.Updated,
+		Id:        e.Id,
+		Email:     e.Email,
+		Password:  e.Password,
+		Status:    uint8(e.Status),
+		CreatedAt: e.CreatedAt,
+		UpdatedAt: e.UpdatedAt,
 	}, nil
 }
 

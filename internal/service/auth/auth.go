@@ -9,21 +9,18 @@ import (
 
 	"github.com/cheebo/rand"
 	serv "github.com/nori-io/authentication/internal/domain/service"
-	h "github.com/nori-io/interfaces/nori/http"
 	s "github.com/nori-io/interfaces/nori/session"
 )
 
 type service struct {
 	session s.Session
-	http    h.Transport
 	db      repository.UserRepository
 }
 
-func New(sessionInstance s.Session, httpInstance h.Transport, dbInstance repository.UserRepository) serv.AuthenticationService {
+func New(sessionInstance s.Session, dbInstance repository.UserRepository) serv.AuthenticationService {
 
 	return &service{
 		session: sessionInstance,
-		http:    httpInstance,
 		db:      dbInstance,
 	}
 

@@ -20,7 +20,6 @@ import (
 	p "github.com/nori-io/common/v3/pkg/domain/plugin"
 	"github.com/nori-io/common/v3/pkg/domain/registry"
 	m "github.com/nori-io/common/v3/pkg/meta"
-	h "github.com/nori-io/interfaces/nori/http"
 	s "github.com/nori-io/interfaces/nori/session"
 
 	noriGorm "github.com/nori-io/interfaces/public/sql/gorm"
@@ -69,10 +68,9 @@ func (p plugin) Init(ctx context.Context, config config.Config, log logger.Field
 func (p plugin) Start(ctx context.Context, registry registry.Registry) error {
 
 	db, _ := noriGorm.GetGorm(registry)
-	httpServer, _ := h.GetTransport(registry)
 	s, _ := s.GetSession(registry)
 	userRepo := user.New(db)
-	p.instance = auth.New(s, httpServer, userRepo)
+	p.instance = auth.New(s, userRepo)
 
 	/*if p.instance == nil {
 

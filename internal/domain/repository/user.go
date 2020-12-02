@@ -13,15 +13,3 @@ type UserRepository interface {
 	Update(ctx context.Context, e *entity.User) error
 	Delete(ctx context.Context, id uint64) error
 }
-
-var userRepository UserRepository
-
-// GetUserRepository returns the UserRepository
-func GetUserRepository() UserRepository {
-	return userRepository
-}
-
-// InitUserRepository injects UserRepository with its implementation
-func InitUserRepository(r UserRepository) {
-	userRepository = r
-}

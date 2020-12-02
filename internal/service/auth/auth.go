@@ -32,17 +32,20 @@ func (srv *service) SignUp(ctx context.Context, data serv.SignUpData) (*entity.U
 		return nil, err
 	}
 
-	var user entity.User
-	user, err = srv.db.Create(ctx, entity.User{
+	var user *entity.User
+
+	user = &entity.User{
 		Email:    data.Email,
 		Password: data.Password,
-	})
+	}
+
+	err = srv.db.Create(ctx, user)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &user, nil
+	return user, nil
 }
 
 func (srv *service) SignIn(ctx context.Context, data serv.SignInData) (*entity.Session, error) {
@@ -51,10 +54,12 @@ func (srv *service) SignIn(ctx context.Context, data serv.SignInData) (*entity.S
 		return nil, err
 	}
 
-	err = srv.db.Update(ctx, entity.User{
+	user := &entity.User{
 		Email:    data.Email,
 		Password: data.Password,
-	})
+	}
+
+	err = srv.db.Update(ctx, user)
 
 	sid, err := srv.getToken()
 

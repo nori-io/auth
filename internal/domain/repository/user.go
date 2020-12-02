@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	"github.com/nori-io/authentication/internal/domain/entity"
 )
 
@@ -16,11 +17,11 @@ type UserRepository interface {
 var userRepository UserRepository
 
 // GetUserRepository returns the UserRepository
-func GetTaskRepository() UserRepository {
+func GetUserRepository() UserRepository {
 	return userRepository
 }
 
-// InitTaskRepository injects TaskRepository with its implementation
-func InitTaskRepository(r UserRepository) {
+// InitUserRepository injects UserRepository with its implementation
+func InitUserRepository(r UserRepository) {
 	userRepository = r
 }

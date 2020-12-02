@@ -19,7 +19,7 @@ type service struct {
 	db      repository.UserRepository
 }
 
-func New(sessionInstance s.Session, httpInstance h.Transport, dbInstance repository.UserRepository /*cfg Config,*/) serv.AuthenticationService {
+func New(sessionInstance s.Session, httpInstance h.Transport, dbInstance repository.UserRepository) serv.AuthenticationService {
 
 	return &service{
 		session: sessionInstance,

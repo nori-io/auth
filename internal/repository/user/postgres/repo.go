@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/jinzhu/gorm"
 	"github.com/nori-io/authentication/internal/domain/entity"
 )
@@ -12,19 +13,19 @@ type UserRepository struct {
 	Db *gorm.DB
 }
 
-func (r *UserRepository) Create(ctx context.Context, e *entity.User) (*entity.User, error) {
+func (r *UserRepository) Create(ctx context.Context, e *entity.User) error {
 
 	model, _ := NewModel(e)
 
 	lastRecord := new(User)
 
 	err := r.Db.Create(model).Scan(&lastRecord).Error
-	l := lastRecord.Convert()
+	lastRecord.Convert()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return l, nil
+	return nil
 }
 
 func (r *UserRepository) Get(ctx context.Context, id uint64) (*entity.User, error) {

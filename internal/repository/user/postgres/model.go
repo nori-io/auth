@@ -3,6 +3,8 @@ package postgres
 import (
 	"time"
 
+	"github.com/nori-io/authentication/internal/domain/enum/user_status"
+
 	"github.com/nori-io/authentication/internal/domain/entity"
 )
 
@@ -20,7 +22,7 @@ func (u *User) Convert() *entity.User {
 		Id:        u.Id,
 		Email:     u.Email,
 		Password:  u.Password,
-		Status:    entity.UserStatus(u.Status),
+		Status:    user_status.UserStatus(u.Status),
 		CreatedAt: u.CreatedAt,
 		UpdatedAt: u.UpdatedAt,
 	}

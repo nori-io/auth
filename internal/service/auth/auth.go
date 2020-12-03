@@ -7,7 +7,8 @@ import (
 
 	"github.com/nori-io/authentication/internal/domain/repository"
 
-	"github.com/cheebo/rand"
+	"crypto/rand"
+
 	serv "github.com/nori-io/authentication/internal/domain/service"
 	s "github.com/nori-io/interfaces/nori/session"
 )
@@ -78,11 +79,17 @@ func (srv *service) SignOut(ctx context.Context, data *entity.Session) error {
 	return err
 }
 
-func (srv *service) getToken() (string, error) {
-	sid := rand.RandomAlphaNum(32)
-	err := srv.session.Get([]byte(sid), s.SessionActive)
+func (srv *service) getToken() ([]byte, error) {
+
+	sid := make([]byte, 32)
+
+	_, err := rand.Read(sid)
 	if err != nil {
-		srv.session.Save([]byte(sid), s.SessionActive, 0)
+		return nil, err
+	}
+	err = srv.session.Get(sid, s.SessionActive)
+	if err != nil {
+		srv.session.Save(sid, s.SessionActive, 0)
 		return sid, nil
 	}
 	return srv.getToken()

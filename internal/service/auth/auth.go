@@ -76,12 +76,11 @@ func (srv *service) SignOut(ctx context.Context, data *entity.Session) error {
 }
 
 func (srv *service) getToken() (string, error) {
-
 	sid := rand.RandomAlphaNum(32)
 	err := srv.session.Get([]byte(sid), s.SessionActive)
 	if err != nil {
 		srv.session.Save([]byte(sid), s.SessionActive, 0)
 		return sid, nil
 	}
-	return "", nil
+	return srv.getToken()
 }

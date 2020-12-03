@@ -60,8 +60,12 @@ github.com/nori-io/interfaces/nori/http v0.0.0-20201201113953-f0922c6438fe h1:bp
 github.com/nori-io/interfaces/nori/http v0.0.0-20201201113953-f0922c6438fe/go.mod h1:UFYcaG1Jhnd3HIDUCe0LLQ7hnn9k/W8TBV2ptlCd25U=
 github.com/nori-io/interfaces/nori/session v0.0.0-20201130125416-7dd1f3b4d383 h1:pgjco+lykhjxbOalLXjlQ2etspdaU5AUH8OfI3aLa3k=
 github.com/nori-io/interfaces/nori/session v0.0.0-20201130125416-7dd1f3b4d383/go.mod h1:1xGZ/EprUhu7ipQs4FMWf66NWedIsnqM7POBIwmvVs8=
+github.com/nori-io/interfaces/nori/session v0.0.0-20201201062931-d18cd27a7f65 h1:LQ7vPdPw/jYIjMHg25cgpunthjkwSkE+WBVYcd3LUDE=
+github.com/nori-io/interfaces/nori/session v0.0.0-20201201062931-d18cd27a7f65/go.mod h1:LaHPjTfuRxnugthCz2jov1aRZ4BGAKkCn7tLBCaKDQ4=
 github.com/nori-io/interfaces/nori/session v0.0.0-20201201062946-9abc1bf72ed5 h1:LzBTRaTLPMWLjdLKU0iSdh5xhev+jizumL/hTFXeh94=
 github.com/nori-io/interfaces/nori/session v0.0.0-20201201062946-9abc1bf72ed5/go.mod h1:LaHPjTfuRxnugthCz2jov1aRZ4BGAKkCn7tLBCaKDQ4=
+github.com/nori-io/interfaces/nori/session v0.0.0-20201201113953-f0922c6438fe h1:+UTWqTeqVAefuzY82VnpB0g/bgotBSI1zho2KyiT1Mc=
+github.com/nori-io/interfaces/nori/session v0.0.0-20201201113953-f0922c6438fe/go.mod h1:LaHPjTfuRxnugthCz2jov1aRZ4BGAKkCn7tLBCaKDQ4=
 github.com/nori-io/interfaces/public/sql/gorm v0.0.0-20200806063219-4ee7b9c342e7 h1:hdCG+ngmottGjsYAXLAHiAp08L6/K4pkZt26SteezeQ=
 github.com/nori-io/interfaces/public/sql/gorm v0.0.0-20200806063219-4ee7b9c342e7/go.mod h1:QT6u+AsI2XoQ4ZJscRMyG9yofLXqV1vbshVzrsXPmyg=
 github.com/nori-io/interfaces/public/sql/gorm v0.0.0-20200811115735-7613f0517380 h1:ZEMzZbcqci7aRarTIvJNz4jU3Eynezi1G5W339iRQCw=

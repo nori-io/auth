@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/jinzhu/gorm"
@@ -33,10 +32,17 @@ func (r *UserRepository) Get(ctx context.Context, id uint64) (*entity.User, erro
 		out = &User{}
 		e   error
 	)
-	if r.Db == nil {
-		return nil, errors.New("database error")
-	}
-	e = r.Db.Where("ID=?", id).First(out).Error
+	e = r.Db.Where("id=?", id).First(out).Error
+
+	return out.Convert(), e
+}
+
+func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*entity.User, error) {
+	var (
+		out = &User{}
+		e   error
+	)
+	e = r.Db.Where("email=?", email).First(out).Error
 
 	return out.Convert(), e
 }

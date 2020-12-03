@@ -59,7 +59,10 @@ func (srv *service) SignIn(ctx context.Context, data serv.SignInData) (*entity.S
 		Password: data.Password,
 	}
 
-	err = srv.db.Update(ctx, user)
+	user, err = srv.db.GetByEmail(ctx, user.Email)
+	if err != nil {
+		return nil, err
+	}
 
 	sid, err := srv.getToken()
 

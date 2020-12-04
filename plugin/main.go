@@ -148,9 +148,13 @@ func (p plugin) UnInstall(_ context.Context, registry registry.Registry) error {
 		return err
 	}
 
-	err = db.Exec(`
-	drop table users;
-	`).Error
+	err = db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(`drop table users;
+		`).Error; err != nil {
+			return err
+		}
+		return nil
+	})
 
 	if err != nil {
 		return err

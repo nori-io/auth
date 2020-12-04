@@ -9,8 +9,6 @@ import (
 
 	"github.com/nori-io/authentication/internal/service/auth"
 
-	"github.com/jinzhu/gorm"
-
 	"github.com/nori-io/authentication/pkg"
 	em "github.com/nori-io/common/v3/pkg/domain/enum/meta"
 
@@ -30,8 +28,12 @@ var (
 )
 
 type plugin struct {
-	db       *gorm.DB
 	instance service.AuthenticationService
+	config   conf
+}
+
+type conf struct {
+	urlPrefix config.String
 }
 
 func (p plugin) Meta() meta.Meta {
@@ -62,6 +64,10 @@ func (p plugin) Instance() interface{} {
 }
 
 func (p plugin) Init(ctx context.Context, config config.Config, log logger.FieldLogger) error {
+	p.config = conf{
+		urlPrefix: config.String("urlPrefix", "url prefix for all handlers"),
+	}
+
 	return nil
 }
 

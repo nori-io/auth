@@ -3,6 +3,10 @@ package main
 import (
 	"context"
 
+	noriHttp "github.com/nori-io/interfaces/nori/http"
+
+	"github.com/nori-io/authentication/internal/handler/http"
+
 	"github.com/nori-io/authentication/internal/domain/service"
 
 	"github.com/nori-io/authentication/internal/repository/user"
@@ -10,6 +14,7 @@ import (
 	"github.com/nori-io/authentication/internal/service/auth"
 
 	"github.com/nori-io/authentication/pkg"
+
 	em "github.com/nori-io/common/v3/pkg/domain/enum/meta"
 
 	"github.com/nori-io/common/v3/pkg/domain/config"
@@ -73,10 +78,32 @@ func (p plugin) Init(ctx context.Context, config config.Config, log logger.Field
 
 func (p plugin) Start(ctx context.Context, registry registry.Registry) error {
 
-	db, _ := noriGorm.GetGorm(registry)
-	s, _ := s.GetSession(registry)
+	db, err := noriGorm.GetGorm(registry)
+	if err != nil {
+		return err
+	}
+
+	s, err := s.GetSession(registry)
+	if err != nil {
+		return err
+	}
+
 	userRepo := user.New(db)
+
 	p.instance = auth.New(s, userRepo)
+
+	httpServer, err := noriHttp.GetHttp(registry)
+	if err != nil {
+		return err
+	}
+
+	h := http.Handler{
+		R:         httpServer,
+		Auth:      p.instance,
+		UrlPrefix: p.config.urlPrefix(),
+	}
+
+	http.New(h)
 
 	return nil
 }
@@ -90,21 +117,32 @@ func (p plugin) Install(_ context.Context, registry registry.Registry) error {
 	if err != nil {
 		return err
 	}
-	db.Exec("`CREATE TABLE users\n" +
-		"(id bigserial PRIMARY KEY,\n" +
-		" email  VARCHAR (32) NOT NULL,\n" +
-		" password VARCHAR (32) NOT NULL,\n" +
-		" status   SMALLINT NOT NULL,\n " +
-		"created_at TIMESTAMP,\n " +
-		"updated_at TIMESTAMP);`")
+	db.Exec(`CREATE TABLE users(
+		id bigserial PRIMARY KEY,
+		email  VARCHAR (32) NOT NULL,
+		password VARCHAR (32) NOT NULL,
+		status   SMALLINT NOT NULL,
+		created_at TIMESTAMP,
+		updated_at TIMESTAMP
+);
+`)
 	return nil
 }
 
 func (p plugin) UnInstall(_ context.Context, registry registry.Registry) error {
 
-	// @TODO db :=p.instance. добавить метод для получения текущего экземпляра базы данных?
-	/*_ = db.Exec(`
+	db, err := noriGorm.GetGorm(registry)
+	if err != nil {
+		return err
+	}
+
+	err = db.Exec(`
 	drop table users;
-	`)*/
+	`).Error
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

@@ -6,12 +6,18 @@ import (
 	"github.com/nori-io/http/pkg"
 )
 
-func New(r pkg.Http, auth service.AuthenticationService) {
-	authHandler := authentication.New(auth)
+type handler struct {
+	r         pkg.Http
+	auth      service.AuthenticationService
+	urlPrefix string
+}
+
+func New(h handler) {
+	authHandler := authentication.New(h.auth)
 
 	// todo: add middleware
 
-	r.Get("/signup", authHandler.SignUp)
-	r.Get("/signin", authHandler.SigIn)
-	r.Get("/signout", authHandler.SignOut)
+	h.r.Get("/signup", authHandler.SignUp)
+	h.r.Get("/signin", authHandler.SigIn)
+	h.r.Get("/signout", authHandler.SignOut)
 }

@@ -16,6 +16,7 @@ github.com/denisenkom/go-mssqldb v0.0.0-20191124224453-732737034ffd h1:83Wprp6RO
 github.com/denisenkom/go-mssqldb v0.0.0-20191124224453-732737034ffd/go.mod h1:xbL0rPBG9cCiLr28tMa8zpbdarY27NDyej4t/EjAShU=
 github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 h1:Yzb9+7DPaBjB8zlTR87/ElzFsnQfuHnVUVqpZZIcV5Y=
 github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5/go.mod h1:a2zkGnVExMxdzMo3M0Hi/3sEU+cWnZpSni0O6/Yb/P0=
+github.com/go-chi/chi v4.1.2+incompatible/go.mod h1:eB3wogJHnLi3x/kFX2A+IbTBlXxmMeXJVKy9tTv1XzQ=
 github.com/go-ozzo/ozzo-validation v3.5.0+incompatible h1:sUy/in/P6askYr16XJgTKq/0SZhiWsdg4WZGaLsGQkM=
 github.com/go-ozzo/ozzo-validation v3.5.0+incompatible/go.mod h1:gsEKFIVnabGBt6mXmxK0MoFy+cZoTJY6mu5Ll3LVLBU=
 github.com/go-sql-driver/mysql v1.5.0 h1:ozyZYNQW3x3HtqT1jira07DN2PArx2v7/mN66gGcHOs=
@@ -38,13 +39,19 @@ github.com/mattn/go-sqlite3 v1.14.0/go.mod h1:JIl7NbARA7phWnGvh0LKTyg7S9BA+6gx71
 github.com/nori-io/auth v0.0.0-20190227115903-f05893a2bd77 h1:oyRR1Z6zGP4DpdoZMF9Sf3tO/nSTLvObS2sQg31nkAc=
 github.com/nori-io/auth v0.0.0-20190227115903-f05893a2bd77/go.mod h1:rtcBxmWSyhTGf/aE5kNT7vaInsR7r/yIrVnspW30B9w=
 github.com/nori-io/common v1.1.0 h1:jJRMXKz3PFyKRjZJFr0oqoLB0Kywz7upr5IGah0QDes=
+github.com/nori-io/common/v3 v3.0.0-20201124183231-795113bbd474/go.mod h1:a/ICgA6b3A3x8HlNDSe9z6HCNiFvuvZJhZP78rzX0ME=
 github.com/nori-io/common/v3 v3.0.0-20201201061338-be5c0cbe7d28 h1:7qLHgsyMPYVV5OraboCV34vtt4Fr88DOkPNGZJEb08g=
 github.com/nori-io/common/v3 v3.0.0-20201201061338-be5c0cbe7d28/go.mod h1:a/ICgA6b3A3x8HlNDSe9z6HCNiFvuvZJhZP78rzX0ME=
 github.com/nori-io/common/v3 v3.0.0 h1:5Qa40t9EL1tqD1j8RgK9fOI/ydMqhVoZYZZVGFo64I8=
 github.com/nori-io/common/v3 v3.0.0/go.mod h1:xWpo27B7goqoWOSIEt/FZnxDaWhBkzowQ625/whGT80=
 github.com/nori-io/http v0.0.0-20201124061642-6b9f91f9943a h1:YppqRyft4knB5XFMIg46LscL+pDLiKonXLH1/CLQUx4=
+github.com/nori-io/http v0.0.0-20201124061642-6b9f91f9943a/go.mod h1:AzMFvsRDMwoS3UqRC9j1dNhCA6maqzGqnJhM79aJR3s=
+github.com/nori-io/http v0.0.0-20201130131242-bb7b998989b8 h1:LLEW2qJvsfvdCh6jrsaqqwAzMxIwDF/6Q8PKneA8YE4=
+github.com/nori-io/http v0.0.0-20201130131242-bb7b998989b8/go.mod h1:TSvtr9ZtcBOcXPPdkramdzp2bQdIOMyzUoMm7FTuSCk=
 github.com/nori-io/interfaces v0.0.0-20200803062810-31472548ebb9 h1:AjN6m4nN8Sc/G8+t2Wr5pVgOOIxqh/G4BU+NudBYzeQ=
 github.com/nori-io/interfaces v0.0.0-20201203095450-9e0cde57301e h1:NgNAcn6zqzj0awhVkISLvBSmIvSo/l3+KkxcYkSUCZQ=
+github.com/nori-io/interfaces/nori/http v0.0.0-20201203095450-9e0cde57301e h1:cgOSAdUffx9uyBFvekZmUwc/VhlZRtssq0zKSd+YnBA=
+github.com/nori-io/interfaces/nori/http v0.0.0-20201203095450-9e0cde57301e/go.mod h1:UFYcaG1Jhnd3HIDUCe0LLQ7hnn9k/W8TBV2ptlCd25U=
 github.com/nori-io/interfaces/nori/session v0.0.0-20201203095450-9e0cde57301e h1:1W5JzrkFWLDlP/KBj2atdt2sJ9cqyuzeYQxtt0HN5bg=
 github.com/nori-io/interfaces/nori/session v0.0.0-20201203095450-9e0cde57301e/go.mod h1:to3YaE+aMmJfy/5+oTtrYhHe0Q6pVGRyo+hM/p2VBAM=
 github.com/nori-io/interfaces/public/sql/gorm v0.0.0-20201203095450-9e0cde57301e h1:iRrXXr6EW9MRMRN+WojLv9sqAk+rRroozoyPZRpnYWs=

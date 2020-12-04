@@ -78,98 +78,6 @@ func (p plugin) Start(ctx context.Context, registry registry.Registry) error {
 	userRepo := user.New(db)
 	p.instance = auth.New(s, userRepo)
 
-	/*if p.instance == nil {
-
-	http, err := registry.Http()
-	if err != nil {
-		return err
-	}
-
-	session, err := registry.Session()
-	if err != nil {
-		return err
-	}
-
-	db, err := registry.Sql()
-	if err != nil {
-		return err
-	}*/
-
-	/*p.instance = service.NewService(
-		auth,
-		session,
-		p.config,
-		registry.Logger(p.Meta()),
-		database.DB(db.GetDB()),
-	)
-	service.Transport(auth, transport, session,
-		http, p.instance, registry.Logger(p.Meta()))*/
-
-	/*		sql1, err := registry.Sql()
-			if err != nil {
-				return err
-			}
-			db1 := sql1.GetDB()
-
-			tx, err := db1.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
-
-			if err != nil {
-				log.Fatal(err)
-			}
-			_, execErr := tx.Exec(
-				sqlScripts.CreateTableUsers)
-			if execErr != nil {
-				_ = tx.Rollback()
-				log.Fatal(execErr)
-
-			}
-			_, execErr = tx.Exec(
-				sqlScripts.CreateTableAuth)
-			if execErr != nil {
-				_ = tx.Rollback()
-				log.Fatal(execErr)
-			}
-			_, execErr = tx.Exec(
-				sqlScripts.CreateTableAuthProviders)
-			if execErr != nil {
-				_ = tx.Rollback()
-				log.Fatal(execErr)
-			}
-
-			_, execErr = tx.Exec(
-				sqlScripts.CreateTableAuthenticationHistory)
-			if execErr != nil {
-				_ = tx.Rollback()
-				log.Fatal(execErr)
-			}
-
-			_, execErr = tx.Exec(
-				sqlScripts.CreateTableUserMfaPhone)
-			if execErr != nil {
-				_ = tx.Rollback()
-				log.Fatal(execErr)
-			}
-
-			_, execErr = tx.Exec(
-				sqlScripts.CreateTableUsersMfaCode)
-			if execErr != nil {
-				_ = tx.Rollback()
-				log.Fatal(execErr)
-			}
-			_, execErr = tx.Exec(
-				sqlScripts.CreateTableUserMfaSecret)
-			if execErr != nil {
-				_ = tx.Rollback()
-				log.Fatal(execErr)
-			}
-
-			if err := tx.Commit(); err != nil {
-				log.Fatal(err)
-			}
-
-			/*service.Transport(auth, transport, session,
-				http, p.instance, registry.Logger(p.Meta()))*/
-	//}
 	return nil
 }
 
@@ -177,15 +85,19 @@ func (p plugin) Stop(ctx context.Context, registry registry.Registry) error {
 	return nil
 }
 
-/*
-func (p plugin) Install(_ context.Context, registry noriPlugin.Registry) error {
-	sql, err := registry.Sql()
+func (p plugin) Install(_ context.Context, registry registry.Registry) error {
+	db, err := noriGorm.GetGorm(registry)
 	if err != nil {
 		return err
 	}
-	db := sql.GetDB()
-	_, err = db.Exec(sqlScripts.CreateTableUsersMfaCode)
-	return err
+	db.Exec("`CREATE TABLE users\n" +
+		"(id bigserial PRIMARY KEY,\n" +
+		" email  VARCHAR (32) NOT NULL,\n" +
+		" password VARCHAR (32) NOT NULL,\n" +
+		" status   SMALLINT NOT NULL,\n " +
+		"created_at TIMESTAMP,\n " +
+		"updated_at TIMESTAMP);`")
+	return nil
 }
 
 func (p plugin) UnInstall(_ context.Context, registry noriPlugin.Registry) error {
@@ -200,4 +112,3 @@ func (p plugin) UnInstall(_ context.Context, registry noriPlugin.Registry) error
 		`)
 	return err
 }
-*/

@@ -44,7 +44,7 @@ func (h *AuthHandler) SigIn(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	JSON(w, r, SignInResponse{
-		SessionID: sess.Id,
+		SessionID: string(sess.Id),
 	})
 }
 

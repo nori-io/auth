@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 
+	"github.com/jinzhu/gorm"
+
 	noriHttp "github.com/nori-io/interfaces/nori/http"
 
 	"github.com/nori-io/authentication/internal/handler/http"
@@ -117,15 +119,25 @@ func (p plugin) Install(_ context.Context, registry registry.Registry) error {
 	if err != nil {
 		return err
 	}
-	db.Exec(`CREATE TABLE users(
+	err = db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(`CREATE TABLE users(
 		id bigserial PRIMARY KEY,
 		email  VARCHAR (32) NOT NULL,
 		password VARCHAR (32) NOT NULL,
 		status   SMALLINT NOT NULL,
 		created_at TIMESTAMP,
 		updated_at TIMESTAMP
-);
-`)
+		);
+		`).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

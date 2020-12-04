@@ -100,15 +100,11 @@ func (p plugin) Install(_ context.Context, registry registry.Registry) error {
 	return nil
 }
 
-func (p plugin) UnInstall(_ context.Context, registry noriPlugin.Registry) error {
-	sql, err := registry.Sql()
-	if err != nil {
-		return err
-	}
-	db := sql.GetDB()
-	_, err = db.Exec(`
-		drop table articles;
-		drop table comments;
-		`)
-	return err
+func (p plugin) UnInstall(_ context.Context, registry registry.Registry) error {
+
+	// @TODO db :=p.instance. добавить метод для получения текущего экземпляра базы данных?
+	/*_ = db.Exec(`
+	drop table users;
+	`)*/
+	return nil
 }

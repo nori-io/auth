@@ -3,6 +3,8 @@ package authentication
 import (
 	"net/http"
 
+	"github.com/nori-io/authentication/internal/domain/entity"
+
 	"github.com/nori-io/authentication/internal/domain/service"
 )
 
@@ -50,9 +52,15 @@ func (h *AuthHandler) SigIn(w http.ResponseWriter, r *http.Request) {
 
 func (h *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
 	// todo: extract session ID from context
-	//sess, err := h.Auth.SignOut(r.Context(), data)
-	//if err != nil {
-	//	http.Error(w, err.Error(), http.StatusInternalServerError)
-	//}
+	sessionIdContext := r.Context().Value("session_id")
+
+	sessionId, _ := sessionIdContext.([]byte)
+
+	err := h.Auth.SignOut(r.Context(), &entity.Session{Id: sessionId})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
 	// todo: redirect
+	http.Redirect(w, r, "/", 0)
 }

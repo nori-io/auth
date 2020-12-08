@@ -62,5 +62,6 @@ func (h *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// todo: redirect
+
 	http.Redirect(w, r, "/", 0)
 }

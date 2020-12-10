@@ -30,9 +30,7 @@ import (
 	noriGorm "github.com/nori-io/interfaces/public/sql/gorm"
 )
 
-var (
-	Plugin p.Plugin = plugin{}
-)
+var Plugin p.Plugin = plugin{}
 
 type plugin struct {
 	instance service.AuthenticationService
@@ -79,7 +77,6 @@ func (p plugin) Init(ctx context.Context, config config.Config, log logger.Field
 }
 
 func (p plugin) Start(ctx context.Context, registry registry.Registry) error {
-
 	db, err := noriGorm.GetGorm(registry)
 	if err != nil {
 		return err
@@ -142,7 +139,6 @@ func (p plugin) Install(_ context.Context, registry registry.Registry) error {
 }
 
 func (p plugin) UnInstall(_ context.Context, registry registry.Registry) error {
-
 	db, err := noriGorm.GetGorm(registry)
 	if err != nil {
 		return err

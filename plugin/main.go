@@ -91,13 +91,13 @@ func (p pluginStruct) Start(ctx context.Context, registry registry.Registry) err
 	if err != nil {
 		return err
 	}
+	h := http.Handler{
+		R:         httpServer,
+		Auth:      p.instance,
+		UrlPrefix: p.config.urlPrefix(),
+	}
 
 	err = container.Invoke(func(server *pluginStruct) {
-		h := http.Handler{
-			R:         httpServer,
-			Auth:      p.instance,
-			UrlPrefix: p.config.urlPrefix(),
-		}
 		http.New(h)
 	})
 	if err != nil {

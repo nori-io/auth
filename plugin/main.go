@@ -82,6 +82,7 @@ func (p pluginStruct) Init(ctx context.Context, config config.Config, log logger
 func (p pluginStruct) Start(ctx context.Context, registry registry.Registry) error {
 	container := dig.New()
 
+	container.Provide(registry)
 	container.Provide(noriGorm.GetGorm)
 	container.Provide(s.GetSession)
 	container.Provide(user.New)

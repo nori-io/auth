@@ -92,7 +92,7 @@ func (p pluginStruct) Start(ctx context.Context, registry registry.Registry) err
 		return err
 	}
 
-	err = container.Invoke(func(server *p.Plugin) {
+	err = container.Invoke(func(server *pluginStruct) {
 		h := http.Handler{
 			R:         httpServer,
 			Auth:      p.instance,
@@ -101,7 +101,7 @@ func (p pluginStruct) Start(ctx context.Context, registry registry.Registry) err
 		http.New(h)
 	})
 	if err != nil {
-		return (err)
+		return err
 	}
 
 	/*db, err := noriGorm.GetGorm(registry)

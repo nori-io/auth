@@ -14,5 +14,6 @@ require (
 	github.com/nori-io/interfaces/nori/session v0.0.0-20201203095450-9e0cde57301e
 	github.com/nori-io/interfaces/public/sql/gorm v0.0.0-20201203095450-9e0cde57301e // indirect
 	github.com/sirupsen/logrus v1.7.0
+	go.uber.org/dig v1.10.0 // indirect
 	mvdan.cc/gofumpt v0.0.0-20201129102820-5c11c50e9475 // indirect
 )

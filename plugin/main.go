@@ -3,6 +3,10 @@ package main
 import (
 	"context"
 
+	"github.com/nori-io/common/v3/pkg/domain/plugin"
+
+	"go.uber.org/dig"
+
 	"github.com/jinzhu/gorm"
 
 	noriHttp "github.com/nori-io/interfaces/nori/http"
@@ -22,7 +26,6 @@ import (
 	"github.com/nori-io/common/v3/pkg/domain/config"
 	"github.com/nori-io/common/v3/pkg/domain/logger"
 	"github.com/nori-io/common/v3/pkg/domain/meta"
-	p "github.com/nori-io/common/v3/pkg/domain/plugin"
 	"github.com/nori-io/common/v3/pkg/domain/registry"
 	m "github.com/nori-io/common/v3/pkg/meta"
 	s "github.com/nori-io/interfaces/nori/session"
@@ -30,9 +33,9 @@ import (
 	noriGorm "github.com/nori-io/interfaces/public/sql/gorm"
 )
 
-var Plugin p.Plugin = plugin{}
+var Plugin plugin.Plugin = pluginStruct{}
 
-type plugin struct {
+type pluginStruct struct {
 	instance service.AuthenticationService
 	config   conf
 }
@@ -41,7 +44,7 @@ type conf struct {
 	urlPrefix config.String
 }
 
-func (p plugin) Meta() meta.Meta {
+func (p pluginStruct) Meta() meta.Meta {
 	return m.Meta{
 		ID: m.ID{
 			ID:      "",
@@ -64,11 +67,11 @@ func (p plugin) Meta() meta.Meta {
 	}
 }
 
-func (p plugin) Instance() interface{} {
+func (p pluginStruct) Instance() interface{} {
 	return p.instance
 }
 
-func (p plugin) Init(ctx context.Context, config config.Config, log logger.FieldLogger) error {
+func (p pluginStruct) Init(ctx context.Context, config config.Config, log logger.FieldLogger) error {
 	p.config = conf{
 		urlPrefix: config.String("urlPrefix", "url prefix for all handlers"),
 	}
@@ -76,42 +79,66 @@ func (p plugin) Init(ctx context.Context, config config.Config, log logger.Field
 	return nil
 }
 
-func (p plugin) Start(ctx context.Context, registry registry.Registry) error {
-	db, err := noriGorm.GetGorm(registry)
-	if err != nil {
-		return err
-	}
+func (p pluginStruct) Start(ctx context.Context, registry registry.Registry) error {
+	container := dig.New()
 
-	s, err := s.GetSession(registry)
-	if err != nil {
-		return err
-	}
-
-	userRepo := user.New(db)
-
-	p.instance = auth.New(s, userRepo)
+	container.Provide(noriGorm.GetGorm)
+	container.Provide(s.GetSession)
+	container.Provide(user.New)
+	container.Provide(auth.New)
 
 	httpServer, err := noriHttp.GetHttp(registry)
 	if err != nil {
 		return err
 	}
 
-	h := http.Handler{
+	err = container.Invoke(func(server *p.Plugin) {
+		h := http.Handler{
+			R:         httpServer,
+			Auth:      p.instance,
+			UrlPrefix: p.config.urlPrefix(),
+		}
+		http.New(h)
+	})
+	if err != nil {
+		return (err)
+	}
+
+	/*db, err := noriGorm.GetGorm(registry)
+	if err != nil {
+		return err
+	}*/
+
+	/*s, err := s.GetSession(registry)
+	if err != nil {
+		return err
+	}*/
+
+	// userRepo := user.New(db)
+
+	// p.instance = auth.New(s, userRepo)
+
+	/*httpServer, err := noriHttp.GetHttp(registry)
+	if err != nil {
+		return err
+	}*/
+
+	/*h := http.Handler{
 		R:         httpServer,
 		Auth:      p.instance,
 		UrlPrefix: p.config.urlPrefix(),
-	}
+	}*/
 
-	http.New(h)
+	// http.New(h)
 
 	return nil
 }
 
-func (p plugin) Stop(ctx context.Context, registry registry.Registry) error {
+func (p pluginStruct) Stop(ctx context.Context, registry registry.Registry) error {
 	return nil
 }
 
-func (p plugin) Install(_ context.Context, registry registry.Registry) error {
+func (p pluginStruct) Install(_ context.Context, registry registry.Registry) error {
 	db, err := noriGorm.GetGorm(registry)
 	if err != nil {
 		return err
@@ -138,7 +165,7 @@ func (p plugin) Install(_ context.Context, registry registry.Registry) error {
 	return nil
 }
 
-func (p plugin) UnInstall(_ context.Context, registry registry.Registry) error {
+func (p pluginStruct) UnInstall(_ context.Context, registry registry.Registry) error {
 	db, err := noriGorm.GetGorm(registry)
 	if err != nil {
 		return err

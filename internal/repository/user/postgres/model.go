@@ -10,8 +10,8 @@ import (
 
 type User struct {
 	Id        uint64    `gorm:"column:id; PRIMARY_KEY; type:bigserial"`
-	Email     string    `gorm:"column:email; type: VARCHAR(64)"`
-	Password  string    `gorm:"column:email; type: VARCHAR(64)"`
+	Email     string    `gorm:"column:email; type: VARCHAR(32)"`
+	Password  string    `gorm:"column:email; type: VARCHAR(32)"`
 	Status    uint8     `gorm:"column:user_id; type:bigint"`
 	CreatedAt time.Time `gorm:"column:created_at; type: TIMESTAMP"`
 	UpdatedAt time.Time `gorm:"column:updated_at; type: TIMESTAMP"`

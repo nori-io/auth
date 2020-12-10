@@ -13,7 +13,6 @@ type UserRepository struct {
 }
 
 func (r *UserRepository) Create(ctx context.Context, e *entity.User) error {
-
 	model, _ := NewModel(e)
 
 	lastRecord := new(User)
@@ -71,7 +70,6 @@ func (r *UserRepository) Update(ctx context.Context, e *entity.User) error {
 }
 
 func (r *UserRepository) Delete(ctx context.Context, id uint64) error {
-
 	if err := r.Db.Delete(&User{Id: id}).Error; err != nil {
 		return err
 	}

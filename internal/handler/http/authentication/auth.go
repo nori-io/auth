@@ -56,8 +56,7 @@ func (h *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
 
 	sessionId, _ := sessionIdContext.([]byte)
 
-	err := h.Auth.SignOut(r.Context(), &entity.Session{Id: sessionId})
-	if err != nil {
+	if err := h.Auth.SignOut(r.Context(), &entity.Session{Id: sessionId}); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 

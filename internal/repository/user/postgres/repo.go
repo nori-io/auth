@@ -17,11 +17,10 @@ func (r *UserRepository) Create(ctx context.Context, e *entity.User) error {
 
 	lastRecord := new(User)
 
-	err := r.Db.Create(model).Scan(&lastRecord).Error
-	lastRecord.Convert()
-	if err != nil {
+	if err := r.Db.Create(model).Scan(&lastRecord).Error; err != nil {
 		return err
 	}
+	lastRecord.Convert()
 
 	return nil
 }

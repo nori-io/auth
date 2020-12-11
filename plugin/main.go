@@ -82,36 +82,7 @@ func (p pluginStruct) Init(ctx context.Context, config config.Config, log logger
 }
 
 func (p pluginStruct) Start(ctx context.Context, registry registry.Registry) error {
-	/*	container := dig.New()
-		container.Provide(registry)
-		container.Provide(noriHttp.GetHttp)
-		container.Provide(noriGorm.GetGorm)
-		container.Provide(s.GetSession)
-		container.Provide(user.New)
-		container.Provide(authentication.New)
-		container.Provide(auth.New)
-		err := container.Invoke(func(router noriHttp.Http, handler *authentication.AuthHandler) {
-			router.Get(p.config.urlPrefix()+"/signup", handler.SignUp)
-			router.Get(p.config.urlPrefix()+"/signin", handler.SigIn)
-			router.Get(p.config.urlPrefix()+"/signout", handler.SignOut)
-		})
-		if err != nil {
-			return err
-		}*/
-	set1 := wire.NewSet(
-		user.New,
-		auth.New,
-		authentication.New,
-		noriGorm.GetGorm,
-		s.GetSession,
-		noriHttp.GetHttp,
-		registry)
-
-	a := func() (pluginStruct, error) {
-		wire.Build(set1)
-		return pluginStruct{}, nil
-	}
-	a()
+	repo := Initialize(registry)
 
 	/*db, err := noriGorm.GetGorm(registry)
 	if err != nil {

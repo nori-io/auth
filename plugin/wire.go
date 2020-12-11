@@ -13,18 +13,26 @@ import (
 	noriGorm "github.com/nori-io/interfaces/public/sql/gorm"
 )
 
+/*type registryManager struct {
+	log           *logrus.Logger
+	plugins       *PluginList
+	interfaces    map[meta.Interface]meta.ID
+	configManager config.Manager
+	registry      plugin.Registry
+}*/
+
+// var registry1 registry.Registry
+
 var set1 = wire.NewSet(
-	user.New,
 	auth.New,
 	authentication.New,
 	noriGorm.GetGorm,
 	s.GetSession,
 	noriHttp.GetHttp,
+	user.New,
 )
 
-var registry2 registry.Registry
-
-func Initialize() (repository.UserRepository, error) {
+func Initialize(registry registry.Registry) (repository.UserRepository, error) {
 	wire.Build(set1)
 	return &postgres.UserRepository{}, nil
 }

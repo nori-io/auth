@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 
-	"github.com/nori-io/authentication/internal/handler/http/authentication"
+	plugin2 "github.com/nori-io/common/v3/pkg/domain/plugin"
 
-	"github.com/nori-io/common/v3/pkg/domain/plugin"
+	"github.com/google/wire"
+
+	"github.com/nori-io/authentication/internal/handler/http/authentication"
 
 	"go.uber.org/dig"
 
@@ -33,7 +35,7 @@ import (
 	noriGorm "github.com/nori-io/interfaces/public/sql/gorm"
 )
 
-var Plugin plugin.Plugin = pluginStruct{}
+var Plugin plugin2.Plugin = pluginStruct{}
 
 type pluginStruct struct {
 	instance service.AuthenticationService
@@ -96,6 +98,13 @@ func (p pluginStruct) Start(ctx context.Context, registry registry.Registry) err
 	if err != nil {
 		return err
 	}
+	wire.NewSet(
+		user.New,
+		auth.New,
+		authentication.New,
+		interface{}(noriGorm.GetGorm(registry)),
+		interface{}(s.GetSession(registry)),
+		interface{}(noriHttp.GetHttp(registry)))
 
 	/*db, err := noriGorm.GetGorm(registry)
 	if err != nil {

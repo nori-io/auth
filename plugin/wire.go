@@ -7,7 +7,7 @@ import (
 	"github.com/nori-io/authentication/internal/repository/user"
 	"github.com/nori-io/authentication/internal/repository/user/postgres"
 	"github.com/nori-io/authentication/internal/service/auth"
-	"github.com/nori-io/common/v3/pkg/domain/registry"
+	"github.com/nori-io/common/v4/pkg/domain/registry"
 	noriHttp "github.com/nori-io/interfaces/nori/http"
 	s "github.com/nori-io/interfaces/nori/session"
 	noriGorm "github.com/nori-io/interfaces/public/sql/gorm"

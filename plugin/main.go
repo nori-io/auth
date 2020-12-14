@@ -3,34 +3,23 @@ package main
 import (
 	"context"
 
-	plugin2 "github.com/nori-io/common/v3/pkg/domain/plugin"
-
-	"github.com/google/wire"
-
-	"github.com/nori-io/authentication/internal/handler/http/authentication"
+	plugin2 "github.com/nori-io/common/v4/pkg/domain/plugin"
 
 	//"go.uber.org/dig"
 
 	"github.com/jinzhu/gorm"
 
-	noriHttp "github.com/nori-io/interfaces/nori/http"
-
 	"github.com/nori-io/authentication/internal/domain/service"
-
-	"github.com/nori-io/authentication/internal/repository/user"
-
-	"github.com/nori-io/authentication/internal/service/auth"
 
 	"github.com/nori-io/authentication/pkg"
 
-	em "github.com/nori-io/common/v3/pkg/domain/enum/meta"
+	em "github.com/nori-io/common/v4/pkg/domain/enum/meta"
 
-	"github.com/nori-io/common/v3/pkg/domain/config"
-	"github.com/nori-io/common/v3/pkg/domain/logger"
-	"github.com/nori-io/common/v3/pkg/domain/meta"
-	"github.com/nori-io/common/v3/pkg/domain/registry"
-	m "github.com/nori-io/common/v3/pkg/meta"
-	s "github.com/nori-io/interfaces/nori/session"
+	"github.com/nori-io/common/v4/pkg/domain/config"
+	"github.com/nori-io/common/v4/pkg/domain/logger"
+	"github.com/nori-io/common/v4/pkg/domain/meta"
+	"github.com/nori-io/common/v4/pkg/domain/registry"
+	m "github.com/nori-io/common/v4/pkg/meta"
 
 	noriGorm "github.com/nori-io/interfaces/public/sql/gorm"
 )
@@ -82,7 +71,7 @@ func (p pluginStruct) Init(ctx context.Context, config config.Config, log logger
 }
 
 func (p pluginStruct) Start(ctx context.Context, registry registry.Registry) error {
-	repo := Initialize(registry)
+	Initialize(registry)
 
 	/*db, err := noriGorm.GetGorm(registry)
 	if err != nil {

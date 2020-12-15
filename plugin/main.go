@@ -21,7 +21,7 @@ import (
 	"github.com/nori-io/common/v4/pkg/domain/registry"
 	m "github.com/nori-io/common/v4/pkg/meta"
 
-	noriGorm "github.com/nori-io/interfaces/public/sql/gorm"
+	noriGorm "github.com/nori-io/interfaces/database/orm/gorm"
 )
 
 var Plugin plugin2.Plugin = pluginStruct{}

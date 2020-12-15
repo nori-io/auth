@@ -8,7 +8,6 @@ import (
 	"github.com/nori-io/authentication/internal/service/auth"
 	"github.com/nori-io/common/v4/pkg/domain/registry"
 	noriGorm "github.com/nori-io/interfaces/database/orm/gorm"
-	"github.com/nori-io/interfaces/nori/http"
 	"github.com/nori-io/interfaces/nori/session"
 )
 

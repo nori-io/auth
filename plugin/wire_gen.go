@@ -18,7 +18,7 @@ import (
 
 // Injectors from wire.go:
 
-func Initialize(registry2 registry.Registry) (*http_handler.Handler, error) {
+func Initialize(registry2 registry.Registry, urlPrefix string) (*http_handler.Handler, error) {
 	httpHttp, err := http.GetHttp(registry2)
 	if err != nil {
 		return nil, err
@@ -34,12 +34,13 @@ func Initialize(registry2 registry.Registry) (*http_handler.Handler, error) {
 	userRepository := user.New(db)
 	authenticationService := auth.New(sessionSession, userRepository)
 	handler := &http_handler.Handler{
-		R:    httpHttp,
-		Auth: authenticationService,
+		R:         httpHttp,
+		Auth:      authenticationService,
+		UrlPrefix: urlPrefix,
 	}
 	return handler, nil
 }
 
 // wire.go:
 
-var set1 = wire.NewSet(auth.New, pg.GetGorm, session.GetSession, user.New, wire.Struct(new(http_handler.Handler), "R", "Auth"), http.GetHttp)
+var set1 = wire.NewSet(auth.New, pg.GetGorm, session.GetSession, user.New, wire.Struct(new(http_handler.Handler), "R", "Auth", "UrlPrefix"), http.GetHttp)

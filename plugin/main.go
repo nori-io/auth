@@ -83,7 +83,7 @@ func (p pluginStruct) Start(ctx context.Context, registry registry.Registry) err
 		UrlPrefix: p.config.urlPrefix(),
 	}*/
 
-	Initialize(registry)
+	Initialize(registry, p.config.urlPrefix())
 
 	/*db, err := noriGorm.GetGorm(registry)
 	if err != nil {

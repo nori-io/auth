@@ -17,11 +17,11 @@ var set1 = wire.NewSet(
 	noriGorm.GetGorm,
 	session.GetSession,
 	user.New,
-	wire.Struct(new(httpHandler.Handler), "R", "Auth"),
+	wire.Struct(new(httpHandler.Handler), "R", "Auth", "UrlPrefix"),
 	noriHttp.GetHttp,
 )
 
-func Initialize(registry registry.Registry) (*httpHandler.Handler, error) {
+func Initialize(registry registry.Registry, urlPrefix string) (*httpHandler.Handler, error) {
 	wire.Build(set1)
 	return &httpHandler.Handler{}, nil
 }

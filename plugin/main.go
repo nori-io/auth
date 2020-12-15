@@ -72,45 +72,7 @@ func (p pluginStruct) Init(ctx context.Context, config config.Config, log logger
 }
 
 func (p pluginStruct) Start(ctx context.Context, registry registry.Registry) error {
-	/*httpServer, err := noriHttp.GetHttp(registry)
-	if err != nil {
-		return err
-	}
-
-	h := httpHandler.Handler{
-		R:         httpServer,
-		Auth:      p.instance,
-		UrlPrefix: p.config.urlPrefix(),
-	}*/
-
 	Initialize(registry, p.config.urlPrefix())
-
-	/*db, err := noriGorm.GetGorm(registry)
-	if err != nil {
-		return err
-	}*/
-
-	/*s, err := s.GetSession(registry)
-	if err != nil {
-		return err
-	}*/
-
-	// userRepo := user.New(db)
-
-	// p.instance = auth.New(s, userRepo)
-
-	/*httpServer, err := noriHttp.GetHttp(registry)
-	if err != nil {
-		return err
-	}*/
-
-	/*h := http.Handler{
-		R:         httpServer,
-		Auth:      p.instance,
-		UrlPrefix: p.config.urlPrefix(),
-	}*/
-
-	// http.New(h)
 
 	return nil
 }

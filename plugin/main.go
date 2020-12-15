@@ -72,9 +72,8 @@ func (p pluginStruct) Init(ctx context.Context, config config.Config, log logger
 }
 
 func (p pluginStruct) Start(ctx context.Context, registry registry.Registry) error {
-	Initialize(registry, p.config.urlPrefix())
-
-	return nil
+	_, err := Initialize(registry, p.config.urlPrefix())
+	return err
 }
 
 func (p pluginStruct) Stop(ctx context.Context, registry registry.Registry) error {

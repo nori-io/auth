@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 
+	httpHandler "github.com/nori-io/authentication/internal/handler/http"
+
 	plugin2 "github.com/nori-io/common/v4/pkg/domain/plugin"
 
 	//"go.uber.org/dig"
@@ -15,6 +17,7 @@ import (
 
 	em "github.com/nori-io/common/v4/pkg/domain/enum/meta"
 
+	// httpHandler "github.com/nori-io/authentication/internal/handler/http"
 	"github.com/nori-io/common/v4/pkg/domain/config"
 	"github.com/nori-io/common/v4/pkg/domain/logger"
 	"github.com/nori-io/common/v4/pkg/domain/meta"
@@ -71,7 +74,13 @@ func (p pluginStruct) Init(ctx context.Context, config config.Config, log logger
 }
 
 func (p pluginStruct) Start(ctx context.Context, registry registry.Registry) error {
-	Initialize(registry)
+	h := httpHandler.Handler{
+		R:         nil,
+		Auth:      p.instance,
+		UrlPrefix: p.config.urlPrefix(),
+	}
+
+	Initialize(registry, h)
 
 	/*db, err := noriGorm.GetGorm(registry)
 	if err != nil {

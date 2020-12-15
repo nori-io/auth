@@ -8,18 +8,9 @@ import (
 	"github.com/nori-io/authentication/internal/service/auth"
 	"github.com/nori-io/common/v4/pkg/domain/registry"
 	noriGorm "github.com/nori-io/interfaces/database/orm/gorm"
+	"github.com/nori-io/interfaces/nori/http"
 	"github.com/nori-io/interfaces/nori/session"
 )
-
-/*type registryManager struct {
-	log           *logrus.Logger
-	plugins       *PluginList
-	interfaces    map[meta.Interface]meta.ID
-	configManager config.Manager
-	registry      plugin.Registry
-}*/
-
-// var registry1 registry.Registry
 
 var set1 = wire.NewSet(
 	auth.New,
@@ -31,7 +22,7 @@ var set1 = wire.NewSet(
 	httpHandler.New,
 )
 
-func Initialize(registry registry.Registry) (*httpHandler.Handler, error) {
+func Initialize(registry registry.Registry, h httpHandler.Handler) (*httpHandler.Handler, error) {
 	wire.Build(set1)
 	return &httpHandler.Handler{}, nil
 }

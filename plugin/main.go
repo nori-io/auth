@@ -25,6 +25,7 @@ import (
 	m "github.com/nori-io/common/v4/pkg/meta"
 
 	noriGorm "github.com/nori-io/interfaces/database/orm/gorm"
+	noriHttp "github.com/nori-io/interfaces/nori/http"
 )
 
 var Plugin plugin2.Plugin = pluginStruct{}
@@ -74,8 +75,13 @@ func (p pluginStruct) Init(ctx context.Context, config config.Config, log logger
 }
 
 func (p pluginStruct) Start(ctx context.Context, registry registry.Registry) error {
+	httpServer, err := noriHttp.GetHttp(registry)
+	if err != nil {
+		return err
+	}
+
 	h := httpHandler.Handler{
-		R:         nil,
+		R:         httpServer,
 		Auth:      p.instance,
 		UrlPrefix: p.config.urlPrefix(),
 	}

@@ -13,7 +13,6 @@ import (
 	"github.com/nori-io/authentication/internal/service/auth"
 	"github.com/nori-io/common/v4/pkg/domain/registry"
 	"github.com/nori-io/interfaces/database/orm/gorm"
-	"github.com/nori-io/interfaces/nori/http"
 	"github.com/nori-io/interfaces/nori/session"
 )
 
@@ -26,4 +25,4 @@ func Initialize(registry2 registry.Registry, h http_handler.Handler) (*http_hand
 
 // wire.go:
 
-var set1 = wire.NewSet(auth.New, authentication.New, pg.GetGorm, session.GetSession, http.GetHttp, user.New, http_handler.New)
+var set1 = wire.NewSet(auth.New, authentication.New, pg.GetGorm, session.GetSession, user.New, http_handler.New)

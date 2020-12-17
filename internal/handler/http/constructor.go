@@ -1,4 +1,4 @@
-package http_handler
+package http
 
 import (
 	"github.com/nori-io/authentication/internal/domain/service"
@@ -25,6 +25,7 @@ func New(h Handler) *Handler {
 
 func Start(h Handler) {
 	authHandler := authentication.New(h.Auth)
+
 	h.R.Get("/signup", authHandler.SignUp)
 	h.R.Get("/signin", authHandler.SigIn)
 	h.R.Get("/signout", authHandler.SignOut)

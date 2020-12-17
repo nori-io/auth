@@ -5,8 +5,6 @@ import (
 
 	plugin2 "github.com/nori-io/common/v4/pkg/domain/plugin"
 
-	//"go.uber.org/dig"
-
 	"github.com/jinzhu/gorm"
 
 	"github.com/nori-io/authentication/internal/domain/service"
@@ -15,7 +13,6 @@ import (
 
 	em "github.com/nori-io/common/v4/pkg/domain/enum/meta"
 
-	// httpHandler "github.com/nori-io/authentication/internal/handler/http"
 	"github.com/nori-io/common/v4/pkg/domain/config"
 	"github.com/nori-io/common/v4/pkg/domain/logger"
 	"github.com/nori-io/common/v4/pkg/domain/meta"

@@ -1,0 +1,19 @@
+language: go
+sudo: false
+go:
+  - 1.15.x
+services:
+  - docker
+cache:
+  directories:
+    - "$GOPATH/pkg/mod"
+stages:
+  - test
+jobs:
+  include:
+    - stage: test
+      script:
+        - go test --tags=integration ./... -coverprofile=coverage.txt -covermode=atomic
+          -p=1
+      after_success:
+        - bash <(curl -s https://codecov.io/bash)

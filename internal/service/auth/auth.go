@@ -4,11 +4,11 @@ import (
 	"context"
 	"crypto/rand"
 
-	"github.com/nori-io/authentication/internal/domain/entity"
+	"github.com/nori-plugins/authentication/internal/domain/entity"
 
-	"github.com/nori-io/authentication/internal/domain/repository"
+	"github.com/nori-plugins/authentication/internal/domain/repository"
 
-	serv "github.com/nori-io/authentication/internal/domain/service"
+	serv "github.com/nori-plugins/authentication/internal/domain/service"
 	s "github.com/nori-io/interfaces/nori/session"
 )
 

@@ -3,9 +3,9 @@ package authentication
 import (
 	"net/http"
 
-	"github.com/nori-io/authentication/internal/domain/entity"
+	"github.com/nori-plugins/authentication/internal/domain/entity"
 
-	"github.com/nori-io/authentication/internal/domain/service"
+	"github.com/nori-plugins/authentication/internal/domain/service"
 )
 
 type AuthHandler struct {

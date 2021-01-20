@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/nori-io/authentication/internal/domain/entity"
+	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
 type UserRepository interface {

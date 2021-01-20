@@ -3,7 +3,7 @@ package entity
 import (
 	"time"
 
-	"github.com/nori-io/authentication/internal/domain/enum/user_status"
+	"github.com/nori-plugins/authentication/internal/domain/enum/user_status"
 )
 
 type User struct {

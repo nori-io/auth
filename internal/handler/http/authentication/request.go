@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/nori-io/authentication/internal/domain/service"
+	"github.com/nori-plugins/authentication/internal/domain/service"
 )
 
 type SignUpRequest struct {

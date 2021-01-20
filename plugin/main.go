@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 
-	"github.com/nori-io/authentication/internal/handler/http/authentication"
+	"github.com/nori-plugins/authentication/internal/handler/http/authentication"
 
-	"github.com/nori-io/common/v3/pkg/domain/plugin"
+	p "github.com/nori-io/common/v4/pkg/domain/plugin"
 
 	"go.uber.org/dig"
 
@@ -13,29 +13,31 @@ import (
 
 	noriHttp "github.com/nori-io/interfaces/nori/http"
 
-	"github.com/nori-io/authentication/internal/domain/service"
+	"github.com/nori-plugins/authentication/internal/domain/service"
 
-	"github.com/nori-io/authentication/internal/repository/user"
+	"github.com/nori-plugins/authentication/internal/repository/user"
 
-	"github.com/nori-io/authentication/internal/service/auth"
+	"github.com/nori-plugins/authentication/internal/service/auth"
 
-	"github.com/nori-io/authentication/pkg"
+	"github.com/nori-plugins/authentication/pkg"
 
-	em "github.com/nori-io/common/v3/pkg/domain/enum/meta"
+	em "github.com/nori-io/common/v4/pkg/domain/enum/meta"
 
-	"github.com/nori-io/common/v3/pkg/domain/config"
-	"github.com/nori-io/common/v3/pkg/domain/logger"
-	"github.com/nori-io/common/v3/pkg/domain/meta"
-	"github.com/nori-io/common/v3/pkg/domain/registry"
-	m "github.com/nori-io/common/v3/pkg/meta"
+	"github.com/nori-io/common/v4/pkg/domain/config"
+	"github.com/nori-io/common/v4/pkg/domain/logger"
+	"github.com/nori-io/common/v4/pkg/domain/meta"
+	"github.com/nori-io/common/v4/pkg/domain/registry"
+	m "github.com/nori-io/common/v4/pkg/meta"
 	s "github.com/nori-io/interfaces/nori/session"
 
-	noriGorm "github.com/nori-io/interfaces/public/sql/gorm"
+	noriGorm "github.com/nori-io/interfaces/database/orm/gorm"
 )
 
-var Plugin plugin.Plugin = pluginStruct{}
+func New() p.Plugin {
+	return &plugin{}
+}
 
-type pluginStruct struct {
+type plugin struct {
 	instance service.AuthenticationService
 	config   conf
 }
@@ -44,7 +46,7 @@ type conf struct {
 	urlPrefix config.String
 }
 
-func (p pluginStruct) Meta() meta.Meta {
+func (p plugin) Meta() meta.Meta {
 	return m.Meta{
 		ID: m.ID{
 			ID:      "",
@@ -67,11 +69,11 @@ func (p pluginStruct) Meta() meta.Meta {
 	}
 }
 
-func (p pluginStruct) Instance() interface{} {
+func (p plugin) Instance() interface{} {
 	return p.instance
 }
 
-func (p pluginStruct) Init(ctx context.Context, config config.Config, log logger.FieldLogger) error {
+func (p plugin) Init(ctx context.Context, config config.Config, log logger.FieldLogger) error {
 	p.config = conf{
 		urlPrefix: config.String("urlPrefix", "url prefix for all handlers"),
 	}
@@ -79,7 +81,7 @@ func (p pluginStruct) Init(ctx context.Context, config config.Config, log logger
 	return nil
 }
 
-func (p pluginStruct) Start(ctx context.Context, registry registry.Registry) error {
+func (p plugin) Start(ctx context.Context, registry registry.Registry) error {
 	container := dig.New()
 	container.Provide(registry)
 	container.Provide(noriHttp.GetHttp)
@@ -127,11 +129,11 @@ func (p pluginStruct) Start(ctx context.Context, registry registry.Registry) err
 	return nil
 }
 
-func (p pluginStruct) Stop(ctx context.Context, registry registry.Registry) error {
+func (p plugin) Stop(ctx context.Context, registry registry.Registry) error {
 	return nil
 }
 
-func (p pluginStruct) Install(_ context.Context, registry registry.Registry) error {
+func (p plugin) Install(_ context.Context, registry registry.Registry) error {
 	db, err := noriGorm.GetGorm(registry)
 	if err != nil {
 		return err
@@ -158,7 +160,7 @@ func (p pluginStruct) Install(_ context.Context, registry registry.Registry) err
 	return nil
 }
 
-func (p pluginStruct) UnInstall(_ context.Context, registry registry.Registry) error {
+func (p plugin) UnInstall(_ context.Context, registry registry.Registry) error {
 	db, err := noriGorm.GetGorm(registry)
 	if err != nil {
 		return err

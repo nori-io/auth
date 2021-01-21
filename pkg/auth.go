@@ -19,7 +19,9 @@ type Authentication interface {
 	SignOutSocial(w http.ResponseWriter, req http.Request) (resp *SignOutSocialResponse)
 
 	GetCurrentUser(w http.ResponseWriter, data *Session)(*User, error)
-	SignOutAll(w http.ResponseWriter, id uint)error
+	GetCurrentSessionId(w http.ResponseWriter, id uint) (*Session, error)
+	GetActiveSessions(w http.ResponseWriter, id uint) (*[]Session, error)
+	CloseActiveSessions(w http.ResponseWriter, id uint) error
 }
 
 type SignUpData struct {

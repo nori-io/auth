@@ -15,8 +15,11 @@ type Authentication interface {
 	SignIn(ctx context.Context, data SignInData) (*Session, error)
 	SignOut(ctx context.Context, data *Session) error
 
-	SignInSocial(res http.ResponseWriter, req http.Request) (resp *SignInSocialResponse)
-	SignOutSocial(res http.ResponseWriter, req http.Request) (resp *SignOutSocialResponse)
+	SignInSocial(w http.ResponseWriter, req http.Request) (resp *SignInSocialResponse)
+	SignOutSocial(w http.ResponseWriter, req http.Request) (resp *SignOutSocialResponse)
+
+	GetCurrentUser(w http.ResponseWriter, data *Session)(*User, error)
+	SignOutAll(w http.ResponseWriter, id uint)error
 }
 
 type SignUpData struct {

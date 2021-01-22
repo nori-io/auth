@@ -18,9 +18,11 @@ type Authentication interface {
 	SignInSocial(w http.ResponseWriter, req http.Request) (resp *SignInSocialResponse)
 	SignOutSocial(w http.ResponseWriter, req http.Request) (resp *SignOutSocialResponse)
 
-	GetCurrentUser(w http.ResponseWriter, data *Session)(*User, error)
+	// Может везде оперировать именно user Id? на входе
+	GetCurrentUser(w http.ResponseWriter, id uint)(*User, error)
 	GetCurrentSessionId(w http.ResponseWriter, id uint) (*Session, error)
 	GetActiveSessions(w http.ResponseWriter, id uint) (*[]Session, error)
+	CreateSession(w http.ResponseWriter, id uint)(*Session, error)
 	CloseActiveSessions(w http.ResponseWriter, id uint) error
 }
 

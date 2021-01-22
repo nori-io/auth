@@ -18,12 +18,12 @@ type Authentication interface {
 	SignInSocial(w http.ResponseWriter, req http.Request) (resp *SignInSocialResponse)
 	SignOutSocial(w http.ResponseWriter, req http.Request) (resp *SignOutSocialResponse)
 
-	// Может везде оперировать именно user Id? на входе
-	GetCurrentUser(w http.ResponseWriter, id uint)(*User, error)
-	GetCurrentSessionId(w http.ResponseWriter, id uint) (*Session, error)
-	GetActiveSessions(w http.ResponseWriter, id uint) (*[]Session, error)
-	CreateSession(w http.ResponseWriter, req http.Request)(*Session, error)
-	CloseActiveSessions(w http.ResponseWriter, id uint) error
+	GetUser(ctx context.Context, user_ID uint) (*User, error)
+	GetCurrentUser(ctx context.Context)(*User, error)
+	GetCurrentSession(ctx context.Context) (*Session, error)
+	GetActiveSessions(ctx context.Context, user_ID uint) ([]Session, error)
+	StartSession(w http.ResponseWriter, s *Session)(error)
+	CloseActiveSessions(w http.ResponseWriter, user_ID uint) error
 }
 
 type SignUpData struct {

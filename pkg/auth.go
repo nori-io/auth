@@ -22,7 +22,7 @@ type Authentication interface {
 	GetCurrentUser(w http.ResponseWriter, id uint)(*User, error)
 	GetCurrentSessionId(w http.ResponseWriter, id uint) (*Session, error)
 	GetActiveSessions(w http.ResponseWriter, id uint) (*[]Session, error)
-	CreateSession(w http.ResponseWriter, id uint)(*Session, error)
+	CreateSession(w http.ResponseWriter, req http.Request)(*Session, error)
 	CloseActiveSessions(w http.ResponseWriter, id uint) error
 }
 

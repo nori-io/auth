@@ -12,18 +12,27 @@ const AuthenticationInterface meta.Interface = "nori/http/Authentication"
 
 type Authentication interface {
 	SignUp(ctx context.Context, data SignUpData) (*User, error)
-	SignIn(ctx context.Context, data SignInData) (*Session, error)
+	SignInByToken(ctx context.Context, data SignInByTokenData) (*Session, error)
 	SignOut(ctx context.Context, data *Session) error
 
 	SignInSocial(w http.ResponseWriter, req http.Request) (resp *SignInSocialResponse)
 	SignOutSocial(w http.ResponseWriter, req http.Request) (resp *SignOutSocialResponse)
 
-	GetUser(ctx context.Context, user_ID uint) (*User, error)
+	GetUserById(ctx context.Context, userID uint64) (*User, error)
+	GetUserByEmail(ctx context.Context, email string) (*User, error)
+	GetUserByPhohe(ctx context.Context, phoneNumber string) (*User, error)
+
+	GetUserStatus(ctx context.Context, userID uint64) user_status.UserStatus
+
+
+	IssueAuthenticationToken(ctx context.Context, userID uint64, length uint8)
+	GetAuthenticationToken(ctx context.Context, userID uint64)
+
 	GetCurrentUser(ctx context.Context)(*User, error)
 	GetCurrentSession(ctx context.Context) (*Session, error)
-	GetActiveSessions(ctx context.Context, user_ID uint) ([]Session, error)
-	StartSession(w http.ResponseWriter, s *Session)(error)
-	CloseActiveSessions(w http.ResponseWriter, user_ID uint) error
+	GetActiveSessions(ctx context.Context, userID uint64) ([]Session, error)
+	OpenSession(w http.ResponseWriter, s *Session) error
+	CloseActiveSessions(w http.ResponseWriter, userID uint64) error
 }
 
 type SignUpData struct {
@@ -32,17 +41,17 @@ type SignUpData struct {
 }
 
 type User struct {
-	Id        uint64
+	ID        uint64
 	Email     string
+	Phone string
 	Password  string
 	Status    user_status.UserStatus
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
-type SignInData struct {
-	Email    string
-	Password string
+type SignInByTokenData struct {
+	Token    string
 }
 type Session struct {
 	Id []byte

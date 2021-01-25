@@ -32,7 +32,7 @@ type Authentication interface {
 	GetCurrentUser(ctx context.Context)(*User, error)
 	GetCurrentSession(ctx context.Context) (*Session, error)
 	GetActiveSessions(ctx context.Context, userID uint64) ([]Session, error)
-	OpenSession(w http.ResponseWriter, s *Session) error
+	OpenSession(w http.ResponseWriter, s *Session, agent string) error
 	CloseActiveSessions(w http.ResponseWriter, userID uint64) error
 }
 

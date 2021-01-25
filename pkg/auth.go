@@ -25,8 +25,9 @@ type Authentication interface {
 	GetUserStatus(ctx context.Context, userID uint64) user_status.UserStatus
 
 
-	IssueAuthenticationToken(ctx context.Context, userID uint64, length uint8)
+	IssueAuthenticationToken(ctx context.Context, userID uint64, length uint8, expireDuration uint16)
 	GetAuthenticationToken(ctx context.Context, userID uint64)
+	VerifyAuthenticationToken(ctx context.Context, data SignInByTokenData)
 
 	GetCurrentUser(ctx context.Context)(*User, error)
 	GetCurrentSession(ctx context.Context) (*Session, error)
@@ -36,7 +37,7 @@ type Authentication interface {
 }
 
 type SignUpData struct {
-	Email    string
+	Login    string
 	Password string
 }
 

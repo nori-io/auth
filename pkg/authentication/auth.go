@@ -27,8 +27,10 @@ type (
 		GetUserByPhone(ctx context.Context, phone string) (User, error)
 		GetCurrentUser(ctx context.Context) (User, error)
 		GetUserStatus(ctx context.Context, userID uint64) users_status.UserStatus
+		GetUserOath2Servers(ctx context.Context, userID uint64) []Oath2Server
 
 	}
+
 
 	Tokens interface {
 		Create(ctx context.Context, userID uint64, lengthTokenAccess uint8, lengthTokenRefresh, ttl time.Duration) SignInByTokenData
@@ -36,7 +38,7 @@ type (
 		Verify(ctx context.Context, data SignInByTokenData) error
 
 		IsValid(ctx context.Context, data SignInByTokenData) bool
-		RefreshToken(ctx context.Context, tokenRefresh string)
+		RefreshToken(ctx context.Context, tokenRefresh string) SignInByTokenData
 
 		GetByUserID(ctx context.Context, userID uint64) SignInByTokenData
 	}
@@ -51,6 +53,13 @@ type (
 		GetByFilter(ctx context.Context, filter SessionFilter) ([]Session, error)
 	}
 )
+
+
+type Oath2Server struct{
+	name string
+	authApi string
+	callBackApi string
+}
 
 type SessionFilter struct {
 	// todo: add more filter fields

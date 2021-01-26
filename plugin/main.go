@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/nori-plugins/authentication/internal/handler/http/authentication"
+	authentication2 "github.com/nori-plugins/authentication/pkg/authentication"
 
 	p "github.com/nori-io/common/v4/pkg/domain/plugin"
 
@@ -18,8 +19,6 @@ import (
 	"github.com/nori-plugins/authentication/internal/repository/user"
 
 	"github.com/nori-plugins/authentication/internal/service/auth"
-
-	"github.com/nori-plugins/authentication/pkg"
 
 	em "github.com/nori-io/common/v4/pkg/domain/enum/meta"
 
@@ -58,7 +57,7 @@ func (p plugin) Meta() meta.Meta {
 		},
 		Dependencies: []meta.Dependency{},
 		Description:  nil,
-		Interface:    pkg.AuthenticationInterface,
+		Interface:    authentication2.AuthenticationInterface,
 		License:      nil,
 		Links:        nil,
 		Repository: m.Repository{

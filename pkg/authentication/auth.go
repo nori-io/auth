@@ -34,7 +34,7 @@ type (
 		Delete(ctx context.Context, token string) error
 		Verify(ctx context.Context, data SignInByTokenData) error
 
-		IsValid(ctx context.Context, data SignInByTokenData) error
+		IsValid(ctx context.Context, data SignInByTokenData) bool
 
 		GetByUserID(ctx context.Context, userID uint64) SignInByTokenData
 	}

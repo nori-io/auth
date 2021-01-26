@@ -27,14 +27,16 @@ type (
 		GetUserByPhone(ctx context.Context, phone string) (User, error)
 		GetCurrentUser(ctx context.Context) (User, error)
 		GetUserStatus(ctx context.Context, userID uint64) users_status.UserStatus
+
 	}
 
 	Tokens interface {
-		Create(ctx context.Context, userID uint64, length uint8, ttl time.Duration) SignInByTokenData
+		Create(ctx context.Context, userID uint64, lengthTokenAccess uint8, lengthTokenRefresh, ttl time.Duration) SignInByTokenData
 		Delete(ctx context.Context, token string) error
 		Verify(ctx context.Context, data SignInByTokenData) error
 
 		IsValid(ctx context.Context, data SignInByTokenData) bool
+		RefreshToken(ctx context.Context, tokenRefresh string)
 
 		GetByUserID(ctx context.Context, userID uint64) SignInByTokenData
 	}
@@ -54,6 +56,8 @@ type SessionFilter struct {
 	// todo: add more filter fields
 	Offset int
 	Limit  int
+	Beginning time.Time
+	End time.Time
 }
 
 type SignUpData struct {
@@ -72,7 +76,8 @@ type User struct {
 }
 
 type SignInByTokenData struct {
-	Token string
+	TokenAccess string
+	TokenRefresh string
 }
 type Session struct {
 	ID     []byte

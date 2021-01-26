@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/nori-io/common/v4/pkg/domain/meta"
-	"github.com/nori-plugins/authentication/internal/domain/enum/user_status"
+	"github.com/nori-plugins/authentication/pkg/enum/users_status"
 )
 
 const AuthenticationInterface meta.Interface = "nori/http/Authentication"
@@ -15,7 +15,6 @@ type (
 	Authentication interface {
 		SignUp(ctx context.Context, data SignUpData) (User, error)
 		SignInByToken(ctx context.Context, data SignInByTokenData) (Session, error)
-		SignOut(ctx context.Context, data Session) error
 
 		Token() Tokens
 		Session() Sessions
@@ -27,15 +26,17 @@ type (
 		GetUserByEmail(ctx context.Context, email string) (User, error)
 		GetUserByPhone(ctx context.Context, phone string) (User, error)
 		GetCurrentUser(ctx context.Context) (User, error)
-		GetUserStatus(ctx context.Context, userID uint64) user_status.UserStatus
+		GetUserStatus(ctx context.Context, userID uint64) users_status.UserStatus
 	}
 
 	Tokens interface {
-		Create(ctx context.Context, userID uint64, length uint8, ttl time.Duration) // <-
+		Create(ctx context.Context, userID uint64, length uint8, ttl time.Duration) SignInByTokenData
 		Delete(ctx context.Context, token string) error
 		Verify(ctx context.Context, data SignInByTokenData) error
 
-		GetByUserID(ctx context.Context, userID uint64)
+		IsValid(ctx context.Context, data SignInByTokenData) error
+
+		GetByUserID(ctx context.Context, userID uint64) SignInByTokenData
 	}
 
 	Sessions interface {
@@ -65,7 +66,7 @@ type User struct {
 	Email     string
 	Phone     string
 	Password  string
-	Status    user_status.UserStatus
+	Status    users_status.UserStatus
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

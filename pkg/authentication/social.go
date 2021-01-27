@@ -10,7 +10,7 @@ type Social interface {
 
 type SocialAccount struct {
 	UserProfile   UserProfile
-	SocialNetwork SocialNetwork
+	SocialNetwork SocialProvider
 }
 
 type UserProfile struct {
@@ -23,7 +23,7 @@ type UserProfile struct {
 	Raw       string
 }
 
-type SocialNetwork struct {
+type SocialProvider struct {
 	name string
 	logo string
 }

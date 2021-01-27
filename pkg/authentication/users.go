@@ -19,7 +19,6 @@ type User struct {
 	ID        uint64
 	Email     string
 	Phone     string
-	Password  string
 	Status    users_status.UserStatus
 	CreatedAt time.Time
 	UpdatedAt time.Time

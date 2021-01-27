@@ -3,7 +3,7 @@ package authentication
 import "context"
 
 type Social interface {
-	GetUserSocialAccounts(ctx context.Context, userProfile UserProfile) []SocialAccount
+	GetUserSocialAccounts(ctx context.Context, userID uint64) []SocialAccount
 	IsValid(ctx context.Context, tokenAccess string) bool
 	RefreshToken(ctx context.Context, tokenRefresh string) (tokenAccess string)
 }

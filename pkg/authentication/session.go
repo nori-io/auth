@@ -19,19 +19,25 @@ type Sessions interface {
 }
 
 type SessionFilter struct {
-	UserID   uint64
-	Offset   int
-	Limit    int
-	Status   session_status.SessionStatus
-	OpenedAt time.Time
-	ClosedAt time.Time
+	UserID        uint64
+	Offset        int
+	Limit         int
+	Status        session_status.SessionStatus
+	OpenedSince   time.Time
+	ClosedBefore  time.Time
+	CreatedSince  time.Time
+	CreatedBefore time.Time
+	UpdatedSince  time.Time
+	UpdatedBefore time.Time
 }
 
 type Session struct {
-	ID       uint64
-	Key      []byte
-	UserID   uint64
-	Status   session_status.SessionStatus
-	OpenedAt time.Time
-	ClosedAt time.Time
+	ID        uint64
+	Key       []byte
+	UserID    uint64
+	Status    session_status.SessionStatus
+	OpenedAt  time.Time
+	ClosedAt  time.Time
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }

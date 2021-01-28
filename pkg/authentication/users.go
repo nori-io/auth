@@ -8,17 +8,19 @@ import (
 )
 
 type Users interface {
-	GetUserById(ctx context.Context, userID uint64) (User, error)
-	GetUserByEmail(ctx context.Context, email string) (User, error)
-	GetUserByPhone(ctx context.Context, phone string) (User, error)
-	GetCurrentUser(ctx context.Context) (User, error)
+	GetByID(ctx context.Context, userID uint64) (User, error)
+	GetByEmail(ctx context.Context, email string) (User, error)
+	GetByPhone(ctx context.Context, phone string) (User, error)
+	GetCurrent(ctx context.Context) (User, error)
 	GetByFilter(ctx context.Context, filter UserFilter) ([]User, error)
 }
 
 type UserFilter struct {
-	Status users_status.UserStatus
-	Offset int
-	Limit  int
+	EmailPattern string
+	PhonePattern string
+	Status       users_status.UserStatus
+	Offset       int
+	Limit        int
 }
 
 type User struct {

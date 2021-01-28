@@ -6,10 +6,10 @@ import (
 )
 
 type Social interface {
-	GetAccounts(ctx context.Context, userID uint64) []SocialAccount
-	GetAccountsByFilter(ctx context.Context)
-	GetAccessToken(ctx context.Context, refreshToken string, serviceProviderID uint64) (accessToken string)
-	GetServiceProviders(ctx context.Context) []ServiceProvider
+	GetAccounts(ctx context.Context, userID uint64) ([]SocialAccount, error)
+	GetAccountsByFilter(ctx context.Context) ([]SocialAccount, error)
+	GetAccessToken(ctx context.Context, refreshToken string, serviceProviderID uint64) (accessToken string, err error)
+	GetServiceProviders(ctx context.Context) ([]ServiceProvider, error)
 }
 
 type SocialFilter struct {

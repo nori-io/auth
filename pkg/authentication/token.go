@@ -10,7 +10,7 @@ type Tokens interface {
 	Use(ctx context.Context, token OneTimeToken) error
 	GetByUserID(ctx context.Context, userID uint64) ([]OneTimeToken, error)
 	GetByUserIdIssuer(ctx context.Context, userID uint64, issuer string) ([]OneTimeToken, error)
-	GetByFilter(ctx context.Context, filter TokenFilter)
+	GetByFilter(ctx context.Context, filter TokenFilter) ([]OneTimeToken, error)
 }
 
 type OneTimeToken struct {
@@ -24,10 +24,13 @@ type OneTimeToken struct {
 }
 
 type TokenFilter struct {
-	UserID    uint64
-	Issuer    string
-	Offset    int
-	Limit     int
-	CreatedAt time.Time
-	UsedAt    time.Time
+	UserID        uint64
+	Issuer        string
+	Offset        int
+	Limit         int
+	CreatedSince  time.Time
+	CreatedBefore time.Time
+
+	UsedSince  time.Time
+	UsedBefore time.Time
 }

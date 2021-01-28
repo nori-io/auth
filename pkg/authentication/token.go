@@ -6,16 +6,28 @@ import (
 )
 
 type Tokens interface {
-	Create(ctx context.Context, userID uint64, lengthTokenAccess uint8, lengthTokenRefresh, ttl time.Duration) (Token, error)
-	Delete(ctx context.Context, token string) error
-	Get(ctx context.Context, userID uint64, issuer string) (*Token, error)
-	GetByUserID(ctx context.Context, userID uint64) ([]Token, error)
+	Create(ctx context.Context, userID uint64, issuer string, length uint8, ttl time.Duration) (OneTimeToken, error)
+	Use(ctx context.Context, token OneTimeToken) error
+	GetByUserID(ctx context.Context, userID uint64) ([]OneTimeToken, error)
+	GetByUserIdIssuer(ctx context.Context, userID uint64, issuer string) ([]OneTimeToken, error)
+	GetByFilter(ctx context.Context, filter TokenFilter)
 }
 
-type Token struct {
+type OneTimeToken struct {
+	ID        uint64
 	UserID    uint64
 	Issuer    string
-	Token     string
+	Token     []byte
 	TTL       time.Duration
 	CreatedAt time.Time
+	UsedAt    time.Time
+}
+
+type TokenFilter struct {
+	UserID    uint64
+	Issuer    string
+	Offset    int
+	Limit     int
+	CreatedAt time.Time
+	UsedAt    time.Time
 }

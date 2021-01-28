@@ -3,27 +3,24 @@ package authentication
 import "context"
 
 type Social interface {
-	GetUserSocialAccounts(ctx context.Context, userID uint64) []SocialAccount
-	IsValid(ctx context.Context, tokenAccess string) bool
-	RefreshToken(ctx context.Context, tokenRefresh string) (tokenAccess string)
+	GetAccounts(ctx context.Context, userID uint64) []SocialAccount
+	GetAccessToken(ctx context.Context, refreshToken string, serviceProviderID uint64) (accessToken string)
+	GetServiceProviders(ctx context.Context) []ServiceProvider
 }
 
 type SocialAccount struct {
-	UserProfile     UserProfile
+	ID              uint64
+	ExternalID      string
+	FirstName       string
+	LastName        string
+	FullName        string
+	Email           string
+	AvatarURL       string
 	ServiceProvider ServiceProvider
 }
 
-type UserProfile struct {
-	ID        uint64
-	FirstName string
-	LastName  string
-	FullName  string
-	Email     string
-	AvatarURL string
-	Raw       string
-}
-
 type ServiceProvider struct {
-	name string
-	logo string
+	ID   uint64
+	Name string
+	Logo string
 }

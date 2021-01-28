@@ -12,7 +12,13 @@ type Users interface {
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByPhone(ctx context.Context, phone string) (User, error)
 	GetCurrentUser(ctx context.Context) (User, error)
-	GetUserStatus(ctx context.Context, userID uint64) users_status.UserStatus
+	GetByFilter(ctx context.Context, filter UserFilter) ([]User, error)
+}
+
+type UserFilter struct {
+	Status users_status.UserStatus
+	Offset int
+	Limit  int
 }
 
 type User struct {

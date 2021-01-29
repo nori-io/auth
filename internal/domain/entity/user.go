@@ -7,8 +7,9 @@ import (
 )
 
 type User struct {
-	Id        uint64
+	ID        uint64
 	Email     string
+	Phone     string
 	Password  string
 	Status    user_status.UserStatus
 	CreatedAt time.Time

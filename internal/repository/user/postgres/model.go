@@ -19,7 +19,7 @@ type User struct {
 
 func (u *User) Convert() *entity.User {
 	return &entity.User{
-		Id:        u.Id,
+		ID:        u.Id,
 		Email:     u.Email,
 		Password:  u.Password,
 		Status:    user_status.UserStatus(u.Status),
@@ -30,7 +30,7 @@ func (u *User) Convert() *entity.User {
 
 func NewModel(e *entity.User) (*User, error) {
 	return &User{
-		Id:        e.Id,
+		Id:        e.ID,
 		Email:     e.Email,
 		Password:  e.Password,
 		Status:    uint8(e.Status),

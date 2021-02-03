@@ -4,6 +4,7 @@ import "time"
 
 type SocialAccount struct {
 	ID              uint64
+	User_ID         uint64
 	ExternalID      string
 	FirstName       string
 	LastName        string

@@ -5,6 +5,7 @@ type UserStatus uint8
 const (
 	Active UserStatus = iota
 	Blocked
+	Deleted
 	Locked
 )
 

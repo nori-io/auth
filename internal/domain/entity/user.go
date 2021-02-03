@@ -11,6 +11,7 @@ type User struct {
 	Email     string
 	Phone     string
 	Password  string
+	Salt      string
 	Status    user_status.UserStatus
 	CreatedAt time.Time
 	UpdatedAt time.Time

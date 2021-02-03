@@ -7,11 +7,11 @@ import (
 )
 
 type Session struct {
-	ID        uint64
-	Key       []byte
-	UserID    uint64
-	Status    session_status.SessionStatus
-	OpenedAt  time.Time
-	ClosedAt  time.Time
-	UpdatedAt time.Time
+	ID         uint64
+	SessionKey []byte
+	UserID     uint64
+	Status     session_status.SessionStatus
+	OpenedAt   time.Time
+	ClosedAt   time.Time
+	UpdatedAt  time.Time
 }

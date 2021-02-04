@@ -8,8 +8,8 @@ import (
 
 	"github.com/nori-plugins/authentication/internal/domain/repository"
 
-	serv "github.com/nori-plugins/authentication/internal/domain/service"
 	s "github.com/nori-io/interfaces/nori/session"
+	serv "github.com/nori-plugins/authentication/internal/domain/service"
 )
 
 type service struct {
@@ -63,11 +63,11 @@ func (srv *service) SignIn(ctx context.Context, data serv.SignInData) (*entity.S
 	if err != nil {
 		return nil, err
 	}
-	return &entity.Session{Id: sid}, nil
+	return &entity.Session{SessionKey: sid}, nil
 }
 
 func (srv *service) SignOut(ctx context.Context, data *entity.Session) error {
-	err := srv.session.Delete([]byte(data.Id))
+	err := srv.session.Delete([]byte(data.SessionKey))
 	return err
 }
 

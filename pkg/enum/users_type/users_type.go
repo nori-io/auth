@@ -5,7 +5,6 @@ type UserType uint8
 const (
 	Admin UserType = iota
 	User
-	Guest
 )
 
 func (u UserType) Value() uint8 {

@@ -1,6 +1,7 @@
 package authentication
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
@@ -30,7 +31,7 @@ func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "sign up error", http.StatusInternalServerError)
 	}
 	JSON(w, r, SignUpResponse{
-		ID:    user.Id,
+		ID:    user.ID,
 		Email: user.Email,
 	})
 }
@@ -46,7 +47,7 @@ func (h *AuthHandler) SigIn(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	JSON(w, r, SignInResponse{
-		SessionID: string(sess.Id),
+		SessionID: string(sess.SessionKey),
 	})
 }
 
@@ -56,11 +57,19 @@ func (h *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
 
 	sessionId, _ := sessionIdContext.([]byte)
 
-	if err := h.Auth.SignOut(r.Context(), &entity.Session{Id: sessionId}); err != nil {
+	if err := h.Auth.SignOut(r.Context(), &entity.Session{SessionKey: sessionId}); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
 	// todo: redirect
 
 	http.Redirect(w, r, "/", 0)
+}
+
+func (h *AuthHandler) MfaRecoveryCodes(w http.ResponseWriter, r *http.Request) {
+	return func(ctx context.Context, r interface{}) (interface{}, error) {
+		req := r.(RecoveryCodesRequest)
+		resp := s.RecoveryCodes(ctx, req)
+		return *resp, resp.Error()
+	}
 }

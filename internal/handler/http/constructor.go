@@ -1,13 +1,13 @@
 package http
 
 import (
-	"github.com/nori-io/authentication/internal/domain/service"
-	"github.com/nori-io/authentication/internal/handler/http/authentication"
-	"github.com/nori-io/http/pkg"
+	"github.com/nori-io/interfaces/nori/http"
+	"github.com/nori-plugins/authentication/internal/domain/service"
+	"github.com/nori-plugins/authentication/internal/handler/http/authentication"
 )
 
 type Handler struct {
-	R         pkg.Http
+	R         http.Http
 	Auth      service.AuthenticationService
 	UrlPrefix string
 }
@@ -20,4 +20,6 @@ func New(h Handler) {
 	h.R.Get("/signup", authHandler.SignUp)
 	h.R.Get("/signin", authHandler.SigIn)
 	h.R.Get("/signout", authHandler.SignOut)
+	h.R.Post(" /mfa/recovery_codes", authHandler.MfaRecoveryCodes)
+	h.R.Put(" /mfa/recovery_codes", authHandler.MfaRecoveryCodes)
 }

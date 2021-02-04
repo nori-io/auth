@@ -71,6 +71,11 @@ func (srv *service) SignOut(ctx context.Context, data *entity.Session) error {
 	return err
 }
 
+func (srv *service) MfaRecoveryCodes(ctx context.Context, data *entity.Session) error {
+	err := srv.db.
+	return err
+}
+
 func (srv *service) getToken() ([]byte, error) {
 	sid := make([]byte, 32)
 

@@ -1,7 +1,6 @@
 package authentication
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
@@ -67,9 +66,12 @@ func (h *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AuthHandler) MfaRecoveryCodes(w http.ResponseWriter, r *http.Request) {
-	return func(ctx context.Context, r interface{}) (interface{}, error) {
-		req := r.(RecoveryCodesRequest)
-		resp := s.RecoveryCodes(ctx, req)
-		return *resp, resp.Error()
+	sessionIdContext := r.Context().Value("session_id")
+
+	sessionId, _ := sessionIdContext.([]byte)
+
+	if err := h.Auth.MfaRecoveryCodes(r.Context(), &entity.Session{SessionKey: sessionId}); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+	http.Redirect(w, r, "/", 0)
 }

@@ -20,6 +20,6 @@ func New(h Handler) {
 	h.R.Get("/signup", authHandler.SignUp)
 	h.R.Get("/signin", authHandler.SigIn)
 	h.R.Get("/signout", authHandler.SignOut)
-	h.R.Post(" /mfa/recovery_codes", authHandler.MfaRecoveryCodes)
-	h.R.Put(" /mfa/recovery_codes", authHandler.MfaRecoveryCodes)
+	h.R.Post("/mfa/recovery_codes", authHandler.MfaRecoveryCodes)
+	h.R.Put("/mfa/recovery_codes", authHandler.MfaRecoveryCodes)
 }

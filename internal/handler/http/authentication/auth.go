@@ -65,13 +65,15 @@ func (h *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", 0)
 }
 
-func (h *AuthHandler) MfaRecoveryCodes(w http.ResponseWriter, r *http.Request) {
+func (h *AuthHandler) GetMfaRecoveryCodes(w http.ResponseWriter, r *http.Request) {
 	sessionIdContext := r.Context().Value("session_id")
 
 	sessionId, _ := sessionIdContext.([]byte)
 
-	if err := h.Auth.MfaRecoveryCodes(r.Context(), &entity.Session{SessionKey: sessionId}); err != nil {
+	if err := h.Auth.GetMfaRecoveryCodes(r.Context(), &entity.Session{SessionKey: sessionId}); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
+	//@todo path
 	http.Redirect(w, r, "/", 0)
 }

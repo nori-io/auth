@@ -10,7 +10,7 @@ type AuthenticationService interface {
 	SignUp(ctx context.Context, data SignUpData) (*entity.User, error)
 	SignIn(ctx context.Context, data SignInData) (*entity.Session, error)
 	SignOut(ctx context.Context, data *entity.Session) error
-	MfaRecoveryCodes(ctx context.Context, data *entity.Session) error
+	GetMfaRecoveryCodes(ctx context.Context, data *entity.Session) ([]entity.MfaRecoveryCode, error)
 }
 
 type SignUpData struct {

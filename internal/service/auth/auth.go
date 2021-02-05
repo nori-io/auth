@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"crypto/rand"
+	"time"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 
@@ -75,8 +76,28 @@ func (srv *service) SignOut(ctx context.Context, data *entity.Session) error {
 	return err
 }
 
-func (srv *service) MfaRecoveryCodes(ctx context.Context, data *entity.Session) ([]entity.MfaRecoveryCode, error) {
-	codes, err := srv.mfaRecoveryCodeRepository.Get(ctx, data.UserID)
+func (srv *service) GetMfaRecoveryCodes(ctx context.Context, data *entity.Session) ([]entity.MfaRecoveryCode, error) {
+	var codes []entity.MfaRecoveryCode
+	var err error
+	var mfaRecoveryCode *entity.MfaRecoveryCode
+	//@todo read count of symbols from config
+	for i := 0; i < 10; i++ {
+		sid := make([]byte, 32)
+
+		if _, err := rand.Read(sid); err != nil {
+			return nil, err
+		}
+		mfaRecoveryCode = &entity.MfaRecoveryCode{
+			UserID:    data.UserID,
+			Code:      string(sid),
+			CreatedAt: time.Now(),
+		}
+		err = srv.mfaRecoveryCodeRepository.Create(ctx, data.UserID, mfaRecoveryCode)
+		if err != nil {
+			break
+		}
+		codes = append(codes, *mfaRecoveryCode)
+	}
 	return codes, err
 }
 

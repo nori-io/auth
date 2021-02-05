@@ -13,14 +13,18 @@ import (
 )
 
 type service struct {
-	session s.Session
-	db      repository.UserRepository
+	session                   s.Session
+	userRepository            repository.UserRepository
+	mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository
 }
 
-func New(sessionInstance s.Session, dbInstance repository.UserRepository) serv.AuthenticationService {
+func New(sessionInstance s.Session,
+	userRepositoryInstance repository.UserRepository,
+	mfaRecoveryCodeRepositoryInstance repository.MfaRecoveryCodeRepository) serv.AuthenticationService {
 	return &service{
-		session: sessionInstance,
-		db:      dbInstance,
+		session:                   sessionInstance,
+		userRepository:            userRepositoryInstance,
+		mfaRecoveryCodeRepository: mfaRecoveryCodeRepositoryInstance,
 	}
 }
 
@@ -36,7 +40,7 @@ func (srv *service) SignUp(ctx context.Context, data serv.SignUpData) (*entity.U
 		Password: data.Password,
 	}
 
-	if err := srv.db.Create(ctx, user); err != nil {
+	if err := srv.userRepository.Create(ctx, user); err != nil {
 		return nil, err
 	}
 
@@ -54,7 +58,7 @@ func (srv *service) SignIn(ctx context.Context, data serv.SignInData) (*entity.S
 	}
 
 	var err error
-	user, err = srv.db.GetByEmail(ctx, user.Email)
+	user, err = srv.userRepository.GetByEmail(ctx, user.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -71,9 +75,9 @@ func (srv *service) SignOut(ctx context.Context, data *entity.Session) error {
 	return err
 }
 
-func (srv *service) MfaRecoveryCodes(ctx context.Context, data *entity.Session) error {
-	err := srv.db.
-	return err
+func (srv *service) MfaRecoveryCodes(ctx context.Context, data *entity.Session) ([]entity.MfaRecoveryCode, error) {
+	codes, err := srv.mfaRecoveryCodeRepository.Get(ctx, data.UserID)
+	return codes, err
 }
 
 func (srv *service) getToken() ([]byte, error) {

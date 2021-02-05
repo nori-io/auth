@@ -42,7 +42,9 @@ type plugin struct {
 }
 
 type conf struct {
-	urlPrefix config.String
+	urlPrefix              config.String
+	MfaRecoveryCodePattern config.String
+	MfaRecoveryCodeSymbols config.String
 }
 
 func (p plugin) Meta() meta.Meta {
@@ -74,7 +76,9 @@ func (p plugin) Instance() interface{} {
 
 func (p plugin) Init(ctx context.Context, config config.Config, log logger.FieldLogger) error {
 	p.config = conf{
-		urlPrefix: config.String("urlPrefix", "url prefix for all handlers"),
+		urlPrefix:              config.String("urlPrefix", "url prefix for all handlers"),
+		MfaRecoveryCodePattern: config.String("mfaRecoveryCodePattern", "pattern for mfa recovery codes"),
+		MfaRecoveryCodeSymbols: config.String("mfaRecoveryCodeSymbols", "symbols that use when mfa recovery code generating"),
 	}
 
 	return nil

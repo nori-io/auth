@@ -15,6 +15,6 @@ func (m MfaRecoveryCodeRepository) Use(ctx context.Context, e *entity.MfaRecover
 	panic("implement me")
 }
 
-func (m MfaRecoveryCodeRepository) Get(ctx context.Context, userID uint64) ([]entity.MfaRecoveryCode, error) {
+func (m MfaRecoveryCodeRepository) Create(ctx context.Context, userID uint64) ([]entity.MfaRecoveryCode, error) {
 	panic("implement me")
 }

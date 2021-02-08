@@ -30,3 +30,8 @@ func NewModel(e *entity.MfaRecoveryCode) (*MfaRecoveryCode, error) {
 		CreatedAt: e.CreatedAt,
 	}, nil
 }
+
+// TableName
+func (MfaRecoveryCode) TableName() string {
+	return "mfa_recovery_codes"
+}

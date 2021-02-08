@@ -1,0 +1,568 @@
+---
+openapi: 3.0.0
+info:
+  title: Nori Authentication
+  license:
+    name: Apache 2.0
+  version: 1.0.0
+servers:
+- url: http://localhost:8080
+paths:
+  /signup:
+    post:
+      summary: Add a new user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignUpForm'
+            encoding:
+              email:
+                style: form
+                allowReserved: true
+              password:
+                style: form
+                allowReserved: true
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SignUpForm'
+            encoding:
+              email:
+                style: form
+                allowReserved: true
+              password:
+                style: form
+                allowReserved: true
+        required: true
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+        "409":
+          description: Conflict
+  /signin:
+    post:
+      summary: get token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignInRequestForm'
+            encoding:
+              email:
+                style: form
+                allowReserved: true
+              password:
+                style: form
+                allowReserved: true
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SignInRequestForm'
+            encoding:
+              email:
+                style: form
+                allowReserved: true
+              password:
+                style: form
+                allowReserved: true
+        required: true
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignInResponse'
+        "400":
+          description: Bad Request
+  /signout:
+    get:
+      summary: send token to logout
+      operationId: signOut
+      parameters:
+      - name: jwt
+        in: query
+        description: jwt token
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Ok
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  /password/restore:
+    get:
+      summary: check token for timeout
+      operationId: restorePasswordCheckToken
+      parameters:
+      - name: jwt
+        in: query
+        description: jwt token
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Ok
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+    put:
+      summary: save password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestorePasswordSetForm'
+            encoding:
+              password:
+                style: form
+                allowReserved: true
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RestorePasswordSetForm'
+            encoding:
+              email:
+                style: form
+                allowReserved: true
+              password:
+                style: form
+                allowReserved: true
+        required: true
+      responses:
+        "200":
+          description: Ok
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    post:
+      summary: receive token to email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestorePasswordRequestForm'
+            encoding:
+              email:
+                style: form
+                allowReserved: true
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RestorePasswordRequestForm'
+            encoding:
+              email:
+                style: form
+                allowReserved: true
+        required: true
+      responses:
+        "200":
+          description: Ok
+        "404":
+          description: Not Found
+  /password:
+    post:
+      summary: restore acting password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordSetForm'
+            encoding:
+              passwordOld:
+                style: form
+                allowReserved: true
+              passwordNew:
+                style: form
+                allowReserved: true
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordSetForm'
+            encoding:
+              passwordOld:
+                style: form
+                allowReserved: true
+              passwordNew:
+                style: form
+                allowReserved: true
+        required: true
+      responses:
+        "200":
+          description: Ok
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+      security:
+      - bearerAuth: []
+  /mfa/recovery_codes:
+    put:
+      summary: generate and update recovery codes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecoveryCodes'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RecoveryCodes'
+        required: true
+      responses:
+        "200":
+          description: Ok
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    post:
+      summary: generate and save recovery codes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecoveryCodes'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RecoveryCodes'
+        required: true
+      responses:
+        "200":
+          description: Ok
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  /mfa/recovery_codes/download:
+    get:
+      summary: download recovery codes
+      operationId: recoveryCodes
+      parameters:
+      - name: user_id
+        in: query
+        description: id of user
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A file with recovery codes
+          content:
+            text/plain:
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  /settings/profile:
+    get:
+      summary: receive user's information
+      operationId: userProfile
+      parameters:
+      - name: jwt
+        in: query
+        description: jwt token
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+            application/x-www-form-urlencoded:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    put:
+      summary: update user's information
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Profile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Profile'
+        required: true
+      responses:
+        "200":
+          description: Ok
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  /settings/security:
+    get:
+      summary: receive mfa status
+      operationId: mfaStatus
+      parameters:
+      - name: jwt
+        in: query
+        description: jwt token
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mfa'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    put:
+      summary: update mfa status
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Mfa'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Mfa'
+        required: true
+      responses:
+        "200":
+          description: Ok
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  /settings/mfa/verify:
+    get:
+      summary: get secret
+      operationId: mfaSecret
+      parameters:
+      - name: jwt
+        in: query
+        description: jwt token
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Secret'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+    put:
+      summary: enter six-digit code
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Code'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Code'
+        required: true
+      responses:
+        "200":
+          description: Ok
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - bearerAuth: []
+  /sessions/mfa:
+    put:
+      summary: send code
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Code'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Code'
+        required: true
+      responses:
+        "200":
+          description: Ok
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+components:
+  schemas:
+    RecoveryCodes:
+      type: array
+      items:
+        type: string
+    RestorePasswordRequestForm:
+      required:
+      - actionCaptcha
+      - email
+      - tokenCaptcha
+      type: object
+      properties:
+        email:
+          type: string
+        tokenCaptcha:
+          type: string
+        actionCaptcha:
+          type: string
+    RestorePasswordSetForm:
+      required:
+      - email
+      - password
+      - token
+      type: object
+      properties:
+        email:
+          type: string
+        token:
+          type: string
+        password:
+          type: string
+    PasswordSetForm:
+      required:
+      - passwordNew
+      - passwordOld
+      - token
+      type: object
+      properties:
+        email:
+          type: string
+        token:
+          type: string
+        password:
+          type: string
+    Profile:
+      required:
+      - email
+      type: object
+      properties:
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        nickName:
+          type: string
+        bio:
+          type: string
+        url:
+          type: string
+        company:
+          type: string
+        location:
+          type: string
+    SignInRequestForm:
+      required:
+      - email
+      - password
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    SignInResponse:
+      required:
+      - token
+      type: object
+      properties:
+        token:
+          type: string
+    SignUpForm:
+      required:
+      - actionCaptcha
+      - email
+      - password
+      - tokenCaptcha
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        nickName:
+          type: string
+        tokenCaptcha:
+          type: string
+        actionCaptcha:
+          type: string
+    Mfa:
+      required:
+      - status
+      type: object
+      properties:
+        status:
+          type: boolean
+    Secret:
+      required:
+      - secret
+      type: object
+      properties:
+        secret:
+          type: string
+    Code:
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

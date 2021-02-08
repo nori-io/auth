@@ -15,19 +15,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SignUpForm'
+              $ref: '#/components/schemas/SignUpRequest'
             encoding:
-              email:
-                style: form
-                allowReserved: true
-              password:
-                style: form
-                allowReserved: true
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/SignUpForm'
-            encoding:
-              email:
+              login:
                 style: form
                 allowReserved: true
               password:
@@ -39,26 +29,24 @@ paths:
           description: Created
         "400":
           description: Bad Request
-        "409":
-          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /signin:
     post:
-      summary: get token
+      summary: authentication start user session
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SignInRequestForm'
-            encoding:
-              email:
-                style: form
-                allowReserved: true
-              password:
-                style: form
-                allowReserved: true
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/SignInRequestForm'
+              $ref: '#/components/schemas/SignInRequest'
             encoding:
               email:
                 style: form
@@ -76,14 +64,24 @@ paths:
                 $ref: '#/components/schemas/SignInResponse'
         "400":
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /signout:
     get:
       summary: send token to logout
       operationId: signOut
       parameters:
-      - name: jwt
-        in: query
-        description: jwt token
+      - name: ssid
+        in: cookie
+        description: user session id
         required: true
         style: form
         explode: true
@@ -94,18 +92,24 @@ paths:
           description: Ok
         "400":
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         "500":
           description: Internal Server Error
-      security:
-      - bearerAuth: []
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /password/restore:
     get:
       summary: check token for timeout
       operationId: restorePasswordCheckToken
       parameters:
-      - name: jwt
-        in: query
-        description: jwt token
+      - name: ssid
+        in: cookie
+        description: user session id
         required: true
         style: form
         explode: true
@@ -116,26 +120,24 @@ paths:
           description: Ok
         "400":
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         "500":
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     put:
       summary: save password
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RestorePasswordSetForm'
+              $ref: '#/components/schemas/RestorePasswordSetRequest'
             encoding:
-              password:
-                style: form
-                allowReserved: true
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/RestorePasswordSetForm'
-            encoding:
-              email:
-                style: form
-                allowReserved: true
               password:
                 style: form
                 allowReserved: true
@@ -145,24 +147,23 @@ paths:
           description: Ok
         "400":
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         "500":
           description: Internal Server Error
-      security:
-      - bearerAuth: []
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     post:
       summary: receive token to email
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RestorePasswordRequestForm'
-            encoding:
-              email:
-                style: form
-                allowReserved: true
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/RestorePasswordRequestForm'
+              $ref: '#/components/schemas/RestorePasswordRequest'
             encoding:
               email:
                 style: form
@@ -171,8 +172,20 @@ paths:
       responses:
         "200":
           description: Ok
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         "404":
           description: Not Found
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /password:
     post:
       summary: restore acting password
@@ -180,17 +193,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PasswordSetForm'
-            encoding:
-              passwordOld:
-                style: form
-                allowReserved: true
-              passwordNew:
-                style: form
-                allowReserved: true
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PasswordSetForm'
+              $ref: '#/components/schemas/PasswordSetRequest'
             encoding:
               passwordOld:
                 style: form
@@ -204,10 +207,18 @@ paths:
           description: Ok
         "400":
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         "404":
           description: Not Found
-      security:
-      - bearerAuth: []
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /mfa/recovery_codes:
     put:
       summary: generate and update recovery codes
@@ -216,19 +227,22 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RecoveryCodes'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/RecoveryCodes'
         required: true
       responses:
         "200":
           description: Ok
         "400":
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         "500":
           description: Internal Server Error
-      security:
-      - bearerAuth: []
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     post:
       summary: generate and save recovery codes
       requestBody:
@@ -236,19 +250,22 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RecoveryCodes'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/RecoveryCodes'
         required: true
       responses:
         "200":
           description: Ok
         "400":
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         "500":
           description: Internal Server Error
-      security:
-      - bearerAuth: []
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /mfa/recovery_codes/download:
     get:
       summary: download recovery codes
@@ -271,18 +288,24 @@ paths:
                 type: string
         "400":
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         "500":
           description: Internal Server Error
-      security:
-      - bearerAuth: []
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /settings/profile:
     get:
       summary: receive user's information
       operationId: userProfile
       parameters:
-      - name: jwt
-        in: query
-        description: jwt token
+      - name: ssid
+        in: cookie
+        description: user session id
         required: true
         style: form
         explode: true
@@ -295,23 +318,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Profile'
-            application/x-www-form-urlencoded:
-              schema:
-                $ref: '#/components/schemas/Profile'
         "400":
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         "500":
           description: Internal Server Error
-      security:
-      - bearerAuth: []
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     put:
       summary: update user's information
       requestBody:
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/Profile'
-          application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/Profile'
         required: true
@@ -320,18 +343,24 @@ paths:
           description: Ok
         "400":
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         "500":
           description: Internal Server Error
-      security:
-      - bearerAuth: []
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /settings/security:
     get:
       summary: receive mfa status
       operationId: mfaStatus
       parameters:
-      - name: jwt
-        in: query
-        description: jwt token
+      - name: ssid
+        in: cookie
+        description: user session id
         required: true
         style: form
         explode: true
@@ -346,10 +375,16 @@ paths:
                 $ref: '#/components/schemas/Mfa'
         "400":
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         "500":
           description: Internal Server Error
-      security:
-      - bearerAuth: []
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     put:
       summary: update mfa status
       requestBody:
@@ -366,18 +401,24 @@ paths:
           description: Ok
         "400":
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         "500":
           description: Internal Server Error
-      security:
-      - bearerAuth: []
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /settings/mfa/verify:
     get:
       summary: get secret
       operationId: mfaSecret
       parameters:
-      - name: jwt
-        in: query
-        description: jwt token
+      - name: ssid
+        in: cookie
+        description: user session id
         required: true
         style: form
         explode: true
@@ -392,18 +433,21 @@ paths:
                 $ref: '#/components/schemas/Secret'
         "400":
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         "500":
           description: Internal Server Error
-      security:
-      - bearerAuth: []
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     put:
       summary: enter six-digit code
       requestBody:
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/Code'
-          application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/Code'
         required: true
@@ -412,10 +456,16 @@ paths:
           description: Ok
         "400":
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         "500":
           description: Internal Server Error
-      security:
-      - bearerAuth: []
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /sessions/mfa:
     put:
       summary: send code
@@ -424,37 +474,42 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Code'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Code'
         required: true
       responses:
         "200":
           description: Ok
         "400":
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         "500":
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     RecoveryCodes:
       type: array
       items:
         type: string
-    RestorePasswordRequestForm:
+    RestorePasswordRequest:
       required:
       - actionCaptcha
-      - email
+      - login
       - tokenCaptcha
       type: object
       properties:
-        email:
+        login:
           type: string
         tokenCaptcha:
           type: string
         actionCaptcha:
           type: string
-    RestorePasswordSetForm:
+    RestorePasswordSetRequest:
       required:
       - email
       - password
@@ -467,7 +522,7 @@ components:
           type: string
         password:
           type: string
-    PasswordSetForm:
+    PasswordSetRequest:
       required:
       - passwordNew
       - passwordOld
@@ -501,13 +556,13 @@ components:
           type: string
         location:
           type: string
-    SignInRequestForm:
+    SignInRequest:
       required:
-      - email
+      - login
       - password
       type: object
       properties:
-        email:
+        login:
           type: string
         password:
           type: string
@@ -518,23 +573,17 @@ components:
       properties:
         token:
           type: string
-    SignUpForm:
+    SignUpRequest:
       required:
       - actionCaptcha
-      - email
+      - login
       - password
       - tokenCaptcha
       type: object
       properties:
-        email:
+        login:
           type: string
         password:
-          type: string
-        firstName:
-          type: string
-        lastName:
-          type: string
-        nickName:
           type: string
         tokenCaptcha:
           type: string
@@ -561,8 +610,22 @@ components:
       properties:
         code:
           type: string
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+    Error:
+      required:
+      - code
+      - errors
+      type: object
+      properties:
+        code:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error_errors'
+    Error_errors:
+      type: object
+      properties:
+        field:
+          type: string
+        message:
+          type: string

@@ -8,80 +8,121 @@ info:
 servers:
 - url: http://localhost:8080
 paths:
-  /signup:
-    post:
-      summary: Add a new user
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SignUpRequest'
-            encoding:
-              login:
-                style: form
-                allowReserved: true
-              password:
-                style: form
-                allowReserved: true
+  /auth/social/{social_provider}:
+    get:
+      parameters:
+      - name: social_provider
+        in: path
+        description: social_provider
         required: true
-      responses:
-        "201":
-          description: Created
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /signin:
-    post:
-      summary: authentication start user session
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SignInRequest'
-            encoding:
-              email:
-                style: form
-                allowReserved: true
-              password:
-                style: form
-                allowReserved: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: client_id
+        in: query
         required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: redirect_uri
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: display
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: scope
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: response_type
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
       responses:
         "200":
           description: Ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SignInResponse'
+                $ref: '#/components/schemas/AuthSocialResponse'
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        "401":
+          description: UnauthorizedError
         "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /signout:
-    get:
-      summary: send token to logout
-      operationId: signOut
+  /auth/social/{social_provider}/callback:
+    post:
       parameters:
-      - name: ssid
+      - name: social_provider
+        in: path
+        description: social_provider
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: external_ID
         in: cookie
-        description: user session id
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: firstName
+        in: cookie
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: lastName
+        in: cookie
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: fullName
+        in: cookie
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: email
+        in: cookie
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: avatarURL
+        in: cookie
         required: true
         style: form
         explode: true
@@ -96,6 +137,75 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        "401":
+          description: UnauthorizedError
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /mfa/recovery_codes/download:
+    get:
+      summary: download recovery codes
+      operationId: recoveryCodes
+      parameters:
+      - name: user_id
+        in: query
+        description: id of user
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A file with recovery codes
+          content:
+            text/plain:
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: UnauthorizedError
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /password:
+    post:
+      summary: restore acting password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordSetRequest'
+            encoding:
+              passwordOld:
+                style: form
+                allowReserved: true
+              passwordNew:
+                style: form
+                allowReserved: true
+        required: true
+      responses:
+        "200":
+          description: Ok
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: Not Found
         "500":
           description: Internal Server Error
           content:
@@ -186,51 +296,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /password:
+  /signin:
     post:
-      summary: restore acting password
+      summary: authentication start user session
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PasswordSetRequest'
+              $ref: '#/components/schemas/SignInRequest'
             encoding:
-              passwordOld:
+              email:
                 style: form
                 allowReserved: true
-              passwordNew:
+              password:
                 style: form
                 allowReserved: true
         required: true
       responses:
         "200":
-          description: Ok
-        "400":
-          description: Bad Request
+          description: User signed in
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        "404":
-          description: Not Found
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mfa/recovery_codes:
-    put:
-      summary: generate and update recovery codes
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RecoveryCodes'
-        required: true
-      responses:
-        "200":
-          description: Ok
+                $ref: '#/components/schemas/SignInResponse'
         "400":
           description: Bad Request
           content:
@@ -243,65 +331,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    post:
-      summary: generate and save recovery codes
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RecoveryCodes'
-        required: true
-      responses:
-        "200":
-          description: Ok
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mfa/recovery_codes/download:
+  /signout:
     get:
-      summary: download recovery codes
-      operationId: recoveryCodes
-      parameters:
-      - name: user_id
-        in: query
-        description: id of user
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: A file with recovery codes
-          content:
-            text/plain:
-              schema:
-                type: string
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /settings/profile:
-    get:
-      summary: receive user's information
-      operationId: userProfile
+      summary: send token to logout
+      operationId: signOut
       parameters:
       - name: ssid
         in: cookie
@@ -313,11 +346,7 @@ paths:
           type: string
       responses:
         "200":
-          description: Ok
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Profile'
+          description: User signed out
         "400":
           description: Bad Request
           content:
@@ -330,13 +359,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    put:
-      summary: update user's information
+  /signup:
+    post:
+      summary: Create a new user
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Profile'
+              $ref: '#/components/schemas/SignUpRequest'
+            encoding:
+              login:
+                style: form
+                allowReserved: true
+              password:
+                style: form
+                allowReserved: true
+        required: true
+      responses:
+        "201":
+          description: User's account created
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /sessions/mfa:
+    put:
+      summary: enter authentication code in second step of two-factor authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Code'
         required: true
       responses:
         "200":
@@ -347,13 +408,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        "401":
+          description: UnauthorizedError
         "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /settings/security:
+  /settings/mfa:
     get:
       summary: receive mfa status
       operationId: mfaStatus
@@ -379,6 +442,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        "401":
+          description: UnauthorizedError
         "500":
           description: Internal Server Error
           content:
@@ -386,16 +451,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     put:
-      summary: update mfa status
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Mfa'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Mfa'
+      summary: turn on mfa
+      parameters:
+      - name: ssid
+        in: cookie
+        description: user session id
         required: true
+        style: form
+        explode: true
+        schema:
+          type: string
       responses:
         "200":
           description: Ok
@@ -405,6 +470,69 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        "401":
+          description: UnauthorizedError
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: turn off mfa
+      parameters:
+      - name: ssid
+        in: cookie
+        description: user session id
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Ok
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: UnauthorizedError
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /settings/mfa/recovery_codes:
+    get:
+      summary: get generated recovery codes
+      parameters:
+      - name: ssid
+        in: cookie
+        description: user session id
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecoveryCodes'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: UnauthorizedError
         "500":
           description: Internal Server Error
           content:
@@ -437,6 +565,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        "401":
+          description: UnauthorizedError
         "500":
           description: Internal Server Error
           content:
@@ -460,30 +590,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /sessions/mfa:
-    put:
-      summary: send code
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Code'
-        required: true
-      responses:
-        "200":
-          description: Ok
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+        "401":
+          description: UnauthorizedError
         "500":
           description: Internal Server Error
           content:
@@ -492,6 +600,25 @@ paths:
                 $ref: '#/components/schemas/Error'
 components:
   schemas:
+    AuthSocialResponse:
+      required:
+      - accessToken
+      type: object
+      properties:
+        accessToken:
+          type: string
+        externalID:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        fullName:
+          type: string
+        email:
+          type: string
+        avatarURL:
+          type: string
     RecoveryCodes:
       type: array
       items:
@@ -535,27 +662,6 @@ components:
           type: string
         password:
           type: string
-    Profile:
-      required:
-      - email
-      type: object
-      properties:
-        email:
-          type: string
-        firstName:
-          type: string
-        lastName:
-          type: string
-        nickName:
-          type: string
-        bio:
-          type: string
-        url:
-          type: string
-        company:
-          type: string
-        location:
-          type: string
     SignInRequest:
       required:
       - login
@@ -568,10 +674,13 @@ components:
           type: string
     SignInResponse:
       required:
+      - login
       - token
       type: object
       properties:
         token:
+          type: string
+        login:
           type: string
     SignUpRequest:
       required:

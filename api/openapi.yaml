@@ -11,6 +11,14 @@ paths:
   /auth/social/{social_provider}:
     get:
       parameters:
+      - name: ssid
+        in: cookie
+        description: user session id
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
       - name: social_provider
         in: path
         description: social_provider
@@ -78,6 +86,14 @@ paths:
   /auth/social/{social_provider}/callback:
     post:
       parameters:
+      - name: ssid
+        in: cookie
+        description: user session id
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
       - name: social_provider
         in: path
         description: social_provider
@@ -158,6 +174,14 @@ paths:
         explode: true
         schema:
           type: string
+      - name: ssid
+        in: cookie
+        description: user session id
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
       responses:
         "200":
           description: A file with recovery codes
@@ -181,7 +205,16 @@ paths:
                 $ref: '#/components/schemas/Error'
   /password:
     post:
-      summary: restore acting password
+      summary: change actual password
+      parameters:
+      - name: ssid
+        in: cookie
+        description: user session id
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
       requestBody:
         content:
           application/json:
@@ -393,6 +426,15 @@ paths:
   /sessions/mfa:
     put:
       summary: enter authentication code in second step of two-factor authentication
+      parameters:
+      - name: token
+        in: cookie
+        description: user session id
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
       requestBody:
         content:
           application/json:
@@ -575,6 +617,15 @@ paths:
                 $ref: '#/components/schemas/Error'
     put:
       summary: enter six-digit code
+      parameters:
+      - name: ssid
+        in: cookie
+        description: user session id
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
       requestBody:
         content:
           application/json:
@@ -640,12 +691,9 @@ components:
       required:
       - email
       - password
-      - token
       type: object
       properties:
         email:
-          type: string
-        token:
           type: string
         password:
           type: string
@@ -653,7 +701,6 @@ components:
       required:
       - passwordNew
       - passwordOld
-      - token
       type: object
       properties:
         email:

@@ -1,0 +1,240 @@
+---
+openapi: 3.0.0
+info:
+  title: Nori Authentication
+  license:
+    name: Apache 2.0
+  version: 1.0.0
+servers:
+- url: http://localhost:8080
+paths:
+  /admin/users:
+    get:
+      parameters:
+      - name: offset
+        in: query
+        description: offset
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        description: limit
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: status
+        in: query
+        description: status - active, blocked, deleted, locked
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: emailPattern
+        in: query
+        description: status - active, blocked, deleted, locked
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: phonePattern
+        in: query
+        description: status - active, blocked, deleted, locked
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: ssid
+        in: cookie
+        description: user session id
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserArrayResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: UnauthorizedError
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /admin/users/{login}:
+    get:
+      parameters:
+      - name: login
+        in: path
+        description: user status
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: ssid
+        in: cookie
+        description: user session id
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: UnauthorizedError
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: update user's status (active, blocked, locked, deleted)
+      parameters:
+      - name: ssid
+        in: cookie
+        description: user session id
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: login
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: user_status
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: User's status updated
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: UnauthorizedError
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: delete user's record hardly
+      parameters:
+      - name: ssid
+        in: cookie
+        description: user session id
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: login
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Ok
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: UnauthorizedError
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Error:
+      required:
+      - code
+      - errors
+      type: object
+      properties:
+        code:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error_errors'
+    UserArrayResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/UserResponse'
+    UserResponse:
+      required:
+      - login
+      - status
+      type: object
+      properties:
+        login:
+          type: string
+        status:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        created:
+          type: string
+    Error_errors:
+      type: object
+      properties:
+        field:
+          type: string
+        message:
+          type: string

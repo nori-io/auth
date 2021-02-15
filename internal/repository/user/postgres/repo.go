@@ -13,7 +13,7 @@ type UserRepository struct {
 }
 
 func (r *UserRepository) Create(ctx context.Context, e *entity.User) error {
-	model, _ := NewModel(e)
+	model := NewModel(e)
 
 	lastRecord := new(User)
 
@@ -61,10 +61,9 @@ func (r *UserRepository) GetAll(ctx context.Context, offset uint64, limit uint64
 }
 
 func (r *UserRepository) Update(ctx context.Context, e *entity.User) error {
-	model, _ := NewModel(e)
+	model := NewModel(e)
 	err := r.Db.Save(model).Error
 
-	fmt.Println("Put error", err)
 	return err
 }
 

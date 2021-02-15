@@ -28,7 +28,7 @@ func (u *User) Convert() *entity.User {
 	}
 }
 
-func NewModel(e *entity.User) (*User, error) {
+func NewModel(e *entity.User) *User {
 	return &User{
 		Id:        e.ID,
 		Email:     e.Email,
@@ -36,7 +36,7 @@ func NewModel(e *entity.User) (*User, error) {
 		Status:    uint8(e.Status),
 		CreatedAt: e.CreatedAt,
 		UpdatedAt: e.UpdatedAt,
-	}, nil
+	}
 }
 
 // TableName

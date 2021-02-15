@@ -80,4 +80,10 @@ func (h *AuthHandler) GetMfaRecoveryCodes(w http.ResponseWriter, r *http.Request
 
 func (h *AuthHandler) PostSecret(w http.ResponseWriter, r *http.Request) {
 	data, err := newPostSecretData(r)
+	//@TODO Login, Issuer
+	//@TODO Error Handling
+	JSON(w, r, MfaSecretResponse{
+		Login:  "",
+		Issuer: "",
+	})
 }

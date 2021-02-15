@@ -27,3 +27,8 @@ func JSON(w http.ResponseWriter, r *http.Request, v interface{}) {
 	w.Header().Set("Context-Type", "application/json; charset=utf-8")
 	w.Write(buf.Bytes())
 }
+
+type MfaSecretResponse struct {
+	Login  string
+	Issuer string
+}

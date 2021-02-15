@@ -11,6 +11,7 @@ type AuthenticationService interface {
 	SignIn(ctx context.Context, data SignInData) (*entity.Session, error)
 	SignOut(ctx context.Context, data *entity.Session) error
 	GetMfaRecoveryCodes(ctx context.Context, data *entity.Session) error
+	GetSecret(ctx context.Context, data *entity.Session)
 }
 
 type SignUpData struct {
@@ -23,10 +24,18 @@ type SignInData struct {
 	Password string
 }
 
+type SecretData struct {
+	Secret string
+}
+
 func (d SignUpData) Validate() error {
 	return nil
 }
 
 func (d SignInData) Validate() error {
+	return nil
+}
+
+func (d SecretData) Validate() error {
 	return nil
 }

@@ -46,6 +46,7 @@ type conf struct {
 	MfaRecoveryCodePattern   config.String
 	MfaRecoveryCodeSymbols   config.String
 	MfaRecoveryCodeMaxLength config.Int
+	Issuer                   config.String
 }
 
 func (p plugin) Meta() meta.Meta {

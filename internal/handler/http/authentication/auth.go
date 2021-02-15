@@ -77,3 +77,7 @@ func (h *AuthHandler) GetMfaRecoveryCodes(w http.ResponseWriter, r *http.Request
 	//@todo path
 	http.Redirect(w, r, "/", 0)
 }
+
+func (h *AuthHandler) PostSecret(w http.ResponseWriter, r *http.Request) {
+	data, err := newPostSecretData(r)
+}

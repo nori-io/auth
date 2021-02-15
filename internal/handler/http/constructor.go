@@ -17,9 +17,11 @@ func New(h Handler) {
 
 	// todo: add middleware
 
-	h.R.Get("/signup", authHandler.SignUp)
-	h.R.Get("/signin", authHandler.SigIn)
-	h.R.Get("/signout", authHandler.SignOut)
-	h.R.Get("/mfa/recovery_codes", authHandler.GetMfaRecoveryCodes)
+	h.R.Get("/auth/signup", authHandler.SignUp)
+	h.R.Get("/auth/signin", authHandler.SigIn)
+	h.R.Get("/auth/signout", authHandler.SignOut)
+	h.R.Get("/auth/settings/mfa/recovery_codes", authHandler.GetMfaRecoveryCodes)
+	h.R.Post("/auth/settings/mfa/verify", authHandler.PostSecret)
+
 	// h.R.Put("/mfa/recovery_codes", authHandler.MfaRecoveryCodes)
 }

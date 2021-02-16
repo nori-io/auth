@@ -3,6 +3,9 @@ package postgres
 import (
 	"time"
 
+	"github.com/nori-plugins/authentication/pkg/enum/mfa_type"
+	"github.com/nori-plugins/authentication/pkg/enum/users_type"
+
 	"github.com/nori-plugins/authentication/pkg/enum/users_status"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
@@ -19,8 +22,10 @@ type User struct {
 
 func (u *User) Convert() *entity.User {
 	return &entity.User{
-		ID:        u.Id,
+		ID:        u.ID,
 		Status:    users_status.UserStatus(u.Status),
+		UserType:  users_type.UserType(u.UserType),
+		MfaType:   mfa_type.MfaType(u.MfaType),
 		CreatedAt: u.CreatedAt,
 		UpdatedAt: u.UpdatedAt,
 	}
@@ -28,10 +33,10 @@ func (u *User) Convert() *entity.User {
 
 func NewModel(e *entity.User) *User {
 	return &User{
-		Id:        e.ID,
-		Email:     e.Email,
-		Password:  e.Password,
+		ID:        e.ID,
 		Status:    uint8(e.Status),
+		UserType:  uint8(e.UserType),
+		MfaType:   uint8(e.MfaType),
 		CreatedAt: e.CreatedAt,
 		UpdatedAt: e.UpdatedAt,
 	}

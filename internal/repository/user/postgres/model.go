@@ -3,26 +3,24 @@ package postgres
 import (
 	"time"
 
-	"github.com/nori-plugins/authentication/internal/domain/enum/user_status"
+	"github.com/nori-plugins/authentication/pkg/enum/users_status"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
 type User struct {
-	Id        uint64    `gorm:"column:id; PRIMARY_KEY; type:bigserial"`
-	Email     string    `gorm:"column:email; type: VARCHAR(32)"`
-	Password  string    `gorm:"column:email; type: VARCHAR(32)"`
-	Status    uint8     `gorm:"column:user_id; type:bigint"`
-	CreatedAt time.Time `gorm:"column:created_at; type: TIMESTAMP"`
+	ID        uint64    `gorm:"column:id; PRIMARY_KEY; type:bigserial"`
+	Status    uint8     `gorm:"column:status; type:smallint; not null" `
+	UserType  uint8     `gorm:"column:user_type; type:smallint; not null"`
+	MfaType   uint8     `gorm:"column:mfa_type; type:smallint; null"`
+	CreatedAt time.Time `gorm:"column:created_at; type: TIMESTAMP; not null"`
 	UpdatedAt time.Time `gorm:"column:updated_at; type: TIMESTAMP"`
 }
 
 func (u *User) Convert() *entity.User {
 	return &entity.User{
 		ID:        u.Id,
-		Email:     u.Email,
-		Password:  u.Password,
-		Status:    user_status.UserStatus(u.Status),
+		Status:    users_status.UserStatus(u.Status),
 		CreatedAt: u.CreatedAt,
 		UpdatedAt: u.UpdatedAt,
 	}

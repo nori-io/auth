@@ -85,11 +85,16 @@ func (h *AuthHandler) PostSecret(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sessionIdContext := r.Context().Value("session_id")
+	if data.Ssid != sessionIdContext {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+	}
 
-	sessionId, _ := sessionIdContext.([]byte)
 	//@TODO Login, Issuer
-	//@TODO Error Handling
-	//@TODO Check token
+
+	if MfaSecretResponse == nil {
+		http.Error(w, "sign up error", http.StatusInternalServerError)
+	}
+
 	JSON(w, r, MfaSecretResponse{
 		Login:  "",
 		Issuer: "",

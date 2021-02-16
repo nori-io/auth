@@ -26,6 +26,7 @@ type SignInData struct {
 
 type SecretData struct {
 	Secret string
+	Ssid   string
 }
 
 func (d SignUpData) Validate() error {

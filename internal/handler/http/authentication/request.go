@@ -46,12 +46,16 @@ type SecretDataRequest struct {
 }
 
 func newPostSecretData(r *http.Request) (service.SecretData, error) {
-	c, err := r.Cookie("secret")
+	cSecret, err := r.Cookie("secret")
 	if err != nil {
 		return service.SecretData{}, err
-	} else {
-		return service.SecretData{
-			Secret: c.Value,
-		}, nil
 	}
+	cSsid, err := r.Cookie("ssid")
+	if err != nil {
+		return service.SecretData{}, err
+	}
+	return service.SecretData{
+		Secret: cSecret.Value,
+		Ssid:   cSsid.Value,
+	}, nil
 }

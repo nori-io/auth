@@ -124,8 +124,8 @@ func (srv *service) PostSecret(ctx context.Context, data *serv.SecretData, sessi
 		return err
 	}
 
-	//@TODO вытащить логин и имя проекта
-	return err
+	//@TODO вытащить логин и имя проекта и выдать в качестве ответа на уровень выше
+	return nil
 }
 
 func (srv *service) getToken() ([]byte, error) {

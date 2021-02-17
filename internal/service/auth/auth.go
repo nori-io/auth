@@ -18,13 +18,20 @@ type service struct {
 	userRepository            repository.UserRepository
 	mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository
 	mfaSecretRepository       repository.MfaSecretRepository
+	configData                configData
+}
+
+type configData struct {
+	Issuer string
 }
 
 func New(sessionInstance s.Session,
 	userRepositoryInstance repository.UserRepository,
 	mfaRecoveryCodeRepositoryInstance repository.MfaRecoveryCodeRepository,
-	mfaSecretRepositoryInstance repository.MfaSecretRepository) serv.AuthenticationService {
+	mfaSecretRepositoryInstance repository.MfaSecretRepository,
+	configData configData) serv.AuthenticationService {
 	return &service{
+		configData:                configData,
 		session:                   sessionInstance,
 		userRepository:            userRepositoryInstance,
 		mfaRecoveryCodeRepository: mfaRecoveryCodeRepositoryInstance,
@@ -108,9 +115,11 @@ func (srv *service) GetMfaRecoveryCodes(ctx context.Context, data *entity.Sessio
 	return codes, err
 }
 
-func (srv *service) PostSecret(ctx context.Context, data *serv.SecretData, session entity.Session) error {
+func (srv *service) PostSecret(
+	ctx context.Context, data *serv.SecretData, session entity.Session) (
+	login string, issuer string, err error) {
 	if err := data.Validate(); err != nil {
-		return err
+		return "", "", err
 	}
 
 	var mfaSecret *entity.MfaSecret
@@ -121,11 +130,20 @@ func (srv *service) PostSecret(ctx context.Context, data *serv.SecretData, sessi
 	}
 
 	if err := srv.mfaSecretRepository.Create(ctx, mfaSecret); err != nil {
-		return err
+		return "", "", err
 	}
 
-	//@TODO вытащить логин и имя проекта и выдать в качестве ответа на уровень выше
-	return nil
+	userData, err := srv.userRepository.Get(ctx, session.UserID)
+	if err != nil {
+		return "", "", err
+	}
+
+	if userData.Email != "" {
+		login = userData.Email
+	} else {
+		login = userData.PhoneCountryCode + userData.PhoneNumber
+	}
+	return login, srv.configData.Issuer, nil
 }
 
 func (srv *service) getToken() ([]byte, error) {

@@ -12,19 +12,20 @@ import (
 )
 
 type User struct {
-	ID                  uint64
-	Status              users_status.UserStatus
-	UserType            users_type.UserType
-	MfaType             mfa_type.MfaType
-	PhoneCountryCode    string
-	PhoneNumber         string
-	Email               string
-	Password            string
-	Salt                string
-	HashAlgorithm       hash_algorithm.HashAlgorithm
-	IsEmailVerified     bool
-	IsPhoneVerified     bool
-	EmailActivationCode string
-	CreatedAt           time.Time
-	UpdatedAt           time.Time
+	ID                     uint64
+	Status                 users_status.UserStatus
+	UserType               users_type.UserType
+	MfaType                mfa_type.MfaType
+	PhoneCountryCode       string
+	PhoneNumber            string
+	Email                  string
+	Password               string
+	Salt                   string
+	HashAlgorithm          hash_algorithm.HashAlgorithm
+	IsEmailVerified        bool
+	IsPhoneVerified        bool
+	EmailActivationCode    string
+	EmailActivationCodeTTL time.Time
+	CreatedAt              time.Time
+	UpdatedAt              time.Time
 }

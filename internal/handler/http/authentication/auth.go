@@ -78,20 +78,23 @@ func (h *AuthHandler) GetMfaRecoveryCodes(w http.ResponseWriter, r *http.Request
 	http.Redirect(w, r, "/", 0)
 }
 
-func (h *AuthHandler) PostSecret(w http.ResponseWriter, r *http.Request) {
-	data, err := newPostSecretData(r)
+func (h *AuthHandler) PutSecret(w http.ResponseWriter, r *http.Request) {
+	data, err := newPutSecretData(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
 	sessionIdContext := r.Context().Value("session_id")
+	sessionId, _ := sessionIdContext.([]byte)
+
 	if data.Ssid != sessionIdContext {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 	}
+	sessionUserId := r.Context().Value("user_id").(uint64)
+	login, issuer, err :=
+		h.Auth.PutSecret(r.Context(), &entity.Session{SessionKey: sessionId, UserID: sessionUserId})
 
-	//@TODO Login, Issuer
-
-	if MfaSecretResponse == nil {
+	if (login == "") && (issuer == "") {
 		http.Error(w, "sign up error", http.StatusInternalServerError)
 	}
 

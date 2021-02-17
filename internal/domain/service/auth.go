@@ -11,7 +11,7 @@ type AuthenticationService interface {
 	SignIn(ctx context.Context, data SignInData) (*entity.Session, error)
 	SignOut(ctx context.Context, data *entity.Session) error
 	GetMfaRecoveryCodes(ctx context.Context, data *entity.Session) error
-	GetSecret(ctx context.Context, data *entity.Session)
+	PutSecret(ctx context.Context, data *entity.Session) (string, string, error)
 }
 
 type SignUpData struct {

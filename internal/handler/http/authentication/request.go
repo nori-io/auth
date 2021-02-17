@@ -45,17 +45,19 @@ type SecretDataRequest struct {
 	Secret string `json:"secret"`
 }
 
-func newPostSecretData(r *http.Request) (service.SecretData, error) {
-	cSecret, err := r.Cookie("secret")
-	if err != nil {
+func newPutSecretData(r *http.Request) (service.SecretData, error) {
+	var body SecretDataRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		return service.SecretData{}, err
 	}
+
 	cSsid, err := r.Cookie("ssid")
 	if err != nil {
 		return service.SecretData{}, err
 	}
 	return service.SecretData{
-		Secret: cSecret.Value,
+		Secret: body.Secret,
 		Ssid:   cSsid.Value,
 	}, nil
 }

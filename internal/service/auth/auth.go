@@ -115,7 +115,7 @@ func (srv *service) GetMfaRecoveryCodes(ctx context.Context, data *entity.Sessio
 	return codes, err
 }
 
-func (srv *service) PostSecret(
+func (srv *service) PutSecret(
 	ctx context.Context, data *serv.SecretData, session entity.Session) (
 	login string, issuer string, err error) {
 	if err := data.Validate(); err != nil {

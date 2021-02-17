@@ -68,7 +68,7 @@ func (r *UserRepository) Update(ctx context.Context, e *entity.User) error {
 }
 
 func (r *UserRepository) Delete(ctx context.Context, id uint64) error {
-	if err := r.Db.Delete(&User{Id: id}).Error; err != nil {
+	if err := r.Db.Delete(&User{ID: id}).Error; err != nil {
 		return err
 	}
 	return nil

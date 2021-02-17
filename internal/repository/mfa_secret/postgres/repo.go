@@ -34,7 +34,7 @@ func (r *MfaSecretRepository) Get(ctx context.Context, userID uint64) (*entity.M
 	return out.Convert(), e
 }
 
-func (r *MfaSecretRepository) Update(ctx context.Context, e *entity.MfaSecret) error {
+func (r *MfaSecretRepository) Update(ctx context.Context, userID uint64, e *entity.MfaSecret) error {
 	model := NewModel(e)
 	err := r.Db.Save(model).Error
 

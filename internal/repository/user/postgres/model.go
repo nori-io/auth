@@ -18,8 +18,8 @@ type User struct {
 	Status                 uint8     `gorm:"column:status; type:smallint; not null" `
 	UserType               uint8     `gorm:"column:user_type; type:smallint; not null"`
 	MfaType                uint8     `gorm:"column:mfa_type; type:smallint; null"`
-	PhoneCountryCode       string    `gorm:"column:phone_country_code; type:VARCHAR(10)"`
-	PhoneNumber            string    `gorm:"column:phone_number; type:VARCHAR(25)"`
+	PhoneCountryCode       string    `gorm:"column:phone_country_code;uniqueIndex:idx_code_phone; type:VARCHAR(10)"`
+	PhoneNumber            string    `gorm:"column:phone_number; uniqueIndex:idx_code_phone; type:VARCHAR(25)"`
 	Email                  string    `gorm:"column:email; type:VARCHAR(254)"`
 	Password               string    `gorm:"column:password; type:VARCHAR(32)"`
 	Salt                   string    `gorm:"column:salt; type:VARCHAR(32)"`

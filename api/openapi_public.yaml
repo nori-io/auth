@@ -500,10 +500,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /auth/settings/mfa/verify:
+  /auth/settings/mfa/otp:
     get:
       summary: get generated secret from backend, login and issuer
-      operationId: mfaSecret
+      operationId: barCodeGenerating
       parameters:
       - name: ssid
         in: cookie
@@ -519,7 +519,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DataForQRCode'
+                $ref: '#/components/schemas/OtpResponse'
         "400":
           description: Bad Request
           content:
@@ -534,9 +534,48 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /auth/settings/mfa/enable:
+  /auth/settings/mfa/sms:
+    post:
+      summary: send Sms via services
+      operationId: sendingSms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SmsRequest'
+            encoding:
+              login:
+                style: form
+                allowReserved: true
+              password:
+                style: form
+                allowReserved: true
+        required: true
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: UnauthorizedError
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/settings/mfa/verify:
     post:
       summary: enter six-digit code from app or sms and turn on mfa
+      operationId: verifyingCode
       parameters:
       - name: ssid
         in: cookie
@@ -555,6 +594,10 @@ paths:
       responses:
         "200":
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyResponse'
         "400":
           description: Bad Request
           content:
@@ -626,11 +669,20 @@ components:
           type: string
         password:
           type: string
-    SecretRequest:
+    OtpResponse:
       required:
+      - issuer
+      - login
       - secret
+      - success
       type: object
       properties:
+        success:
+          type: boolean
+        login:
+          type: string
+        issuer:
+          type: string
         secret:
           type: string
     SignInRequest:
@@ -669,6 +721,29 @@ components:
           type: string
         actionCaptcha:
           type: string
+    SmsRequest:
+      required:
+      - countryCode
+      - phoneNumber
+      type: object
+      properties:
+        countryCode:
+          type: string
+        phoneNumber:
+          type: string
+    SmsResponse:
+      required:
+      - cellphone
+      - message
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        cellphone:
+          type: string
     Mfa:
       required:
       - status
@@ -676,19 +751,6 @@ components:
       properties:
         status:
           type: boolean
-    DataForQRCode:
-      required:
-      - issuer
-      - login
-      - secret
-      type: object
-      properties:
-        login:
-          type: string
-        issuer:
-          type: string
-        secret:
-          type: string
     Code:
       required:
       - code
@@ -708,6 +770,16 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Error_errors'
+    VerifyResponse:
+      required:
+      - message
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
     Error_errors:
       type: object
       properties:

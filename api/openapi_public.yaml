@@ -438,35 +438,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    put:
-      summary: turn on mfa
-      parameters:
-      - name: ssid
-        in: cookie
-        description: user session id
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: Ok
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        "401":
-          description: UnauthorizedError
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    delete:
+  /auth/settings/mfa/disable:
+    post:
       summary: turn off mfa
       parameters:
       - name: ssid
@@ -528,8 +501,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
   /auth/settings/mfa/verify:
-    put:
-      summary: put generated secret from front-end
+    get:
+      summary: get generated secret from backend, login and issuer
       operationId: mfaSecret
       parameters:
       - name: ssid
@@ -540,23 +513,13 @@ paths:
         explode: true
         schema:
           type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SecretRequest'
-            encoding:
-              secret:
-                style: form
-                allowReserved: true
-        required: true
       responses:
         "200":
           description: Ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DataForSecret'
+                $ref: '#/components/schemas/DataForQRCode'
         "400":
           description: Bad Request
           content:
@@ -571,8 +534,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /auth/settings/mfa/enable:
     post:
-      summary: enter six-digit code
+      summary: enter six-digit code from app or sms and turn on mfa
       parameters:
       - name: ssid
         in: cookie
@@ -712,15 +676,18 @@ components:
       properties:
         status:
           type: boolean
-    DataForSecret:
+    DataForQRCode:
       required:
       - issuer
       - login
+      - secret
       type: object
       properties:
         login:
           type: string
         issuer:
+          type: string
+        secret:
           type: string
     Code:
       required:

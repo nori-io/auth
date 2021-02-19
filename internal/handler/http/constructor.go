@@ -21,7 +21,10 @@ func New(h Handler) {
 	h.R.Get("/auth/signin", authHandler.SigIn)
 	h.R.Get("/auth/signout", authHandler.SignOut)
 	h.R.Get("/auth/settings/mfa/recovery_codes", authHandler.GetMfaRecoveryCodes)
-	h.R.Put("/auth/settings/mfa/verify", authHandler.PostSecret)
+
+	// mfa
+	h.R.Get("/auth/settings/mfa", nil)
+	h.R.Get("/auth/settings/mfa/verify?", authHandler.PutSecret)
 
 	// h.R.Put("/mfa/recovery_codes", authHandler.MfaRecoveryCodes)
 }

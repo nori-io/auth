@@ -358,7 +358,18 @@ paths:
         required: true
       responses:
         "200":
-          description: Ok
+          description: User signed in
+          headers:
+            Set-Cookie:
+              style: simple
+              explode: false
+              schema:
+                type: string
+                example: session_id=abcde12345; Path=/; HttpOnly
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignInMfaResponse'
         "400":
           description: Bad Request
           content:
@@ -730,6 +741,22 @@ components:
         password:
           type: string
     SignInResponse:
+      required:
+      - login
+      - message
+      - mfaStatus
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        login:
+          type: string
+        mfaStatus:
+          type: boolean
+    SignInMfaResponse:
       required:
       - login
       - message

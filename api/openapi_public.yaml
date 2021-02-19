@@ -22,6 +22,10 @@ paths:
       responses:
         "200":
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialResponse'
         "400":
           description: Bad Request
           content:
@@ -45,20 +49,26 @@ paths:
         explode: false
         schema:
           type: string
-      - name: authorization_code
-        in: cookie
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallbackRequest'
         required: true
-        style: form
-        explode: true
-        schema:
-          type: string
       responses:
         "200":
           description: Ok
+          headers:
+            Set-Cookie:
+              style: simple
+              explode: false
+              schema:
+                type: string
+                example: ssid=abcde12345; Path=/; HttpOnly
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthSocialResponse'
+                $ref: '#/components/schemas/CallbackResponse'
         "400":
           description: Bad Request
           content:
@@ -107,6 +117,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - cookieAuth: []
   /auth/password:
     post:
       summary: change actual password
@@ -149,6 +161,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - cookieAuth: []
   /auth/password/restore:
     get:
       summary: check token for timeout
@@ -165,6 +179,10 @@ paths:
       responses:
         "200":
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestorePasswordGetResponse'
         "400":
           description: Bad Request
           content:
@@ -192,6 +210,10 @@ paths:
       responses:
         "200":
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestorePasswordPutResponse'
         "400":
           description: Bad Request
           content:
@@ -219,6 +241,10 @@ paths:
       responses:
         "200":
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestorePasswordPostResponse'
         "400":
           description: Bad Request
           content:
@@ -258,7 +284,7 @@ paths:
               explode: false
               schema:
                 type: string
-                example: session_id=abcde12345; Path=/; HttpOnly
+                example: ssid=abcde12345; Path=/; HttpOnly
           content:
             application/json:
               schema:
@@ -307,6 +333,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - cookieAuth: []
   /auth/signup:
     post:
       summary: Create a new user
@@ -339,7 +367,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
   /auth/signin/mfa:
-    put:
+    post:
       summary: enter authentication code in second step of two-factor authentication
       parameters:
       - name: token
@@ -365,7 +393,7 @@ paths:
               explode: false
               schema:
                 type: string
-                example: session_id=abcde12345; Path=/; HttpOnly
+                example: ssid=abcde12345; Path=/; HttpOnly
           content:
             application/json:
               schema:
@@ -384,6 +412,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - cookieAuth: []
   /auth/settings/mfa:
     get:
       summary: receive mfa status
@@ -418,6 +448,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - cookieAuth: []
   /auth/settings/mfa/disable:
     post:
       summary: turn off mfa
@@ -451,6 +483,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - cookieAuth: []
   /auth/settings/mfa/recovery_codes:
     get:
       summary: get generated recovery codes
@@ -484,6 +518,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - cookieAuth: []
   /auth/settings/mfa/otp:
     get:
       summary: get generated secret from backend, login and issuer
@@ -518,6 +554,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - cookieAuth: []
   /auth/settings/mfa/sms:
     post:
       summary: send Sms via services
@@ -556,6 +594,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - cookieAuth: []
   /auth/settings/mfa/verify:
     post:
       summary: enter six-digit code from app or sms and turn on mfa
@@ -596,9 +636,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - cookieAuth: []
 components:
   schemas:
-    AuthSocialResponse:
+    SocialResponse:
       required:
       - accessToken
       - message
@@ -619,6 +661,23 @@ components:
         tokenID:
           type: string
         tokenType:
+          type: string
+    CallbackRequest:
+      required:
+      - authorizationCode
+      type: object
+      properties:
+        code:
+          type: string
+    CallbackResponse:
+      required:
+      - message
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
           type: string
     CodeRequest:
       required:
@@ -720,6 +779,36 @@ components:
           type: string
         actionCaptcha:
           type: string
+    RestorePasswordGetResponse:
+      required:
+      - message
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+    RestorePasswordPostResponse:
+      required:
+      - message
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+    RestorePasswordPutResponse:
+      required:
+      - message
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
     RestorePasswordSetRequest:
       required:
       - email
@@ -742,7 +831,6 @@ components:
           type: string
     SignInResponse:
       required:
-      - login
       - message
       - mfaStatus
       - success
@@ -751,14 +839,11 @@ components:
         success:
           type: boolean
         message:
-          type: string
-        login:
           type: string
         mfaStatus:
           type: boolean
     SignInMfaResponse:
       required:
-      - login
       - message
       - mfaStatus
       - success
@@ -767,8 +852,6 @@ components:
         success:
           type: boolean
         message:
-          type: string
-        login:
           type: string
         mfaStatus:
           type: boolean
@@ -841,3 +924,8 @@ components:
           type: string
         message:
           type: string
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      name: ssid
+      in: cookie

@@ -86,14 +86,6 @@ paths:
   /auth/social/{social_provider}/logout:
     get:
       parameters:
-      - name: access_token
-        in: cookie
-        description: access token from social provider
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
       - name: social_provider
         in: path
         description: social_provider
@@ -122,15 +114,6 @@ paths:
   /auth/password:
     post:
       summary: change actual password
-      parameters:
-      - name: ssid
-        in: cookie
-        description: user session id
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
       requestBody:
         content:
           application/json:
@@ -164,37 +147,6 @@ paths:
       security:
       - cookieAuth: []
   /auth/password/restore:
-    get:
-      summary: check token for timeout
-      operationId: restorePasswordCheckToken
-      parameters:
-      - name: ssid
-        in: cookie
-        description: user session id
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: Ok
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestorePasswordGetResponse'
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
     put:
       summary: save password
       requestBody:
@@ -210,6 +162,13 @@ paths:
       responses:
         "200":
           description: Ok
+          headers:
+            Set-Cookie:
+              style: simple
+              explode: false
+              schema:
+                type: string
+                example: ssid=abcde12345; Path=/; HttpOnly
           content:
             application/json:
               schema:
@@ -305,15 +264,6 @@ paths:
     get:
       summary: send token to logout
       operationId: signOut
-      parameters:
-      - name: ssid
-        in: cookie
-        description: user session id
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
       responses:
         "200":
           description: User signed out
@@ -369,15 +319,6 @@ paths:
   /auth/signin/mfa:
     post:
       summary: enter authentication code in second step of two-factor authentication
-      parameters:
-      - name: token
-        in: cookie
-        description: user session id
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
       requestBody:
         content:
           application/json:
@@ -418,15 +359,6 @@ paths:
     get:
       summary: receive mfa status
       operationId: mfaStatus
-      parameters:
-      - name: ssid
-        in: cookie
-        description: user session id
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
       responses:
         "200":
           description: Ok
@@ -453,15 +385,6 @@ paths:
   /auth/settings/mfa/disable:
     post:
       summary: turn off mfa
-      parameters:
-      - name: ssid
-        in: cookie
-        description: user session id
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
       responses:
         "200":
           description: Ok
@@ -488,15 +411,6 @@ paths:
   /auth/settings/mfa/recovery_codes:
     get:
       summary: get generated recovery codes
-      parameters:
-      - name: ssid
-        in: cookie
-        description: user session id
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
       responses:
         "200":
           description: Ok
@@ -524,15 +438,6 @@ paths:
     get:
       summary: get generated secret from backend, login and issuer
       operationId: barCodeGenerating
-      parameters:
-      - name: ssid
-        in: cookie
-        description: user session id
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
       responses:
         "200":
           description: Ok
@@ -600,15 +505,6 @@ paths:
     post:
       summary: enter six-digit code from app or sms and turn on mfa
       operationId: verifyingCode
-      parameters:
-      - name: ssid
-        in: cookie
-        description: user session id
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
       requestBody:
         content:
           application/json:

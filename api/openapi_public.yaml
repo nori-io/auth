@@ -8,6 +8,31 @@ info:
 servers:
 - url: http://localhost:8080
 paths:
+  /auth/session:
+    get:
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: UnauthorizedError
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - cookieAuth: []
   /auth/social/{social_provider}:
     get:
       parameters:
@@ -20,7 +45,7 @@ paths:
         schema:
           type: string
       responses:
-        "200":
+        "302":
           description: Ok
           content:
             application/json:
@@ -544,37 +569,34 @@ paths:
       - cookieAuth: []
 components:
   schemas:
-    SocialResponse:
-      required:
-      - accessToken
-      - message
-      - refreshToken
-      - success
-      - tokenID
-      - tokenType
-      type: object
-      properties:
-        success:
-          type: boolean
-        message:
-          type: string
-        accessToken:
-          type: string
-        refreshToken:
-          type: string
-        tokenID:
-          type: string
-        tokenType:
-          type: string
     CallbackRequest:
       required:
-      - authorizationCode
+      - access_token
+      - expires_in
+      - info
+      - refresh_token
+      - token_type
+      - uid
       type: object
       properties:
-        code:
+        access_token:
+          type: string
+        token_type:
+          type: string
+        expires_in:
+          type: number
+          format: int64
+        refresh_token:
+          type: string
+        uid:
+          type: number
+          format: int64
+        info:
           type: string
     CallbackResponse:
       required:
+      - isExistSocialAccount
+      - isSocialAccountBoundedEarlier
       - message
       - success
       type: object
@@ -583,6 +605,10 @@ components:
           type: boolean
         message:
           type: string
+        isExistSocialAccount:
+          type: boolean
+        isSocialAccountBoundedEarlier:
+          type: boolean
     CodeRequest:
       required:
       - code
@@ -724,6 +750,26 @@ components:
           type: string
         password:
           type: string
+    SessionResponse:
+      required:
+      - createdAt
+      - email
+      - message
+      - phone
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
     SignInRequest:
       required:
       - login
@@ -811,6 +857,16 @@ components:
         countryCode:
           type: string
         phoneNumber:
+          type: string
+    SocialResponse:
+      required:
+      - message
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
           type: string
     VerifyResponse:
       required:

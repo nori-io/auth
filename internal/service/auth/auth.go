@@ -87,7 +87,6 @@ func (srv *service) SignOut(ctx context.Context, data *entity.Session) error {
 }
 
 func (srv *service) GetMfaRecoveryCodes(ctx context.Context, data *entity.Session) ([]entity.MfaRecoveryCode, error) {
-
 	var err error
 
 	//@todo read count of symbols from config
@@ -95,11 +94,9 @@ func (srv *service) GetMfaRecoveryCodes(ctx context.Context, data *entity.Sessio
 	//@todo read symbol sequence from config
 	//@todo generating of specify sequence
 	//@todo нужна ли максимальная длина, или указать всё в паттерне?
+	err = srv.mfaRecoveryCodeRepository.Create(ctx, data.UserID, mfaRecoveryCode)
 
-		err = srv.mfaRecoveryCodeRepository.Create(ctx, data.UserID, mfaRecoveryCode)
-
-	}
-	return codes, err
+	return nil, nil
 }
 
 func (srv *service) PutSecret(

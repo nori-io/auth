@@ -23,19 +23,22 @@ func (h mfaRecoveryCodesHelper) GenerateRecoveryCodes(userID uint64, count int) 
 			Code:      string(sid),
 			CreatedAt: time.Now(),
 		}
+
 		codes = append(codes, mfaRecoveryCode)
 
 	}
 	return codes, nil
 }
 
-func (h mfaRecoveryCodesHelper) GenerateRecoveryCode() (entity.MfaRecoveryCode, error) {
-	var mfaRecoveryCode entity.MfaRecoveryCode
-
+func (h mfaRecoveryCodesHelper) GenerateRecoveryCode(userID uint64) (entity.MfaRecoveryCode, error) {
 	sid := make([]byte, 32)
 
 	if _, err := rand.Read(sid); err != nil {
 		return entity.MfaRecoveryCode{}, err
 	}
-	return mfaRecoveryCode, nil
+	return entity.MfaRecoveryCode{
+		UserID:    userID,
+		Code:      string(sid),
+		CreatedAt: time.Now(),
+	}, nil
 }

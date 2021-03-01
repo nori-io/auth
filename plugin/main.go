@@ -3,22 +3,13 @@ package main
 import (
 	"context"
 
-	"github.com/nori-plugins/authentication/internal/handler/http/authentication"
 	authentication2 "github.com/nori-plugins/authentication/pkg/authentication"
 
 	p "github.com/nori-io/common/v4/pkg/domain/plugin"
 
-	"go.uber.org/dig"
-
 	"github.com/jinzhu/gorm"
 
-	noriHttp "github.com/nori-io/interfaces/nori/http"
-
 	"github.com/nori-plugins/authentication/internal/domain/service"
-
-	"github.com/nori-plugins/authentication/internal/repository/user"
-
-	"github.com/nori-plugins/authentication/internal/service/auth"
 
 	em "github.com/nori-io/common/v4/pkg/domain/enum/meta"
 
@@ -27,7 +18,6 @@ import (
 	"github.com/nori-io/common/v4/pkg/domain/meta"
 	"github.com/nori-io/common/v4/pkg/domain/registry"
 	m "github.com/nori-io/common/v4/pkg/meta"
-	s "github.com/nori-io/interfaces/nori/session"
 
 	noriGorm "github.com/nori-io/interfaces/database/orm/gorm"
 )
@@ -88,51 +78,8 @@ func (p plugin) Init(ctx context.Context, config config.Config, log logger.Field
 }
 
 func (p plugin) Start(ctx context.Context, registry registry.Registry) error {
-	container := dig.New()
-	container.Provide(registry)
-	container.Provide(noriHttp.GetHttp)
-	container.Provide(noriGorm.GetGorm)
-	container.Provide(s.GetSession)
-	container.Provide(user.New)
-	container.Provide(authentication.New)
-	container.Provide(auth.New)
-	err := container.Invoke(func(router noriHttp.Http, handler *authentication.AuthHandler) {
-		router.Get(p.config.urlPrefix()+"/signup", handler.SignUp)
-		router.Get(p.config.urlPrefix()+"/signin", handler.SigIn)
-		router.Get(p.config.urlPrefix()+"/signout", handler.SignOut)
-	})
-	if err != nil {
-		return err
-	}
-
-	/*db, err := noriGorm.GetGorm(registry)
-	if err != nil {
-		return err
-	}*/
-
-	/*s, err := s.GetSession(registry)
-	if err != nil {
-		return err
-	}*/
-
-	// userRepo := user.New(db)
-
-	// p.instance = auth.New(s, userRepo)
-
-	/*httpServer, err := noriHttp.GetHttp(registry)
-	if err != nil {
-		return err
-	}*/
-
-	/*h := http.Handler{
-		R:         httpServer,
-		Auth:      p.instance,
-		UrlPrefix: p.config.urlPrefix(),
-	}*/
-
-	// http.New(h)
-
-	return nil
+	_, err := Initialize(registry, p.config.urlPrefix())
+	return err
 }
 
 func (p plugin) Stop(ctx context.Context, registry registry.Registry) error {

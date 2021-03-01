@@ -3,13 +3,13 @@ package main
 import (
 	"context"
 
-	plugin2 "github.com/nori-io/common/v4/pkg/domain/plugin"
+	authentication2 "github.com/nori-plugins/authentication/pkg/authentication"
+
+	p "github.com/nori-io/common/v4/pkg/domain/plugin"
 
 	"github.com/jinzhu/gorm"
 
-	"github.com/nori-io/authentication/internal/domain/service"
-
-	"github.com/nori-io/authentication/pkg"
+	"github.com/nori-plugins/authentication/internal/domain/service"
 
 	em "github.com/nori-io/common/v4/pkg/domain/enum/meta"
 
@@ -22,18 +22,24 @@ import (
 	noriGorm "github.com/nori-io/interfaces/database/orm/gorm"
 )
 
-var Plugin plugin2.Plugin = pluginStruct{}
+func New() p.Plugin {
+	return &plugin{}
+}
 
-type pluginStruct struct {
+type plugin struct {
 	instance service.AuthenticationService
 	config   conf
 }
 
 type conf struct {
-	urlPrefix config.String
+	urlPrefix                config.String
+	MfaRecoveryCodePattern   config.String
+	MfaRecoveryCodeSymbols   config.String
+	MfaRecoveryCodeMaxLength config.Int
+	Issuer                   config.String
 }
 
-func (p pluginStruct) Meta() meta.Meta {
+func (p plugin) Meta() meta.Meta {
 	return m.Meta{
 		ID: m.ID{
 			ID:      "",
@@ -45,7 +51,7 @@ func (p pluginStruct) Meta() meta.Meta {
 		},
 		Dependencies: []meta.Dependency{},
 		Description:  nil,
-		Interface:    pkg.AuthenticationInterface,
+		Interface:    authentication2.AuthenticationInterface,
 		License:      nil,
 		Links:        nil,
 		Repository: m.Repository{
@@ -56,28 +62,31 @@ func (p pluginStruct) Meta() meta.Meta {
 	}
 }
 
-func (p pluginStruct) Instance() interface{} {
+func (p plugin) Instance() interface{} {
 	return p.instance
 }
 
-func (p pluginStruct) Init(ctx context.Context, config config.Config, log logger.FieldLogger) error {
+func (p plugin) Init(ctx context.Context, config config.Config, log logger.FieldLogger) error {
 	p.config = conf{
-		urlPrefix: config.String("urlPrefix", "url prefix for all handlers"),
+		urlPrefix:                config.String("urlPrefix", "url prefix for all handlers"),
+		MfaRecoveryCodePattern:   config.String("mfaRecoveryCodePattern", "pattern for mfa recovery codes"),
+		MfaRecoveryCodeSymbols:   config.String("mfaRecoveryCodeSymbols", "symbols that use when mfa recovery code generating"),
+		MfaRecoveryCodeMaxLength: config.Int("mfaRecoveryCodeMaxLength", "max length of mfaRecoveryCode"),
 	}
 
 	return nil
 }
 
-func (p pluginStruct) Start(ctx context.Context, registry registry.Registry) error {
+func (p plugin) Start(ctx context.Context, registry registry.Registry) error {
 	_, err := Initialize(registry, p.config.urlPrefix())
 	return err
 }
 
-func (p pluginStruct) Stop(ctx context.Context, registry registry.Registry) error {
+func (p plugin) Stop(ctx context.Context, registry registry.Registry) error {
 	return nil
 }
 
-func (p pluginStruct) Install(_ context.Context, registry registry.Registry) error {
+func (p plugin) Install(_ context.Context, registry registry.Registry) error {
 	db, err := noriGorm.GetGorm(registry)
 	if err != nil {
 		return err
@@ -104,7 +113,7 @@ func (p pluginStruct) Install(_ context.Context, registry registry.Registry) err
 	return nil
 }
 
-func (p pluginStruct) UnInstall(_ context.Context, registry registry.Registry) error {
+func (p plugin) UnInstall(_ context.Context, registry registry.Registry) error {
 	db, err := noriGorm.GetGorm(registry)
 	if err != nil {
 		return err

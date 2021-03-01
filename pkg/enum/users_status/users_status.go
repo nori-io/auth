@@ -1,10 +1,11 @@
-package user_status
+package users_status
 
 type UserStatus uint8
 
 const (
 	Active UserStatus = iota
 	Blocked
+	Deleted
 	Locked
 )
 

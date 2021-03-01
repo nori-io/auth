@@ -3,9 +3,9 @@ package authentication
 import (
 	"net/http"
 
-	"github.com/nori-io/authentication/internal/domain/entity"
+	"github.com/nori-plugins/authentication/internal/domain/entity"
 
-	"github.com/nori-io/authentication/internal/domain/service"
+	"github.com/nori-plugins/authentication/internal/domain/service"
 )
 
 type AuthHandler struct {
@@ -30,7 +30,7 @@ func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "sign up error", http.StatusInternalServerError)
 	}
 	JSON(w, r, SignUpResponse{
-		ID:    user.Id,
+		ID:    user.ID,
 		Email: user.Email,
 	})
 }
@@ -46,7 +46,7 @@ func (h *AuthHandler) SigIn(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	JSON(w, r, SignInResponse{
-		SessionID: string(sess.Id),
+		SessionID: string(sess.SessionKey),
 	})
 }
 
@@ -56,11 +56,50 @@ func (h *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
 
 	sessionId, _ := sessionIdContext.([]byte)
 
-	if err := h.Auth.SignOut(r.Context(), &entity.Session{Id: sessionId}); err != nil {
+	if err := h.Auth.SignOut(r.Context(), &entity.Session{SessionKey: sessionId}); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
 	// todo: redirect
 
 	http.Redirect(w, r, "/", 0)
+}
+
+func (h *AuthHandler) GetMfaRecoveryCodes(w http.ResponseWriter, r *http.Request) {
+	sessionIdContext := r.Context().Value("session_id")
+
+	sessionId, _ := sessionIdContext.([]byte)
+
+	if err := h.Auth.GetMfaRecoveryCodes(r.Context(), &entity.Session{SessionKey: sessionId}); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	//@todo path
+	http.Redirect(w, r, "/", 0)
+}
+
+func (h *AuthHandler) PutSecret(w http.ResponseWriter, r *http.Request) {
+	data, err := newPutSecretData(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	sessionIdContext := r.Context().Value("session_id")
+	sessionId, _ := sessionIdContext.([]byte)
+
+	if data.Ssid != sessionIdContext {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+	}
+	sessionUserId := r.Context().Value("user_id").(uint64)
+	login, issuer, err :=
+		h.Auth.PutSecret(r.Context(), &entity.Session{SessionKey: sessionId, UserID: sessionUserId})
+
+	if (login == "") && (issuer == "") {
+		http.Error(w, "sign up error", http.StatusInternalServerError)
+	}
+
+	JSON(w, r, MfaSecretResponse{
+		Login:  login,
+		Issuer: issuer,
+	})
 }

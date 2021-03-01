@@ -1,0 +1,892 @@
+---
+openapi: 3.0.0
+info:
+  title: Nori Authentication
+  license:
+    name: Apache 2.0
+  version: 1.0.0
+servers:
+- url: http://localhost:8080
+paths:
+  /auth/session:
+    get:
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: UnauthorizedError
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - cookieAuth: []
+  /auth/social/{social_provider}:
+    get:
+      parameters:
+      - name: social_provider
+        in: path
+        description: social_provider
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "302":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /auth/social/{social_provider}/callback:
+    post:
+      parameters:
+      - name: social_provider
+        in: path
+        description: social_provider
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallbackRequest'
+        required: true
+      responses:
+        "200":
+          description: Ok
+          headers:
+            Set-Cookie:
+              style: simple
+              explode: false
+              schema:
+                type: string
+                description: set session's cookie of session for identification of users
+                example: ssid=abcde12345; Path=/; HttpOnly
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallbackResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: UnauthorizedError
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /auth/social/{social_provider}/logout:
+    get:
+      parameters:
+      - name: social_provider
+        in: path
+        description: social_provider
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: User signed out from social provider
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - cookieAuth: []
+  /auth/password/restore:
+    put:
+      summary: save password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestorePasswordSetRequest'
+            encoding:
+              password:
+                style: form
+                allowReserved: true
+        required: true
+      responses:
+        "200":
+          description: Ok
+          headers:
+            Set-Cookie:
+              style: simple
+              explode: false
+              schema:
+                type: string
+                description: set session's cookie of session for identification of users
+                example: ssid=abcde12345; Path=/; HttpOnly
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestorePasswordPutResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      summary: receive token to email/phone
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestorePasswordRequest'
+            encoding:
+              email:
+                style: form
+                allowReserved: true
+        required: true
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestorePasswordPostResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /auth/signin:
+    post:
+      summary: authentication start user session
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignInRequest'
+            encoding:
+              email:
+                style: form
+                allowReserved: true
+              password:
+                style: form
+                allowReserved: true
+        required: true
+      responses:
+        "200":
+          description: User signed in
+          headers:
+            Set-Cookie:
+              style: simple
+              explode: false
+              schema:
+                type: string
+                description: set session's cookie of session for identification of users
+                example: ssid=abcde12345; Path=/; HttpOnly
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignInResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /auth/signout:
+    get:
+      summary: send token to logout
+      operationId: signOut
+      responses:
+        "200":
+          description: User signed out
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignOutResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - cookieAuth: []
+  /auth/signup:
+    post:
+      summary: Create a new user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignUpRequest'
+            encoding:
+              login:
+                style: form
+                allowReserved: true
+              password:
+                style: form
+                allowReserved: true
+        required: true
+      responses:
+        "201":
+          description: User's account created
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /auth/signin/mfa:
+    post:
+      summary: enter authentication code in second step of two-factor authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CodeRequest'
+        required: true
+      responses:
+        "200":
+          description: User signed in
+          headers:
+            Set-Cookie:
+              style: simple
+              explode: false
+              schema:
+                type: string
+                description: set session's cookie of session for identification of users
+                example: ssid=abcde12345; Path=/; HttpOnly
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignInMfaResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: UnauthorizedError
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - cookieAuth: []
+  /auth/settings/mfa:
+    get:
+      summary: receive mfa status
+      operationId: mfaStatus
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: UnauthorizedError
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - cookieAuth: []
+  /auth/settings/mfa/disable:
+    post:
+      summary: turn off mfa
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DisableResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: UnauthorizedError
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - cookieAuth: []
+  /auth/settings/mfa/recovery_codes:
+    get:
+      summary: get generated recovery codes
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecoveryCodesResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: UnauthorizedError
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - cookieAuth: []
+  /auth/settings/mfa/otp:
+    get:
+      summary: get generated secret from backend, login and issuer
+      operationId: barCodeGenerating
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OtpResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: UnauthorizedError
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - cookieAuth: []
+  /auth/settings/mfa/sms:
+    post:
+      summary: send Sms via services
+      operationId: sendingSms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SmsRequest'
+            encoding:
+              login:
+                style: form
+                allowReserved: true
+              password:
+                style: form
+                allowReserved: true
+        required: true
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: UnauthorizedError
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - cookieAuth: []
+  /auth/settings/mfa/verify:
+    post:
+      summary: enter six-digit code from app or sms and turn on mfa
+      operationId: verifyingCode
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CodeRequest'
+        required: true
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: UnauthorizedError
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - cookieAuth: []
+  /auth/settings/password:
+    post:
+      summary: change actual password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordSetRequest'
+            encoding:
+              passwordOld:
+                style: form
+                allowReserved: true
+              passwordNew:
+                style: form
+                allowReserved: true
+        required: true
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordSetResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - cookieAuth: []
+components:
+  schemas:
+    CallbackRequest:
+      required:
+      - access_token
+      - expires_in
+      - info
+      - refresh_token
+      - token_type
+      - uid
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+        expires_in:
+          type: number
+          format: int64
+        refresh_token:
+          type: string
+        uid:
+          type: number
+          format: int64
+        info:
+          type: string
+    CallbackResponse:
+      required:
+      - isExistSocialAccount
+      - isSocialAccountBoundedEarlier
+      - message
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        isExistSocialAccount:
+          type: boolean
+        isSocialAccountBoundedEarlier:
+          type: boolean
+    CodeRequest:
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          type: string
+    DisableResponse:
+      required:
+      - message
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+    ErrorResponse:
+      required:
+      - code
+      - errors
+      type: object
+      properties:
+        code:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorResponse_errors'
+    MfaResponse:
+      required:
+      - message
+      - status
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        status:
+          type: boolean
+    OtpResponse:
+      required:
+      - issuer
+      - login
+      - message
+      - secret
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        login:
+          type: string
+        issuer:
+          type: string
+        secret:
+          type: string
+    PasswordSetRequest:
+      required:
+      - login
+      - passwordNew
+      - passwordOld
+      type: object
+      properties:
+        login:
+          type: string
+        passwordOld:
+          type: string
+        passwordNew:
+          type: string
+    PasswordSetResponse:
+      required:
+      - message
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+    RecoveryCodesResponse:
+      required:
+      - message
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        codes:
+          type: array
+          items:
+            type: string
+    RestorePasswordRequest:
+      required:
+      - actionCaptcha
+      - login
+      - tokenCaptcha
+      type: object
+      properties:
+        login:
+          type: string
+        tokenCaptcha:
+          type: string
+        actionCaptcha:
+          type: string
+    RestorePasswordPostResponse:
+      required:
+      - message
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+    RestorePasswordPutResponse:
+      required:
+      - message
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+    RestorePasswordSetRequest:
+      required:
+      - login
+      - password
+      type: object
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+    SessionResponse:
+      required:
+      - createdAt
+      - email
+      - message
+      - phone
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    SignInRequest:
+      required:
+      - login
+      - password
+      type: object
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+    SignInResponse:
+      required:
+      - message
+      - mfaStatus
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        mfaStatus:
+          type: boolean
+    SignInMfaResponse:
+      required:
+      - message
+      - mfaStatus
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        mfaStatus:
+          type: boolean
+    SignUpRequest:
+      required:
+      - actionCaptcha
+      - login
+      - password
+      - tokenCaptcha
+      type: object
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+        tokenCaptcha:
+          type: string
+        actionCaptcha:
+          type: string
+    SignOutResponse:
+      required:
+      - message
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+    SmsRequest:
+      required:
+      - countryCode
+      - phoneNumber
+      type: object
+      properties:
+        countryCode:
+          type: string
+        phoneNumber:
+          type: string
+    SmsResponse:
+      required:
+      - countryCode
+      - message
+      - phoneNumber
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        countryCode:
+          type: string
+        phoneNumber:
+          type: string
+    SocialResponse:
+      required:
+      - message
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+    VerifyResponse:
+      required:
+      - message
+      - success
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+    ErrorResponse_errors:
+      type: object
+      properties:
+        field:
+          type: string
+        message:
+          type: string
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      name: ssid
+      in: cookie

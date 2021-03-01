@@ -1,5 +1,17 @@
 package entity
 
+import (
+	"time"
+
+	"github.com/nori-plugins/authentication/pkg/enum/session_status"
+)
+
 type Session struct {
-	Id []byte
+	ID         uint64
+	SessionKey []byte
+	UserID     uint64
+	Status     session_status.SessionStatus
+	OpenedAt   time.Time
+	ClosedAt   time.Time
+	UpdatedAt  time.Time
 }

@@ -4,9 +4,9 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/helper/mfa_recovery_codes"
 )
 
-type helper struct {
+type mfaRecoveryCodesHelper struct {
 }
 
 func New() mfa_recovery_codes.MfaRecoveryCodesHelper {
-	return &helper{}
+	return &mfaRecoveryCodesHelper{}
 }

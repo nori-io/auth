@@ -87,30 +87,17 @@ func (srv *service) SignOut(ctx context.Context, data *entity.Session) error {
 }
 
 func (srv *service) GetMfaRecoveryCodes(ctx context.Context, data *entity.Session) ([]entity.MfaRecoveryCode, error) {
-	var codes []entity.MfaRecoveryCode
+
 	var err error
-	var mfaRecoveryCode *entity.MfaRecoveryCode
+
 	//@todo read count of symbols from config
 	//@todo read pattenn from config
 	//@todo read symbol sequence from config
 	//@todo generating of specify sequence
 	//@todo нужна ли максимальная длина, или указать всё в паттерне?
-	for i := 0; i < 10; i++ {
-		sid := make([]byte, 32)
 
-		if _, err := rand.Read(sid); err != nil {
-			return nil, err
-		}
-		mfaRecoveryCode = &entity.MfaRecoveryCode{
-			UserID:    data.UserID,
-			Code:      string(sid),
-			CreatedAt: time.Now(),
-		}
 		err = srv.mfaRecoveryCodeRepository.Create(ctx, data.UserID, mfaRecoveryCode)
-		if err != nil {
-			break
-		}
-		codes = append(codes, *mfaRecoveryCode)
+
 	}
 	return codes, err
 }

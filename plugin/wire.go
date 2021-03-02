@@ -10,7 +10,7 @@ import (
 	"github.com/nori-io/interfaces/nori/session"
 	httpHandler "github.com/nori-plugins/authentication/internal/handler/http"
 	"github.com/nori-plugins/authentication/internal/handler/http/authentication"
-	"github.com/nori-plugins/authentication/internal/repository/mfa_recovery_code"
+	"github.com/nori-plugins/authentication/internal/handler/http/mfa_recovery_code"
 	"github.com/nori-plugins/authentication/internal/repository/user"
 )
 
@@ -18,10 +18,11 @@ var set1 = wire.NewSet(
 	noriGorm.GetGorm,
 	session.GetSession,
 	user.New,
-	wire.Struct(new(httpHandler.Handler), "R", "AuthenticationService", "MfaRecoveryCodeService", "UrlPrefix"),
-	noriHttp.GetHttp,
+
 	authentication.New,
 	mfa_recovery_code.New,
+	wire.Struct(new(httpHandler.Handler), "R", "AuthenticationService", "MfaRecoveryCodeService", "UrlPrefix"),
+	noriHttp.GetHttp,
 )
 
 func Initialize(registry registry.Registry, urlPrefix string) (*httpHandler.Handler, error) {

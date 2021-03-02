@@ -18,14 +18,14 @@ type config struct {
 	Issuer string
 }
 
-func New(sessionInstance s.Session,
+func New(session s.Session,
 	userRepository repository.UserRepository,
 	mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository,
 	mfaSecretRepository repository.MfaSecretRepository,
 	config config) pkg.Authentication {
 	return &Service{
 		config:                    config,
-		session:                   sessionInstance,
+		session:                   session,
 		userRepository:            userRepository,
 		mfaRecoveryCodeRepository: mfaRecoveryCodeRepository,
 		mfaSecretRepository:       mfaSecretRepository,

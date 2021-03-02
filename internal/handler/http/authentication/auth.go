@@ -8,15 +8,15 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/service"
 )
 
-type Handler struct {
+type AuthenticationHandler struct {
 	AuthenticationService service.AuthenticationService
 }
 
-func New(authenticationService service.AuthenticationService) *Handler {
-	return &Handler{AuthenticationService: authenticationService}
+func New(authenticationService service.AuthenticationService) *AuthenticationHandler {
+	return &AuthenticationHandler{AuthenticationService: authenticationService}
 }
 
-func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
+func (h *AuthenticationHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	data, err := newSignUpData(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -35,7 +35,7 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (h *Handler) SigIn(w http.ResponseWriter, r *http.Request) {
+func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	data, err := newSignInData(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -50,7 +50,7 @@ func (h *Handler) SigIn(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (h *Handler) SignOut(w http.ResponseWriter, r *http.Request) {
+func (h *AuthenticationHandler) SignOut(w http.ResponseWriter, r *http.Request) {
 	// todo: extract session ID from context
 	sessionIdContext := r.Context().Value("session_id")
 
@@ -65,7 +65,7 @@ func (h *Handler) SignOut(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", 0)
 }
 
-func (h *Handler) PutSecret(w http.ResponseWriter, r *http.Request) {
+func (h *AuthenticationHandler) PutSecret(w http.ResponseWriter, r *http.Request) {
 	data, err := newPutSecretData(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

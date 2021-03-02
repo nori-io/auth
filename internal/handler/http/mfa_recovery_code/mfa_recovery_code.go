@@ -7,15 +7,15 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/service"
 )
 
-type Handler struct {
+type MfaRecoveryCodeHandler struct {
 	MfaRecoveryCodeService service.MfaRecoveryCodeService
 }
 
-func New(mfaRecoveryCodeService service.MfaRecoveryCodeService) *Handler {
-	return &Handler{MfaRecoveryCodeService: mfaRecoveryCodeService}
+func New(mfaRecoveryCodeService service.MfaRecoveryCodeService) *MfaRecoveryCodeHandler {
+	return &MfaRecoveryCodeHandler{MfaRecoveryCodeService: mfaRecoveryCodeService}
 }
 
-func (h *Handler) GetMfaRecoveryCodes(w http.ResponseWriter, r *http.Request) {
+func (h *MfaRecoveryCodeHandler) GetMfaRecoveryCodes(w http.ResponseWriter, r *http.Request) {
 	sessionIdContext := r.Context().Value("session_id")
 
 	sessionId, _ := sessionIdContext.([]byte)

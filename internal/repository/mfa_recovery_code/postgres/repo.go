@@ -15,7 +15,7 @@ func (m MfaRecoveryCodeRepository) Use(ctx context.Context, e *entity.MfaRecover
 	panic("implement me")
 }
 
-func (m MfaRecoveryCodeRepository) Create(ctx context.Context, e *entity.MfaRecoveryCode) error {
+func (m MfaRecoveryCodeRepository) Create(ctx context.Context, userID uint64, e *entity.MfaRecoveryCode) error {
 	model, _ := NewModel(e)
 
 	lastRecord := new(MfaRecoveryCode)

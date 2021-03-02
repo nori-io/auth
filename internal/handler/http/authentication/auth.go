@@ -8,21 +8,21 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/service"
 )
 
-type AuthHandler struct {
-	Auth service.AuthenticationService
+type Handler struct {
+	AuthenticationService service.AuthenticationService
 }
 
-func New(auth service.AuthenticationService) *AuthHandler {
-	return &AuthHandler{Auth: auth}
+func New(authenticationService service.AuthenticationService) *Handler {
+	return &Handler{AuthenticationService: authenticationService}
 }
 
-func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 	data, err := newSignUpData(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	user, err := h.Auth.SignUp(r.Context(), data)
+	user, err := h.AuthenticationService.SignUp(r.Context(), data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -35,13 +35,13 @@ func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (h *AuthHandler) SigIn(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) SigIn(w http.ResponseWriter, r *http.Request) {
 	data, err := newSignInData(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	sess, err := h.Auth.SignIn(r.Context(), data)
+	sess, err := h.AuthenticationService.SignIn(r.Context(), data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -50,13 +50,13 @@ func (h *AuthHandler) SigIn(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (h *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) SignOut(w http.ResponseWriter, r *http.Request) {
 	// todo: extract session ID from context
 	sessionIdContext := r.Context().Value("session_id")
 
 	sessionId, _ := sessionIdContext.([]byte)
 
-	if err := h.Auth.SignOut(r.Context(), &entity.Session{SessionKey: sessionId}); err != nil {
+	if err := h.AuthenticationService.SignOut(r.Context(), &entity.Session{SessionKey: sessionId}); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
@@ -65,20 +65,7 @@ func (h *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", 0)
 }
 
-func (h *AuthHandler) GetMfaRecoveryCodes(w http.ResponseWriter, r *http.Request) {
-	sessionIdContext := r.Context().Value("session_id")
-
-	sessionId, _ := sessionIdContext.([]byte)
-
-	if err := h.Auth.GetMfaRecoveryCodes(r.Context(), &entity.Session{SessionKey: sessionId}); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-
-	//@todo path
-	http.Redirect(w, r, "/", 0)
-}
-
-func (h *AuthHandler) PutSecret(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) PutSecret(w http.ResponseWriter, r *http.Request) {
 	data, err := newPutSecretData(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -92,7 +79,7 @@ func (h *AuthHandler) PutSecret(w http.ResponseWriter, r *http.Request) {
 	}
 	sessionUserId := r.Context().Value("user_id").(uint64)
 	login, issuer, err :=
-		h.Auth.PutSecret(r.Context(), &entity.Session{SessionKey: sessionId, UserID: sessionUserId})
+		h.AuthenticationService.PutSecret(r.Context(), &entity.Session{SessionKey: sessionId, UserID: sessionUserId})
 
 	if (login == "") && (issuer == "") {
 		http.Error(w, "sign up error", http.StatusInternalServerError)

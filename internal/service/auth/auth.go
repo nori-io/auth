@@ -3,14 +3,13 @@ package auth
 import (
 	"context"
 	"crypto/rand"
-	"time"
+
+	"github.com/nori-plugins/authentication/internal/domain/repository"
+	service2 "github.com/nori-plugins/authentication/internal/domain/service"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 
-	"github.com/nori-plugins/authentication/internal/domain/repository"
-
 	s "github.com/nori-io/interfaces/nori/session"
-	serv "github.com/nori-plugins/authentication/internal/domain/service"
 )
 
 type service struct {
@@ -18,28 +17,14 @@ type service struct {
 	userRepository            repository.UserRepository
 	mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository
 	mfaSecretRepository       repository.MfaSecretRepository
-	configData                configData
+	config                    config
 }
 
-type configData struct {
+type config struct {
 	Issuer string
 }
 
-func New(sessionInstance s.Session,
-	userRepositoryInstance repository.UserRepository,
-	mfaRecoveryCodeRepositoryInstance repository.MfaRecoveryCodeRepository,
-	mfaSecretRepositoryInstance repository.MfaSecretRepository,
-	configData configData) serv.AuthenticationService {
-	return &service{
-		configData:                configData,
-		session:                   sessionInstance,
-		userRepository:            userRepositoryInstance,
-		mfaRecoveryCodeRepository: mfaRecoveryCodeRepositoryInstance,
-		mfaSecretRepository:       mfaRecoveryCodeRepositoryInstance,
-	}
-}
-
-func (srv *service) SignUp(ctx context.Context, data serv.SignUpData) (*entity.User, error) {
+func (srv service) SignUp(ctx context.Context, data service2.SignUpData) (*entity.User, error) {
 	if err := data.Validate(); err != nil {
 		return nil, err
 	}
@@ -69,7 +54,7 @@ func (srv *service) SignIn(ctx context.Context, data serv.SignInData) (*entity.S
 	}
 
 	var err error
-	user, err = srv.userRepository.GetByEmail(ctx, user.Email)
+	user, err = srv.userRepository.FindByEmail(ctx, user.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -84,19 +69,6 @@ func (srv *service) SignIn(ctx context.Context, data serv.SignInData) (*entity.S
 func (srv *service) SignOut(ctx context.Context, data *entity.Session) error {
 	err := srv.session.Delete([]byte(data.SessionKey))
 	return err
-}
-
-func (srv *service) GetMfaRecoveryCodes(ctx context.Context, data *entity.Session) ([]entity.MfaRecoveryCode, error) {
-	var err error
-
-	//@todo read count of symbols from config
-	//@todo read pattenn from config
-	//@todo read symbol sequence from config
-	//@todo generating of specify sequence
-	//@todo нужна ли максимальная длина, или указать всё в паттерне?
-	err = srv.mfaRecoveryCodeRepository.Create(ctx, data.UserID, mfaRecoveryCode)
-
-	return nil, nil
 }
 
 func (srv *service) PutSecret(
@@ -127,7 +99,7 @@ func (srv *service) PutSecret(
 	} else {
 		login = userData.PhoneCountryCode + userData.PhoneNumber
 	}
-	return login, srv.configData.Issuer, nil
+	return login, srv.config.Issuer, nil
 }
 
 func (srv *service) getToken() ([]byte, error) {

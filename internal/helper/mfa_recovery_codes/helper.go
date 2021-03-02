@@ -2,14 +2,10 @@ package mfa_recovery_codes
 
 import (
 	"crypto/rand"
-	"time"
-
-	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
-func (h mfaRecoveryCodesHelper) GenerateRecoveryCodes(userID uint64, count int) ([]entity.MfaRecoveryCode, error) {
-	var codes []entity.MfaRecoveryCode
-	var mfaRecoveryCode entity.MfaRecoveryCode
+func (h mfaRecoveryCodesHelper) Generate(count int) ([]string, error) {
+	var codes []string
 
 	for i := 0; i < count; i++ {
 		sid := make([]byte, 32)
@@ -18,27 +14,8 @@ func (h mfaRecoveryCodesHelper) GenerateRecoveryCodes(userID uint64, count int) 
 			return nil, err
 		}
 
-		mfaRecoveryCode = entity.MfaRecoveryCode{
-			UserID:    userID,
-			Code:      string(sid),
-			CreatedAt: time.Now(),
-		}
-
-		codes = append(codes, mfaRecoveryCode)
+		codes = append(codes, string(sid))
 
 	}
 	return codes, nil
-}
-
-func (h mfaRecoveryCodesHelper) GenerateRecoveryCode(userID uint64) (entity.MfaRecoveryCode, error) {
-	sid := make([]byte, 32)
-
-	if _, err := rand.Read(sid); err != nil {
-		return entity.MfaRecoveryCode{}, err
-	}
-	return entity.MfaRecoveryCode{
-		UserID:    userID,
-		Code:      string(sid),
-		CreatedAt: time.Now(),
-	}, nil
 }

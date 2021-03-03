@@ -10,21 +10,15 @@ type Service struct {
 	session                s.Session
 	authenticationService  service.AuthenticationService
 	mfaRecoveryCodeService service.MfaRecoveryCodeService
-	config                 config
-}
-
-type config struct {
-	Issuer string
 }
 
 func New(session s.Session,
 	authenticationService service.AuthenticationService,
 	mfaRecoveryCodeService service.MfaRecoveryCodeService,
-	config config) pkg.Authentication {
+) pkg.Authentication {
 	return &Service{
 		session:                session,
 		authenticationService:  authenticationService,
 		mfaRecoveryCodeService: mfaRecoveryCodeService,
-		config:                 config,
 	}
 }

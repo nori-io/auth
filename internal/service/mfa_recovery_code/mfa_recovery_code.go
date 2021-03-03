@@ -12,10 +12,18 @@ import (
 
 type MfaRecoveryCodeService struct {
 	mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository
+	config                    config
 }
 
-func New(mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository) service2.MfaRecoveryCodeService {
-	return &MfaRecoveryCodeService{mfaRecoveryCodeRepository: mfaRecoveryCodeRepository}
+type config struct {
+	MfaRecoveryCodeCount int
+}
+
+func New(mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository, config config) service2.MfaRecoveryCodeService {
+	return &MfaRecoveryCodeService{
+		mfaRecoveryCodeRepository: mfaRecoveryCodeRepository,
+		config:                    config,
+	}
 }
 
 func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data *entity.Session) ([]entity.MfaRecoveryCode, error) {

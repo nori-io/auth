@@ -36,6 +36,7 @@ type conf struct {
 	MfaRecoveryCodePattern   config.String
 	MfaRecoveryCodeSymbols   config.String
 	MfaRecoveryCodeMaxLength config.Int
+	MfaRecoveryCodeCount     config.Int
 	Issuer                   config.String
 }
 
@@ -72,6 +73,8 @@ func (p plugin) Init(ctx context.Context, config config.Config, log logger.Field
 		MfaRecoveryCodePattern:   config.String("mfaRecoveryCodePattern", "pattern for mfa recovery codes"),
 		MfaRecoveryCodeSymbols:   config.String("mfaRecoveryCodeSymbols", "symbols that use when mfa recovery code generating"),
 		MfaRecoveryCodeMaxLength: config.Int("mfaRecoveryCodeMaxLength", "max length of mfaRecoveryCode"),
+		MfaRecoveryCodeCount:     config.Int("mfaRecoveryCodeCount", "count of mfa recovery codes"),
+		Issuer:                   config.String("issuer", "issuer"),
 	}
 
 	return nil

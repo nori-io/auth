@@ -7,7 +7,8 @@ import (
 )
 
 type SecretService interface {
-	PutSecret(ctx context.Context, data *entity.Session) (string, string, error)
+	PutSecret(ctx context.Context, data *SecretData, session entity.Session) (
+		string, string, error)
 }
 
 type SecretData struct {

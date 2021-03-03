@@ -2,16 +2,15 @@ package service
 
 import (
 	s "github.com/nori-io/interfaces/nori/session"
-	"github.com/nori-plugins/authentication/internal/domain/repository"
+	"github.com/nori-plugins/authentication/internal/domain/service"
 	"github.com/nori-plugins/authentication/pkg"
 )
 
 type Service struct {
-	session                   s.Session
-	userRepository            repository.UserRepository
-	mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository
-	mfaSecretRepository       repository.MfaSecretRepository
-	config                    config
+	session                s.Session
+	authenticationService  service.AuthenticationService
+	mfaRecoveryCodeService service.MfaRecoveryCodeService
+	config                 config
 }
 
 type config struct {
@@ -19,15 +18,13 @@ type config struct {
 }
 
 func New(session s.Session,
-	userRepository repository.UserRepository,
-	mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository,
-	mfaSecretRepository repository.MfaSecretRepository,
+	authenticationService service.AuthenticationService,
+	mfaRecoveryCodeService service.MfaRecoveryCodeService,
 	config config) pkg.Authentication {
 	return &Service{
-		config:                    config,
-		session:                   session,
-		userRepository:            userRepository,
-		mfaRecoveryCodeRepository: mfaRecoveryCodeRepository,
-		mfaSecretRepository:       mfaSecretRepository,
+		session:                session,
+		authenticationService:  authenticationService,
+		mfaRecoveryCodeService: mfaRecoveryCodeService,
+		config:                 config,
 	}
 }

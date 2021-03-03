@@ -4,13 +4,13 @@ import (
 	"context"
 	"crypto/rand"
 
+	s "github.com/nori-io/interfaces/nori/session"
+
 	"github.com/nori-plugins/authentication/internal/domain/repository"
 
 	service2 "github.com/nori-plugins/authentication/internal/domain/service"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
-
-	s "github.com/nori-io/interfaces/nori/session"
 )
 
 type AuthenticationService struct {
@@ -40,7 +40,7 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service2.SignU
 	return user, nil
 }
 
-func (srv *AuthenticationService) SignIn(ctx context.Context, data serv.SignInData) (*entity.Session, error) {
+func (srv *AuthenticationService) SignIn(ctx context.Context, data service2.SignInData) (*entity.Session, error) {
 	if err := data.Validate(); err != nil {
 		return nil, err
 	}
@@ -66,37 +66,6 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data serv.SignInDa
 func (srv *AuthenticationService) SignOut(ctx context.Context, data *entity.Session) error {
 	err := srv.session.Delete([]byte(data.SessionKey))
 	return err
-}
-
-func (srv *AuthenticationService) PutSecret(
-	ctx context.Context, data *serv.SecretData, session entity.Session) (
-	login string, issuer string, err error) {
-	if err := data.Validate(); err != nil {
-		return "", "", err
-	}
-
-	var mfaSecret *entity.MfaSecret
-
-	mfaSecret = &entity.MfaSecret{
-		UserID: session.UserID,
-		Secret: data.Secret,
-	}
-
-	if err := srv.mfaSecretRepository.Create(ctx, mfaSecret); err != nil {
-		return "", "", err
-	}
-
-	userData, err := srv.userRepository.Get(ctx, session.UserID)
-	if err != nil {
-		return "", "", err
-	}
-
-	if userData.Email != "" {
-		login = userData.Email
-	} else {
-		login = userData.PhoneCountryCode + userData.PhoneNumber
-	}
-	return login, srv.config.Issuer, nil
 }
 
 func (srv *AuthenticationService) getToken() ([]byte, error) {

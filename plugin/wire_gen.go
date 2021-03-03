@@ -13,10 +13,11 @@ import (
 	"github.com/nori-io/interfaces/nori/session"
 	"github.com/nori-plugins/authentication/internal/handler/http"
 	"github.com/nori-plugins/authentication/internal/handler/http/authentication"
-	mfa_recovery_code2 "github.com/nori-plugins/authentication/internal/handler/http/mfa_recovery_code"
+	mfa_recovery_code3 "github.com/nori-plugins/authentication/internal/handler/http/mfa_recovery_code"
+	"github.com/nori-plugins/authentication/internal/repository/mfa_recovery_code"
 	"github.com/nori-plugins/authentication/internal/repository/user"
 	"github.com/nori-plugins/authentication/internal/service/auth"
-	"github.com/nori-plugins/authentication/internal/service/mfa_recovery_code"
+	mfa_recovery_code2 "github.com/nori-plugins/authentication/internal/service/mfa_recovery_code"
 )
 
 // Injectors from wire.go:
@@ -32,9 +33,10 @@ func Initialize(registry2 registry.Registry, urlPrefix string) (*http.Handler, e
 	}
 	userRepository := user.New(db)
 	authenticationService := auth.New(userRepository)
-	mfaRecoveryCodeService := mfa_recovery_code.New()
+	mfaRecoveryCodeRepository := mfa_recovery_code.New(db)
+	mfaRecoveryCodeService := mfa_recovery_code2.New(mfaRecoveryCodeRepository)
 	authenticationHandler := authentication.New(authenticationService)
-	mfaRecoveryCodeHandler := mfa_recovery_code2.New(mfaRecoveryCodeService)
+	mfaRecoveryCodeHandler := mfa_recovery_code3.New(mfaRecoveryCodeService)
 	handler := &http.Handler{
 		R:                      httpHttp,
 		AuthenticationService:  authenticationService,
@@ -48,6 +50,6 @@ func Initialize(registry2 registry.Registry, urlPrefix string) (*http.Handler, e
 
 // wire.go:
 
-var set1 = wire.NewSet(pg.GetGorm, session.GetSession, user.New, auth.New, mfa_recovery_code.New, authentication.New, mfa_recovery_code2.New, wire.Struct(new(http.Handler), "R", "AuthenticationService",
+var set1 = wire.NewSet(pg.GetGorm, mfa_recovery_code.New, session.GetSession, user.New, auth.New, mfa_recovery_code2.New, authentication.New, mfa_recovery_code3.New, wire.Struct(new(http.Handler), "R", "AuthenticationService",
 	"MfaRecoveryCodeService", "UrlPrefix", "AuthenticationHandler", "MfaRecoveryCodeHandler"), http2.GetHttp,
 )

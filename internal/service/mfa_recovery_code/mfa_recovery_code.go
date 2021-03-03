@@ -3,16 +3,19 @@ package mfa_recovery_code
 import (
 	"context"
 
+	"github.com/nori-plugins/authentication/internal/domain/repository"
+
 	service2 "github.com/nori-plugins/authentication/internal/domain/service"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
 type MfaRecoveryCodeService struct {
+	mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository
 }
 
-func New() service2.MfaRecoveryCodeService {
-	return &MfaRecoveryCodeService{}
+func New(mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository) service2.MfaRecoveryCodeService {
+	return &MfaRecoveryCodeService{mfaRecoveryCodeRepository: mfaRecoveryCodeRepository}
 }
 
 func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data *entity.Session) ([]entity.MfaRecoveryCode, error) {

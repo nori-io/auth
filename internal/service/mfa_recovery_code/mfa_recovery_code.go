@@ -3,6 +3,8 @@ package mfa_recovery_code
 import (
 	"context"
 
+	"github.com/nori-plugins/authentication/internal/domain/helper/mfa_recovery_codes"
+
 	"github.com/nori-plugins/authentication/internal/domain/repository"
 
 	service2 "github.com/nori-plugins/authentication/internal/domain/service"
@@ -12,6 +14,7 @@ import (
 
 type MfaRecoveryCodeService struct {
 	mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository
+	mfaRecoveryCodeHelper     mfa_recovery_codes.MfaRecoveryCodesHelper
 	config                    Config
 }
 
@@ -19,9 +22,10 @@ type Config struct {
 	MfaRecoveryCodeCount int
 }
 
-func New(mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository, config Config) service2.MfaRecoveryCodeService {
+func New(mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository, mfaRecoveryCodeHelper mfa_recovery_codes.MfaRecoveryCodesHelper, config Config) service2.MfaRecoveryCodeService {
 	return &MfaRecoveryCodeService{
 		mfaRecoveryCodeRepository: mfaRecoveryCodeRepository,
+		mfaRecoveryCodeHelper:     mfaRecoveryCodeHelper,
 		config:                    config,
 	}
 }
@@ -32,6 +36,7 @@ func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data
 	//@todo read symbol sequence from config
 	//@todo generating of specify sequence
 	//@todo нужна ли максимальная длина, или указать всё в паттерне?
+
 	err = srv.mfaRecoveryCodeRepository.Create(ctx, data.UserID, mfaRecoveryCode)
 
 	return nil, nil

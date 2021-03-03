@@ -14,6 +14,7 @@ import (
 	"github.com/nori-plugins/authentication/internal/handler/http"
 	"github.com/nori-plugins/authentication/internal/handler/http/authentication"
 	mfa_recovery_code3 "github.com/nori-plugins/authentication/internal/handler/http/mfa_recovery_code"
+	"github.com/nori-plugins/authentication/internal/helper/mfa_recovery_codes"
 	"github.com/nori-plugins/authentication/internal/repository/mfa_recovery_code"
 	"github.com/nori-plugins/authentication/internal/repository/user"
 	"github.com/nori-plugins/authentication/internal/service/auth"
@@ -34,10 +35,11 @@ func Initialize(registry2 registry.Registry, urlPrefix string, mfaRecoveryCodeCo
 	userRepository := user.New(db)
 	authenticationService := auth.New(userRepository)
 	mfaRecoveryCodeRepository := mfa_recovery_code.New(db)
+	mfaRecoveryCodesHelper := mfa_recovery_codes.New()
 	config := mfa_recovery_code2.Config{
 		MfaRecoveryCodeCount: mfaRecoveryCodeCount,
 	}
-	mfaRecoveryCodeService := mfa_recovery_code2.New(mfaRecoveryCodeRepository, config)
+	mfaRecoveryCodeService := mfa_recovery_code2.New(mfaRecoveryCodeRepository, mfaRecoveryCodesHelper, config)
 	authenticationHandler := authentication.New(authenticationService)
 	mfaRecoveryCodeHandler := mfa_recovery_code3.New(mfaRecoveryCodeService)
 	handler := &http.Handler{
@@ -53,6 +55,6 @@ func Initialize(registry2 registry.Registry, urlPrefix string, mfaRecoveryCodeCo
 
 // wire.go:
 
-var set1 = wire.NewSet(pg.GetGorm, mfa_recovery_code.New, session.GetSession, user.New, auth.New, mfa_recovery_code2.New, wire.Struct(new(mfa_recovery_code2.Config), "MfaRecoveryCodeCount"), authentication.New, mfa_recovery_code3.New, wire.Struct(new(http.Handler), "R", "AuthenticationService",
+var set1 = wire.NewSet(pg.GetGorm, mfa_recovery_code.New, mfa_recovery_codes.New, session.GetSession, user.New, auth.New, mfa_recovery_code2.New, wire.Struct(new(mfa_recovery_code2.Config), "MfaRecoveryCodeCount"), authentication.New, mfa_recovery_code3.New, wire.Struct(new(http.Handler), "R", "AuthenticationService",
 	"MfaRecoveryCodeService", "UrlPrefix", "AuthenticationHandler", "MfaRecoveryCodeHandler"), http2.GetHttp,
 )

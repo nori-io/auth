@@ -10,10 +10,6 @@ type Service struct {
 	session                s.Session
 	authenticationService  service.AuthenticationService
 	mfaRecoveryCodeService service.MfaRecoveryCodeService
-	config                 config
-}
-
-type config struct {
 }
 
 func New(session s.Session,
@@ -24,6 +20,5 @@ func New(session s.Session,
 		session:                session,
 		authenticationService:  authenticationService,
 		mfaRecoveryCodeService: mfaRecoveryCodeService,
-		config:                 config{},
 	}
 }

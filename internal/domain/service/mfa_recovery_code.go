@@ -7,5 +7,5 @@ import (
 )
 
 type MfaRecoveryCodeService interface {
-	GetMfaRecoveryCodes(ctx context.Context, data *entity.Session) error
+	GetMfaRecoveryCodes(ctx context.Context, data *entity.Session) ([]entity.MfaRecoveryCode, error)
 }

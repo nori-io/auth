@@ -26,7 +26,12 @@ func Initialize(registry2 registry.Registry, urlPrefix string) (*http.Handler, e
 	if err != nil {
 		return nil, err
 	}
-	authenticationService := auth.New()
+	db, err := pg.GetGorm(registry2)
+	if err != nil {
+		return nil, err
+	}
+	userRepository := user.New(db)
+	authenticationService := auth.New(userRepository)
 	mfaRecoveryCodeService := mfa_recovery_code.New()
 	authenticationHandler := authentication.New(authenticationService)
 	mfaRecoveryCodeHandler := mfa_recovery_code2.New(mfaRecoveryCodeService)

@@ -3,25 +3,19 @@ package mfa_recovery_code
 import (
 	"context"
 
-	s "github.com/nori-io/interfaces/nori/session"
-	"github.com/nori-plugins/authentication/internal/domain/repository"
+	service2 "github.com/nori-plugins/authentication/internal/domain/service"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
-type service struct {
-	session                   s.Session
-	userRepository            repository.UserRepository
-	mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository
-	mfaSecretRepository       repository.MfaSecretRepository
-	config                    config
+type MfaRecoveryCodeService struct {
 }
 
-type config struct {
-	Issuer string
+func New() service2.MfaRecoveryCodeService {
+	return &MfaRecoveryCodeService{}
 }
 
-func (srv *service) GetMfaRecoveryCodes(ctx context.Context, data *entity.Session) ([]entity.MfaRecoveryCode, error) {
+func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data *entity.Session) ([]entity.MfaRecoveryCode, error) {
 	//@todo read count of symbols from config
 	//@todo read pattenn from config
 	//@todo read symbol sequence from config

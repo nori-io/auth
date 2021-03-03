@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 
 	"github.com/nori-plugins/authentication/internal/domain/repository"
+
 	service2 "github.com/nori-plugins/authentication/internal/domain/service"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
@@ -12,19 +13,15 @@ import (
 	s "github.com/nori-io/interfaces/nori/session"
 )
 
-type service struct {
-	session                   s.Session
-	userRepository            repository.UserRepository
-	mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository
-	mfaSecretRepository       repository.MfaSecretRepository
-	config                    config
+type AuthenticationService struct {
+	userRepository repository.UserRepository
 }
 
-type config struct {
-	Issuer string
+func New(userRepository repository.UserRepository) service2.AuthenticationService {
+	return &AuthenticationService{userRepository: userRepository}
 }
 
-func (srv service) SignUp(ctx context.Context, data service2.SignUpData) (*entity.User, error) {
+func (srv AuthenticationService) SignUp(ctx context.Context, data service2.SignUpData) (*entity.User, error) {
 	if err := data.Validate(); err != nil {
 		return nil, err
 	}
@@ -43,7 +40,7 @@ func (srv service) SignUp(ctx context.Context, data service2.SignUpData) (*entit
 	return user, nil
 }
 
-func (srv *service) SignIn(ctx context.Context, data serv.SignInData) (*entity.Session, error) {
+func (srv *AuthenticationService) SignIn(ctx context.Context, data serv.SignInData) (*entity.Session, error) {
 	if err := data.Validate(); err != nil {
 		return nil, err
 	}
@@ -66,12 +63,12 @@ func (srv *service) SignIn(ctx context.Context, data serv.SignInData) (*entity.S
 	return &entity.Session{SessionKey: sid}, nil
 }
 
-func (srv *service) SignOut(ctx context.Context, data *entity.Session) error {
+func (srv *AuthenticationService) SignOut(ctx context.Context, data *entity.Session) error {
 	err := srv.session.Delete([]byte(data.SessionKey))
 	return err
 }
 
-func (srv *service) PutSecret(
+func (srv *AuthenticationService) PutSecret(
 	ctx context.Context, data *serv.SecretData, session entity.Session) (
 	login string, issuer string, err error) {
 	if err := data.Validate(); err != nil {
@@ -102,7 +99,7 @@ func (srv *service) PutSecret(
 	return login, srv.config.Issuer, nil
 }
 
-func (srv *service) getToken() ([]byte, error) {
+func (srv *AuthenticationService) getToken() ([]byte, error) {
 	sid := make([]byte, 32)
 
 	if _, err := rand.Read(sid); err != nil {

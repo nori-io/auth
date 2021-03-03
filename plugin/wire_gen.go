@@ -22,7 +22,7 @@ import (
 
 // Injectors from wire.go:
 
-func Initialize(registry2 registry.Registry, urlPrefix string) (*http.Handler, error) {
+func Initialize(registry2 registry.Registry, urlPrefix string, mfaRecoveryCodeCount int) (*http.Handler, error) {
 	httpHttp, err := http2.GetHttp(registry2)
 	if err != nil {
 		return nil, err
@@ -34,7 +34,10 @@ func Initialize(registry2 registry.Registry, urlPrefix string) (*http.Handler, e
 	userRepository := user.New(db)
 	authenticationService := auth.New(userRepository)
 	mfaRecoveryCodeRepository := mfa_recovery_code.New(db)
-	mfaRecoveryCodeService := mfa_recovery_code2.New(mfaRecoveryCodeRepository)
+	config := mfa_recovery_code2.Config{
+		MfaRecoveryCodeCount: mfaRecoveryCodeCount,
+	}
+	mfaRecoveryCodeService := mfa_recovery_code2.New(mfaRecoveryCodeRepository, config)
 	authenticationHandler := authentication.New(authenticationService)
 	mfaRecoveryCodeHandler := mfa_recovery_code3.New(mfaRecoveryCodeService)
 	handler := &http.Handler{
@@ -50,6 +53,6 @@ func Initialize(registry2 registry.Registry, urlPrefix string) (*http.Handler, e
 
 // wire.go:
 
-var set1 = wire.NewSet(pg.GetGorm, mfa_recovery_code.New, session.GetSession, user.New, auth.New, mfa_recovery_code2.New, authentication.New, mfa_recovery_code3.New, wire.Struct(new(http.Handler), "R", "AuthenticationService",
+var set1 = wire.NewSet(pg.GetGorm, mfa_recovery_code.New, session.GetSession, user.New, auth.New, mfa_recovery_code2.New, wire.Struct(new(mfa_recovery_code2.Config), "MfaRecoveryCodeCount"), authentication.New, mfa_recovery_code3.New, wire.Struct(new(http.Handler), "R", "AuthenticationService",
 	"MfaRecoveryCodeService", "UrlPrefix", "AuthenticationHandler", "MfaRecoveryCodeHandler"), http2.GetHttp,
 )

@@ -28,10 +28,10 @@ func New() p.Plugin {
 
 type plugin struct {
 	instance service.AuthenticationService
-	config   conf
+	config   Conf
 }
 
-type conf struct {
+type Conf struct {
 	urlPrefix                config.String
 	MfaRecoveryCodePattern   config.String
 	MfaRecoveryCodeSymbols   config.String
@@ -68,7 +68,7 @@ func (p plugin) Instance() interface{} {
 }
 
 func (p plugin) Init(ctx context.Context, config config.Config, log logger.FieldLogger) error {
-	p.config = conf{
+	p.config = Conf{
 		urlPrefix:                config.String("urlPrefix", "url prefix for all handlers"),
 		MfaRecoveryCodePattern:   config.String("mfaRecoveryCodePattern", "pattern for mfa recovery codes"),
 		MfaRecoveryCodeSymbols:   config.String("mfaRecoveryCodeSymbols", "symbols that use when mfa recovery code generating"),
@@ -81,7 +81,7 @@ func (p plugin) Init(ctx context.Context, config config.Config, log logger.Field
 }
 
 func (p plugin) Start(ctx context.Context, registry registry.Registry) error {
-	_, err := Initialize(registry, p.config.urlPrefix())
+	_, err := Initialize(registry, p.config.urlPrefix(), p.config.MfaRecoveryCodeCount())
 	return err
 }
 

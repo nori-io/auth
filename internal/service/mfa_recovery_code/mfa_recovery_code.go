@@ -12,14 +12,14 @@ import (
 
 type MfaRecoveryCodeService struct {
 	mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository
-	config                    config
+	config                    Config
 }
 
-type config struct {
+type Config struct {
 	MfaRecoveryCodeCount int
 }
 
-func New(mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository, config config) service2.MfaRecoveryCodeService {
+func New(mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository, config Config) service2.MfaRecoveryCodeService {
 	return &MfaRecoveryCodeService{
 		mfaRecoveryCodeRepository: mfaRecoveryCodeRepository,
 		config:                    config,

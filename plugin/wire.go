@@ -24,6 +24,7 @@ var set1 = wire.NewSet(
 	user.New,
 	servAuth.New,
 	servMfaRecoveryCode.New,
+	wire.Struct(new(servMfaRecoveryCode.Config), "MfaRecoveryCodeCount"),
 	authentication.New,
 	mfa_recovery_code.New,
 	wire.Struct(new(httpHandler.Handler), "R", "AuthenticationService",
@@ -31,7 +32,7 @@ var set1 = wire.NewSet(
 	noriHttp.GetHttp,
 )
 
-func Initialize(registry registry.Registry, urlPrefix string) (*httpHandler.Handler, error) {
+func Initialize(registry registry.Registry, urlPrefix string, mfaRecoveryCodeCount int) (*httpHandler.Handler, error) {
 	wire.Build(set1)
 	return &httpHandler.Handler{}, nil
 }

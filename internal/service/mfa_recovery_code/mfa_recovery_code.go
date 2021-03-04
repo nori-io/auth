@@ -4,32 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/nori-plugins/authentication/internal/domain/helper/mfa_recovery_codes"
-
-	"github.com/nori-plugins/authentication/internal/domain/repository"
-
-	service2 "github.com/nori-plugins/authentication/internal/domain/service"
-
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
-
-type MfaRecoveryCodeService struct {
-	mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository
-	mfaRecoveryCodeHelper     mfa_recovery_codes.MfaRecoveryCodesHelper
-	config                    Config
-}
-
-type Config struct {
-	MfaRecoveryCodeCount int
-}
-
-func New(mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository, mfaRecoveryCodeHelper mfa_recovery_codes.MfaRecoveryCodesHelper, config Config) service2.MfaRecoveryCodeService {
-	return &MfaRecoveryCodeService{
-		mfaRecoveryCodeRepository: mfaRecoveryCodeRepository,
-		mfaRecoveryCodeHelper:     mfaRecoveryCodeHelper,
-		config:                    config,
-	}
-}
 
 func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data *entity.Session) ([]entity.MfaRecoveryCode, error) {
 	//@todo read count of symbols from config

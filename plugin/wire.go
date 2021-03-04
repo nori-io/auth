@@ -26,6 +26,7 @@ var set1 = wire.NewSet(
 	user.New,
 	servAuth.New,
 	servMfaRecoveryCode.New,
+	wire.Struct(new(servMfaRecoveryCode.ServiceParams), "MfaRecoveryCodeRepository", "MfaRecoveryCodeHelper", "Config"),
 	wire.Struct(new(servMfaRecoveryCode.Config), "MfaRecoveryCodeCount"),
 	authentication.New,
 	mfa_recovery_code.New,

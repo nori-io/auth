@@ -23,7 +23,7 @@ import (
 
 // Injectors from wire.go:
 
-func Initialize(registry2 registry.Registry, urlPrefix string, mfaRecoveryCodeCount int) (*http.Handler, error) {
+func Initialize(registry2 registry.Registry, config Conf) (*http.Handler, error) {
 	httpHttp, err := http2.GetHttp(registry2)
 	if err != nil {
 		return nil, err
@@ -36,32 +36,37 @@ func Initialize(registry2 registry.Registry, urlPrefix string, mfaRecoveryCodeCo
 	authenticationService := auth.New(userRepository)
 	mfaRecoveryCodeRepository := mfa_recovery_code.New(db)
 	mfaRecoveryCodesHelper := mfa_recovery_codes.New()
-	config := mfa_recovery_code2.Config{
-		MfaRecoveryCodeCount: mfaRecoveryCodeCount,
+	int2 := _wireIntValue
+	mfa_recovery_codeConfig := mfa_recovery_code2.Config{
+		MfaRecoveryCodeCount: int2,
 	}
 	serviceParams := mfa_recovery_code2.ServiceParams{
 		MfaRecoveryCodeRepository: mfaRecoveryCodeRepository,
 		MfaRecoveryCodeHelper:     mfaRecoveryCodesHelper,
-		Config:                    config,
+		Config:                    mfa_recovery_codeConfig,
 	}
 	mfaRecoveryCodeService := mfa_recovery_code2.New(serviceParams)
+	string2 := _wireStringValue
 	authenticationHandler := authentication.New(authenticationService)
 	mfaRecoveryCodeHandler := mfa_recovery_code3.New(mfaRecoveryCodeService)
 	handler := &http.Handler{
 		R:                      httpHttp,
 		AuthenticationService:  authenticationService,
 		MfaRecoveryCodeService: mfaRecoveryCodeService,
-		UrlPrefix:              urlPrefix,
+		UrlPrefix:              string2,
 		AuthenticationHandler:  authenticationHandler,
 		MfaRecoveryCodeHandler: mfaRecoveryCodeHandler,
 	}
 	return handler, nil
 }
 
+var (
+	_wireIntValue    = 42
+	_wireStringValue = "urlprefix"
+)
+
 // wire.go:
 
-var set1 = wire.NewSet(pg.GetGorm, mfa_recovery_code.New, mfa_recovery_codes.New, session.GetSession, user.New, auth.New, mfa_recovery_code2.New)
-
-var set2 = wire.NewSet(wire.Struct(new(mfa_recovery_code2.ServiceParams), "MfaRecoveryCodeRepository", "MfaRecoveryCodeHelper", "Config"), wire.Struct(new(mfa_recovery_code2.Config), "MfaRecoveryCodeCount"), authentication.New, mfa_recovery_code3.New, wire.Struct(new(http.Handler), "R", "AuthenticationService",
+var set1 = wire.NewSet(wire.Struct(new(mfa_recovery_code2.Config), "MfaRecoveryCodeCount"), wire.Struct(new(mfa_recovery_code2.ServiceParams), "MfaRecoveryCodeRepository", "MfaRecoveryCodeHelper", "Config"), pg.GetGorm, mfa_recovery_code.New, mfa_recovery_codes.New, session.GetSession, user.New, auth.New, mfa_recovery_code2.New, authentication.New, mfa_recovery_code3.New, wire.Struct(new(http.Handler), "R", "AuthenticationService",
 	"MfaRecoveryCodeService", "UrlPrefix", "AuthenticationHandler", "MfaRecoveryCodeHandler"), http2.GetHttp,
 )

@@ -1,6 +1,7 @@
 package mfa_recovery_code
 
 import (
+	"github.com/nori-plugins/authentication/internal/config"
 	"github.com/nori-plugins/authentication/internal/domain/helper/mfa_recovery_codes"
 	"github.com/nori-plugins/authentication/internal/domain/repository"
 	"github.com/nori-plugins/authentication/internal/domain/service"
@@ -9,23 +10,19 @@ import (
 type MfaRecoveryCodeService struct {
 	mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository
 	mfaRecoveryCodeHelper     mfa_recovery_codes.MfaRecoveryCodesHelper
-	config                    Config
-}
-
-type Config struct {
-	MfaRecoveryCodeCount int
+	Config                    config.Config
 }
 
 type ServiceParams struct {
 	MfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository
 	MfaRecoveryCodeHelper     mfa_recovery_codes.MfaRecoveryCodesHelper
-	Config                    Config
+	Config                    config.Config
 }
 
 func New(params ServiceParams) service.MfaRecoveryCodeService {
 	return &MfaRecoveryCodeService{
 		mfaRecoveryCodeRepository: params.MfaRecoveryCodeRepository,
 		mfaRecoveryCodeHelper:     params.MfaRecoveryCodeHelper,
-		config:                    params.Config,
+		Config:                    params.Config,
 	}
 }

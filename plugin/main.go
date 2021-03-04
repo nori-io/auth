@@ -20,6 +20,7 @@ import (
 	m "github.com/nori-io/common/v4/pkg/meta"
 
 	noriGorm "github.com/nori-io/interfaces/database/orm/gorm"
+	conf "github.com/nori-plugins/authentication/internal/config"
 )
 
 func New() p.Plugin {
@@ -28,16 +29,7 @@ func New() p.Plugin {
 
 type plugin struct {
 	instance service.AuthenticationService
-	config   Conf
-}
-
-type Conf struct {
-	urlPrefix                config.String
-	MfaRecoveryCodePattern   config.String
-	MfaRecoveryCodeSymbols   config.String
-	MfaRecoveryCodeMaxLength config.Int
-	MfaRecoveryCodeCount     config.Int
-	Issuer                   config.String
+	config   conf.Config
 }
 
 func (p plugin) Meta() meta.Meta {
@@ -68,8 +60,8 @@ func (p plugin) Instance() interface{} {
 }
 
 func (p plugin) Init(ctx context.Context, config config.Config, log logger.FieldLogger) error {
-	p.config = Conf{
-		urlPrefix:                config.String("urlprefix", "url prefix for all handlers"),
+	p.config = conf.Config{
+		UrlPrefix:                config.String("urlprefix", "url prefix for all handlers"),
 		MfaRecoveryCodePattern:   config.String("mfa.recoverycode.pattern", "pattern for mfa recovery codes"),
 		MfaRecoveryCodeSymbols:   config.String("mfa.recoverycode.symbols", "symbols that use when mfa recovery code generating"),
 		MfaRecoveryCodeMaxLength: config.Int("mfa.recoverycode.maxlength", "max length of mfaRecoveryCode"),
@@ -81,7 +73,8 @@ func (p plugin) Init(ctx context.Context, config config.Config, log logger.Field
 }
 
 func (p plugin) Start(ctx context.Context, registry registry.Registry) error {
-	_, err := Initialize(registry, p.config.urlPrefix(), p.config.MfaRecoveryCodeCount())
+	config := p.config
+	_, err := Initialize(registry, config)
 	return err
 }
 

@@ -8,6 +8,7 @@ import (
 	noriGorm "github.com/nori-io/interfaces/database/orm/gorm"
 	noriHttp "github.com/nori-io/interfaces/nori/http"
 	"github.com/nori-io/interfaces/nori/session"
+	"github.com/nori-plugins/authentication/internal/config"
 	httpHandler "github.com/nori-plugins/authentication/internal/handler/http"
 	"github.com/nori-plugins/authentication/internal/handler/http/authentication"
 	"github.com/nori-plugins/authentication/internal/handler/http/mfa_recovery_code"
@@ -19,6 +20,8 @@ import (
 )
 
 var set1 = wire.NewSet(
+
+	wire.Struct(new(servMfaRecoveryCode.ServiceParams), "MfaRecoveryCodeRepository", "MfaRecoveryCodeHelper", "Config"),
 	noriGorm.GetGorm,
 	mfaRecoveryCodeRepository.New,
 	mfaRecoveryCodeHelper.New,
@@ -26,18 +29,13 @@ var set1 = wire.NewSet(
 	user.New,
 	servAuth.New,
 	servMfaRecoveryCode.New,
-)
-
-var set2 = wire.NewSet(
-	wire.Struct(new(servMfaRecoveryCode.ServiceParams), "MfaRecoveryCodeRepository", "MfaRecoveryCodeHelper", "Config"),
-	wire.Struct(new(servMfaRecoveryCode.Config), "MfaRecoveryCodeCount"),
 	authentication.New,
 	mfa_recovery_code.New,
 	wire.Struct(new(httpHandler.Handler), "R", "AuthenticationService",
 		"MfaRecoveryCodeService", "UrlPrefix", "AuthenticationHandler", "MfaRecoveryCodeHandler"),
 	noriHttp.GetHttp)
 
-func Initialize(registry registry.Registry, urlPrefix string, mfaRecoveryCodeCount int) (*httpHandler.Handler, error) {
-	wire.Build(set1, set2)
+func Initialize(registry registry.Registry, config config.Config) (*httpHandler.Handler, error) {
+	wire.Build(set1)
 	return &httpHandler.Handler{}, nil
 }

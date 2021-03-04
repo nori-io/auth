@@ -2,6 +2,7 @@ package mfa_recovery_code
 
 import (
 	"context"
+	"time"
 
 	"github.com/nori-plugins/authentication/internal/domain/helper/mfa_recovery_codes"
 
@@ -36,10 +37,20 @@ func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data
 	//@todo read symbol sequence from config
 	//@todo generating of specify sequence
 	//@todo нужна ли максимальная длина, или указать всё в паттерне?
-	var mfaRecoveryCodes []string
+	var mfaRecoveryCodes []entity.MfaRecoveryCode
 	mfa_recovery_codes, err := srv.mfaRecoveryCodeHelper.Generate(srv.config.MfaRecoveryCodeCount)
-
-	err = srv.mfaRecoveryCodeRepository.Create(ctx, data.UserID, mfaRecoveryCodes)
+	if err != nil {
+		return nil, err
+	}
+	for _, v := range mfa_recovery_codes {
+		mfaRecoveryCodes = append(mfaRecoveryCodes, entity.MfaRecoveryCode{
+			ID:        0,
+			UserID:    data.UserID,
+			Code:      v,
+			CreatedAt: time.Now(),
+		})
+	}
+	err = srv.mfaRecoveryCodeRepository.Create(ctx, mfaRecoveryCodes)
 
 	return nil, nil
 }

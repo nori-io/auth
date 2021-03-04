@@ -8,5 +8,5 @@ import (
 
 type MfaRecoveryCodeRepository interface {
 	Use(ctx context.Context, e *entity.MfaRecoveryCode) error
-	Create(ctx context.Context, userID uint64, mfaRecoveryCode []entity.MfaRecoveryCode) error
+	Create(ctx context.Context, mfaRecoveryCode []entity.MfaRecoveryCode) error
 }

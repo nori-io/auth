@@ -22,13 +22,13 @@ func (u *MfaRecoveryCode) Convert() *entity.MfaRecoveryCode {
 	}
 }
 
-func NewModel(e *entity.MfaRecoveryCode) (*MfaRecoveryCode, error) {
+func NewModel(e *entity.MfaRecoveryCode) *MfaRecoveryCode {
 	return &MfaRecoveryCode{
 		ID:        e.ID,
 		UserID:    e.UserID,
 		Code:      e.Code,
 		CreatedAt: e.CreatedAt,
-	}, nil
+	}
 }
 
 // TableName

@@ -8,21 +8,23 @@ package main
 import (
 	"github.com/google/wire"
 	"github.com/nori-io/common/v4/pkg/domain/registry"
-	pg "github.com/nori-io/interfaces/database/orm/gorm"
+	"github.com/nori-io/interfaces/database/orm/gorm"
 	http2 "github.com/nori-io/interfaces/nori/http"
 	"github.com/nori-io/interfaces/nori/session"
+	"github.com/nori-plugins/authentication/internal/config"
 	"github.com/nori-plugins/authentication/internal/handler/http"
 	"github.com/nori-plugins/authentication/internal/handler/http/authentication"
-	mfa_recovery_code3 "github.com/nori-plugins/authentication/internal/handler/http/mfa_recovery_code"
+	mfa_recovery_code4 "github.com/nori-plugins/authentication/internal/handler/http/mfa_recovery_code"
+	mfa_recovery_code2 "github.com/nori-plugins/authentication/internal/helper/mfa_recovery_code"
 	"github.com/nori-plugins/authentication/internal/repository/mfa_recovery_code"
 	"github.com/nori-plugins/authentication/internal/repository/user"
 	"github.com/nori-plugins/authentication/internal/service/auth"
-	mfa_recovery_code2 "github.com/nori-plugins/authentication/internal/service/mfa_recovery_code"
+	mfa_recovery_code3 "github.com/nori-plugins/authentication/internal/service/mfa_recovery_code"
 )
 
 // Injectors from wire.go:
 
-func Initialize(registry2 registry.Registry, config Conf) (*http.Handler, error) {
+func Initialize(registry2 registry.Registry, config2 config.Config) (*http.Handler, error) {
 	httpHttp, err := http2.GetHttp(registry2)
 	if err != nil {
 		return nil, err
@@ -32,40 +34,36 @@ func Initialize(registry2 registry.Registry, config Conf) (*http.Handler, error)
 		return nil, err
 	}
 	userRepository := user.New(db)
-	authenticationService := auth.New(userRepository)
-	mfaRecoveryCodeRepository := mfa_recovery_code.New(db)
-	mfaRecoveryCodesHelper := mfa_recovery_code.New()
-	int2 := _wireIntValue
-	mfa_recovery_codeConfig := mfa_recovery_code2.Config{
-		MfaRecoveryCodeCount: int2,
+	sessionSession, err := session.GetSession(registry2)
+	if err != nil {
+		return nil, err
 	}
-	serviceParams := mfa_recovery_code2.ServiceParams{
+	params := auth.Params{
+		UserRepository: userRepository,
+		Session:        sessionSession,
+	}
+	authenticationService := auth.New(params)
+	mfaRecoveryCodeRepository := mfa_recovery_code.New(db)
+	mfaRecoveryCodesHelper := mfa_recovery_code2.New()
+	mfa_recovery_codeParams := mfa_recovery_code3.Params{
 		MfaRecoveryCodeRepository: mfaRecoveryCodeRepository,
 		MfaRecoveryCodeHelper:     mfaRecoveryCodesHelper,
-		Config:                    mfa_recovery_codeConfig,
+		Config:                    config2,
 	}
-	mfaRecoveryCodeService := mfa_recovery_code2.New(serviceParams)
-	string2 := _wireStringValue
+	mfaRecoveryCodeService := mfa_recovery_code3.New(mfa_recovery_codeParams)
 	authenticationHandler := authentication.New(authenticationService)
-	mfaRecoveryCodeHandler := mfa_recovery_code3.New(mfaRecoveryCodeService)
+	mfaRecoveryCodeHandler := mfa_recovery_code4.New(mfaRecoveryCodeService)
 	handler := &http.Handler{
 		R:                      httpHttp,
 		AuthenticationService:  authenticationService,
 		MfaRecoveryCodeService: mfaRecoveryCodeService,
-		UrlPrefix:              string2,
+		Config:                 config2,
 		AuthenticationHandler:  authenticationHandler,
 		MfaRecoveryCodeHandler: mfaRecoveryCodeHandler,
 	}
 	return handler, nil
 }
 
-var (
-	_wireIntValue    = 42
-	_wireStringValue = "urlprefix"
-)
-
 // wire.go:
 
-var set1 = wire.NewSet(wire.Struct(new(mfa_recovery_code2.Config), "MfaRecoveryCodeCount"), wire.Struct(new(mfa_recovery_code2.ServiceParams), "MfaRecoveryCodeRepository", "MfaRecoveryCodeHelper", "Config"), pg.GetGorm, mfa_recovery_code.New, mfa_recovery_code.New, session.GetSession, user.New, auth.New, mfa_recovery_code2.New, authentication.New, mfa_recovery_code3.New, wire.Struct(new(http.Handler), "R", "AuthenticationService",
-	"MfaRecoveryCodeService", "UrlPrefix", "AuthenticationHandler", "MfaRecoveryCodeHandler"), http2.GetHttp,
-)
+var set1 = wire.NewSet(pg.GetGorm, http2.GetHttp)

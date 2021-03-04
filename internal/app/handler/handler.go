@@ -9,7 +9,7 @@ import (
 
 var HandlerSet = wire.NewSet(
 	wire.Struct(new(httpHandler.Handler), "R", "AuthenticationService",
-		"MfaRecoveryCodeService", "UrlPrefix", "AuthenticationHandler", "MfaRecoveryCodeHandler"),
+		"MfaRecoveryCodeService", "Config", "AuthenticationHandler", "MfaRecoveryCodeHandler"),
 	authentication.New,
 	mfa_recovery_code.New,
 )

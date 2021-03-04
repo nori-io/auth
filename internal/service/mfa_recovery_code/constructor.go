@@ -13,13 +13,13 @@ type MfaRecoveryCodeService struct {
 	Config                    config.Config
 }
 
-type ServiceParams struct {
+type Params struct {
 	MfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository
 	MfaRecoveryCodeHelper     mfa_recovery_code.MfaRecoveryCodesHelper
 	Config                    config.Config
 }
 
-func New(params ServiceParams) service.MfaRecoveryCodeService {
+func New(params Params) service.MfaRecoveryCodeService {
 	return &MfaRecoveryCodeService{
 		mfaRecoveryCodeRepository: params.MfaRecoveryCodeRepository,
 		mfaRecoveryCodeHelper:     params.MfaRecoveryCodeHelper,

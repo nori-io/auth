@@ -15,10 +15,9 @@ import (
 
 var set1 = wire.NewSet(
 	noriGorm.GetGorm,
-	session.GetSession,
 	noriHttp.GetHttp)
 
 func Initialize(registry registry.Registry, config config.Config) (*httpHandler.Handler, error) {
-	wire.Build(app.AppSet, set1)
+	wire.Build(session.GetSession, app.AppSet, set1)
 	return &httpHandler.Handler{}, nil
 }

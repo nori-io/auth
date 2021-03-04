@@ -20,10 +20,11 @@ type AuthenticationService struct {
 
 type Params struct {
 	UserRepository repository.UserRepository
+	Session        s.Session
 }
 
 func New(params Params) service.AuthenticationService {
-	return &AuthenticationService{UserRepository: params.UserRepository}
+	return &AuthenticationService{UserRepository: params.UserRepository, Session: params.Session}
 }
 
 func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUpData) (*entity.User, error) {
@@ -38,7 +39,7 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 		Password: data.Password,
 	}
 
-	if err := srv.userRepository.Create(ctx, user); err != nil {
+	if err := srv.UserRepository.Create(ctx, user); err != nil {
 		return nil, err
 	}
 

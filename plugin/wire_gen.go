@@ -60,6 +60,8 @@ func Initialize(registry2 registry.Registry, urlPrefix string, mfaRecoveryCodeCo
 
 // wire.go:
 
-var set1 = wire.NewSet(pg.GetGorm, mfa_recovery_code.New, mfa_recovery_codes.New, session.GetSession, user.New, auth.New, mfa_recovery_code2.New, wire.Struct(new(mfa_recovery_code2.ServiceParams), "MfaRecoveryCodeRepository", "MfaRecoveryCodeHelper", "Config"), wire.Struct(new(mfa_recovery_code2.Config), "MfaRecoveryCodeCount"), authentication.New, mfa_recovery_code3.New, wire.Struct(new(http.Handler), "R", "AuthenticationService",
+var set1 = wire.NewSet(pg.GetGorm, mfa_recovery_code.New, mfa_recovery_codes.New, session.GetSession, user.New, auth.New, mfa_recovery_code2.New)
+
+var set2 = wire.NewSet(wire.Struct(new(mfa_recovery_code2.ServiceParams), "MfaRecoveryCodeRepository", "MfaRecoveryCodeHelper", "Config"), wire.Struct(new(mfa_recovery_code2.Config), "MfaRecoveryCodeCount"), authentication.New, mfa_recovery_code3.New, wire.Struct(new(http.Handler), "R", "AuthenticationService",
 	"MfaRecoveryCodeService", "UrlPrefix", "AuthenticationHandler", "MfaRecoveryCodeHandler"), http2.GetHttp,
 )

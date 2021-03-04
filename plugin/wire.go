@@ -26,16 +26,18 @@ var set1 = wire.NewSet(
 	user.New,
 	servAuth.New,
 	servMfaRecoveryCode.New,
+)
+
+var set2 = wire.NewSet(
 	wire.Struct(new(servMfaRecoveryCode.ServiceParams), "MfaRecoveryCodeRepository", "MfaRecoveryCodeHelper", "Config"),
 	wire.Struct(new(servMfaRecoveryCode.Config), "MfaRecoveryCodeCount"),
 	authentication.New,
 	mfa_recovery_code.New,
 	wire.Struct(new(httpHandler.Handler), "R", "AuthenticationService",
 		"MfaRecoveryCodeService", "UrlPrefix", "AuthenticationHandler", "MfaRecoveryCodeHandler"),
-	noriHttp.GetHttp,
-)
+	noriHttp.GetHttp)
 
 func Initialize(registry registry.Registry, urlPrefix string, mfaRecoveryCodeCount int) (*httpHandler.Handler, error) {
-	wire.Build(set1)
+	wire.Build(set1, set2)
 	return &httpHandler.Handler{}, nil
 }

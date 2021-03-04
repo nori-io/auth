@@ -8,13 +8,12 @@ package main
 import (
 	"github.com/google/wire"
 	"github.com/nori-io/common/v4/pkg/domain/registry"
-	"github.com/nori-io/interfaces/database/orm/gorm"
+	pg "github.com/nori-io/interfaces/database/orm/gorm"
 	http2 "github.com/nori-io/interfaces/nori/http"
 	"github.com/nori-io/interfaces/nori/session"
 	"github.com/nori-plugins/authentication/internal/handler/http"
 	"github.com/nori-plugins/authentication/internal/handler/http/authentication"
 	mfa_recovery_code3 "github.com/nori-plugins/authentication/internal/handler/http/mfa_recovery_code"
-	"github.com/nori-plugins/authentication/internal/helper/mfa_recovery_codes"
 	"github.com/nori-plugins/authentication/internal/repository/mfa_recovery_code"
 	"github.com/nori-plugins/authentication/internal/repository/user"
 	"github.com/nori-plugins/authentication/internal/service/auth"
@@ -35,7 +34,7 @@ func Initialize(registry2 registry.Registry, config Conf) (*http.Handler, error)
 	userRepository := user.New(db)
 	authenticationService := auth.New(userRepository)
 	mfaRecoveryCodeRepository := mfa_recovery_code.New(db)
-	mfaRecoveryCodesHelper := mfa_recovery_codes.New()
+	mfaRecoveryCodesHelper := mfa_recovery_code.New()
 	int2 := _wireIntValue
 	mfa_recovery_codeConfig := mfa_recovery_code2.Config{
 		MfaRecoveryCodeCount: int2,
@@ -67,6 +66,6 @@ var (
 
 // wire.go:
 
-var set1 = wire.NewSet(wire.Struct(new(mfa_recovery_code2.Config), "MfaRecoveryCodeCount"), wire.Struct(new(mfa_recovery_code2.ServiceParams), "MfaRecoveryCodeRepository", "MfaRecoveryCodeHelper", "Config"), pg.GetGorm, mfa_recovery_code.New, mfa_recovery_codes.New, session.GetSession, user.New, auth.New, mfa_recovery_code2.New, authentication.New, mfa_recovery_code3.New, wire.Struct(new(http.Handler), "R", "AuthenticationService",
+var set1 = wire.NewSet(wire.Struct(new(mfa_recovery_code2.Config), "MfaRecoveryCodeCount"), wire.Struct(new(mfa_recovery_code2.ServiceParams), "MfaRecoveryCodeRepository", "MfaRecoveryCodeHelper", "Config"), pg.GetGorm, mfa_recovery_code.New, mfa_recovery_code.New, session.GetSession, user.New, auth.New, mfa_recovery_code2.New, authentication.New, mfa_recovery_code3.New, wire.Struct(new(http.Handler), "R", "AuthenticationService",
 	"MfaRecoveryCodeService", "UrlPrefix", "AuthenticationHandler", "MfaRecoveryCodeHandler"), http2.GetHttp,
 )

@@ -1,4 +1,4 @@
-package mfa_recovery_codes
+package mfa_recovery_code
 
 import (
 	"crypto/rand"

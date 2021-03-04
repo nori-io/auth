@@ -8,7 +8,7 @@ import (
 	"github.com/nori-plugins/authentication/internal/repository/user"
 )
 
-var repositorySet = wire.NewSet(
+var RepositorySet = wire.NewSet(
 	user.New,
 	mfa_recovery_code.New,
 	mfa_secret.New,

@@ -10,21 +10,11 @@ import (
 	"github.com/nori-io/interfaces/nori/session"
 	"github.com/nori-plugins/authentication/internal/config"
 	httpHandler "github.com/nori-plugins/authentication/internal/handler/http"
-	"github.com/nori-plugins/authentication/internal/handler/http/authentication"
-	"github.com/nori-plugins/authentication/internal/handler/http/mfa_recovery_code"
-	servAuth "github.com/nori-plugins/authentication/internal/service/auth"
-	servMfaRecoveryCode "github.com/nori-plugins/authentication/internal/service/mfa_recovery_code"
 )
 
 var set1 = wire.NewSet(
-
-	wire.Struct(new(servMfaRecoveryCode.ServiceParams), "MfaRecoveryCodeRepository", "MfaRecoveryCodeHelper", "Config"),
 	noriGorm.GetGorm,
 	session.GetSession,
-	servAuth.New,
-	servMfaRecoveryCode.New,
-	authentication.New,
-	mfa_recovery_code.New,
 	wire.Struct(new(httpHandler.Handler), "R", "AuthenticationService",
 		"MfaRecoveryCodeService", "UrlPrefix", "AuthenticationHandler", "MfaRecoveryCodeHandler"),
 	noriHttp.GetHttp)

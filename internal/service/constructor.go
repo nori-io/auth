@@ -1,24 +1,23 @@
 package service
 
 import (
-	s "github.com/nori-io/interfaces/nori/session"
 	"github.com/nori-plugins/authentication/internal/domain/service"
 	"github.com/nori-plugins/authentication/pkg"
 )
 
 type Service struct {
-	session                s.Session
-	authenticationService  service.AuthenticationService
-	mfaRecoveryCodeService service.MfaRecoveryCodeService
+	AuthenticationService  service.AuthenticationService
+	MfaRecoveryCodeService service.MfaRecoveryCodeService
 }
 
-func New(session s.Session,
-	authenticationService service.AuthenticationService,
-	mfaRecoveryCodeService service.MfaRecoveryCodeService,
-) pkg.Authentication {
+type Params struct {
+	AuthenticationService  service.AuthenticationService
+	MfaRecoveryCodeService service.MfaRecoveryCodeService
+}
+
+func New(params Params) pkg.Authentication {
 	return &Service{
-		session:                session,
-		authenticationService:  authenticationService,
-		mfaRecoveryCodeService: mfaRecoveryCodeService,
+		AuthenticationService:  params.AuthenticationService,
+		MfaRecoveryCodeService: params.MfaRecoveryCodeService,
 	}
 }

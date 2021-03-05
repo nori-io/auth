@@ -6,8 +6,8 @@ import (
 )
 
 type Service struct {
-	AuthenticationService  service.AuthenticationService
-	MfaRecoveryCodeService service.MfaRecoveryCodeService
+	authenticationService  service.AuthenticationService
+	mfaRecoveryCodeService service.MfaRecoveryCodeService
 }
 
 type Params struct {
@@ -17,7 +17,7 @@ type Params struct {
 
 func New(params Params) pkg.Authentication {
 	return &Service{
-		AuthenticationService:  params.AuthenticationService,
-		MfaRecoveryCodeService: params.MfaRecoveryCodeService,
+		authenticationService:  params.AuthenticationService,
+		mfaRecoveryCodeService: params.MfaRecoveryCodeService,
 	}
 }

@@ -54,16 +54,16 @@ func Initialize(registry2 registry.Registry, config2 config.Config) (*http.Handl
 	authenticationHandler := authentication.New(authenticationService)
 	mfaRecoveryCodeHandler := mfa_recovery_code4.New(mfaRecoveryCodeService)
 	handler := &http.Handler{
-		R:                      httpHttp,
-		AuthenticationService:  authenticationService,
-		MfaRecoveryCodeService: mfaRecoveryCodeService,
-		Config:                 config2,
-		AuthenticationHandler:  authenticationHandler,
-		MfaRecoveryCodeHandler: mfaRecoveryCodeHandler,
+		r:                      httpHttp,
+		authenticationService:  authenticationService,
+		mfaRecoveryCodeService: mfaRecoveryCodeService,
+		config:                 config2,
+		authenticationHandler:  authenticationHandler,
+		mfaRecoveryCodeHandler: mfaRecoveryCodeHandler,
 	}
 	return handler, nil
 }
 
 // wire.go:
 
-var set1 = wire.NewSet(pg.GetGorm, http2.GetHttp)
+var set = wire.NewSet(pg.GetGorm, http2.GetHttp)

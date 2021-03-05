@@ -9,11 +9,11 @@ import (
 )
 
 type AuthenticationHandler struct {
-	AuthenticationService service.AuthenticationService
+	authenticationService service.AuthenticationService
 }
 
 func New(authenticationService service.AuthenticationService) *AuthenticationHandler {
-	return &AuthenticationHandler{AuthenticationService: authenticationService}
+	return &AuthenticationHandler{authenticationService: authenticationService}
 }
 
 func (h *AuthenticationHandler) SignUp(w http.ResponseWriter, r *http.Request) {
@@ -22,7 +22,7 @@ func (h *AuthenticationHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	user, err := h.AuthenticationService.SignUp(r.Context(), data)
+	user, err := h.authenticationService.SignUp(r.Context(), data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -41,7 +41,7 @@ func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	sess, err := h.AuthenticationService.SignIn(r.Context(), data)
+	sess, err := h.authenticationService.SignIn(r.Context(), data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -56,7 +56,7 @@ func (h *AuthenticationHandler) SignOut(w http.ResponseWriter, r *http.Request) 
 
 	sessionId, _ := sessionIdContext.([]byte)
 
-	if err := h.AuthenticationService.SignOut(r.Context(), &entity.Session{SessionKey: sessionId}); err != nil {
+	if err := h.authenticationService.SignOut(r.Context(), &entity.Session{SessionKey: sessionId}); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
@@ -79,7 +79,7 @@ func (h *AuthenticationHandler) PutSecret(w http.ResponseWriter, r *http.Request
 	}
 	sessionUserId := r.Context().Value("user_id").(uint64)
 	login, issuer, err :=
-		h.AuthenticationService.PutSecret(r.Context(), &entity.Session{SessionKey: sessionId, UserID: sessionUserId})
+		h.authenticationService.PutSecret(r.Context(), &entity.Session{SessionKey: sessionId, UserID: sessionUserId})
 
 	if (login == "") && (issuer == "") {
 		http.Error(w, "sign up error", http.StatusInternalServerError)

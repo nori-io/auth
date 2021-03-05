@@ -9,12 +9,12 @@ import (
 )
 
 type Handler struct {
-	R                      http.Http
-	AuthenticationService  service.AuthenticationService
-	MfaRecoveryCodeService service.MfaRecoveryCodeService
-	Config                 config.Config
-	AuthenticationHandler  *authentication.AuthenticationHandler
-	MfaRecoveryCodeHandler *mfa_recovery_code.MfaRecoveryCodeHandler
+	r                      http.Http
+	authenticationService  service.AuthenticationService
+	mfaRecoveryCodeService service.MfaRecoveryCodeService
+	config                 config.Config
+	authenticationHandler  *authentication.AuthenticationHandler
+	mfaRecoveryCodeHandler *mfa_recovery_code.MfaRecoveryCodeHandler
 }
 
 type Params struct {
@@ -28,22 +28,22 @@ type Params struct {
 
 func New(params Params) *Handler {
 	handler := Handler{
-		R:                      params.R,
-		AuthenticationService:  params.AuthenticationService,
-		MfaRecoveryCodeService: params.MfaRecoveryCodeService,
-		Config:                 params.Config,
-		AuthenticationHandler:  params.AuthenticationHandler,
-		MfaRecoveryCodeHandler: params.MfaRecoveryCodeHandler,
+		r:                      params.R,
+		authenticationService:  params.AuthenticationService,
+		mfaRecoveryCodeService: params.MfaRecoveryCodeService,
+		config:                 params.Config,
+		authenticationHandler:  params.AuthenticationHandler,
+		mfaRecoveryCodeHandler: params.MfaRecoveryCodeHandler,
 	}
 
 	// todo: add middleware
-	handler.R.Get("/auth/signup", handler.AuthenticationHandler.SignUp)
-	handler.R.Get("/auth/signin", handler.AuthenticationHandler.SignIn)
-	handler.R.Get("/auth/signout", handler.AuthenticationHandler.SignOut)
+	handler.r.Get("/auth/signup", handler.authenticationHandler.SignUp)
+	handler.r.Get("/auth/signin", handler.authenticationHandler.SignIn)
+	handler.r.Get("/auth/signout", handler.authenticationHandler.SignOut)
 
 	// mfa
-	handler.R.Get("/auth/settings/mfa", nil)
+	handler.r.Get("/auth/settings/mfa", nil)
 	// h.R.Get("/auth/settings/mfa/verify?", handler.PutSecret)
-	handler.R.Get("/auth/settings/mfa/recovery_codes", handler.MfaRecoveryCodeHandler.GetMfaRecoveryCodes)
+	handler.r.Get("/auth/settings/mfa/recovery_codes", handler.mfaRecoveryCodeHandler.GetMfaRecoveryCodes)
 	return &handler
 }

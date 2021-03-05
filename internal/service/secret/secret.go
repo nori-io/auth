@@ -46,7 +46,7 @@ func (srv *SecretService) PutSecret(
 		return "", "", err
 	}
 
-	userData, err := srv.UserRepository.Get(ctx, session.UserID)
+	userData, err := srv.UserRepository.FindById(ctx, session.UserID)
 	if err != nil {
 		return "", "", err
 	}

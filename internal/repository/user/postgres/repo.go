@@ -66,9 +66,29 @@ func (r *UserRepository) FindByFilter(ctx context.Context, filter repository.Use
 		outEntities []entity.User
 		e           error
 	)
+	var emailPatternQuery string
+	var phonePatternQuery string
+	var userStatusQuery string
+	if filter.EmailPattern == nil {
+		emailPatternQuery = "email LIKE ``"
+	} else {
+		emailPatternQuery = "email LIKE " + *filter.EmailPattern
+	}
 
-	e = r.Db.Offset(filter.Offset).Limit(filter.Limit).Where("email LIKE ?, phone LIKE ?, status=?",
-		filter.EmailPattern, filter.PhonePattern, filter.Status).Find(&out).Error
+	if filter.PhonePattern == nil {
+		phonePatternQuery = "CONCAT(phone_number, phone_country_code) LIKE ``"
+	} else {
+		phonePatternQuery = "CONCAT(phone_number, phone_country_code) LIKE " + *filter.PhonePattern
+	}
+
+	if filter.Status == nil {
+		userStatusQuery = "status LIKE ``"
+	} else {
+		userStatusQuery = "status LIKE ``" + string(*filter.Status)
+	}
+
+	query := emailPatternQuery + "," + phonePatternQuery + "," + userStatusQuery
+	e = r.Db.Offset(filter.Offset).Limit(filter.Limit).Where(query).Find(&out).Error
 	for i, v := range out {
 		outEntities = append(outEntities, *v.Convert())
 		fmt.Println("OUT is", outEntities[i])

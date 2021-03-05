@@ -10,7 +10,7 @@ func (h mfaRecoveryCodesHelper) Generate() ([]string, error) {
 	for i := 0; i < h.config.MfaRecoveryCodeCount(); i++ {
 		code := randomString([]rune(h.config.MfaRecoveryCodeSymbols()), h.config.MfaRecoveryCodeLength())
 
-		codes = append(codes, string(code))
+		codes = append(codes, code)
 
 	}
 	return codes, nil

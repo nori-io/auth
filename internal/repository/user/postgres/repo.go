@@ -14,12 +14,18 @@ type UserRepository struct {
 	Db *gorm.DB
 }
 
+func (r *UserRepository) Count(ctx context.Context) (uint64, error) {
+	var count uint64
+	err := r.Db.Count(&count).Error
+	return count, err
+}
+
 func (r *UserRepository) Create(ctx context.Context, e *entity.User) error {
-	model := NewModel(e)
+	modelUser := NewModel(e)
 
-	lastRecord := new(User)
+	lastRecord := new(model)
 
-	if err := r.Db.Create(model).Scan(&lastRecord).Error; err != nil {
+	if err := r.Db.Create(modelUser).Scan(&lastRecord).Error; err != nil {
 		return err
 	}
 	lastRecord.Convert()
@@ -29,7 +35,7 @@ func (r *UserRepository) Create(ctx context.Context, e *entity.User) error {
 
 func (r *UserRepository) FindById(ctx context.Context, id uint64) (*entity.User, error) {
 	var (
-		out = &User{}
+		out = &model{}
 		e   error
 	)
 	e = r.Db.Where("id=?", id).First(out).Error
@@ -39,7 +45,7 @@ func (r *UserRepository) FindById(ctx context.Context, id uint64) (*entity.User,
 
 func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*entity.User, error) {
 	var (
-		out = &User{}
+		out = &model{}
 		e   error
 	)
 	e = r.Db.Where("email=?", email).First(out).Error
@@ -48,14 +54,12 @@ func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*entity
 }
 
 func (r *UserRepository) FindByPhone(ctx context.Context, phone string) (*entity.User, error) {
-	var (
-		out = &User{}
-		e   error
-	)
-	//@todo find by phone number and country code
-	e = r.Db.Where("phone=?", phone).First(out).Error
+	out := &model{}
 
-	return out.Convert(), e
+	//@todo find by phone number and country code
+	err := r.Db.Where("phone=?", phone).First(out).Error
+
+	return out.Convert(), err
 }
 
 func (r *UserRepository) FindByFilter(ctx context.Context, filter repository.UserFilter) ([]entity.User, error) {
@@ -65,7 +69,7 @@ func (r *UserRepository) FindByFilter(ctx context.Context, filter repository.Use
 
 func (r *UserRepository) FindAll(ctx context.Context) ([]entity.User, error) {
 	var (
-		out         []User
+		out         []model
 		outEntities []entity.User
 		e           error
 	)
@@ -86,7 +90,7 @@ func (r *UserRepository) Update(ctx context.Context, e *entity.User) error {
 }
 
 func (r *UserRepository) Delete(ctx context.Context, id uint64) error {
-	if err := r.Db.Delete(&User{ID: id}).Error; err != nil {
+	if err := r.Db.Delete(&model{ID: id}).Error; err != nil {
 		return err
 	}
 	return nil

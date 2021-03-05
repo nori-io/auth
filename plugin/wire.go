@@ -13,11 +13,11 @@ import (
 	httpHandler "github.com/nori-plugins/authentication/internal/handler/http"
 )
 
-var set1 = wire.NewSet(
+var set = wire.NewSet(
 	noriGorm.GetGorm,
 	noriHttp.GetHttp)
 
 func Initialize(registry registry.Registry, config config.Config) (*httpHandler.Handler, error) {
-	wire.Build(session.GetSession, app.AppSet, set1)
+	wire.Build(session.GetSession, app.AppSet, set)
 	return &httpHandler.Handler{}, nil
 }

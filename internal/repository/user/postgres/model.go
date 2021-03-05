@@ -13,7 +13,7 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
-type User struct {
+type model struct {
 	ID                     uint64    `gorm:"column:id; PRIMARY_KEY; type:bigserial"`
 	Status                 uint8     `gorm:"column:status; type:smallint; not null" `
 	UserType               uint8     `gorm:"column:user_type; type:smallint; not null"`
@@ -32,7 +32,7 @@ type User struct {
 	UpdatedAt              time.Time `gorm:"column:updated_at; type: TIMESTAMP"`
 }
 
-func (u *User) Convert() *entity.User {
+func (u model) Convert() *entity.User {
 	return &entity.User{
 		ID:                     u.ID,
 		Status:                 users_status.UserStatus(u.Status),
@@ -53,8 +53,8 @@ func (u *User) Convert() *entity.User {
 	}
 }
 
-func NewModel(e *entity.User) *User {
-	return &User{
+func NewModel(e *entity.User) model {
+	return model{
 		ID:                     e.ID,
 		Status:                 uint8(e.Status),
 		UserType:               uint8(e.UserType),
@@ -75,6 +75,6 @@ func NewModel(e *entity.User) *User {
 }
 
 // TableName
-func (User) TableName() string {
+func (model) TableName() string {
 	return "users"
 }

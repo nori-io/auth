@@ -12,11 +12,11 @@ type MfaSecretRepository struct {
 }
 
 func (r *MfaSecretRepository) Create(ctx context.Context, e *entity.MfaSecret) error {
-	model := NewModel(e)
+	modelMfaSecret := NewModel(e)
 
-	lastRecord := new(MfaSecret)
+	lastRecord := new(model)
 
-	if err := r.Db.Create(model).Scan(&lastRecord).Error; err != nil {
+	if err := r.Db.Create(modelMfaSecret).Scan(&lastRecord).Error; err != nil {
 		return err
 	}
 	lastRecord.Convert()
@@ -26,7 +26,7 @@ func (r *MfaSecretRepository) Create(ctx context.Context, e *entity.MfaSecret) e
 
 func (r *MfaSecretRepository) Get(ctx context.Context, userID uint64) (*entity.MfaSecret, error) {
 	var (
-		out = &MfaSecret{}
+		out = &model{}
 		e   error
 	)
 	e = r.Db.Where("id=?", userID).First(out).Error
@@ -42,7 +42,7 @@ func (r *MfaSecretRepository) Update(ctx context.Context, userID uint64, e *enti
 }
 
 func (r *MfaSecretRepository) Delete(ctx context.Context, userID uint64) error {
-	if err := r.Db.Delete(&MfaSecret{UserID: userID}).Error; err != nil {
+	if err := r.Db.Delete(&model{UserID: userID}).Error; err != nil {
 		return err
 	}
 	return nil

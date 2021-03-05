@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/nori-plugins/authentication/internal/domain/repository"
 
@@ -62,39 +61,29 @@ func (r *UserRepository) FindByPhone(ctx context.Context, phone string) (*entity
 
 func (r *UserRepository) FindByFilter(ctx context.Context, filter repository.UserFilter) ([]entity.User, error) {
 	var (
-		out         []model
-		outEntities []entity.User
-		e           error
+		models   []model
+		entities []entity.User
 	)
-	var emailPatternQuery string
-	var phonePatternQuery string
-	var userStatusQuery string
-	if filter.EmailPattern == nil {
-		emailPatternQuery = "email LIKE ``"
-	} else {
-		emailPatternQuery = "email LIKE " + *filter.EmailPattern
+	q := r.Db.Offset(filter.Offset).Limit(filter.Limit)
+	if filter.EmailPattern != nil {
+		q = q.Where("email LIKE ?", filter.EmailPattern)
+	}
+	if filter.PhonePattern != nil {
+		q = q.Where("CONCAT(phone_number, phone_country_code) LIKE ?", filter.PhonePattern)
 	}
 
-	if filter.PhonePattern == nil {
-		phonePatternQuery = "CONCAT(phone_number, phone_country_code) LIKE ``"
-	} else {
-		phonePatternQuery = "CONCAT(phone_number, phone_country_code) LIKE " + *filter.PhonePattern
+	if filter.UserStatus != nil {
+		q = q.Where("status = ?", filter.UserStatus.Value())
 	}
 
-	if filter.Status == nil {
-		userStatusQuery = "status LIKE ``"
-	} else {
-		userStatusQuery = "status LIKE ``" + string(*filter.Status)
+	err := q.Find(&models).Error
+	if err != nil {
+		return nil, err
 	}
-
-	query := emailPatternQuery + "," + phonePatternQuery + "," + userStatusQuery
-	e = r.Db.Offset(filter.Offset).Limit(filter.Limit).Where(query).Find(&out).Error
-	for i, v := range out {
-		outEntities = append(outEntities, *v.Convert())
-		fmt.Println("OUT is", outEntities[i])
-
+	for _, v := range models {
+		entities = append(entities, *v.Convert())
 	}
-	return outEntities, e
+	return entities, err
 }
 
 func (r *UserRepository) Update(ctx context.Context, e *entity.User) error {

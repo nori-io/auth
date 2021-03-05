@@ -22,7 +22,7 @@ type UserRepository interface {
 type UserFilter struct {
 	EmailPattern *string
 	PhonePattern *string
-	Status       *users_status.UserStatus
+	UserStatus   *users_status.UserStatus
 	Offset       int
 	Limit        int
 }

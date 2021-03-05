@@ -55,7 +55,7 @@ func (r *UserRepository) FindByPhone(ctx context.Context, phone string) (*entity
 	out := &model{}
 
 	//@todo find by phone number and country code
-	err := r.Db.Where("(phone_number)+(phone_country_code)=?", phone).First(out).Error
+	err := r.Db.Where("CONCAT(phone_number, phone_country_code)=?", phone).First(out).Error
 
 	return out.Convert(), err
 }

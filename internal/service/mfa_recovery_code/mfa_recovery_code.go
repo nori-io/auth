@@ -14,7 +14,7 @@ func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data
 	//@todo generating of specify sequence
 	//@todo нужна ли максимальная длина, или указать всё в паттерне?
 	var mfaRecoveryCodes []entity.MfaRecoveryCode
-	mfa_recovery_codes, err := srv.mfaRecoveryCodeHelper.Generate(srv.Config.MfaRecoveryCodeCount())
+	mfa_recovery_codes, err := srv.mfaRecoveryCodeHelper.Generate(srv.config.MfaRecoveryCodeCount())
 	if err != nil {
 		return nil, err
 	}

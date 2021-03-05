@@ -7,6 +7,7 @@ import (
 )
 
 var HelperSet = wire.NewSet(
+	wire.Struct(new(mfaRecoveryCodeHelper.Params), "Config"),
 	mfaRecoveryCodeHelper.New,
 	helper.New,
 )

@@ -61,12 +61,12 @@ func (p plugin) Instance() interface{} {
 
 func (p plugin) Init(ctx context.Context, config config.Config, log logger.FieldLogger) error {
 	p.config = conf.Config{
-		UrlPrefix:                config.String("urlprefix", "url prefix for all handlers"),
-		MfaRecoveryCodePattern:   config.String("mfa.recoverycode.pattern", "pattern for mfa recovery codes"),
-		MfaRecoveryCodeSymbols:   config.String("mfa.recoverycode.symbols", "symbols that use when mfa recovery code generating"),
-		MfaRecoveryCodeMaxLength: config.Int("mfa.recoverycode.maxlength", "max length of mfaRecoveryCode"),
-		MfaRecoveryCodeCount:     config.Int("mfa.recoverycode.count", "count of mfa recovery codes"),
-		Issuer:                   config.String("mfa.issuer", "issuer"),
+		UrlPrefix:              config.String("urlprefix", "url prefix for all handlers"),
+		MfaRecoveryCodePattern: config.String("mfa.recoverycode.pattern", "pattern for mfa recovery codes"),
+		MfaRecoveryCodeSymbols: config.String("mfa.recoverycode.symbols", "symbols that use when mfa recovery code generating"),
+		MfaRecoveryCodeLength:  config.Int("mfa.recoverycode.maxlength", "max length of mfaRecoveryCode"),
+		MfaRecoveryCodeCount:   config.Int("mfa.recoverycode.count", "count of mfa recovery codes"),
+		Issuer:                 config.String("mfa.issuer", "issuer"),
 	}
 
 	return nil

@@ -1,21 +1,25 @@
 package mfa_recovery_code
 
 import (
-	"crypto/rand"
+	"math/rand"
 )
 
-func (h mfaRecoveryCodesHelper) Generate(count int) ([]string, error) {
+func (h mfaRecoveryCodesHelper) Generate() ([]string, error) {
 	var codes []string
 
-	for i := 0; i < count; i++ {
-		sid := make([]byte, 32)
+	for i := 0; i < h.config.MfaRecoveryCodeCount(); i++ {
+		code := randomString([]rune(h.config.MfaRecoveryCodeSymbols()), h.config.MfaRecoveryCodeLength())
 
-		if _, err := rand.Read(sid); err != nil {
-			return nil, err
-		}
-
-		codes = append(codes, string(sid))
+		codes = append(codes, string(code))
 
 	}
 	return codes, nil
+}
+
+func randomString(mfaRecoveryCodeSymbols []rune, n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = mfaRecoveryCodeSymbols[rand.Intn(len(mfaRecoveryCodeSymbols))]
+	}
+	return string(b)
 }

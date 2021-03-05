@@ -8,13 +8,10 @@ import (
 )
 
 func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data *entity.Session) ([]entity.MfaRecoveryCode, error) {
-	//@todo read count of symbols from config
 	//@todo read pattenn from config
-	//@todo read symbol sequence from config
-	//@todo generating of specify sequence
 	//@todo нужна ли максимальная длина, или указать всё в паттерне?
 	var mfaRecoveryCodes []entity.MfaRecoveryCode
-	mfa_recovery_codes, err := srv.mfaRecoveryCodeHelper.Generate(srv.config.MfaRecoveryCodeCount())
+	mfa_recovery_codes, err := srv.mfaRecoveryCodeHelper.Generate()
 	if err != nil {
 		return nil, err
 	}

@@ -47,13 +47,16 @@ func Initialize(registry2 registry.Registry, config2 config.Config) (*http.Handl
 	}
 	authenticationService := auth.New(params)
 	mfaRecoveryCodeRepository := mfa_recovery_code.New(db)
-	mfaRecoveryCodesHelper := mfa_recovery_code2.New()
-	mfa_recovery_codeParams := mfa_recovery_code3.Params{
+	mfa_recovery_codeParams := mfa_recovery_code2.Params{
+		Config: config2,
+	}
+	mfaRecoveryCodesHelper := mfa_recovery_code2.New(mfa_recovery_codeParams)
+	params2 := mfa_recovery_code3.Params{
 		MfaRecoveryCodeRepository: mfaRecoveryCodeRepository,
 		MfaRecoveryCodeHelper:     mfaRecoveryCodesHelper,
 		Config:                    config2,
 	}
-	mfaRecoveryCodeService := mfa_recovery_code3.New(mfa_recovery_codeParams)
+	mfaRecoveryCodeService := mfa_recovery_code3.New(params2)
 	authenticationHandler := authentication.New(authenticationService)
 	mfaRecoveryCodeHandler := mfa_recovery_code4.New(mfaRecoveryCodeService)
 	mfaSecretRepository := mfa_secret.New(db)

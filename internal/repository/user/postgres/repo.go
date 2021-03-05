@@ -44,36 +44,31 @@ func (r *UserRepository) FindById(ctx context.Context, id uint64) (*entity.User,
 }
 
 func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*entity.User, error) {
-	var (
-		out = &model{}
-		e   error
-	)
-	e = r.Db.Where("email=?", email).First(out).Error
+	out := &model{}
 
-	return out.Convert(), e
+	err := r.Db.Where("email=?", email).First(out).Error
+
+	return out.Convert(), err
 }
 
 func (r *UserRepository) FindByPhone(ctx context.Context, phone string) (*entity.User, error) {
 	out := &model{}
 
 	//@todo find by phone number and country code
-	err := r.Db.Where("phone=?", phone).First(out).Error
+	err := r.Db.Where("(phone_number)+(phone_country_code)=?", phone).First(out).Error
 
 	return out.Convert(), err
 }
 
 func (r *UserRepository) FindByFilter(ctx context.Context, filter repository.UserFilter) ([]entity.User, error) {
-	//@todo
-	return nil, nil
-}
-
-func (r *UserRepository) FindAll(ctx context.Context) ([]entity.User, error) {
 	var (
 		out         []model
 		outEntities []entity.User
 		e           error
 	)
-	e = r.Db.Find(&out).Error
+
+	e = r.Db.Offset(filter.Offset).Limit(filter.Limit).Where("email LIKE ?, phone LIKE ?, status=?",
+		filter.EmailPattern, filter.PhonePattern, filter.Status).Find(&out).Error
 	for i, v := range out {
 		outEntities = append(outEntities, *v.Convert())
 		fmt.Println("OUT is", outEntities[i])

@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/nori-plugins/authentication/internal/domain/repository"
+
 	"github.com/jinzhu/gorm"
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
@@ -25,7 +27,7 @@ func (r *UserRepository) Create(ctx context.Context, e *entity.User) error {
 	return nil
 }
 
-func (r *UserRepository) Get(ctx context.Context, id uint64) (*entity.User, error) {
+func (r *UserRepository) FindById(ctx context.Context, id uint64) (*entity.User, error) {
 	var (
 		out = &User{}
 		e   error
@@ -35,7 +37,7 @@ func (r *UserRepository) Get(ctx context.Context, id uint64) (*entity.User, erro
 	return out.Convert(), e
 }
 
-func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*entity.User, error) {
+func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*entity.User, error) {
 	var (
 		out = &User{}
 		e   error
@@ -45,7 +47,23 @@ func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*entity.
 	return out.Convert(), e
 }
 
-func (r *UserRepository) GetAll(ctx context.Context, offset uint64, limit uint64) ([]entity.User, error) {
+func (r *UserRepository) FindByPhone(ctx context.Context, phone string) (*entity.User, error) {
+	var (
+		out = &User{}
+		e   error
+	)
+	//@todo find by phone number and country code
+	e = r.Db.Where("phone=?", phone).First(out).Error
+
+	return out.Convert(), e
+}
+
+func (r *UserRepository) FindByFilter(ctx context.Context, filter repository.UserFilter) ([]entity.User, error) {
+	//@todo
+	return nil, nil
+}
+
+func (r *UserRepository) FindAll(ctx context.Context) ([]entity.User, error) {
 	var (
 		out         []User
 		outEntities []entity.User

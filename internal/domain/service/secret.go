@@ -6,7 +6,7 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
-type SecretService interface {
+type MfaSecretService interface {
 	PutSecret(ctx context.Context, data *SecretData, session entity.Session) (
 		string, string, error)
 }

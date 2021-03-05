@@ -9,5 +9,4 @@ require (
 	github.com/nori-io/interfaces/database/orm/gorm v0.0.1
 	github.com/nori-io/interfaces/nori/http v0.0.1
 	github.com/nori-io/interfaces/nori/session v0.0.1
-	go.uber.org/dig v1.10.0 // indirect
 )

@@ -15,11 +15,14 @@ import (
 	"github.com/nori-plugins/authentication/internal/handler/http"
 	"github.com/nori-plugins/authentication/internal/handler/http/authentication"
 	mfa_recovery_code4 "github.com/nori-plugins/authentication/internal/handler/http/mfa_recovery_code"
+	mfa_secret3 "github.com/nori-plugins/authentication/internal/handler/http/mfa_secret"
 	mfa_recovery_code2 "github.com/nori-plugins/authentication/internal/helper/mfa_recovery_code"
 	"github.com/nori-plugins/authentication/internal/repository/mfa_recovery_code"
+	"github.com/nori-plugins/authentication/internal/repository/mfa_secret"
 	"github.com/nori-plugins/authentication/internal/repository/user"
 	"github.com/nori-plugins/authentication/internal/service/auth"
 	mfa_recovery_code3 "github.com/nori-plugins/authentication/internal/service/mfa_recovery_code"
+	mfa_secret2 "github.com/nori-plugins/authentication/internal/service/mfa_secret"
 )
 
 // Injectors from wire.go:
@@ -53,13 +56,22 @@ func Initialize(registry2 registry.Registry, config2 config.Config) (*http.Handl
 	mfaRecoveryCodeService := mfa_recovery_code3.New(mfa_recovery_codeParams)
 	authenticationHandler := authentication.New(authenticationService)
 	mfaRecoveryCodeHandler := mfa_recovery_code4.New(mfaRecoveryCodeService)
+	mfaSecretRepository := mfa_secret.New(db)
+	mfa_secretParams := mfa_secret2.Params{
+		MfaSecretRepository: mfaSecretRepository,
+		UserRepository:      userRepository,
+		Config:              config2,
+	}
+	mfaSecretService := mfa_secret2.New(mfa_secretParams)
+	mfaSecretHandler := mfa_secret3.New(mfaSecretService)
 	handler := &http.Handler{
-		r:                      httpHttp,
-		authenticationService:  authenticationService,
-		mfaRecoveryCodeService: mfaRecoveryCodeService,
-		config:                 config2,
-		authenticationHandler:  authenticationHandler,
-		mfaRecoveryCodeHandler: mfaRecoveryCodeHandler,
+		R:                      httpHttp,
+		AuthenticationService:  authenticationService,
+		MfaRecoveryCodeService: mfaRecoveryCodeService,
+		Config:                 config2,
+		AuthenticationHandler:  authenticationHandler,
+		MfaRecoveryCodeHandler: mfaRecoveryCodeHandler,
+		MfaSecretHandler:       mfaSecretHandler,
 	}
 	return handler, nil
 }

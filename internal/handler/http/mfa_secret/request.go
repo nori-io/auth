@@ -1,4 +1,4 @@
-package mfa_recovery_code
+package mfa_secret
 
 import (
 	"encoding/json"

@@ -20,7 +20,7 @@ func (h *MfaRecoveryCodeHandler) GetMfaRecoveryCodes(w http.ResponseWriter, r *h
 
 	sessionId, _ := sessionIdContext.([]byte)
 
-	if err := h.MfaRecoveryCodeService.GetMfaRecoveryCodes(r.Context(), &entity.Session{SessionKey: sessionId}); err != nil {
+	if _, err := h.MfaRecoveryCodeService.GetMfaRecoveryCodes(r.Context(), &entity.Session{SessionKey: sessionId}); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 

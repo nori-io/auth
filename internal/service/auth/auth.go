@@ -70,7 +70,7 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 }
 
 func (srv *AuthenticationService) SignOut(ctx context.Context, data *entity.Session) error {
-	err := srv.session.Delete([]byte(data.SessionKey))
+	err := srv.Session.Delete([]byte(data.SessionKey))
 	return err
 }
 

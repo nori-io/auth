@@ -8,8 +8,9 @@ import (
 )
 
 func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data *entity.Session) ([]entity.MfaRecoveryCode, error) {
-	//@todo read pattenn from config
+	//@todo будет ли использоваться паттерн?
 	//@todo нужна ли максимальная длина, или указать всё в паттерне?
+	//@ указать ограничение на максимальную длину, связанную с базой данных?
 	var mfaRecoveryCodes []entity.MfaRecoveryCode
 	mfa_recovery_codes, err := srv.mfaRecoveryCodeHelper.Generate()
 	if err != nil {
@@ -23,7 +24,9 @@ func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data
 			CreatedAt: time.Now(),
 		})
 	}
-	err = srv.mfaRecoveryCodeRepository.Create(ctx, mfaRecoveryCodes)
+	if err = srv.mfaRecoveryCodeRepository.Create(ctx, mfaRecoveryCodes); err != nil {
+		return nil, err
+	}
 
-	return nil, nil
+	return mfaRecoveryCodes, nil
 }

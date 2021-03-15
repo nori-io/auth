@@ -32,24 +32,24 @@ type model struct {
 	UpdatedAt              time.Time `gorm:"column:updated_at; type: TIMESTAMP"`
 }
 
-func (u model) Convert() *entity.User {
+func (m model) Convert() *entity.User {
 	return &entity.User{
-		ID:                     u.ID,
-		Status:                 users_status.UserStatus(u.Status),
-		UserType:               users_type.UserType(u.UserType),
-		MfaType:                mfa_type.MfaType(u.MfaType),
-		PhoneCountryCode:       u.PhoneCountryCode,
-		PhoneNumber:            u.PhoneNumber,
-		Email:                  u.Email,
-		Password:               u.Password,
-		Salt:                   u.Salt,
-		HashAlgorithm:          hash_algorithm.HashAlgorithm(u.HashAlgorithm),
-		IsEmailVerified:        u.IsEmailVerified,
-		IsPhoneVerified:        u.IsPhoneVerified,
-		EmailActivationCode:    u.EmailActivationCode,
-		EmailActivationCodeTTL: u.EmailActivationCodeTTL,
-		CreatedAt:              u.CreatedAt,
-		UpdatedAt:              u.UpdatedAt,
+		ID:                     m.ID,
+		Status:                 users_status.UserStatus(m.Status),
+		UserType:               users_type.UserType(m.UserType),
+		MfaType:                mfa_type.MfaType(m.MfaType),
+		PhoneCountryCode:       m.PhoneCountryCode,
+		PhoneNumber:            m.PhoneNumber,
+		Email:                  m.Email,
+		Password:               m.Password,
+		Salt:                   m.Salt,
+		HashAlgorithm:          hash_algorithm.HashAlgorithm(m.HashAlgorithm),
+		IsEmailVerified:        m.IsEmailVerified,
+		IsPhoneVerified:        m.IsPhoneVerified,
+		EmailActivationCode:    m.EmailActivationCode,
+		EmailActivationCodeTTL: m.EmailActivationCodeTTL,
+		CreatedAt:              m.CreatedAt,
+		UpdatedAt:              m.UpdatedAt,
 	}
 }
 

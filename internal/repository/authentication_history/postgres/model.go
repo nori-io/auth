@@ -1,6 +1,10 @@
 package postgres
 
-import "time"
+import (
+	"time"
+
+	"github.com/nori-plugins/authentication/internal/domain/entity"
+)
 
 type model struct {
 	ID        uint64    `gorm:"column:id; PRIMARY_KEY; type:bigserial"`
@@ -10,4 +14,33 @@ type model struct {
 	SignoutAt time.Time `gorm:"column:signout_at; type: TIMESTAMP"`
 	CreatedAt time.Time `gorm:"column:created_at; type: TIMESTAMP; not null"`
 	UpdatedAt time.Time `gorm:"column:updated_at; type: TIMESTAMP"`
+}
+
+func (m model) Convert() *entity.AuthenticationHistory {
+	return &entity.AuthenticationHistory{
+		ID:        m.ID,
+		UserID:    m.UserID,
+		SigninAt:  m.SigninAt,
+		Meta:      m.Meta,
+		SignoutAt: m.SignoutAt,
+		CreatedAt: m.CreatedAt,
+		UpdatedAt: m.UpdatedAt,
+	}
+}
+
+func NewModel(e *entity.AuthenticationHistory) model {
+	return model{
+		ID:        e.ID,
+		UserID:    e.UserID,
+		SigninAt:  e.SigninAt,
+		Meta:      e.Meta,
+		SignoutAt: e.SignoutAt,
+		CreatedAt: e.CreatedAt,
+		UpdatedAt: e.UpdatedAt,
+	}
+}
+
+// TableName
+func (model) TableName() string {
+	return "authentication_history"
 }

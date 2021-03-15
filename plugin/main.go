@@ -87,6 +87,7 @@ func (p plugin) Install(_ context.Context, registry registry.Registry) error {
 	if err != nil {
 		return err
 	}
+	//@todo actual sql code
 	err = db.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(`CREATE TABLE users(
 		id bigserial PRIMARY KEY,

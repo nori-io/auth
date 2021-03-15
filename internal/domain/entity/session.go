@@ -8,8 +8,8 @@ import (
 
 type Session struct {
 	ID         uint64
-	SessionKey []byte
 	UserID     uint64
+	SessionKey []byte
 	Status     session_status.SessionStatus
 	OpenedAt   time.Time
 	ClosedAt   time.Time

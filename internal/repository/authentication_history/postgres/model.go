@@ -8,7 +8,7 @@ import (
 
 type model struct {
 	ID        uint64    `gorm:"column:id; PRIMARY_KEY; type:bigserial"`
-	UserID    uint64    `gorm:"column:user_id; type: bigint; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	UserID    uint64    `gorm:"column:user_id; type: bigint; constraint:OnUpdate:CASCADE,OnDelete:CASCADE; not null"`
 	SigninAt  time.Time `gorm:"column:signin_at; type: TIMESTAMP; not null"`
 	Meta      string    `gorm:"column:meta; type:VARCHAR(254)"`
 	SignoutAt time.Time `gorm:"column:signout_at; type: TIMESTAMP"`

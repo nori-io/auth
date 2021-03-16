@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"crypto/rand"
+	"time"
 
 	s "github.com/nori-io/interfaces/nori/session"
 
@@ -14,17 +15,23 @@ import (
 )
 
 type AuthenticationService struct {
-	UserRepository repository.UserRepository
-	Session        s.Session
+	AuthenticationHistoryRepository repository.AuthenticationHistoryRepository
+	UserRepository                  repository.UserRepository
+	Session                         s.Session
 }
 
 type Params struct {
-	UserRepository repository.UserRepository
-	Session        s.Session
+	AuthenticationHistoryRepository repository.AuthenticationHistoryRepository
+	UserRepository                  repository.UserRepository
+	Session                         s.Session
 }
 
 func New(params Params) service.AuthenticationService {
-	return &AuthenticationService{UserRepository: params.UserRepository, Session: params.Session}
+	return &AuthenticationService{
+		AuthenticationHistoryRepository: params.AuthenticationHistoryRepository,
+		UserRepository:                  params.UserRepository,
+		Session:                         params.Session,
+	}
 }
 
 func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUpData) (*entity.User, error) {
@@ -52,13 +59,24 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 		return nil, err
 	}
 
-	_, err = srv.UserRepository.FindByEmail(ctx, data.Login)
+	var user *entity.User
+	user, err = srv.UserRepository.FindByEmail(ctx, data.Login)
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = srv.UserRepository.FindByPhone(ctx, data.Login)
+	user, err = srv.UserRepository.FindByPhone(ctx, data.Login)
 	if err != nil {
+		return nil, err
+	}
+
+	if err = srv.AuthenticationHistoryRepository.Create(ctx, &entity.AuthenticationHistory{
+		ID:        0,
+		UserID:    user.ID,
+		SigninAt:  time.Now(),
+		Meta:      "",
+		CreatedAt: time.Now(),
+	}); err != nil {
 		return nil, err
 	}
 

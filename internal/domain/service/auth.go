@@ -13,7 +13,7 @@ type AuthenticationService interface {
 }
 
 type SignUpData struct {
-	Email    string
+	Login    string
 	Password string
 }
 

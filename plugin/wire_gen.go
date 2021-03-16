@@ -17,6 +17,7 @@ import (
 	mfa_recovery_code4 "github.com/nori-plugins/authentication/internal/handler/http/mfa_recovery_code"
 	mfa_secret3 "github.com/nori-plugins/authentication/internal/handler/http/mfa_secret"
 	mfa_recovery_code2 "github.com/nori-plugins/authentication/internal/helper/mfa_recovery_code"
+	"github.com/nori-plugins/authentication/internal/repository/authentication_history"
 	"github.com/nori-plugins/authentication/internal/repository/mfa_recovery_code"
 	"github.com/nori-plugins/authentication/internal/repository/mfa_secret"
 	"github.com/nori-plugins/authentication/internal/repository/user"
@@ -37,13 +38,15 @@ func Initialize(registry2 registry.Registry, config2 config.Config) (*http.Handl
 		return nil, err
 	}
 	userRepository := user.New(db)
+	authenticationHistoryRepository := authentication_history.New(db)
 	sessionSession, err := session.GetSession(registry2)
 	if err != nil {
 		return nil, err
 	}
 	params := auth.Params{
-		UserRepository: userRepository,
-		Session:        sessionSession,
+		UserRepository:                  userRepository,
+		AuthenticationHistoryRepository: authenticationHistoryRepository,
+		Session:                         sessionSession,
 	}
 	authenticationService := auth.New(params)
 	mfaRecoveryCodeRepository := mfa_recovery_code.New(db)

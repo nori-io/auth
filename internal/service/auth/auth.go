@@ -47,17 +47,17 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 }
 
 func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignInData) (*entity.Session, error) {
-	if err := data.Validate(); err != nil {
+	var err error
+	if err = data.Validate(); err != nil {
 		return nil, err
 	}
 
-	user := &entity.User{
-		Email:    data.Email,
-		Password: data.Password,
+	_, err = srv.UserRepository.FindByEmail(ctx, data.Login)
+	if err != nil {
+		return nil, err
 	}
 
-	var err error
-	user, err = srv.UserRepository.FindByEmail(ctx, user.Email)
+	_, err = srv.UserRepository.FindByPhone(ctx, data.Login)
 	if err != nil {
 		return nil, err
 	}

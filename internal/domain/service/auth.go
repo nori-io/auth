@@ -18,7 +18,7 @@ type SignUpData struct {
 }
 
 type SignInData struct {
-	Email    string
+	Login    string
 	Password string
 }
 

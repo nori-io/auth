@@ -11,10 +11,6 @@ type MfaRecoveryCodeRepository struct {
 	Db *gorm.DB
 }
 
-func (m MfaRecoveryCodeRepository) Use(ctx context.Context, e *entity.MfaRecoveryCode) error {
-	panic("implement me")
-}
-
 func (m MfaRecoveryCodeRepository) Create(ctx context.Context, e []entity.MfaRecoveryCode) error {
 	var mfaRecoveryCodes []model
 
@@ -30,4 +26,8 @@ func (m MfaRecoveryCodeRepository) Create(ctx context.Context, e []entity.MfaRec
 	lastRecord.Convert()
 
 	return nil
+}
+
+func (m MfaRecoveryCodeRepository) Delete(ctx context.Context, e *entity.MfaRecoveryCode) error {
+	panic("implement me")
 }

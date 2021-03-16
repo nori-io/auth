@@ -6,6 +6,7 @@ import (
 
 func (h mfaRecoveryCodesHelper) Generate() ([]string, error) {
 	var codes []string
+	//@todo обеспечить уникальность генерации
 
 	for i := 0; i < h.config.MfaRecoveryCodeCount(); i++ {
 		code := randomString([]rune(h.config.MfaRecoveryCodeSymbols()), h.config.MfaRecoveryCodeLength())

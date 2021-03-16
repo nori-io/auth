@@ -11,7 +11,7 @@ type MfaRecoveryCodeRepository struct {
 	Db *gorm.DB
 }
 
-func (m MfaRecoveryCodeRepository) Create(ctx context.Context, e []entity.MfaRecoveryCode) error {
+func (r MfaRecoveryCodeRepository) Create(ctx context.Context, e []entity.MfaRecoveryCode) error {
 	var mfaRecoveryCodes []model
 
 	for _, v := range e {
@@ -20,7 +20,7 @@ func (m MfaRecoveryCodeRepository) Create(ctx context.Context, e []entity.MfaRec
 
 	lastRecord := new(model)
 
-	if err := m.Db.Create(mfaRecoveryCodes).Scan(&lastRecord).Error; err != nil {
+	if err := r.Db.Create(mfaRecoveryCodes).Scan(&lastRecord).Error; err != nil {
 		return err
 	}
 	lastRecord.Convert()
@@ -28,6 +28,16 @@ func (m MfaRecoveryCodeRepository) Create(ctx context.Context, e []entity.MfaRec
 	return nil
 }
 
-func (m MfaRecoveryCodeRepository) Delete(ctx context.Context, e *entity.MfaRecoveryCode) error {
-	panic("implement me")
+func (r MfaRecoveryCodeRepository) DeleteCode(ctx context.Context, userId uint64, code string) error {
+	if err := r.Db.Delete(&model{UserID: userId, Code: code}).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r MfaRecoveryCodeRepository) DeleteCodes(ctx context.Context, userId uint64) error {
+	if err := r.Db.Delete(&model{UserID: userId}).Error; err != nil {
+		return err
+	}
+	return nil
 }

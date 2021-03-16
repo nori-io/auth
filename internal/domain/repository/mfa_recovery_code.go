@@ -7,6 +7,7 @@ import (
 )
 
 type MfaRecoveryCodeRepository interface {
-	Delete(ctx context.Context, e *entity.MfaRecoveryCode) error
 	Create(ctx context.Context, mfaRecoveryCode []entity.MfaRecoveryCode) error
+	DeleteMfaRecoveryCode(ctx context.Context, userId uint64) error
+	DeleteMfaRecoveryCodes(ctx context.Context, userId uint64) error
 }

@@ -28,14 +28,14 @@ func (r MfaRecoveryCodeRepository) Create(ctx context.Context, e []entity.MfaRec
 	return nil
 }
 
-func (r MfaRecoveryCodeRepository) DeleteCode(ctx context.Context, userId uint64, code string) error {
+func (r MfaRecoveryCodeRepository) DeleteMfaRecoveryCode(ctx context.Context, userId uint64, code string) error {
 	if err := r.Db.Delete(&model{UserID: userId, Code: code}).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r MfaRecoveryCodeRepository) DeleteCodes(ctx context.Context, userId uint64) error {
+func (r MfaRecoveryCodeRepository) DeleteMfaRecoveryCodes(ctx context.Context, userId uint64) error {
 	if err := r.Db.Delete(&model{UserID: userId}).Error; err != nil {
 		return err
 	}

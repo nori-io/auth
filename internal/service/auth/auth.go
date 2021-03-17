@@ -38,12 +38,7 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 	}
 
 	var user *entity.User
-	user, err = srv.UserRepository.FindByEmail(ctx, data.Login)
-	if err != nil {
-		return nil, err
-	}
-
-	user, err = srv.UserRepository.FindByPhone(ctx, data.Login)
+	user, err = srv.UserRepository.FindByEmail(ctx, data.Email)
 	if err != nil {
 		return nil, err
 	}

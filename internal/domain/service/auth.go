@@ -13,12 +13,12 @@ type AuthenticationService interface {
 }
 
 type SignUpData struct {
-	Login    string
+	Email    string
 	Password string
 }
 
 type SignInData struct {
-	Login    string
+	Email    string
 	Password string
 }
 

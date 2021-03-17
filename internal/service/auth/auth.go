@@ -7,32 +7,10 @@ import (
 
 	s "github.com/nori-io/interfaces/nori/session"
 
-	"github.com/nori-plugins/authentication/internal/domain/repository"
-
 	service "github.com/nori-plugins/authentication/internal/domain/service"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
-
-type AuthenticationService struct {
-	AuthenticationHistoryRepository repository.AuthenticationHistoryRepository
-	UserRepository                  repository.UserRepository
-	Session                         s.Session
-}
-
-type Params struct {
-	AuthenticationHistoryRepository repository.AuthenticationHistoryRepository
-	UserRepository                  repository.UserRepository
-	Session                         s.Session
-}
-
-func New(params Params) service.AuthenticationService {
-	return &AuthenticationService{
-		AuthenticationHistoryRepository: params.AuthenticationHistoryRepository,
-		UserRepository:                  params.UserRepository,
-		Session:                         params.Session,
-	}
-}
 
 func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUpData) (*entity.User, error) {
 	if err := data.Validate(); err != nil {

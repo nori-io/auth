@@ -12,22 +12,6 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
-type MfaSecretService struct {
-	MfaSecretRepository repository.MfaSecretRepository
-	UserRepository      repository.UserRepository
-	Config              config.Config
-}
-
-type Params struct {
-	MfaSecretRepository repository.MfaSecretRepository
-	UserRepository      repository.UserRepository
-	Config              config.Config
-}
-
-func New(params Params) service.MfaSecretService {
-	return &MfaSecretService{MfaSecretRepository: params.MfaSecretRepository, UserRepository: params.UserRepository}
-}
-
 func (srv *MfaSecretService) PutSecret(
 	ctx context.Context, data *service.SecretData, session entity.Session) (
 	login string, issuer string, err error) {

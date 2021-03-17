@@ -5,6 +5,8 @@ import (
 	"crypto/rand"
 	"time"
 
+	"github.com/nori-plugins/authentication/pkg/enum/session_status"
+
 	s "github.com/nori-io/interfaces/nori/session"
 
 	service "github.com/nori-plugins/authentication/internal/domain/service"
@@ -57,11 +59,27 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 	if err != nil {
 		return nil, err
 	}
-	return &entity.Session{SessionKey: sid}, nil
+
+	if err := srv.SessionRepository.Create(ctx, &entity.Session{
+		ID:         0,
+		UserID:     user.ID,
+		SessionKey: sid,
+		Status:     session_status.Active,
+		OpenedAt:   time.Now(),
+		ClosedAt:   time.Time{},
+		UpdatedAt:  time.Time{},
+	}); err != nil {
+		return nil, err
+	}
+
+	//@todo возможно вернуть сущность, у которой заполнены все поля
+	return &entity.Session{
+		SessionKey: sid,
+	}, nil
 }
 
 func (srv *AuthenticationService) SignOut(ctx context.Context, data *entity.Session) error {
-	err := srv.Session.Delete([]byte(data.SessionKey))
+	err := srv.Session.Delete(data.SessionKey)
 	return err
 }
 

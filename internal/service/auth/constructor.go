@@ -9,11 +9,13 @@ import (
 type AuthenticationService struct {
 	AuthenticationHistoryRepository repository.AuthenticationHistoryRepository
 	UserRepository                  repository.UserRepository
+	SessionRepository               repository.SessionRepository
 	Session                         s.Session
 }
 
 type Params struct {
 	AuthenticationHistoryRepository repository.AuthenticationHistoryRepository
+	SessionRepository               repository.SessionRepository
 	UserRepository                  repository.UserRepository
 	Session                         s.Session
 }
@@ -21,6 +23,7 @@ type Params struct {
 func New(params Params) service.AuthenticationService {
 	return &AuthenticationService{
 		AuthenticationHistoryRepository: params.AuthenticationHistoryRepository,
+		SessionRepository:               params.SessionRepository,
 		UserRepository:                  params.UserRepository,
 		Session:                         params.Session,
 	}

@@ -3,11 +3,7 @@ package mfa_secret
 import (
 	"context"
 
-	"github.com/nori-plugins/authentication/internal/config"
-
-	"github.com/nori-plugins/authentication/internal/domain/repository"
-
-	service "github.com/nori-plugins/authentication/internal/domain/service"
+	"github.com/nori-plugins/authentication/internal/domain/service"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )

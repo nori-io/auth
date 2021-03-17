@@ -23,3 +23,20 @@ func (r *SessionRepository) Create(ctx context.Context, e *entity.Session) error
 
 	return nil
 }
+
+func (r *SessionRepository) Update(ctx context.Context, e *entity.Session) error {
+	model := NewModel(e)
+	err := r.Db.Save(model).Error
+
+	return err
+}
+
+func (r *SessionRepository) FindBySessionKey(ctx context.Context, sessionKey string) (*entity.Session, error) {
+	var (
+		out = &model{}
+		e   error
+	)
+	e = r.Db.Where("session_key=?", sessionKey).First(out).Error
+
+	return out.Convert(), e
+}

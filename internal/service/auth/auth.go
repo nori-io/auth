@@ -79,7 +79,25 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 }
 
 func (srv *AuthenticationService) SignOut(ctx context.Context, data *entity.Session) error {
-	err := srv.Session.Delete(data.SessionKey)
+	if err := srv.Session.Delete(data.SessionKey); err != nil {
+		return err
+	}
+
+	session, err := srv.SessionRepository.FindBySessionKey(ctx, string(data.SessionKey))
+	if err != nil {
+		return err
+	}
+
+	if err := srv.SessionRepository.Update(ctx, &entity.Session{
+		ID:        session.ID,
+		UserID:    session.UserID,
+		Status:    session_status.Inactive,
+		ClosedAt:  time.Now(),
+		UpdatedAt: time.Now(),
+	}); err != nil {
+		return err
+	}
+
 	return err
 }
 

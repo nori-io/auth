@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"crypto/rand"
+	"github.com/nori-plugins/authentication/pkg/enum/users_action"
 	"time"
 
 	"github.com/nori-plugins/authentication/pkg/enum/session_status"
@@ -21,9 +22,11 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 
 	var user *entity.User
 
+	//@todo внести больше информации на этом уровне
 	user = &entity.User{
 		Email:    data.Email,
 		Password: data.Password,
+
 	}
 
 	if err := srv.UserRepository.Create(ctx, user); err != nil {
@@ -48,7 +51,8 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 	if err = srv.AuthenticationLogRepository.Create(ctx, &entity.AuthenticationLog{
 		ID:        0,
 		UserID:    user.ID,
-		SigninAt:  time.Now(),
+		Action:    users_action.SignUp,
+		//@todo заполнить метаданные айпи адресом и городом или чем-то ещё?
 		Meta:      "",
 		CreatedAt: time.Now(),
 	}); err != nil {

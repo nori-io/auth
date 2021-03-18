@@ -31,6 +31,16 @@ func (r *AuthenticationHistoryRepository) Update(ctx context.Context, e *entity.
 	return err
 }
 
+func (r *AuthenticationHistoryRepository) FindByUserId(ctx context.Context, userId uint64) (*entity.AuthenticationHistory, error) {
+	var (
+		out = &model{}
+		e   error
+	)
+	e = r.Db.Where("user_id=?", userId).Last(out).Error
+
+	return out.Convert(), e
+}
+
 func (r *AuthenticationHistoryRepository) Delete(ctx context.Context, id uint64) error {
 	if err := r.Db.Delete(&model{ID: id}).Error; err != nil {
 		return err

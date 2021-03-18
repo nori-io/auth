@@ -9,7 +9,7 @@ import (
 )
 
 var ServiceSet = wire.NewSet(
-	wire.Struct(new(auth.Params), "UserRepository", "AuthenticationHistoryRepository", "Session"),
+	wire.Struct(new(auth.Params), "UserRepository", "AuthenticationLogRepository", "Session"),
 	auth.New,
 	wire.Struct(new(mfa_recovery_code.Params), "MfaRecoveryCodeRepository", "MfaRecoveryCodeHelper", "Config"),
 	mfa_recovery_code.New,

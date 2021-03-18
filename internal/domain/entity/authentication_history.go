@@ -2,7 +2,7 @@ package entity
 
 import "time"
 
-type AuthenticationHistory struct {
+type AuthenticationLog struct {
 	ID        uint64
 	UserID    uint64
 	SigninAt  time.Time

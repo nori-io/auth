@@ -16,8 +16,8 @@ type model struct {
 	UpdatedAt time.Time `gorm:"column:updated_at; type: TIMESTAMP"`
 }
 
-func (m model) Convert() *entity.AuthenticationHistory {
-	return &entity.AuthenticationHistory{
+func (m model) Convert() *entity.AuthenticationLog {
+	return &entity.AuthenticationLog{
 		ID:        m.ID,
 		UserID:    m.UserID,
 		SigninAt:  m.SigninAt,
@@ -28,7 +28,7 @@ func (m model) Convert() *entity.AuthenticationHistory {
 	}
 }
 
-func NewModel(e *entity.AuthenticationHistory) model {
+func NewModel(e *entity.AuthenticationLog) model {
 	return model{
 		ID:        e.ID,
 		UserID:    e.UserID,
@@ -42,5 +42,5 @@ func NewModel(e *entity.AuthenticationHistory) model {
 
 // TableName
 func (model) TableName() string {
-	return "authentication_history"
+	return "authentication_log"
 }

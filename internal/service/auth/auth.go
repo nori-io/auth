@@ -45,7 +45,7 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 		return nil, err
 	}
 
-	if err = srv.AuthenticationHistoryRepository.Create(ctx, &entity.AuthenticationHistory{
+	if err = srv.AuthenticationLogRepository.Create(ctx, &entity.AuthenticationLog{
 		ID:        0,
 		UserID:    user.ID,
 		SigninAt:  time.Now(),
@@ -98,8 +98,8 @@ func (srv *AuthenticationService) SignOut(ctx context.Context, data *entity.Sess
 		return err
 	}
 
-	if err:=srv.AuthenticationHistoryRepository.
-	if err:=srv.AuthenticationHistoryRepository.Update(ctx, )
+	if err:=srv.AuthenticationLogRepository.
+	if err:=srv.AuthenticationLogRepository.Update(ctx, )
 
 	return err
 }

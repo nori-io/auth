@@ -8,7 +8,7 @@ package main
 import (
 	"github.com/google/wire"
 	"github.com/nori-io/common/v4/pkg/domain/registry"
-	"github.com/nori-io/interfaces/database/orm/gorm"
+	pg "github.com/nori-io/interfaces/database/orm/gorm"
 	http2 "github.com/nori-io/interfaces/nori/http"
 	"github.com/nori-io/interfaces/nori/session"
 	"github.com/nori-plugins/authentication/internal/config"
@@ -17,7 +17,7 @@ import (
 	mfa_recovery_code4 "github.com/nori-plugins/authentication/internal/handler/http/mfa_recovery_code"
 	mfa_secret3 "github.com/nori-plugins/authentication/internal/handler/http/mfa_secret"
 	mfa_recovery_code2 "github.com/nori-plugins/authentication/internal/helper/mfa_recovery_code"
-	"github.com/nori-plugins/authentication/internal/repository/authentication_history"
+	"github.com/nori-plugins/authentication/internal/repository/authentication_log"
 	"github.com/nori-plugins/authentication/internal/repository/mfa_recovery_code"
 	"github.com/nori-plugins/authentication/internal/repository/mfa_secret"
 	"github.com/nori-plugins/authentication/internal/repository/user"
@@ -38,15 +38,15 @@ func Initialize(registry2 registry.Registry, config2 config.Config) (*http.Handl
 		return nil, err
 	}
 	userRepository := user.New(db)
-	authenticationHistoryRepository := authentication_history.New(db)
+	authenticationLogRepository := authentication_log.New(db)
 	sessionSession, err := session.GetSession(registry2)
 	if err != nil {
 		return nil, err
 	}
 	params := auth.Params{
-		UserRepository:                  userRepository,
-		AuthenticationHistoryRepository: authenticationHistoryRepository,
-		Session:                         sessionSession,
+		UserRepository:              userRepository,
+		AuthenticationLogRepository: authenticationLogRepository,
+		Session:                     sessionSession,
 	}
 	authenticationService := auth.New(params)
 	mfaRecoveryCodeRepository := mfa_recovery_code.New(db)

@@ -98,7 +98,7 @@ func (srv *AuthenticationService) SignOut(ctx context.Context, data *entity.Sess
 		return err
 	}
 
-	if err:=srv.AuthenticationLogRepository.
+	if err:=srv.AuthenticationLogRepository.Create()
 	if err:=srv.AuthenticationLogRepository.Update(ctx, )
 
 	return err

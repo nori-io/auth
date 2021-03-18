@@ -1,13 +1,15 @@
 package entity
 
-import "time"
+import (
+	"time"
+
+	"github.com/nori-plugins/authentication/pkg/enum/users_action"
+)
 
 type AuthenticationLog struct {
 	ID        uint64
 	UserID    uint64
-	SigninAt  time.Time
+	Action    users_action.Action
 	Meta      string
-	SignoutAt time.Time
 	CreatedAt time.Time
-	UpdatedAt time.Time
 }

@@ -10,6 +10,7 @@ type AuthenticationLog struct {
 	ID        uint64
 	UserID    uint64
 	Action    users_action.Action
+	SessionID uint64
 	Meta      string
 	CreatedAt time.Time
 }

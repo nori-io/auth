@@ -3,8 +3,12 @@ package auth
 import (
 	"context"
 	"crypto/rand"
-	"github.com/nori-plugins/authentication/pkg/enum/users_action"
 	"time"
+
+	"github.com/nori-plugins/authentication/pkg/enum/hash_algorithm"
+	"github.com/nori-plugins/authentication/pkg/enum/users_action"
+	"github.com/nori-plugins/authentication/pkg/enum/users_status"
+	"github.com/nori-plugins/authentication/pkg/enum/users_type"
 
 	"github.com/nori-plugins/authentication/pkg/enum/session_status"
 
@@ -22,11 +26,18 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 
 	var user *entity.User
 
-	//@todo внести больше информации на этом уровне
+	//@todo определить на уровне конфига верификацию email и на основании этого заполнить информацию о статусе
+	//@todo заполнить оставшиеся поля
 	user = &entity.User{
-		Email:    data.Email,
-		Password: data.Password,
-
+		Status:          users_status.Active,
+		UserType:        users_type.User,
+		MfaType:         0,
+		Email:           data.Email,
+		Password:        data.Password,
+		HashAlgorithm:   hash_algorithm.Bcrypt,
+		IsEmailVerified: false,
+		IsPhoneVerified: false,
+		CreatedAt:       time.Now(),
 	}
 
 	if err := srv.UserRepository.Create(ctx, user); err != nil {
@@ -48,17 +59,6 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 		return nil, err
 	}
 
-	if err = srv.AuthenticationLogRepository.Create(ctx, &entity.AuthenticationLog{
-		ID:        0,
-		UserID:    user.ID,
-		Action:    users_action.SignUp,
-		//@todo заполнить метаданные айпи адресом и городом или чем-то ещё?
-		Meta:      "",
-		CreatedAt: time.Now(),
-	}); err != nil {
-		return nil, err
-	}
-
 	sid, err := srv.getToken()
 	if err != nil {
 		return nil, err
@@ -70,13 +70,27 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 		SessionKey: sid,
 		Status:     session_status.Active,
 		OpenedAt:   time.Now(),
-		ClosedAt:   time.Time{},
-		UpdatedAt:  time.Time{},
 	}); err != nil {
 		return nil, err
 	}
 
-	//@todo возможно вернуть сущность, у которой заполнены все поля
+	session, err := srv.SessionRepository.FindBySessionKey(ctx, string(sid))
+	if err != nil {
+		return nil, err
+	}
+
+	if err = srv.AuthenticationLogRepository.Create(ctx, &entity.AuthenticationLog{
+		ID:     0,
+		UserID: user.ID,
+		Action: users_action.SignUp,
+		//@todo заполнить метаданные айпи адресом и городом или чем-то ещё?
+		Meta:      "",
+		SessionID: session.ID,
+		CreatedAt: time.Now(),
+	}); err != nil {
+		return nil, err
+	}
+
 	return &entity.Session{
 		SessionKey: sid,
 	}, nil
@@ -102,8 +116,8 @@ func (srv *AuthenticationService) SignOut(ctx context.Context, data *entity.Sess
 		return err
 	}
 
-	if err:=srv.AuthenticationLogRepository.Create()
-	if err:=srv.AuthenticationLogRepository.Update(ctx, )
+	// if err:=srv.AuthenticationLogRepository.Create()
+	// if err:=srv.AuthenticationLogRepository.Update(ctx, )
 
 	return err
 }

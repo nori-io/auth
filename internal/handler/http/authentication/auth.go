@@ -50,6 +50,21 @@ func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func (h *AuthenticationHandler) SignInMfa(w http.ResponseWriter, r *http.Request) {
+	data, err := newSignInData(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	sess, err := h.authenticationService.SignIn(r.Context(), data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	JSON(w, r, SignInResponse{
+		SessionID: string(sess.SessionKey),
+	})
+}
+
 func (h *AuthenticationHandler) SignOut(w http.ResponseWriter, r *http.Request) {
 	// todo: extract session ID from context
 	sessionIdContext := r.Context().Value("session_id")

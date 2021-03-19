@@ -128,7 +128,7 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 	if err != nil {
 		return nil, err
 	}
-
+	//@todo проверить кэш и отп
 	isCodeFounded := srv.MfaRecoveryCodeRepository.FindByUserIdMfaRecoveryCode(ctx, session.UserID, data.Code)
 
 	if !isCodeFounded {

@@ -51,12 +51,12 @@ func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AuthenticationHandler) SignInMfa(w http.ResponseWriter, r *http.Request) {
-	data, err := newSignInData(r)
+	data, err := newSignInMfaData(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	sess, err := h.authenticationService.SignIn(r.Context(), data)
+	sess, err := h.authenticationService.SignInMfa(r.Context(), data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

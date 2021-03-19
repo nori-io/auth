@@ -64,21 +64,21 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 	return user, nil
 }
 
-func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignInData) (*entity.Session, error) {
+func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignInData) (*entity.Session, uint8, error) {
 	var err error
 	if err = data.Validate(); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	var user *entity.User
 	user, err = srv.UserRepository.FindByEmail(ctx, data.Email)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	sid, err := srv.getToken()
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	if err := srv.SessionRepository.Create(ctx, &entity.Session{
@@ -88,17 +88,82 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 		Status:     session_status.Active,
 		OpenedAt:   time.Now(),
 	}); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	session, err := srv.SessionRepository.FindBySessionKey(ctx, string(sid))
+	if err != nil {
+		return nil, 0, err
+	}
+
+	if err = srv.AuthenticationLogRepository.Create(ctx, &entity.AuthenticationLog{
+		ID:     0,
+		UserID: user.ID,
+		Action: users_action.SignIn,
+		//@todo заполнить метаданные айпи адресом и городом или чем-то ещё?
+		Meta:      "",
+		SessionID: session.ID,
+		CreatedAt: time.Now(),
+	}); err != nil {
+		return &entity.Session{
+			SessionKey: sid,
+		}, 0, err
+	}
+
+	mfaType := user.MfaType.Value()
+
+	return &entity.Session{
+		SessionKey: sid,
+	}, mfaType, nil
+}
+
+func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.SignInMfaData) (*entity.Session, error) {
+	var err error
+	if err = data.Validate(); err != nil {
+		return nil, err
+	}
+
+	var session *entity.Session
+	session, err = srv.SessionRepository.FindBySessionKey(ctx, data.SessionKey)
+	if err != nil {
+		return nil, err
+	}
+
+	isCodeFounded := srv.MfaRecoveryCodeRepository.FindByUserIdMfaRecoveryCode(ctx, session.UserID, data.Code)
+
+	if !isCodeFounded {
+		return nil, err
+	}
+	if isCodeFounded {
+		err = srv.MfaRecoveryCodeRepository.DeleteMfaRecoveryCode(ctx, session.UserID, data.Code)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	sid, err := srv.getToken()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := srv.SessionRepository.Create(ctx, &entity.Session{
+		ID:         0,
+		UserID:     session.UserID,
+		SessionKey: sid,
+		Status:     session_status.Active,
+		OpenedAt:   time.Now(),
+	}); err != nil {
+		return nil, err
+	}
+
+	session, err = srv.SessionRepository.FindBySessionKey(ctx, string(sid))
 	if err != nil {
 		return nil, err
 	}
 
 	if err = srv.AuthenticationLogRepository.Create(ctx, &entity.AuthenticationLog{
 		ID:     0,
-		UserID: user.ID,
+		UserID: session.UserID,
 		Action: users_action.SignIn,
 		//@todo заполнить метаданные айпи адресом и городом или чем-то ещё?
 		Meta:      "",

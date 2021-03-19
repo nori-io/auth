@@ -28,6 +28,18 @@ func (r MfaRecoveryCodeRepository) Create(ctx context.Context, e []entity.MfaRec
 	return nil
 }
 
+func (r MfaRecoveryCodeRepository) FindByUserIdMfaRecoveryCode(ctx context.Context, userId uint64, code string) bool {
+	out := &model{}
+
+	rows := r.Db.Where("user_id=?, code=?", userId, code).First(out).RowsAffected
+
+	if rows == 1 {
+		return true
+	}
+
+	return false
+}
+
 func (r MfaRecoveryCodeRepository) DeleteMfaRecoveryCode(ctx context.Context, userId uint64, code string) error {
 	if err := r.Db.Delete(&model{UserID: userId, Code: code}).Error; err != nil {
 		return err

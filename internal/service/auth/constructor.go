@@ -10,11 +10,13 @@ type AuthenticationService struct {
 	AuthenticationLogRepository repository.AuthenticationLogRepository
 	UserRepository              repository.UserRepository
 	SessionRepository           repository.SessionRepository
+	MfaRecoveryCodeRepository   repository.MfaRecoveryCodeRepository
 	Session                     s.Session
 }
 
 type Params struct {
 	AuthenticationLogRepository repository.AuthenticationLogRepository
+	MfaRecoveryCodeRepository   repository.MfaRecoveryCodeRepository
 	SessionRepository           repository.SessionRepository
 	UserRepository              repository.UserRepository
 	Session                     s.Session
@@ -23,6 +25,7 @@ type Params struct {
 func New(params Params) service.AuthenticationService {
 	return &AuthenticationService{
 		AuthenticationLogRepository: params.AuthenticationLogRepository,
+		MfaRecoveryCodeRepository:   params.MfaRecoveryCodeRepository,
 		SessionRepository:           params.SessionRepository,
 		UserRepository:              params.UserRepository,
 		Session:                     params.Session,

@@ -40,3 +40,18 @@ func newSignInData(r *http.Request) (service.SignInData, error) {
 		Password: body.Password,
 	}, nil
 }
+
+type SignInMfaRequest struct {
+	Code string `json:"code"`
+}
+
+func newSignInMfaData(r *http.Request) (service.SignInMfaData, error) {
+	var body SignInMfaRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		return service.SignInMfaData{}, err
+	}
+	return service.SignInMfaData{
+		Code: body.Code,
+	}, nil
+}

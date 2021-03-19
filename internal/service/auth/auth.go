@@ -44,6 +44,23 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 		return nil, err
 	}
 
+	var err error
+	user, err = srv.UserRepository.FindByEmail(ctx, user.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = srv.AuthenticationLogRepository.Create(ctx, &entity.AuthenticationLog{
+		ID:     0,
+		UserID: user.ID,
+		Action: users_action.SignUp,
+		//@todo заполнить метаданные айпи адресом и городом или чем-то ещё?
+		Meta:      "",
+		CreatedAt: time.Now(),
+	}); err != nil {
+		return nil, err
+	}
+
 	return user, nil
 }
 
@@ -82,7 +99,7 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 	if err = srv.AuthenticationLogRepository.Create(ctx, &entity.AuthenticationLog{
 		ID:     0,
 		UserID: user.ID,
-		Action: users_action.SignUp,
+		Action: users_action.SignIn,
 		//@todo заполнить метаданные айпи адресом и городом или чем-то ещё?
 		Meta:      "",
 		SessionID: session.ID,
@@ -106,6 +123,7 @@ func (srv *AuthenticationService) SignOut(ctx context.Context, data *entity.Sess
 		return err
 	}
 
+	//@todo если передать не все поля, то обнулятся ли непереданные поля в базе данных?
 	if err := srv.SessionRepository.Update(ctx, &entity.Session{
 		ID:        session.ID,
 		UserID:    session.UserID,
@@ -116,8 +134,15 @@ func (srv *AuthenticationService) SignOut(ctx context.Context, data *entity.Sess
 		return err
 	}
 
-	// if err:=srv.AuthenticationLogRepository.Create()
-	// if err:=srv.AuthenticationLogRepository.Update(ctx, )
+	if err := srv.AuthenticationLogRepository.Create(ctx, &entity.AuthenticationLog{
+		ID:        0,
+		UserID:    session.UserID,
+		Action:    users_action.SignOut,
+		SessionID: session.ID,
+		CreatedAt: time.Now(),
+	}); err != nil {
+		return err
+	}
 
 	return err
 }

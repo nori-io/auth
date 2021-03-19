@@ -58,7 +58,7 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 		Meta:      "",
 		CreatedAt: time.Now(),
 	}); err != nil {
-		return nil, err
+		return user, err
 	}
 
 	return user, nil
@@ -105,7 +105,9 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 		SessionID: session.ID,
 		CreatedAt: time.Now(),
 	}); err != nil {
-		return nil, err
+		return &entity.Session{
+			SessionKey: sid,
+		}, err
 	}
 
 	return &entity.Session{

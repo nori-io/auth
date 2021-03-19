@@ -5,6 +5,7 @@ type Action uint8
 const (
 	SignUp Action = iota
 	SignIn
+	SignInMfa
 	SignOut
 )
 

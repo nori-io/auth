@@ -164,7 +164,7 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 	if err = srv.AuthenticationLogRepository.Create(ctx, &entity.AuthenticationLog{
 		ID:     0,
 		UserID: session.UserID,
-		Action: users_action.SignIn,
+		Action: users_action.SignInMfa,
 		//@todo заполнить метаданные айпи адресом и городом или чем-то ещё?
 		Meta:      "",
 		SessionID: session.ID,

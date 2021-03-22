@@ -35,6 +35,7 @@ func (h *AuthenticationHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.authenticationService.SignUp(r.Context(), data)
 	if err != nil {
+		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	if user == nil {

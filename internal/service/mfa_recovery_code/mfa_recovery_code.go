@@ -7,6 +7,8 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
+//@todo как передать сюда всю сессию? скорее, нужно извлечь пользовательский userID из контекста
+//@todo что мы будем хранить в контексте?
 func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data *entity.Session) ([]entity.MfaRecoveryCode, error) {
 	//@todo будет ли использоваться паттерн?
 	//@todo нужна ли максимальная длина, или указать всё в паттерне?

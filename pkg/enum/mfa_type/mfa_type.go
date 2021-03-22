@@ -3,8 +3,9 @@ package mfa_type
 type MfaType uint8
 
 const (
-	OTP MfaType = iota
+	None MfaType = iota
 	Phone
+	OTP
 )
 
 func (u MfaType) Value() uint8 {

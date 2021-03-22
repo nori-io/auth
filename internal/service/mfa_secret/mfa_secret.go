@@ -8,8 +8,7 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
-func (srv *MfaSecretService) PutSecret(
-	ctx context.Context, data *service.SecretData, session entity.Session) (
+func (srv *MfaSecretService) PutSecret(ctx context.Context, data *service.SecretData, session entity.Session) (
 	login string, issuer string, err error) {
 	if err := data.Validate(); err != nil {
 		return "", "", err

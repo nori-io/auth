@@ -30,6 +30,7 @@ func New() p.Plugin {
 type plugin struct {
 	instance service.AuthenticationService
 	config   conf.Config
+	logger   logger.FieldLogger
 }
 
 func (p plugin) Meta() meta.Meta {
@@ -69,12 +70,13 @@ func (p plugin) Init(ctx context.Context, config config.Config, log logger.Field
 		Issuer:                 config.String("mfa.issuer", "issuer"),
 	}
 
+	p.logger = log
 	return nil
 }
 
 func (p plugin) Start(ctx context.Context, registry registry.Registry) error {
 	config := p.config
-	_, err := Initialize(registry, config)
+	_, err := Initialize(registry, config, p.logger)
 	return err
 }
 

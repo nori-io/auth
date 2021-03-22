@@ -5,6 +5,8 @@ import (
 	"crypto/rand"
 	"time"
 
+	"github.com/nori-plugins/authentication/pkg/enum/mfa_type"
+
 	"github.com/nori-plugins/authentication/pkg/enum/hash_algorithm"
 	"github.com/nori-plugins/authentication/pkg/enum/users_action"
 	"github.com/nori-plugins/authentication/pkg/enum/users_status"
@@ -31,7 +33,7 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 	user = &entity.User{
 		Status:          users_status.Active,
 		UserType:        users_type.User,
-		MfaType:         0,
+		MfaType:         mfa_type.None,
 		Email:           data.Email,
 		Password:        data.Password,
 		HashAlgorithm:   hash_algorithm.Bcrypt,
@@ -51,11 +53,9 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 	}
 
 	if err = srv.AuthenticationLogRepository.Create(ctx, &entity.AuthenticationLog{
-		ID:     0,
 		UserID: user.ID,
 		Action: users_action.SignUp,
 		//@todo заполнить метаданные айпи адресом и городом или чем-то ещё?
-		Meta:      "",
 		CreatedAt: time.Now(),
 	}); err != nil {
 		return user, err
@@ -180,12 +180,12 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 	}, nil
 }
 
-func (srv *AuthenticationService) SignOut(ctx context.Context, data *entity.Session) error {
-	if err := srv.Session.Delete(data.SessionKey); err != nil {
+func (srv *AuthenticationService) SignOut(ctx context.Context, sess *entity.Session) error {
+	if err := srv.Session.Delete(sess.SessionKey); err != nil {
 		return err
 	}
 
-	session, err := srv.SessionRepository.FindBySessionKey(ctx, string(data.SessionKey))
+	session, err := srv.SessionRepository.FindBySessionKey(ctx, string(sess.SessionKey))
 	if err != nil {
 		return err
 	}
@@ -220,6 +220,7 @@ func (srv *AuthenticationService) getToken() ([]byte, error) {
 	if _, err := rand.Read(sid); err != nil {
 		return nil, err
 	}
+	// @todo что сохраняем в сессии?
 	if err := srv.Session.Get(sid, s.SessionActive); err != nil {
 		srv.Session.Save(sid, s.SessionActive, 0)
 		return sid, nil

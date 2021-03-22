@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 
+	v "github.com/go-ozzo/ozzo-validation/v4"
+
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
@@ -14,8 +16,10 @@ type AuthenticationService interface {
 }
 
 type SignUpData struct {
-	Email    string
-	Password string
+	Email         string
+	Password      string
+	TokenCaptcha  string
+	ActionCaptcha string
 }
 
 type SignInData struct {
@@ -30,7 +34,11 @@ type SignInMfaData struct {
 
 //@todo ?
 func (d SignUpData) Validate() error {
-	return nil
+	return v.Errors{
+		"email":    v.Validate(d.Title, v.Required, v.Length(2, 60)),
+		"password": v.Validate(d.Template, v.Required),
+		//@todo проверки для каптчи?
+	}.Filter()
 }
 
 //@todo ?

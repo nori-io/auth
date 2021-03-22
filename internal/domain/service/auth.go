@@ -4,6 +4,7 @@ import (
 	"context"
 
 	v "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/go-ozzo/ozzo-validation/v4/is"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
@@ -35,8 +36,8 @@ type SignInMfaData struct {
 //@todo ?
 func (d SignUpData) Validate() error {
 	return v.Errors{
-		"email":    v.Validate(d.Title, v.Required, v.Length(2, 60)),
-		"password": v.Validate(d.Template, v.Required),
+		"email":    v.Validate(d.Email, v.Required, v.Length(3, 254), is.Email),
+		"password": v.Validate(d.Password, v.Required),
 		//@todo проверки для каптчи?
 	}.Filter()
 }

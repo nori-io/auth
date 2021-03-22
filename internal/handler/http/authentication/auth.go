@@ -3,6 +3,8 @@ package authentication
 import (
 	"net/http"
 
+	"github.com/nori-io/common/v4/pkg/domain/logger"
+
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 
 	"github.com/nori-plugins/authentication/internal/domain/service"
@@ -10,10 +12,19 @@ import (
 
 type AuthenticationHandler struct {
 	authenticationService service.AuthenticationService
+	logger                logger.FieldLogger
 }
 
-func New(authenticationService service.AuthenticationService) *AuthenticationHandler {
-	return &AuthenticationHandler{authenticationService: authenticationService}
+type Params struct {
+	AuthenticationService service.AuthenticationService
+	Logger                logger.FieldLogger
+}
+
+func New(params Params) *AuthenticationHandler {
+	return &AuthenticationHandler{
+		authenticationService: params.AuthenticationService,
+		logger:                params.Logger,
+	}
 }
 
 func (h *AuthenticationHandler) SignUp(w http.ResponseWriter, r *http.Request) {

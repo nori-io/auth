@@ -7,8 +7,9 @@ package main
 
 import (
 	"github.com/google/wire"
+	"github.com/nori-io/common/v4/pkg/domain/logger"
 	"github.com/nori-io/common/v4/pkg/domain/registry"
-	pg "github.com/nori-io/interfaces/database/orm/gorm"
+	"github.com/nori-io/interfaces/database/orm/gorm"
 	http2 "github.com/nori-io/interfaces/nori/http"
 	"github.com/nori-io/interfaces/nori/session"
 	"github.com/nori-plugins/authentication/internal/config"
@@ -28,7 +29,7 @@ import (
 
 // Injectors from wire.go:
 
-func Initialize(registry2 registry.Registry, config2 config.Config) (*http.Handler, error) {
+func Initialize(registry2 registry.Registry, config2 config.Config, logger2 logger.FieldLogger) (*http.Handler, error) {
 	httpHttp, err := http2.GetHttp(registry2)
 	if err != nil {
 		return nil, err
@@ -49,6 +50,11 @@ func Initialize(registry2 registry.Registry, config2 config.Config) (*http.Handl
 		Session:                     sessionSession,
 	}
 	authenticationService := auth.New(params)
+	authenticationParams := authentication.Params{
+		AuthenticationService: authenticationService,
+		Logger:                logger2,
+	}
+	authenticationHandler := authentication.New(authenticationParams)
 	mfaRecoveryCodeRepository := mfa_recovery_code.New(db)
 	mfa_recovery_codeParams := mfa_recovery_code2.Params{
 		Config: config2,
@@ -60,7 +66,6 @@ func Initialize(registry2 registry.Registry, config2 config.Config) (*http.Handl
 		Config:                    config2,
 	}
 	mfaRecoveryCodeService := mfa_recovery_code3.New(params2)
-	authenticationHandler := authentication.New(authenticationService)
 	mfaRecoveryCodeHandler := mfa_recovery_code4.New(mfaRecoveryCodeService)
 	mfaSecretRepository := mfa_secret.New(db)
 	mfa_secretParams := mfa_secret2.Params{
@@ -72,9 +77,6 @@ func Initialize(registry2 registry.Registry, config2 config.Config) (*http.Handl
 	mfaSecretHandler := mfa_secret3.New(mfaSecretService)
 	handler := &http.Handler{
 		R:                      httpHttp,
-		AuthenticationService:  authenticationService,
-		MfaRecoveryCodeService: mfaRecoveryCodeService,
-		Config:                 config2,
 		AuthenticationHandler:  authenticationHandler,
 		MfaRecoveryCodeHandler: mfaRecoveryCodeHandler,
 		MfaSecretHandler:       mfaSecretHandler,

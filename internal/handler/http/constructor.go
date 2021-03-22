@@ -1,6 +1,7 @@
 package http
 
 import (
+	"github.com/nori-io/common/v4/pkg/domain/logger"
 	"github.com/nori-io/interfaces/nori/http"
 	"github.com/nori-plugins/authentication/internal/config"
 	"github.com/nori-plugins/authentication/internal/domain/service"
@@ -14,6 +15,7 @@ type Handler struct {
 	AuthenticationService  service.AuthenticationService
 	MfaRecoveryCodeService service.MfaRecoveryCodeService
 	Config                 config.Config
+	Logger                 logger.FieldLogger
 	AuthenticationHandler  *authentication.AuthenticationHandler
 	MfaRecoveryCodeHandler *mfa_recovery_code.MfaRecoveryCodeHandler
 	MfaSecretHandler       *mfa_secret.MfaSecretHandler
@@ -24,6 +26,8 @@ type Params struct {
 	AuthenticationService  service.AuthenticationService
 	MfaRecoveryCodeService service.MfaRecoveryCodeService
 	Config                 config.Config
+	Logger                 logger.FieldLogger
+
 	AuthenticationHandler  *authentication.AuthenticationHandler
 	MfaRecoveryCodeHandler *mfa_recovery_code.MfaRecoveryCodeHandler
 	MfaSecretHandler       *mfa_secret.MfaSecretHandler
@@ -32,9 +36,6 @@ type Params struct {
 func New(params Params) *Handler {
 	handler := Handler{
 		R:                      params.R,
-		AuthenticationService:  params.AuthenticationService,
-		MfaRecoveryCodeService: params.MfaRecoveryCodeService,
-		Config:                 params.Config,
 		AuthenticationHandler:  params.AuthenticationHandler,
 		MfaRecoveryCodeHandler: params.MfaRecoveryCodeHandler,
 		MfaSecretHandler:       params.MfaSecretHandler,

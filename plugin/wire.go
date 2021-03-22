@@ -4,6 +4,7 @@ package main
 
 import (
 	"github.com/google/wire"
+	"github.com/nori-io/common/v4/pkg/domain/logger"
 	"github.com/nori-io/common/v4/pkg/domain/registry"
 	noriGorm "github.com/nori-io/interfaces/database/orm/gorm"
 	noriHttp "github.com/nori-io/interfaces/nori/http"
@@ -17,7 +18,7 @@ var set = wire.NewSet(
 	noriGorm.GetGorm,
 	noriHttp.GetHttp)
 
-func Initialize(registry registry.Registry, config config.Config) (*httpHandler.Handler, error) {
+func Initialize(registry registry.Registry, config config.Config, logger logger.FieldLogger) (*httpHandler.Handler, error) {
 	wire.Build(session.GetSession, app.AppSet, set)
 	return &httpHandler.Handler{}, nil
 }

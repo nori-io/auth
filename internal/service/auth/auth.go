@@ -67,21 +67,23 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 	return user, nil
 }
 
-func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignInData) (*entity.Session, uint8, error) {
+func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignInData) (*entity.Session, string, error) {
 	var err error
 	if err = data.Validate(); err != nil {
-		return nil, 0, err
+		return nil, false, err
 	}
 
 	var user *entity.User
 	user, err = srv.UserRepository.FindByEmail(ctx, data.Email)
 	if err != nil {
-		return nil, 0, err
+		return nil, false, err
 	}
+
+	//@todo проверить пароль на корректность
 
 	sid, err := srv.getToken()
 	if err != nil {
-		return nil, 0, err
+		return nil, false, err
 	}
 
 	if err := srv.SessionRepository.Create(ctx, &entity.Session{
@@ -91,12 +93,12 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 		Status:     session_status.Active,
 		OpenedAt:   time.Now(),
 	}); err != nil {
-		return nil, 0, err
+		return nil, false, err
 	}
 
 	session, err := srv.SessionRepository.FindBySessionKey(ctx, string(sid))
 	if err != nil {
-		return nil, 0, err
+		return nil, false, err
 	}
 
 	if err = srv.AuthenticationLogRepository.Create(ctx, &entity.AuthenticationLog{
@@ -110,14 +112,14 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 	}); err != nil {
 		return &entity.Session{
 			SessionKey: sid,
-		}, 0, err
+		}, false, err
 	}
 
 	mfaType := user.MfaType.Value()
 
 	return &entity.Session{
 		SessionKey: sid,
-	}, mfaType, nil
+	}, user.MfaType.Value(), nil
 }
 
 func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.SignInMfaData) (*entity.Session, error) {

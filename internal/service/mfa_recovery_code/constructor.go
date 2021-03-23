@@ -1,6 +1,7 @@
 package mfa_recovery_code
 
 import (
+	"github.com/nori-io/interfaces/nori/session"
 	"github.com/nori-plugins/authentication/internal/config"
 	"github.com/nori-plugins/authentication/internal/domain/helper/mfa_recovery_code"
 	"github.com/nori-plugins/authentication/internal/domain/repository"
@@ -17,6 +18,7 @@ type Params struct {
 	MfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository
 	MfaRecoveryCodeHelper     mfa_recovery_code.MfaRecoveryCodesHelper
 	Config                    config.Config
+	Session                   session.Session
 }
 
 func New(params Params) service.MfaRecoveryCodeService {

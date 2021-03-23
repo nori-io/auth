@@ -10,6 +10,7 @@ import (
 //@todo как передать сюда всю сессию? скорее, нужно извлечь пользовательский userID из контекста
 //@todo что мы будем хранить в контексте?
 func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data *entity.Session) ([]entity.MfaRecoveryCode, error) {
+	//@todo проверить активность сессии
 	//@todo будет ли использоваться паттерн?
 	//@todo нужна ли максимальная длина, или указать всё в паттерне?
 	//@todo указать ограничение на максимальную длину, связанную с базой данных?

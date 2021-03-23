@@ -3,28 +3,28 @@ package postgres
 import (
 	"time"
 
+	"github.com/nori-plugins/authentication/pkg/enum/users_action"
+
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
 type model struct {
 	ID        uint64    `gorm:"column:id; PRIMARY_KEY; type:bigserial"`
 	UserID    uint64    `gorm:"column:user_id; type: bigint; constraint:OnUpdate:CASCADE,OnDelete:CASCADE; not null"`
-	SigninAt  time.Time `gorm:"column:signin_at; type: TIMESTAMP; not null"`
+	Action    uint8     `gorm:"column:action; type: smallint; not null"`
+	SessionID uint64    `gorm:"column:session_id; type:bigint"`
 	Meta      string    `gorm:"column:meta; type:VARCHAR(254)"`
-	SignoutAt time.Time `gorm:"column:signout_at; type: TIMESTAMP"`
 	CreatedAt time.Time `gorm:"column:created_at; type: TIMESTAMP; not null"`
-	UpdatedAt time.Time `gorm:"column:updated_at; type: TIMESTAMP"`
 }
 
 func (m model) Convert() *entity.AuthenticationLog {
 	return &entity.AuthenticationLog{
 		ID:        m.ID,
 		UserID:    m.UserID,
-		SigninAt:  m.SigninAt,
+		Action:    users_action.Action(m.Action),
+		SessionID: m.SessionID,
 		Meta:      m.Meta,
-		SignoutAt: m.SignoutAt,
 		CreatedAt: m.CreatedAt,
-		UpdatedAt: m.UpdatedAt,
 	}
 }
 
@@ -32,11 +32,10 @@ func NewModel(e *entity.AuthenticationLog) model {
 	return model{
 		ID:        e.ID,
 		UserID:    e.UserID,
-		SigninAt:  e.SigninAt,
+		Action:    uint8(e.Action),
+		SessionID: e.SessionID,
 		Meta:      e.Meta,
-		SignoutAt: e.SignoutAt,
 		CreatedAt: e.CreatedAt,
-		UpdatedAt: e.UpdatedAt,
 	}
 }
 

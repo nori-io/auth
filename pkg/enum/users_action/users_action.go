@@ -3,7 +3,9 @@ package users_action
 type Action uint8
 
 const (
-	SignUp Action = iota
+	EnableMfa Action = iota
+	DisableMfa
+	SignUp
 	SignIn
 	SignInMfa
 	SignOut

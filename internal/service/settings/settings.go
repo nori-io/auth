@@ -11,5 +11,6 @@ func (s SettingsService) DisableMfa(ctx context.Context, sessionKey string) erro
 }
 
 func (s SettingsService) ChangePassword(ctx context.Context, sessionKey string, passwordOld string, passwordNew string) error {
+	// расшифровать пароль с salt и hash и установить в качестве нового
 	panic("implement me")
 }

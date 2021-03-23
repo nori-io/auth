@@ -11,7 +11,7 @@ import (
 
 type AuthenticationService interface {
 	SignUp(ctx context.Context, data SignUpData) (*entity.User, error)
-	SignIn(ctx context.Context, data SignInData) (*entity.Session, uint8, error)
+	SignIn(ctx context.Context, data SignInData) (*entity.Session, bool, error)
 	SignInMfa(ctx context.Context, data SignInMfaData) (*entity.Session, error)
 	SignOut(ctx context.Context, data *entity.Session) error
 }

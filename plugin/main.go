@@ -62,6 +62,8 @@ func (p plugin) Instance() interface{} {
 
 func (p plugin) Init(ctx context.Context, config config.Config, log logger.FieldLogger) error {
 	p.config = conf.Config{
+		EmailVerification:      config.Bool("email.verification", "verification of email"),
+		EmailActivationCodeTTL: config.UInt64("email.activationcodettl", "time to live of email activation code"),
 		UrlPrefix:              config.String("urlprefix", "url prefix for all handlers"),
 		MfaRecoveryCodePattern: config.String("mfa.recoverycode.pattern", "pattern for mfa recovery codes"),
 		MfaRecoveryCodeSymbols: config.String("mfa.recoverycode.symbols", "symbols that use when mfa recovery code generating"),

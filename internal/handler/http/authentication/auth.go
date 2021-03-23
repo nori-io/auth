@@ -39,6 +39,7 @@ func (h *AuthenticationHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	if user == nil {
+		h.logger.Error("%s", err)
 		http.Error(w, "sign up error", http.StatusInternalServerError)
 	}
 	JSON(w, r, SignUpResponse{

@@ -26,9 +26,12 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 		return nil, err
 	}
 
-	var user *entity.User
+	//@todo
+	if srv.Config.EmailVerification() {
+		return nil, nil
+	}
 
-	//@todo определить на уровне конфига верификацию email и на основании этого заполнить информацию о статусе
+	var user *entity.User
 	//@todo заполнить оставшиеся поля
 	user = &entity.User{
 		Status:          users_status.Active,
@@ -37,7 +40,7 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 		Email:           data.Email,
 		Password:        data.Password,
 		HashAlgorithm:   hash_algorithm.Bcrypt,
-		IsEmailVerified: false,
+		IsEmailVerified: srv.Config.EmailVerification(),
 		IsPhoneVerified: false,
 		CreatedAt:       time.Now(),
 	}

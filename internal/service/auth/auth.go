@@ -5,6 +5,8 @@ import (
 	"crypto/rand"
 	"time"
 
+	"golang.org/x/crypto/bcrypt"
+
 	"github.com/nori-plugins/authentication/pkg/enum/mfa_type"
 
 	"github.com/nori-plugins/authentication/pkg/enum/hash_algorithm"
@@ -32,24 +34,27 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 	}
 
 	var user *entity.User
+
+	password, err := bcrypt.GenerateFromPassword([]byte(data.Password), srv.Config.PasswordBcryptCost())
 	//@todo заполнить оставшиеся поля
 	user = &entity.User{
-		Status:          users_status.Active,
-		UserType:        users_type.User,
-		MfaType:         mfa_type.None,
-		Email:           data.Email,
-		Password:        data.Password,
-		HashAlgorithm:   hash_algorithm.Bcrypt,
-		IsEmailVerified: srv.Config.EmailVerification(),
-		IsPhoneVerified: false,
-		CreatedAt:       time.Now(),
+		ID:                     0,
+		Status:                 users_status.Active,
+		UserType:               users_type.User,
+		MfaType:                mfa_type.None,
+		Email:                  data.Email,
+		Password:               string(password),
+		HashAlgorithm:          hash_algorithm.Bcrypt,
+		IsEmailVerified:        srv.Config.EmailVerification(),
+		EmailActivationCodeTTL: time.Time{},
+		CreatedAt:              time.Now(),
+		UpdatedAt:              time.Time{},
 	}
 
 	if err := srv.UserRepository.Create(ctx, user); err != nil {
 		return nil, err
 	}
 
-	var err error
 	user, err = srv.UserRepository.FindByEmail(ctx, user.Email)
 	if err != nil {
 		return nil, err

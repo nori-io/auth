@@ -12,6 +12,7 @@ type MfaRecoveryCodeService struct {
 	mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository
 	mfaRecoveryCodeHelper     mfa_recovery_code.MfaRecoveryCodesHelper
 	config                    config.Config
+	session                   session.Session
 }
 
 type Params struct {
@@ -26,5 +27,6 @@ func New(params Params) service.MfaRecoveryCodeService {
 		mfaRecoveryCodeRepository: params.MfaRecoveryCodeRepository,
 		mfaRecoveryCodeHelper:     params.MfaRecoveryCodeHelper,
 		config:                    params.Config,
+		session:                   params.Session,
 	}
 }

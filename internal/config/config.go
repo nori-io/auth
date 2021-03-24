@@ -11,4 +11,5 @@ type Config struct {
 	MfaRecoveryCodeLength  config.Int
 	MfaRecoveryCodeCount   config.Int
 	Issuer                 config.String
+	PasswordBcryptCost     config.Int
 }

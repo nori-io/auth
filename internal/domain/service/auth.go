@@ -11,7 +11,7 @@ import (
 
 type AuthenticationService interface {
 	SignUp(ctx context.Context, data SignUpData) (*entity.User, error)
-	SignIn(ctx context.Context, data SignInData) (*entity.Session, bool, error)
+	SignIn(ctx context.Context, data SignInData) (*entity.Session, *string, error)
 	SignInMfa(ctx context.Context, data SignInMfaData) (*entity.Session, error)
 	SignOut(ctx context.Context, data *entity.Session) error
 }
@@ -38,6 +38,7 @@ func (d SignUpData) Validate() error {
 	return v.Errors{
 		"email":    v.Validate(d.Email, v.Required, v.Length(3, 254), is.Email),
 		"password": v.Validate(d.Password, v.Required),
+
 		//@todo проверки для каптчи?
 	}.Filter()
 }

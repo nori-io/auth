@@ -15,3 +15,14 @@ func (u MfaType) Value() uint8 {
 func New(mfaType uint8) MfaType {
 	return MfaType(mfaType)
 }
+
+func (e MfaType) String() string {
+	switch e {
+	case Phone:
+		return "Phone"
+	case OTP:
+		return "OTP"
+	default:
+		return "None"
+	}
+}

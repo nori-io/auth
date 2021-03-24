@@ -67,23 +67,23 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 	return user, nil
 }
 
-func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignInData) (*entity.Session, string, error) {
+func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignInData) (*entity.Session, *string, error) {
 	var err error
 	if err = data.Validate(); err != nil {
-		return nil, false, err
+		return nil, nil, err
 	}
 
 	var user *entity.User
 	user, err = srv.UserRepository.FindByEmail(ctx, data.Email)
 	if err != nil {
-		return nil, false, err
+		return nil, nil, err
 	}
 
 	//@todo проверить пароль на корректность
 
 	sid, err := srv.getToken()
 	if err != nil {
-		return nil, false, err
+		return nil, nil, err
 	}
 
 	if err := srv.SessionRepository.Create(ctx, &entity.Session{
@@ -93,12 +93,12 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 		Status:     session_status.Active,
 		OpenedAt:   time.Now(),
 	}); err != nil {
-		return nil, false, err
+		return nil, nil, err
 	}
 
 	session, err := srv.SessionRepository.FindBySessionKey(ctx, string(sid))
 	if err != nil {
-		return nil, false, err
+		return nil, nil, err
 	}
 
 	if err = srv.AuthenticationLogRepository.Create(ctx, &entity.AuthenticationLog{
@@ -112,14 +112,18 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 	}); err != nil {
 		return &entity.Session{
 			SessionKey: sid,
-		}, false, err
+		}, nil, err
 	}
 
-	mfaType := user.MfaType.Value()
+	mfaType := user.MfaType.String()
+
+	if mfaType == mfa_type.Phone.String() {
+		//@todo послать смс на номер пользователя
+	}
 
 	return &entity.Session{
 		SessionKey: sid,
-	}, user.MfaType.Value(), nil
+	}, &mfaType, nil
 }
 
 func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.SignInMfaData) (*entity.Session, error) {
@@ -129,10 +133,12 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 	}
 
 	var session *entity.Session
-	session, err = srv.SessionRepository.FindBySessionKey(ctx, data.SessionKey)
+
+	err = srv.Session.Get([]byte(data.SessionKey), s.SessionActive)
 	if err != nil {
 		return nil, err
 	}
+
 	//@todo проверить кэш и отп
 	isCodeFounded := srv.MfaRecoveryCodeRepository.FindByUserIdMfaRecoveryCode(ctx, session.UserID, data.Code)
 

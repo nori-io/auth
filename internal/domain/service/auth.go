@@ -38,8 +38,6 @@ func (d SignUpData) Validate() error {
 	return v.Errors{
 		"email":    v.Validate(d.Email, v.Required, v.Length(3, 254), is.Email),
 		"password": v.Validate(d.Password, v.Required),
-
-		//@todo проверки для каптчи?
 	}.Filter()
 }
 

@@ -27,36 +27,29 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 	if err := data.Validate(); err != nil {
 		return nil, err
 	}
+	//@todo add checking action and token captcha
 
-	//@todo
 	if srv.Config.EmailVerification() {
-		return nil, nil
+		//@todo задействовать зависимость от плагина с интерфейсом mail
 	}
 
 	var user *entity.User
 
 	password, err := bcrypt.GenerateFromPassword([]byte(data.Password), srv.Config.PasswordBcryptCost())
 	//@todo заполнить оставшиеся поля
+
 	user = &entity.User{
-		ID:                     0,
-		Status:                 users_status.Active,
-		UserType:               users_type.User,
-		MfaType:                mfa_type.None,
-		Email:                  data.Email,
-		Password:               string(password),
-		HashAlgorithm:          hash_algorithm.Bcrypt,
-		IsEmailVerified:        srv.Config.EmailVerification(),
-		EmailActivationCodeTTL: time.Time{},
-		CreatedAt:              time.Now(),
-		UpdatedAt:              time.Time{},
+		Status:          users_status.Active,
+		UserType:        users_type.User,
+		MfaType:         mfa_type.None,
+		Email:           data.Email,
+		Password:        string(password),
+		HashAlgorithm:   hash_algorithm.Bcrypt,
+		IsEmailVerified: srv.Config.EmailVerification(),
+		CreatedAt:       time.Now(),
 	}
 
 	if err := srv.UserRepository.Create(ctx, user); err != nil {
-		return nil, err
-	}
-
-	user, err = srv.UserRepository.FindByEmail(ctx, user.Email)
-	if err != nil {
 		return nil, err
 	}
 
@@ -67,6 +60,25 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 		CreatedAt: time.Now(),
 	}); err != nil {
 		return user, err
+	}
+
+	user2 := &entity.User{
+		ID:                     user.ID,
+		Status:                 0,
+		UserType:               0,
+		MfaType:                0,
+		PhoneCountryCode:       "",
+		PhoneNumber:            "",
+		Email:                  "",
+		Password:               "",
+		Salt:                   "",
+		HashAlgorithm:          0,
+		IsEmailVerified:        false,
+		IsPhoneVerified:        false,
+		EmailActivationCode:    "",
+		EmailActivationCodeTTL: time.Time{},
+		CreatedAt:              time.Time{},
+		UpdatedAt:              time.Time{},
 	}
 
 	return user, nil

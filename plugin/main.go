@@ -70,7 +70,6 @@ func (p plugin) Init(ctx context.Context, config config.Config, log logger.Field
 		MfaRecoveryCodeLength:  config.Int("mfa.recoverycode.maxlength", "max length of mfaRecoveryCode"),
 		MfaRecoveryCodeCount:   config.Int("mfa.recoverycode.count", "count of mfa recovery codes"),
 		Issuer:                 config.String("mfa.issuer", "issuer"),
-		PasswordBcryptCost:     config.Int("password.bcrypt.cost", "cost passed into GenerateFromPassword func"),
 	}
 
 	p.logger = log

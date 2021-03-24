@@ -7,6 +7,7 @@ import (
 	"github.com/nori-io/common/v4/pkg/domain/logger"
 	"github.com/nori-io/common/v4/pkg/domain/registry"
 	noriGorm "github.com/nori-io/interfaces/database/orm/gorm"
+	noriCache "github.com/nori-io/interfaces/nori/cache"
 	noriHttp "github.com/nori-io/interfaces/nori/http"
 	"github.com/nori-io/interfaces/nori/session"
 	"github.com/nori-plugins/authentication/internal/app"

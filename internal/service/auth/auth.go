@@ -23,22 +23,20 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
+//@todo add checking action and token captcha
 func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUpData) (*entity.User, error) {
 	if err := data.Validate(); err != nil {
 		return nil, err
 	}
-	//@todo add checking action and token captcha
 
 	if srv.Config.EmailVerification() {
 		//@todo задействовать зависимость от плагина с интерфейсом mail
 	}
 
-	var user *entity.User
-
 	password, err := bcrypt.GenerateFromPassword([]byte(data.Password), srv.Config.PasswordBcryptCost())
 	//@todo заполнить оставшиеся поля
 
-	user = &entity.User{
+	user := &entity.User{
 		Status:          users_status.Active,
 		UserType:        users_type.User,
 		MfaType:         mfa_type.None,
@@ -51,6 +49,7 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 
 	tx := srv.DB.Begin()
 	if err := srv.UserRepository.Create(tx, ctx, user); err != nil {
+		tx.Rollback()
 		return nil, err
 	}
 
@@ -62,6 +61,7 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 	}
 
 	if err = srv.AuthenticationLogRepository.Create(tx, ctx, authenticationLog); err != nil {
+		tx.Rollback()
 		return nil, err
 	}
 
@@ -71,18 +71,18 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 }
 
 func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignInData) (*entity.Session, *string, error) {
-	var err error
-	if err = data.Validate(); err != nil {
+	if err := data.Validate(); err != nil {
 		return nil, nil, err
 	}
 
-	var user *entity.User
-	user, err = srv.UserRepository.FindByEmail(ctx, data.Email)
+	user, err := srv.UserRepository.FindByEmail(ctx, data.Email)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	//@todo проверить пароль на корректность
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(data.Password)); err != nil {
+		return nil, nil, err
+	}
 
 	sid, err := srv.getToken()
 	if err != nil {
@@ -98,11 +98,13 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 		Status:     session_status.Active,
 		OpenedAt:   time.Now(),
 	}); err != nil {
+		tx.Rollback()
 		return nil, nil, err
 	}
 
 	session, err := srv.SessionRepository.FindBySessionKey(ctx, string(sid))
 	if err != nil {
+		tx.Rollback()
 		return nil, nil, err
 	}
 
@@ -115,9 +117,8 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 		SessionID: session.ID,
 		CreatedAt: time.Now(),
 	}); err != nil {
-		return &entity.Session{
-			SessionKey: sid,
-		}, nil, err
+		tx.Rollback()
+		return nil, nil, err
 	}
 
 	tx.Commit()
@@ -172,6 +173,7 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 		Status:     session_status.Active,
 		OpenedAt:   time.Now(),
 	}); err != nil {
+		tx.Rollback()
 		//@todo тут тоже возвращается ошибка, как быть?
 		//создать новый тип ошибки?
 		//и как быть в коде дальше
@@ -181,6 +183,7 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 
 	session, err = srv.SessionRepository.FindBySessionKey(ctx, string(sid))
 	if err != nil {
+		tx.Rollback()
 		return nil, err
 	}
 
@@ -193,9 +196,8 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 		SessionID: session.ID,
 		CreatedAt: time.Now(),
 	}); err != nil {
-		return &entity.Session{
-			SessionKey: sid,
-		}, err
+		tx.Rollback()
+		return nil, err
 	}
 
 	tx.Commit()
@@ -223,6 +225,7 @@ func (srv *AuthenticationService) SignOut(ctx context.Context, sess *entity.Sess
 		ClosedAt:  time.Now(),
 		UpdatedAt: time.Now(),
 	}); err != nil {
+		tx.Rollback()
 		return err
 	}
 
@@ -233,6 +236,7 @@ func (srv *AuthenticationService) SignOut(ctx context.Context, sess *entity.Sess
 		SessionID: session.ID,
 		CreatedAt: time.Now(),
 	}); err != nil {
+		tx.Rollback()
 		return err
 	}
 

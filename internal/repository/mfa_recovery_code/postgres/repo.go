@@ -21,7 +21,6 @@ func (r MfaRecoveryCodeRepository) Create(tx *gorm.DB, ctx context.Context, e []
 	lastRecord := new(model)
 
 	if err := r.Db.Create(mfaRecoveryCodes).Scan(&lastRecord).Error; err != nil {
-		tx.Rollback()
 		return err
 	}
 	lastRecord.Convert()
@@ -50,7 +49,6 @@ func (r MfaRecoveryCodeRepository) DeleteMfaRecoveryCode(ctx context.Context, us
 
 func (r MfaRecoveryCodeRepository) DeleteMfaRecoveryCodes(tx *gorm.DB, ctx context.Context, userId uint64) error {
 	if err := r.Db.Delete(&model{UserID: userId}).Error; err != nil {
-		tx.Rollback()
 		return err
 	}
 	return nil

@@ -25,7 +25,6 @@ func (r *UserRepository) Create(tx *gorm.DB, ctx context.Context, e *entity.User
 	lastRecord := new(model)
 
 	if err := tx.Create(modelUser).Scan(&lastRecord).Error; err != nil {
-		tx.Rollback()
 		return err
 	}
 	lastRecord.Convert()

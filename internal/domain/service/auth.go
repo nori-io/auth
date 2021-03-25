@@ -43,7 +43,10 @@ func (d SignUpData) Validate() error {
 
 //@todo ?
 func (d SignInData) Validate() error {
-	return nil
+	return v.Errors{
+		"email":    v.Validate(d.Email, v.Required, v.Length(3, 254), is.Email),
+		"password": v.Validate(d.Password, v.Required),
+	}.Filter()
 }
 
 //@todo ?

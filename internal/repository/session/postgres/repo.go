@@ -17,7 +17,6 @@ func (r *SessionRepository) Create(tx *gorm.DB, ctx context.Context, e *entity.S
 	lastRecord := new(model)
 
 	if err := tx.Create(modelSession).Scan(&lastRecord).Error; err != nil {
-		tx.Rollback()
 		return err
 	}
 	lastRecord.Convert()

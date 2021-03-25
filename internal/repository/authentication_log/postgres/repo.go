@@ -17,7 +17,6 @@ func (r *AuthenticationLogRepository) Create(tx *gorm.DB, ctx context.Context, e
 	lastRecord := new(model)
 
 	if err := tx.Create(modelAuthenticationLog).Scan(&lastRecord).Error; err != nil {
-		tx.Rollback()
 		return err
 	}
 	lastRecord.Convert()

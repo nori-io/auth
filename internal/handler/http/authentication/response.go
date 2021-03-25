@@ -13,6 +13,7 @@ type SignUpResponse struct {
 
 type SignInResponse struct {
 	SessionID string
+	MfaType   string
 }
 
 func JSON(w http.ResponseWriter, r *http.Request, v interface{}) {

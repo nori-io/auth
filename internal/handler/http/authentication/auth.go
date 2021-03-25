@@ -54,12 +54,13 @@ func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	sess, err := h.authenticationService.SignIn(r.Context(), data)
+	sess, mfaType, err := h.authenticationService.SignIn(r.Context(), data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	JSON(w, r, SignInResponse{
 		SessionID: string(sess.SessionKey),
+		MfaType:   *mfaType,
 	})
 }
 

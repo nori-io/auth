@@ -1,6 +1,7 @@
 package mfa_recovery_code
 
 import (
+	"github.com/jinzhu/gorm"
 	"github.com/nori-io/interfaces/nori/session"
 	"github.com/nori-plugins/authentication/internal/config"
 	"github.com/nori-plugins/authentication/internal/domain/helper/mfa_recovery_code"
@@ -13,6 +14,7 @@ type MfaRecoveryCodeService struct {
 	mfaRecoveryCodeHelper     mfa_recovery_code.MfaRecoveryCodesHelper
 	config                    config.Config
 	session                   session.Session
+	db                        *gorm.DB
 }
 
 type Params struct {
@@ -20,6 +22,7 @@ type Params struct {
 	MfaRecoveryCodeHelper     mfa_recovery_code.MfaRecoveryCodesHelper
 	Config                    config.Config
 	Session                   session.Session
+	Db                        *gorm.DB
 }
 
 func New(params Params) service.MfaRecoveryCodeService {
@@ -28,5 +31,6 @@ func New(params Params) service.MfaRecoveryCodeService {
 		mfaRecoveryCodeHelper:     params.MfaRecoveryCodeHelper,
 		config:                    params.Config,
 		session:                   params.Session,
+		db:                        params.Db,
 	}
 }

@@ -166,6 +166,7 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 	}
 
 	sid, err := srv.getToken()
+	srv.Session.Delete([]byte(data.SessionKey))
 	if err != nil {
 		return nil, err
 	}

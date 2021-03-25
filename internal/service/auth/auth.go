@@ -99,11 +99,14 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 		OpenedAt:   time.Now(),
 	}); err != nil {
 		tx.Rollback()
+		srv.Session.Delete(sid)
 		return nil, nil, err
 	}
 
 	session, err := srv.SessionRepository.FindBySessionKey(ctx, string(sid))
 	if err != nil {
+		srv.Session.Delete(sid)
+
 		tx.Rollback()
 		return nil, nil, err
 	}
@@ -117,6 +120,8 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 		SessionID: session.ID,
 		CreatedAt: time.Now(),
 	}); err != nil {
+		srv.Session.Delete(sid)
+
 		tx.Rollback()
 		return nil, nil, err
 	}
@@ -183,6 +188,8 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 
 	session, err = srv.SessionRepository.FindBySessionKey(ctx, string(sid))
 	if err != nil {
+		srv.Session.Delete(sid)
+
 		tx.Rollback()
 		return nil, err
 	}
@@ -196,6 +203,8 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 		SessionID: session.ID,
 		CreatedAt: time.Now(),
 	}); err != nil {
+		srv.Session.Delete(sid)
+
 		tx.Rollback()
 		return nil, err
 	}

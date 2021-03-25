@@ -48,6 +48,7 @@ func Initialize(registry2 registry.Registry, config2 config.Config, logger2 logg
 		UserRepository:              userRepository,
 		AuthenticationLogRepository: authenticationLogRepository,
 		Session:                     sessionSession,
+		DB:                          db,
 	}
 	authenticationService := auth.New(params)
 	authenticationParams := authentication.Params{

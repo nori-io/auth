@@ -89,6 +89,8 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 		return nil, nil, err
 	}
 
+	tx := srv.DB.Begin()
+
 	if err := srv.SessionRepository.Create(ctx, &entity.Session{
 		ID:         0,
 		UserID:     user.ID,
@@ -103,8 +105,6 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 	if err != nil {
 		return nil, nil, err
 	}
-
-	tx := srv.DB.Begin()
 
 	if err = srv.AuthenticationLogRepository.Create(tx, ctx, &entity.AuthenticationLog{
 		ID:     0,
@@ -164,13 +164,18 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 		return nil, err
 	}
 
-	if err := srv.SessionRepository.Create(ctx, &entity.Session{
+	tx := srv.DB.Begin()
+	if err := srv.SessionRepository.Create(tx, ctx, &entity.Session{
 		ID:         0,
 		UserID:     session.UserID,
 		SessionKey: sid,
 		Status:     session_status.Active,
 		OpenedAt:   time.Now(),
 	}); err != nil {
+		//@todo тут тоже возвращается ошибка, как быть?
+		//создать новый тип ошибки?
+		//и как быть в коде дальше
+		srv.Session.Delete(sid)
 		return nil, err
 	}
 
@@ -179,7 +184,7 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 		return nil, err
 	}
 
-	if err = srv.AuthenticationLogRepository.Create(ctx, &entity.AuthenticationLog{
+	if err = srv.AuthenticationLogRepository.Create(tx, ctx, &entity.AuthenticationLog{
 		ID:     0,
 		UserID: session.UserID,
 		Action: users_action.SignInMfa,
@@ -193,6 +198,7 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 		}, err
 	}
 
+	tx.Commit()
 	return &entity.Session{
 		SessionKey: sid,
 	}, nil

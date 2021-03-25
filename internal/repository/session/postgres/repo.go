@@ -11,12 +11,13 @@ type SessionRepository struct {
 	Db *gorm.DB
 }
 
-func (r *SessionRepository) Create(ctx context.Context, e *entity.Session) error {
+func (r *SessionRepository) Create(tx *gorm.DB, ctx context.Context, e *entity.Session) error {
 	modelSession := NewModel(e)
 
 	lastRecord := new(model)
 
-	if err := r.Db.Create(modelSession).Scan(&lastRecord).Error; err != nil {
+	if err := tx.Create(modelSession).Scan(&lastRecord).Error; err != nil {
+		tx.Rollback()
 		return err
 	}
 	lastRecord.Convert()

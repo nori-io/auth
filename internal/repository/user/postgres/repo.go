@@ -19,12 +19,13 @@ func (r *UserRepository) Count(ctx context.Context) (uint64, error) {
 	return count, err
 }
 
-func (r *UserRepository) Create(ctx context.Context, e *entity.User) error {
+func (r *UserRepository) Create(tx *gorm.DB, ctx context.Context, e *entity.User) error {
 	modelUser := NewModel(e)
 
 	lastRecord := new(model)
 
-	if err := r.Db.Create(modelUser).Scan(&lastRecord).Error; err != nil {
+	if err := tx.Create(modelUser).Scan(&lastRecord).Error; err != nil {
+		tx.Rollback()
 		return err
 	}
 	lastRecord.Convert()

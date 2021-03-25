@@ -49,37 +49,23 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 		CreatedAt:       time.Now(),
 	}
 
-	if err := srv.UserRepository.Create(ctx, user); err != nil {
+	tx := srv.DB.Begin()
+	if err := srv.UserRepository.Create(tx, ctx, user); err != nil {
 		return nil, err
 	}
 
-	if err = srv.AuthenticationLogRepository.Create(ctx, &entity.AuthenticationLog{
+	authenticationLog := &entity.AuthenticationLog{
 		UserID: user.ID,
 		Action: users_action.SignUp,
 		//@todo заполнить метаданные айпи адресом и городом или чем-то ещё?
 		CreatedAt: time.Now(),
-	}); err != nil {
-		return user, err
 	}
 
-	user2 := &entity.User{
-		ID:                     user.ID,
-		Status:                 0,
-		UserType:               0,
-		MfaType:                0,
-		PhoneCountryCode:       "",
-		PhoneNumber:            "",
-		Email:                  "",
-		Password:               "",
-		Salt:                   "",
-		HashAlgorithm:          0,
-		IsEmailVerified:        false,
-		IsPhoneVerified:        false,
-		EmailActivationCode:    "",
-		EmailActivationCodeTTL: time.Time{},
-		CreatedAt:              time.Time{},
-		UpdatedAt:              time.Time{},
+	if err = srv.AuthenticationLogRepository.Create(tx, ctx, authenticationLog); err != nil {
+		return nil, err
 	}
+
+	tx.Commit()
 
 	return user, nil
 }

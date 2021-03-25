@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"github.com/jinzhu/gorm"
 	s "github.com/nori-io/interfaces/nori/session"
 	"github.com/nori-plugins/authentication/internal/config"
 	"github.com/nori-plugins/authentication/internal/domain/repository"
@@ -14,6 +15,7 @@ type AuthenticationService struct {
 	SessionRepository           repository.SessionRepository
 	MfaRecoveryCodeRepository   repository.MfaRecoveryCodeRepository
 	Session                     s.Session
+	DB                          *gorm.DB
 }
 
 type Params struct {
@@ -23,6 +25,7 @@ type Params struct {
 	SessionRepository           repository.SessionRepository
 	UserRepository              repository.UserRepository
 	Session                     s.Session
+	DB                          *gorm.DB
 }
 
 func New(params Params) service.AuthenticationService {
@@ -33,5 +36,6 @@ func New(params Params) service.AuthenticationService {
 		SessionRepository:           params.SessionRepository,
 		UserRepository:              params.UserRepository,
 		Session:                     params.Session,
+		DB:                          params.DB,
 	}
 }

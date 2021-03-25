@@ -11,12 +11,13 @@ type AuthenticationLogRepository struct {
 	Db *gorm.DB
 }
 
-func (r *AuthenticationLogRepository) Create(ctx context.Context, e *entity.AuthenticationLog) error {
+func (r *AuthenticationLogRepository) Create(tx *gorm.DB, ctx context.Context, e *entity.AuthenticationLog) error {
 	modelAuthenticationLog := NewModel(e)
 
 	lastRecord := new(model)
 
-	if err := r.Db.Create(modelAuthenticationLog).Scan(&lastRecord).Error; err != nil {
+	if err := tx.Create(modelAuthenticationLog).Scan(&lastRecord).Error; err != nil {
+		tx.Rollback()
 		return err
 	}
 	lastRecord.Convert()

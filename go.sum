@@ -34,6 +34,8 @@ github.com/mattn/go-sqlite3 v1.14.0 h1:mLyGNKR8+Vv9CAU7PphKa2hkEqxxhn8i32J6FPj1/
 github.com/mattn/go-sqlite3 v1.14.0/go.mod h1:JIl7NbARA7phWnGvh0LKTyg7S9BA+6gx71ShQilpsus=
 github.com/nori-io/common/v4 v4.0.0 h1:0FXpBgbmmgiv8JWswR9d+DoQHiyqdmbCo8aZWQkk6Xc=
 github.com/nori-io/common/v4 v4.0.0/go.mod h1:eCj7GlyiP9QNw+cVvucqIdrkiAF5G6wgzXBPRAi3zQw=
+github.com/nori-io/interfaces v0.0.0-20201214121740-875e049f95da h1:qDNUnpMSYwcHhZwZjbt1BxnhcRL0nJRrbfk2kVuVXKk=
+github.com/nori-io/interfaces v0.0.0-20201214121740-875e049f95da/go.mod h1:B7yAZybAgh78Fbe/+tFtQ3FTpOhq7ALtXTN3tihHcMg=
 github.com/nori-io/interfaces/database/orm/gorm v0.0.1 h1:eXWmVQRgM1LLQ9xs9v3U3dJL6VbbbuxVIkZ6mMpc6g0=
 github.com/nori-io/interfaces/database/orm/gorm v0.0.1/go.mod h1:Fvj3QsnL5AN4RhvUhIaJSYXwmpY0OWrh2wYjEz1AR9c=
 github.com/nori-io/interfaces/nori/http v0.0.1 h1:NiTnc2y/cTJ+5sSQM3JmA3YiQUzTfKRtva0Mo77IcqA=

@@ -104,7 +104,9 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 		return nil, nil, err
 	}
 
-	if err = srv.AuthenticationLogRepository.Create(ctx, &entity.AuthenticationLog{
+	tx := srv.DB.Begin()
+
+	if err = srv.AuthenticationLogRepository.Create(tx, ctx, &entity.AuthenticationLog{
 		ID:     0,
 		UserID: user.ID,
 		Action: users_action.SignIn,
@@ -117,6 +119,8 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 			SessionKey: sid,
 		}, nil, err
 	}
+
+	tx.Commit()
 
 	mfaType := user.MfaType.String()
 

@@ -91,7 +91,7 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 
 	tx := srv.DB.Begin()
 
-	if err := srv.SessionRepository.Create(ctx, &entity.Session{
+	if err := srv.SessionRepository.Create(tx, ctx, &entity.Session{
 		ID:         0,
 		UserID:     user.ID,
 		SessionKey: sid,
@@ -214,8 +214,9 @@ func (srv *AuthenticationService) SignOut(ctx context.Context, sess *entity.Sess
 		return err
 	}
 
+	tx := srv.DB.Begin()
 	//@todo если передать не все поля, то обнулятся ли непереданные поля в базе данных?
-	if err := srv.SessionRepository.Update(ctx, &entity.Session{
+	if err := srv.SessionRepository.Update(tx, ctx, &entity.Session{
 		ID:        session.ID,
 		UserID:    session.UserID,
 		Status:    session_status.Inactive,
@@ -225,7 +226,7 @@ func (srv *AuthenticationService) SignOut(ctx context.Context, sess *entity.Sess
 		return err
 	}
 
-	if err := srv.AuthenticationLogRepository.Create(ctx, &entity.AuthenticationLog{
+	if err := srv.AuthenticationLogRepository.Create(tx, ctx, &entity.AuthenticationLog{
 		ID:        0,
 		UserID:    session.UserID,
 		Action:    users_action.SignOut,
@@ -235,6 +236,7 @@ func (srv *AuthenticationService) SignOut(ctx context.Context, sess *entity.Sess
 		return err
 	}
 
+	tx.Commit()
 	return err
 }
 

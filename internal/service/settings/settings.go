@@ -4,11 +4,11 @@ import (
 	"context"
 
 	s "github.com/nori-io/interfaces/nori/session"
+	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
 func (srv SettingsService) ReceiveMfaStatus(ctx context.Context, sessionKey string) (*bool, error) {
-	err := srv.session.Get([]byte(sessionKey), s.SessionActive)
-	if err != nil {
+	if err := srv.session.Get([]byte(sessionKey), s.SessionActive); err != nil {
 		return nil, err
 	}
 
@@ -28,7 +28,23 @@ func (srv SettingsService) ReceiveMfaStatus(ctx context.Context, sessionKey stri
 }
 
 func (srv SettingsService) DisableMfa(ctx context.Context, sessionKey string) error {
-	panic("implement me")
+	if err := srv.session.Get([]byte(sessionKey), s.SessionActive); err != nil {
+		return err
+	}
+
+	session, err := srv.sessionRepository.FindBySessionKey(ctx, sessionKey)
+	if err != nil {
+		return err
+	}
+
+	if err := srv.userRepository.Update(ctx, &entity.User{
+		ID:      session.UserID,
+		MfaType: 0,
+	}); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (srv SettingsService) ChangePassword(ctx context.Context, sessionKey string, passwordOld string, passwordNew string) error {

@@ -33,19 +33,13 @@ func (h *AuthenticationHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	user, err := h.authenticationService.SignUp(r.Context(), data)
+	_, err = h.authenticationService.SignUp(r.Context(), data)
 	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	if user == nil {
-		h.logger.Error("%s", err)
-		http.Error(w, "sign up error", http.StatusInternalServerError)
-	}
-	JSON(w, r, SignUpResponse{
-		ID:    user.ID,
-		Email: user.Email,
-	})
+
+	JSON(w, r, http.StatusCreated)
 }
 
 func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
@@ -58,9 +52,17 @@ func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
+	c := http.Cookie{
+		Name:     "ssid",
+		Value:    string(sess.SessionKey),
+		HttpOnly: true,
+	}
+
+	http.SetCookie(w, &c)
+
 	JSON(w, r, SignInResponse{
-		SessionID: string(sess.SessionKey),
-		MfaType:   *mfaType,
+		MfaType: *mfaType,
 	})
 }
 

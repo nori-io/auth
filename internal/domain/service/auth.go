@@ -51,5 +51,6 @@ func (d SignInData) Validate() error {
 
 //@todo ?
 func (d SignInMfaData) Validate() error {
+	//@todo нужно ли проверять длину кода
 	return nil
 }

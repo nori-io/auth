@@ -3,6 +3,8 @@ package settings
 import (
 	"context"
 
+	"golang.org/x/crypto/bcrypt"
+
 	s "github.com/nori-io/interfaces/nori/session"
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
@@ -48,6 +50,29 @@ func (srv SettingsService) DisableMfa(ctx context.Context, sessionKey string) er
 }
 
 func (srv SettingsService) ChangePassword(ctx context.Context, sessionKey string, passwordOld string, passwordNew string) error {
-	// расшифровать пароль с salt и hash и установить в качестве нового
-	panic("implement me")
+	if err := srv.session.Get([]byte(sessionKey), s.SessionActive); err != nil {
+		return err
+	}
+
+	session, err := srv.sessionRepository.FindBySessionKey(ctx, sessionKey)
+	if err != nil {
+		return err
+	}
+	user, err := srv.userRepository.FindById(ctx, session.UserID)
+	if err != nil {
+		return err
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(passwordOld)); err != nil {
+		return err
+	}
+
+	if err := srv.userRepository.Update(ctx, &entity.User{
+		ID:       user.ID,
+		Password: passwordNew,
+	}); err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -124,12 +124,12 @@ func (h *AuthenticationHandler) SignInMfa(w http.ResponseWriter, r *http.Request
 }
 
 func (h *AuthenticationHandler) SignOut(w http.ResponseWriter, r *http.Request) {
-	// todo: extract session ID from context
-	sessionIdContext := r.Context().Value("session_id")
+	sessionId, err := r.Cookie("ssid")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
 
-	sessionId, _ := sessionIdContext.([]byte)
-
-	if err := h.authenticationService.SignOut(r.Context(), &entity.Session{SessionKey: sessionId}); err != nil {
+	if err := h.authenticationService.SignOut(r.Context(), &entity.Session{SessionKey: []byte(sessionId.Value)}); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 

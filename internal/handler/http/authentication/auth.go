@@ -47,7 +47,7 @@ func (h *AuthenticationHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	response.JSON(w, r, http.StatusCreated)
+	w.WriteHeader(http.StatusCreated)
 }
 
 func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
@@ -78,8 +78,11 @@ func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, &c)
+	w.WriteHeader(http.StatusOK)
 
 	response.JSON(w, r, SignInResponse{
+		Success: true,
+		Message: "User sign in",
 		MfaType: *mfaType,
 	})
 }
@@ -94,8 +97,29 @@ func (h *AuthenticationHandler) SignInMfa(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
+	c := http.Cookie{
+		Name:   "ssid",
+		Value:  string(sess.SessionKey),
+		Path:   h.config.CookiesPath(),
+		Domain: h.config.CookiesDomain(),
+		//@todo Expires
+		Expires:    time.Unix(h.config.CookiesExpires(), 0),
+		RawExpires: h.config.CookiesRawExpires(),
+		MaxAge:     h.config.CookiesMaxAge(),
+		Secure:     h.config.CookiesSecure(),
+		HttpOnly:   h.config.CookiesHttpOnly(),
+		SameSite:   http.SameSite(h.config.CookiesSameSite()),
+		Raw:        h.config.CookiesRaw(),
+		Unparsed:   h.config.CookiesUnparsed(),
+	}
+	http.SetCookie(w, &c)
+
+	w.WriteHeader(http.StatusOK)
+
 	response.JSON(w, r, SignInMfaResponse{
-		SessionID: string(sess.SessionKey),
+		Success: true,
+		Message: "User sign in by mfa",
 	})
 }
 

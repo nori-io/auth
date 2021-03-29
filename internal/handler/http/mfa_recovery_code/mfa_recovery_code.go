@@ -16,11 +16,12 @@ func New(mfaRecoveryCodeService service.MfaRecoveryCodeService) *MfaRecoveryCode
 }
 
 func (h *MfaRecoveryCodeHandler) GetMfaRecoveryCodes(w http.ResponseWriter, r *http.Request) {
-	sessionIdContext := r.Context().Value("session_id")
+	sessionId, err := r.Cookie("ssid")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+	}
 
-	sessionId, _ := sessionIdContext.([]byte)
-
-	if _, err := h.MfaRecoveryCodeService.GetMfaRecoveryCodes(r.Context(), &entity.Session{SessionKey: sessionId}); err != nil {
+	if _, err := h.MfaRecoveryCodeService.GetMfaRecoveryCodes(r.Context(), &entity.Session{SessionKey: []byte(sessionId.Value)}); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 

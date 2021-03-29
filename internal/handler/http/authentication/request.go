@@ -48,16 +48,10 @@ type SignInMfaRequest struct {
 func newSignInMfaData(r *http.Request) (service.SignInMfaData, error) {
 	var body SignInMfaRequest
 
-	cSsid, err := r.Cookie("ssid")
-	if err != nil {
-		return service.SignInMfaData{}, err
-	}
-
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		return service.SignInMfaData{}, err
 	}
 	return service.SignInMfaData{
-		Code:       body.Code,
-		SessionKey: cSsid.Value,
+		Code: body.Code,
 	}, nil
 }

@@ -4,6 +4,10 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/nori-plugins/authentication/pkg/enum/session_status"
+
+	s "github.com/nori-io/interfaces/nori/session"
+
 	"github.com/nori-plugins/authentication/internal/config"
 
 	"github.com/nori-plugins/authentication/internal/handler/http/response"
@@ -19,12 +23,14 @@ type AuthenticationHandler struct {
 	authenticationService service.AuthenticationService
 	logger                logger.FieldLogger
 	config                config.Config
+	session               s.Session
 }
 
 type Params struct {
 	AuthenticationService service.AuthenticationService
 	Logger                logger.FieldLogger
 	Config                config.Config
+	Session               s.Session
 }
 
 func New(params Params) *AuthenticationHandler {
@@ -32,6 +38,7 @@ func New(params Params) *AuthenticationHandler {
 		authenticationService: params.AuthenticationService,
 		logger:                params.Logger,
 		config:                params.Config,
+		session:               params.Session,
 	}
 }
 
@@ -88,6 +95,16 @@ func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AuthenticationHandler) SignInMfa(w http.ResponseWriter, r *http.Request) {
+	sessionId, err := r.Cookie("ssid")
+	if err != nil {
+		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
+	}
+
+	h.session.Get([]byte(sessionId.Value), session_status.Active)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+	}
+
 	data, err := newSignInMfaData(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

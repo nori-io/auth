@@ -14,7 +14,6 @@ type AuthenticationService struct {
 	UserRepository              repository.UserRepository
 	SessionRepository           repository.SessionRepository
 	MfaRecoveryCodeRepository   repository.MfaRecoveryCodeRepository
-	Session                     s.Session
 	DB                          *gorm.DB
 }
 

@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/nori-plugins/authentication/internal/config"
+
 	"github.com/nori-plugins/authentication/internal/handler/http/response"
 
 	"github.com/nori-io/common/v4/pkg/domain/logger"
@@ -16,17 +18,20 @@ import (
 type AuthenticationHandler struct {
 	authenticationService service.AuthenticationService
 	logger                logger.FieldLogger
+	config                config.Config
 }
 
 type Params struct {
 	AuthenticationService service.AuthenticationService
 	Logger                logger.FieldLogger
+	Config                config.Config
 }
 
 func New(params Params) *AuthenticationHandler {
 	return &AuthenticationHandler{
 		authenticationService: params.AuthenticationService,
 		logger:                params.Logger,
+		config:                params.Config,
 	}
 }
 
@@ -57,18 +62,19 @@ func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c := http.Cookie{
-		Name:       "ssid",
-		Value:      string(sess.SessionKey),
-		Path:       "",
-		Domain:     "",
-		Expires:    time.Time{},
-		RawExpires: "",
-		MaxAge:     0,
-		Secure:     false,
-		HttpOnly:   true,
-		SameSite:   0,
-		Raw:        "",
-		Unparsed:   nil,
+		Name:   "ssid",
+		Value:  string(sess.SessionKey),
+		Path:   h.config.CookiesPath(),
+		Domain: h.config.CookiesDomain(),
+		//@todo Expires
+		Expires:    time.Unix(h.config.CookiesExpires(), 0),
+		RawExpires: h.config.CookiesRawExpires(),
+		MaxAge:     h.config.CookiesMaxAge(),
+		Secure:     h.config.CookiesSecure(),
+		HttpOnly:   h.config.CookiesHttpOnly(),
+		SameSite:   http.SameSite(h.config.CookiesSameSite()),
+		Raw:        h.config.CookiesRaw(),
+		Unparsed:   h.config.CookiesUnparsed(),
 	}
 
 	http.SetCookie(w, &c)

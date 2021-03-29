@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"time"
 
 	authentication2 "github.com/nori-plugins/authentication/pkg/authentication"
 
@@ -74,12 +73,12 @@ func (p plugin) Init(ctx context.Context, config config.Config, log logger.Field
 		PasswordBcryptCost:     config.Int("password.bcrypt.cost", "cost passed into GenerateFromPassword func"),
 		CookiesPath:            config.String("cookies.path", "path of cookies"),
 		CookiesDomain:          config.String("cookies.domain", "domain of cookies"),
-		CookiesExpires:         config.UInt64("cookies.expires", ""),
+		CookiesExpires:         config.Int64("cookies.expires", ""),
 		CookiesRawExpires:      config.String("cookies.rawexpires", ""),
-		CookiesMaxAge:          config.UInt64("cookies.maxage", ""),
+		CookiesMaxAge:          config.Int("cookies.maxage", ""),
 		CookiesSecure:          config.Bool("cookies.secure", ""),
 		CookiesHttpOnly:        config.Bool("cookies.httponly", ""),
-		CookiesSameSite:        config.UInt64("cookies.samesite", ""),
+		CookiesSameSite:        config.Int("cookies.samesite", ""),
 		CookiesRaw:             config.String("cookies.raw", ""),
 		CookiesUnparsed:        config.SliceString("cookies.unparsed", ""),
 	}

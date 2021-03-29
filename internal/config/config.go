@@ -14,12 +14,12 @@ type Config struct {
 	PasswordBcryptCost     config.Int
 	CookiesPath            config.String
 	CookiesDomain          config.String
-	CookiesExpires         config.UInt64
+	CookiesExpires         config.Int64
 	CookiesRawExpires      config.String
-	CookiesMaxAge          config.UInt64
+	CookiesMaxAge          config.Int
 	CookiesSecure          config.Bool
 	CookiesHttpOnly        config.Bool
-	CookiesSameSite        config.UInt64
+	CookiesSameSite        config.Int64
 	CookiesRaw             config.String
 	CookiesUnparsed        config.SliceString
 }

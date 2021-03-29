@@ -46,11 +46,11 @@ func New(params Params) *Handler {
 	}
 
 	// todo: add middleware
-	handler.R.Get("/auth/signup", handler.AuthenticationHandler.SignUp)
-	handler.R.Get("/auth/signin", handler.AuthenticationHandler.SignIn)
-	handler.R.Get("/auth/signin/mfa", handler.AuthenticationHandler.SignInMfa)
+	handler.R.Post("/auth/signup", handler.AuthenticationHandler.SignUp)
+	handler.R.Post("/auth/signin", handler.AuthenticationHandler.SignIn)
+	handler.R.Post("/auth/signin/mfa", handler.AuthenticationHandler.SignInMfa)
 	handler.R.Get("/auth/signout", handler.AuthenticationHandler.SignOut)
-
+	handler.R.Get("/auth/session", handler.AuthenticationHandler.Session)
 	// mfa
 	// handler.R.Get("/auth/settings/mfa", handler.SettingsHandler)
 

@@ -42,6 +42,19 @@ func New(params Params) *AuthenticationHandler {
 	}
 }
 
+func (h *AuthenticationHandler) Session(w http.ResponseWriter, r *http.Request) {
+	sessionId, err := r.Cookie("ssid")
+	if err != nil {
+		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
+	}
+
+	h.session.Get([]byte(sessionId.Value), session_status.Active)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+	}
+	//@todo какую информацию о сессии вернуть?
+}
+
 func (h *AuthenticationHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	data, err := newSignUpData(r)
 	if err != nil {

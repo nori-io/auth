@@ -3,7 +3,7 @@ package settings
 import (
 	"net/http"
 
-	"github.com/nori-plugins/authentication/internal/handler/http/authentication"
+	"github.com/nori-plugins/authentication/internal/handler/http/response"
 
 	"github.com/nori-io/common/v4/pkg/domain/logger"
 	"github.com/nori-plugins/authentication/internal/domain/service"
@@ -37,5 +37,5 @@ func (h *SettingsHandler) DisableMfa(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	authentication.JSON(w, r, http.StatusOK)
+	response.JSON(w, r, http.StatusOK)
 }

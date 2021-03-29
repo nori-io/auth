@@ -3,6 +3,8 @@ package mfa_secret
 import (
 	"net/http"
 
+	"github.com/nori-plugins/authentication/internal/handler/http/response"
+
 	"github.com/nori-plugins/authentication/internal/handler/http/authentication"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
@@ -41,7 +43,7 @@ func (h *MfaSecretHandler) PutSecret(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "sign up error", http.StatusInternalServerError)
 	}
 
-	authentication.JSON(w, r, MfaSecretResponse{
+	response.JSON(w, r, MfaSecretResponse{
 		Login:  login,
 		Issuer: issuer,
 	})

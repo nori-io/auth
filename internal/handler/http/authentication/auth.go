@@ -2,6 +2,9 @@ package authentication
 
 import (
 	"net/http"
+	"time"
+
+	"github.com/nori-plugins/authentication/internal/handler/http/response"
 
 	"github.com/nori-io/common/v4/pkg/domain/logger"
 
@@ -39,7 +42,7 @@ func (h *AuthenticationHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	JSON(w, r, http.StatusCreated)
+	response.JSON(w, r, http.StatusCreated)
 }
 
 func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
@@ -54,14 +57,23 @@ func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c := http.Cookie{
-		Name:     "ssid",
-		Value:    string(sess.SessionKey),
-		HttpOnly: true,
+		Name:       "ssid",
+		Value:      string(sess.SessionKey),
+		Path:       "",
+		Domain:     "",
+		Expires:    time.Time{},
+		RawExpires: "",
+		MaxAge:     0,
+		Secure:     false,
+		HttpOnly:   true,
+		SameSite:   0,
+		Raw:        "",
+		Unparsed:   nil,
 	}
 
 	http.SetCookie(w, &c)
 
-	JSON(w, r, SignInResponse{
+	response.JSON(w, r, SignInResponse{
 		MfaType: *mfaType,
 	})
 }
@@ -76,7 +88,7 @@ func (h *AuthenticationHandler) SignInMfa(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	JSON(w, r, SignInResponse{
+	response.JSON(w, r, SignInMfaResponse{
 		SessionID: string(sess.SessionKey),
 	})
 }

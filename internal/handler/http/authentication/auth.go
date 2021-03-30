@@ -52,7 +52,22 @@ func (h *AuthenticationHandler) Session(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 	}
-	//@todo какую информацию о сессии вернуть?
+
+	sess, user, err := h.authenticationService.GetSessionInfo(r.Context(), sessionId.Value)
+	if err != nil {
+		h.logger.Error("%s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	w.WriteHeader(http.StatusOK)
+
+	response.JSON(w, r, SessionResponse{
+		Success:  true,
+		Message:  "session exists",
+		Email:    user.Email,
+		Phone:    user.PhoneCountryCode + user.PhoneNumber,
+		OpenedAt: sess.OpenedAt,
+	})
 }
 
 func (h *AuthenticationHandler) SignUp(w http.ResponseWriter, r *http.Request) {

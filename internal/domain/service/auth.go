@@ -14,6 +14,7 @@ type AuthenticationService interface {
 	SignIn(ctx context.Context, data SignInData) (*entity.Session, *string, error)
 	SignInMfa(ctx context.Context, data SignInMfaData) (*entity.Session, error)
 	SignOut(ctx context.Context, data *entity.Session) error
+	GetSessionInfo(ctx context.Context, ssid string) (*entity.Session, *entity.User, error)
 }
 
 type SignUpData struct {

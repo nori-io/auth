@@ -1,5 +1,7 @@
 package authentication
 
+import "time"
+
 type SignInResponse struct {
 	Success bool
 	Message string
@@ -9,4 +11,12 @@ type SignInResponse struct {
 type SignInMfaResponse struct {
 	Success bool
 	Message string
+}
+
+type SessionResponse struct {
+	Success  bool
+	Message  string
+	Email    string
+	Phone    string
+	OpenedAt time.Time
 }

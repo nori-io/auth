@@ -254,6 +254,27 @@ func (srv *AuthenticationService) SignOut(ctx context.Context, sess *entity.Sess
 	return err
 }
 
+func (srv *AuthenticationService) GetSessionInfo(ctx context.Context, ssid string) (*entity.Session, *entity.User, error) {
+	session, err := srv.SessionRepository.FindBySessionKey(ctx, ssid)
+	if err != nil {
+		srv.Session.Delete([]byte(ssid))
+		return nil, nil, err
+	}
+
+	user, err := srv.UserRepository.FindById(ctx, session.UserID)
+	if err != nil {
+		return nil, nil, err
+	}
+	return &entity.Session{
+			OpenedAt: session.OpenedAt,
+		},
+		&entity.User{
+			PhoneCountryCode: user.PhoneCountryCode,
+			PhoneNumber:      user.PhoneNumber,
+			Email:            user.Email,
+		}, nil
+}
+
 func (srv *AuthenticationService) getToken() ([]byte, error) {
 	sid := make([]byte, 32)
 

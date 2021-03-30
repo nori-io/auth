@@ -51,10 +51,6 @@ func New(params Params) *Handler {
 	handler.R.Post("/auth/signin/mfa", handler.AuthenticationHandler.SignInMfa)
 	handler.R.Get("/auth/signout", handler.AuthenticationHandler.SignOut)
 	handler.R.Get("/auth/session", handler.AuthenticationHandler.Session)
-	// mfa
-	// handler.R.Get("/auth/settings/mfa", handler.SettingsHandler)
-
-	// h.R.Get("/auth/settings/mfa/verify?", handler.PutSecret)
 	handler.R.Get("/auth/settings/mfa/recovery_codes", handler.MfaRecoveryCodeHandler.GetMfaRecoveryCodes)
 	return &handler
 }

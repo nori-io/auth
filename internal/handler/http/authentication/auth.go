@@ -45,11 +45,13 @@ func New(params Params) *AuthenticationHandler {
 func (h *AuthenticationHandler) Session(w http.ResponseWriter, r *http.Request) {
 	sessionId, err := r.Cookie("ssid")
 	if err != nil {
+		h.logger.Error("%s", err)
 		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
 	}
 
-	h.session.Get([]byte(sessionId.Value), session_status.Active)
+	err = h.session.Get([]byte(sessionId.Value), session_status.Active)
 	if err != nil {
+		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 	}
 
@@ -171,7 +173,12 @@ func (h *AuthenticationHandler) SignInMfa(w http.ResponseWriter, r *http.Request
 func (h *AuthenticationHandler) SignOut(w http.ResponseWriter, r *http.Request) {
 	sessionId, err := r.Cookie("ssid")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+	}
+
+	h.session.Get([]byte(sessionId.Value), session_status.Active)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
 	}
 
 	if err := h.authenticationService.SignOut(r.Context(), &entity.Session{SessionKey: []byte(sessionId.Value)}); err != nil {

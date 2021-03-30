@@ -75,9 +75,12 @@ func (h *AuthenticationHandler) Session(w http.ResponseWriter, r *http.Request) 
 func (h *AuthenticationHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	data, err := newSignUpData(r)
 	if err != nil {
+		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
+	//@todo проверить, нет ли у пользователя сессии, если есть, то выдать ошибку 403
+	//@todo если пользователь уже зарегистрирован, то выдать ошибку 409
 	_, err = h.authenticationService.SignUp(r.Context(), data)
 	if err != nil {
 		h.logger.Error("%s", err)
@@ -90,11 +93,13 @@ func (h *AuthenticationHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	data, err := newSignInData(r)
 	if err != nil {
+		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
 	sess, mfaType, err := h.authenticationService.SignIn(r.Context(), data)
 	if err != nil {
+		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
@@ -114,6 +119,7 @@ func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 		Unparsed:   h.config.CookiesUnparsed(),
 	}
 
+	//@todo логировать положительные действия?
 	http.SetCookie(w, &c)
 	w.WriteHeader(http.StatusOK)
 
@@ -127,21 +133,25 @@ func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 func (h *AuthenticationHandler) SignInMfa(w http.ResponseWriter, r *http.Request) {
 	sessionId, err := r.Cookie("ssid")
 	if err != nil {
+		h.logger.Error("%s", err)
 		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
 	}
 
 	h.session.Get([]byte(sessionId.Value), session_status.Active)
 	if err != nil {
+		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 	}
 
 	data, err := newSignInMfaData(r)
 	if err != nil {
+		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
 	sess, err := h.authenticationService.SignInMfa(r.Context(), data)
 	if err != nil {
+		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
@@ -173,15 +183,30 @@ func (h *AuthenticationHandler) SignInMfa(w http.ResponseWriter, r *http.Request
 func (h *AuthenticationHandler) SignOut(w http.ResponseWriter, r *http.Request) {
 	sessionId, err := r.Cookie("ssid")
 	if err != nil {
+		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 	}
 
-	h.session.Get([]byte(sessionId.Value), session_status.Active)
+	data:=&entity.Session{
+		ID:         0,
+		UserID:     0,
+		SessionKey: nil,
+		Status:     0,
+		OpenedAt:   time.Time{},
+		ClosedAt:   time.Time{},
+		UpdatedAt:  time.Time{},
+	}
+
+	err = h.session.Get([]byte(sessionId.Value), data)
 	if err != nil {
+		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 	}
+
+	if data.Status!=session_status.Active
 
 	if err := h.authenticationService.SignOut(r.Context(), &entity.Session{SessionKey: []byte(sessionId.Value)}); err != nil {
+		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 

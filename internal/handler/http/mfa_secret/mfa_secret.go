@@ -5,8 +5,6 @@ import (
 
 	"github.com/nori-plugins/authentication/internal/handler/http/response"
 
-	"github.com/nori-plugins/authentication/internal/handler/http/authentication"
-
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 	"github.com/nori-plugins/authentication/internal/domain/service"
 )

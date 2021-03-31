@@ -27,6 +27,26 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
+func (srv *AuthenticationService) GetSessionInfo(ctx context.Context, ssid string) (*entity.Session, *entity.User, error) {
+	session, err := srv.SessionRepository.FindBySessionKey(ctx, ssid)
+	if err != nil {
+		return nil, nil, errors.NewInternal(err)
+	}
+
+	user, err := srv.UserRepository.FindById(ctx, session.UserID)
+	if err != nil {
+		return nil, nil, errors.NewInternal(err)
+	}
+	return &entity.Session{
+			OpenedAt: session.OpenedAt,
+		},
+		&entity.User{
+			PhoneCountryCode: user.PhoneCountryCode,
+			PhoneNumber:      user.PhoneNumber,
+			Email:            user.Email,
+		}, nil
+}
+
 //@todo add checking action and token captcha
 func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUpData) (*entity.User, error) {
 	if err := data.Validate(); err != nil {
@@ -111,14 +131,11 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 		OpenedAt:   time.Now(),
 	}); err != nil {
 		tx.Rollback()
-		srv.Session.Delete(sid)
 		return nil, nil, err
 	}
 
 	session, err := srv.SessionRepository.FindBySessionKey(ctx, string(sid))
 	if err != nil {
-		srv.Session.Delete(sid)
-
 		tx.Rollback()
 		return nil, nil, err
 	}
@@ -132,7 +149,6 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 		SessionID: session.ID,
 		CreatedAt: time.Now(),
 	}); err != nil {
-		srv.Session.Delete(sid)
 
 		tx.Rollback()
 		return nil, nil, err
@@ -159,11 +175,6 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 
 	var session *entity.Session
 
-	err = srv.Session.Get([]byte(data.SessionKey), s.SessionActive)
-	if err != nil {
-		return nil, err
-	}
-
 	//@todo проверить кэш и отп
 	isCodeFounded := srv.MfaRecoveryCodeRepository.FindByUserIdMfaRecoveryCode(ctx, session.UserID, data.Code)
 
@@ -178,10 +189,6 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 	}
 
 	sid, err := srv.getToken()
-	srv.Session.Delete([]byte(data.SessionKey))
-	if err != nil {
-		return nil, err
-	}
 
 	tx := srv.DB.Begin()
 	if err := srv.SessionRepository.Create(tx, ctx, &entity.Session{
@@ -195,14 +202,11 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 		//@todo тут тоже возвращается ошибка, как быть?
 		//создать новый тип ошибки?
 		//и как быть в коде дальше
-		srv.Session.Delete(sid)
 		return nil, err
 	}
 
 	session, err = srv.SessionRepository.FindBySessionKey(ctx, string(sid))
 	if err != nil {
-		srv.Session.Delete(sid)
-
 		tx.Rollback()
 		return nil, err
 	}
@@ -216,8 +220,6 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 		SessionID: session.ID,
 		CreatedAt: time.Now(),
 	}); err != nil {
-		srv.Session.Delete(sid)
-
 		tx.Rollback()
 		return nil, err
 	}
@@ -229,10 +231,6 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 }
 
 func (srv *AuthenticationService) SignOut(ctx context.Context, sess *entity.Session) error {
-	if err := srv.Session.Delete(sess.SessionKey); err != nil {
-		return err
-	}
-
 	session, err := srv.SessionRepository.FindBySessionKey(ctx, string(sess.SessionKey))
 	if err != nil {
 		return err
@@ -264,27 +262,6 @@ func (srv *AuthenticationService) SignOut(ctx context.Context, sess *entity.Sess
 
 	tx.Commit()
 	return err
-}
-
-func (srv *AuthenticationService) GetSessionInfo(ctx context.Context, ssid string) (*entity.Session, *entity.User, error) {
-	session, err := srv.SessionRepository.FindBySessionKey(ctx, ssid)
-	if err != nil {
-		srv.Session.Delete([]byte(ssid))
-		return nil, nil, err
-	}
-
-	user, err := srv.UserRepository.FindById(ctx, session.UserID)
-	if err != nil {
-		return nil, nil, err
-	}
-	return &entity.Session{
-			OpenedAt: session.OpenedAt,
-		},
-		&entity.User{
-			PhoneCountryCode: user.PhoneCountryCode,
-			PhoneNumber:      user.PhoneNumber,
-			Email:            user.Email,
-		}, nil
 }
 
 func (srv *AuthenticationService) getToken() ([]byte, error) {

@@ -5,15 +5,10 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
-	s "github.com/nori-io/interfaces/nori/session"
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
 func (srv SettingsService) ReceiveMfaStatus(ctx context.Context, sessionKey string) (*bool, error) {
-	if err := srv.session.Get([]byte(sessionKey), s.SessionActive); err != nil {
-		return nil, err
-	}
-
 	session, err := srv.sessionRepository.FindBySessionKey(ctx, sessionKey)
 	if err != nil {
 		return nil, err
@@ -30,10 +25,6 @@ func (srv SettingsService) ReceiveMfaStatus(ctx context.Context, sessionKey stri
 }
 
 func (srv SettingsService) DisableMfa(ctx context.Context, sessionKey string) error {
-	if err := srv.session.Get([]byte(sessionKey), s.SessionActive); err != nil {
-		return err
-	}
-
 	session, err := srv.sessionRepository.FindBySessionKey(ctx, sessionKey)
 	if err != nil {
 		return err
@@ -50,10 +41,6 @@ func (srv SettingsService) DisableMfa(ctx context.Context, sessionKey string) er
 }
 
 func (srv SettingsService) ChangePassword(ctx context.Context, sessionKey string, passwordOld string, passwordNew string) error {
-	if err := srv.session.Get([]byte(sessionKey), s.SessionActive); err != nil {
-		return err
-	}
-
 	session, err := srv.sessionRepository.FindBySessionKey(ctx, sessionKey)
 	if err != nil {
 		return err

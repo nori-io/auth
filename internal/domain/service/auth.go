@@ -25,9 +25,8 @@ type SignUpData struct {
 }
 
 type SignInData struct {
-	SessionKey string
-	Email      string
-	Password   string
+	Email    string
+	Password string
 }
 
 type SignInMfaData struct {

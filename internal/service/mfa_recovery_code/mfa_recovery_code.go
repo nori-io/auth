@@ -4,8 +4,6 @@ import (
 	"context"
 	"time"
 
-	s "github.com/nori-io/interfaces/nori/session"
-
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
@@ -15,11 +13,6 @@ func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data
 	//@todo будет ли использоваться паттерн?
 	//@todo нужна ли максимальная длина, или указать всё в паттерне?
 	//@todo указать ограничение на максимальную длину, связанную с базой данных?
-
-	err := srv.session.Get([]byte(data.SessionKey), s.SessionActive)
-	if err != nil {
-		return nil, err
-	}
 
 	var mfaRecoveryCodes []entity.MfaRecoveryCode
 	mfa_recovery_codes, err := srv.mfaRecoveryCodeHelper.Generate()

@@ -24,7 +24,6 @@ type Params struct {
 	MfaRecoveryCodeRepository   repository.MfaRecoveryCodeRepository
 	SessionRepository           repository.SessionRepository
 	UserRepository              repository.UserRepository
-	Session                     s.Session
 	DB                          *gorm.DB
 }
 
@@ -35,7 +34,6 @@ func New(params Params) service.AuthenticationService {
 		MfaRecoveryCodeRepository:   params.MfaRecoveryCodeRepository,
 		SessionRepository:           params.SessionRepository,
 		UserRepository:              params.UserRepository,
-		Session:                     params.Session,
 		DB:                          params.DB,
 	}
 }

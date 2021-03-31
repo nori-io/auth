@@ -59,7 +59,7 @@ func (h *AuthenticationHandler) Session(w http.ResponseWriter, r *http.Request) 
 	sess, user, err := h.authenticationService.GetSessionInfo(r.Context(), sessionId)
 	if err != nil {
 		h.logger.Error("%s", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.errorHelper.Error(w, err)
 	}
 
 	response.JSON(w, r, SessionResponse{
@@ -101,7 +101,7 @@ func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.cookieHelper.SetSession(w, sess)
-	//@todo логировать положительные действия?
+
 	response.JSON(w, r, SignInResponse{
 		Success: true,
 		Message: "User sign in",

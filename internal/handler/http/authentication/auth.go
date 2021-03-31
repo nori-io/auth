@@ -9,8 +9,6 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/helper/cookie"
 	"github.com/nori-plugins/authentication/pkg/enum/session_status"
 
-	s "github.com/nori-io/interfaces/nori/session"
-
 	"github.com/nori-plugins/authentication/internal/config"
 
 	"github.com/nori-plugins/authentication/internal/handler/http/response"
@@ -26,7 +24,6 @@ type AuthenticationHandler struct {
 	authenticationService service.AuthenticationService
 	logger                logger.FieldLogger
 	config                config.Config
-	session               s.Session
 	cookieHelper          cookie.CookieHelper
 	errorHelper           error2.ErrorHelper
 }
@@ -35,7 +32,6 @@ type Params struct {
 	AuthenticationService service.AuthenticationService
 	Logger                logger.FieldLogger
 	Config                config.Config
-	Session               s.Session
 	CookieHelper          cookie.CookieHelper
 	ErrorHelper           error2.ErrorHelper
 }
@@ -45,7 +41,6 @@ func New(params Params) *AuthenticationHandler {
 		authenticationService: params.AuthenticationService,
 		logger:                params.Logger,
 		config:                params.Config,
-		session:               params.Session,
 		cookieHelper:          params.CookieHelper,
 		errorHelper:           params.ErrorHelper,
 	}
@@ -56,12 +51,6 @@ func (h *AuthenticationHandler) Session(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
-	}
-
-	err = h.session.Get([]byte(sessionId), session_status.Active)
-	if err != nil {
-		h.logger.Error("%s", err)
-		http.Error(w, err.Error(), http.StatusUnauthorized)
 	}
 
 	sess, user, err := h.authenticationService.GetSessionInfo(r.Context(), sessionId)
@@ -126,12 +115,6 @@ func (h *AuthenticationHandler) SignInMfa(w http.ResponseWriter, r *http.Request
 		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
 	}
 
-	h.session.Get([]byte(sessionId.Value), session_status.Active)
-	if err != nil {
-		h.logger.Error("%s", err)
-		http.Error(w, err.Error(), http.StatusUnauthorized)
-	}
-
 	data, err := newSignInMfaData(r)
 	if err != nil {
 		h.logger.Error("%s", err)
@@ -167,12 +150,6 @@ func (h *AuthenticationHandler) SignOut(w http.ResponseWriter, r *http.Request) 
 		OpenedAt:   time.Time{},
 		ClosedAt:   time.Time{},
 		UpdatedAt:  time.Time{},
-	}
-
-	err = h.session.Get([]byte(sessionId.Value), data)
-	if err != nil {
-		h.logger.Error("%s", err)
-		http.Error(w, err.Error(), http.StatusUnauthorized)
 	}
 
 	if data.Status != session_status.Active {

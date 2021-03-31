@@ -11,6 +11,7 @@ import (
 var HandlerSet = wire.NewSet(
 	wire.Struct(new(httpHandler.Handler), "R", "AuthenticationHandler", "MfaRecoveryCodeHandler", "MfaSecretHandler"),
 	wire.Struct(new(authentication.Params), "AuthenticationService", "Logger"),
+	wire.Struct(new(mfa_recovery_code.Params), "MfaRecoveryCodeService", "Logger"),
 	authentication.New,
 	mfa_recovery_code.New,
 	mfa_secret.New,

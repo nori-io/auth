@@ -11,7 +11,6 @@ import (
 	"github.com/nori-io/common/v4/pkg/domain/registry"
 	"github.com/nori-io/interfaces/database/orm/gorm"
 	http2 "github.com/nori-io/interfaces/nori/http"
-	"github.com/nori-io/interfaces/nori/session"
 	"github.com/nori-plugins/authentication/internal/config"
 	"github.com/nori-plugins/authentication/internal/handler/http"
 	"github.com/nori-plugins/authentication/internal/handler/http/authentication"
@@ -40,14 +39,9 @@ func Initialize(registry2 registry.Registry, config2 config.Config, logger2 logg
 	}
 	userRepository := user.New(db)
 	authenticationLogRepository := authentication_log.New(db)
-	sessionSession, err := session.GetSession(registry2)
-	if err != nil {
-		return nil, err
-	}
 	params := auth.Params{
 		UserRepository:              userRepository,
 		AuthenticationLogRepository: authenticationLogRepository,
-		Session:                     sessionSession,
 		DB:                          db,
 	}
 	authenticationService := auth.New(params)
@@ -67,7 +61,11 @@ func Initialize(registry2 registry.Registry, config2 config.Config, logger2 logg
 		Config:                    config2,
 	}
 	mfaRecoveryCodeService := mfa_recovery_code3.New(params2)
-	mfaRecoveryCodeHandler := mfa_recovery_code4.New(mfaRecoveryCodeService)
+	params3 := mfa_recovery_code4.Params{
+		mfaRecoveryCodeService: mfaRecoveryCodeService,
+		logger:                 logger2,
+	}
+	mfaRecoveryCodeHandler := mfa_recovery_code4.New(params3)
 	mfaSecretRepository := mfa_secret.New(db)
 	mfa_secretParams := mfa_secret2.Params{
 		MfaSecretRepository: mfaSecretRepository,

@@ -83,6 +83,10 @@ func (h *AuthenticationHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
+	if data.SessionKey != "" {
+		h.cookieHelper.UnsetSession(w)
+	}
+
 	w.WriteHeader(http.StatusCreated)
 }
 
@@ -109,7 +113,7 @@ func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AuthenticationHandler) SignInMfa(w http.ResponseWriter, r *http.Request) {
-	sessionId, err := r.Cookie("ssid")
+	_, err := h.cookieHelper.GetSessionID(r)
 	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
@@ -136,10 +140,10 @@ func (h *AuthenticationHandler) SignInMfa(w http.ResponseWriter, r *http.Request
 }
 
 func (h *AuthenticationHandler) SignOut(w http.ResponseWriter, r *http.Request) {
-	sessionId, err := r.Cookie("ssid")
+	sessionId, err := h.cookieHelper.GetSessionID(r)
 	if err != nil {
 		h.logger.Error("%s", err)
-		http.Error(w, err.Error(), http.StatusUnauthorized)
+		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
 	}
 
 	data := &entity.Session{

@@ -22,11 +22,13 @@ type SignUpData struct {
 	Password      string
 	TokenCaptcha  string
 	ActionCaptcha string
+	SessionKey    string
 }
 
 type SignInData struct {
-	Email    string
-	Password string
+	SessionKey string
+	Email      string
+	Password   string
 }
 
 type SignInMfaData struct {

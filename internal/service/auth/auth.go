@@ -5,6 +5,10 @@ import (
 	"crypto/rand"
 	"time"
 
+	errors2 "github.com/nori-plugins/authentication/internal/domain/errors"
+
+	"github.com/nori-plugins/authentication/pkg/errors"
+
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/nori-plugins/authentication/pkg/enum/mfa_type"
@@ -26,17 +30,25 @@ import (
 //@todo add checking action and token captcha
 func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUpData) (*entity.User, error) {
 	if err := data.Validate(); err != nil {
-		return nil, err
+		return nil, errors.New("invalid_data", err.Error(), errors.ErrValidation)
 	}
 
 	if srv.Config.EmailVerification() {
 		//@todo задействовать зависимость от плагина с интерфейсом mail
 	}
 
-	password, err := bcrypt.GenerateFromPassword([]byte(data.Password), srv.Config.PasswordBcryptCost())
-	//@todo заполнить оставшиеся поля
+	user, err := srv.UserRepository.FindByEmail(ctx, data.Email)
+	if err != nil {
+		return nil, errors.NewInternal(err)
+	}
+	if user != nil {
+		return nil, errors2.DuplicateUser
+	}
 
-	user := &entity.User{
+	password, err := bcrypt.GenerateFromPassword([]byte(data.Password), srv.Config.PasswordBcryptCost())
+
+	//@todo заполнить оставшиеся поля по мере разработки нового функционала
+	user = &entity.User{
 		Status:          users_status.Active,
 		UserType:        users_type.User,
 		MfaType:         mfa_type.None,
@@ -50,7 +62,7 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 	tx := srv.DB.Begin()
 	if err := srv.UserRepository.Create(tx, ctx, user); err != nil {
 		tx.Rollback()
-		return nil, err
+		return nil, errors.NewInternal(err)
 	}
 
 	authenticationLog := &entity.AuthenticationLog{
@@ -62,7 +74,7 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 
 	if err = srv.AuthenticationLogRepository.Create(tx, ctx, authenticationLog); err != nil {
 		tx.Rollback()
-		return nil, err
+		return nil, errors.NewInternal(err)
 	}
 
 	tx.Commit()

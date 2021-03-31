@@ -104,21 +104,21 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 
 func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignInData) (*entity.Session, *string, error) {
 	if err := data.Validate(); err != nil {
-		return nil, nil, err
+		return nil, nil, errors.New("invalid_data", err.Error(), errors.ErrValidation)
 	}
 
 	user, err := srv.UserRepository.FindByEmail(ctx, data.Email)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errors.NewInternal(err)
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(data.Password)); err != nil {
-		return nil, nil, err
+		return nil, nil, errors.NewInternal(err)
 	}
 
 	sid, err := srv.getToken()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errors.NewInternal(err)
 	}
 
 	tx := srv.DB.Begin()
@@ -131,13 +131,13 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 		OpenedAt:   time.Now(),
 	}); err != nil {
 		tx.Rollback()
-		return nil, nil, err
+		return nil, nil, errors.NewInternal(err)
 	}
 
 	session, err := srv.SessionRepository.FindBySessionKey(ctx, string(sid))
 	if err != nil {
 		tx.Rollback()
-		return nil, nil, err
+		return nil, nil, errors.NewInternal(err)
 	}
 
 	if err = srv.AuthenticationLogRepository.Create(tx, ctx, &entity.AuthenticationLog{
@@ -151,7 +151,7 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 	}); err != nil {
 
 		tx.Rollback()
-		return nil, nil, err
+		return nil, nil, errors.NewInternal(err)
 	}
 
 	tx.Commit()
@@ -170,7 +170,7 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.SignInMfaData) (*entity.Session, error) {
 	var err error
 	if err = data.Validate(); err != nil {
-		return nil, err
+		return nil, errors.New("invalid_data", err.Error(), errors.ErrValidation)
 	}
 
 	var session *entity.Session

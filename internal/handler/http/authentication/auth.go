@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"time"
 
+	error2 "github.com/nori-plugins/authentication/internal/domain/helper/error"
+
 	"github.com/nori-plugins/authentication/internal/domain/helper/cookie"
 	"github.com/nori-plugins/authentication/pkg/enum/session_status"
 
@@ -26,6 +28,7 @@ type AuthenticationHandler struct {
 	config                config.Config
 	session               s.Session
 	cookieHelper          cookie.CookieHelper
+	errorHelper           error2.ErrorHelper
 }
 
 type Params struct {
@@ -34,6 +37,7 @@ type Params struct {
 	Config                config.Config
 	Session               s.Session
 	CookieHelper          cookie.CookieHelper
+	ErrorHelper           error2.ErrorHelper
 }
 
 func New(params Params) *AuthenticationHandler {
@@ -43,6 +47,7 @@ func New(params Params) *AuthenticationHandler {
 		config:                params.Config,
 		session:               params.Session,
 		cookieHelper:          params.CookieHelper,
+		errorHelper:           params.ErrorHelper,
 	}
 }
 
@@ -64,8 +69,6 @@ func (h *AuthenticationHandler) Session(w http.ResponseWriter, r *http.Request) 
 		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-
-	w.WriteHeader(http.StatusOK)
 
 	response.JSON(w, r, SessionResponse{
 		Success:  true,
@@ -109,8 +112,6 @@ func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 
 	h.cookieHelper.SetSession(w, sess)
 	//@todo логировать положительные действия?
-	w.WriteHeader(http.StatusOK)
-
 	response.JSON(w, r, SignInResponse{
 		Success: true,
 		Message: "User sign in",
@@ -175,7 +176,6 @@ func (h *AuthenticationHandler) SignOut(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if data.Status != session_status.Active {
-
 	}
 
 	if err := h.authenticationService.SignOut(r.Context(), &entity.Session{SessionKey: []byte(sessionId.Value)}); err != nil {

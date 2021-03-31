@@ -14,7 +14,7 @@ func JSON(w http.ResponseWriter, r *http.Request, v interface{}) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
+	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Context-Type", "application/json; charset=utf-8")
 	w.Write(buf.Bytes())
 }

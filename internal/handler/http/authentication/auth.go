@@ -22,6 +22,7 @@ import (
 
 type AuthenticationHandler struct {
 	authenticationService service.AuthenticationService
+	sessionService        service.SessionService
 	logger                logger.FieldLogger
 	config                config.Config
 	cookieHelper          cookie.CookieHelper
@@ -30,6 +31,7 @@ type AuthenticationHandler struct {
 
 type Params struct {
 	AuthenticationService service.AuthenticationService
+	SessionService        service.SessionService
 	Logger                logger.FieldLogger
 	Config                config.Config
 	CookieHelper          cookie.CookieHelper
@@ -39,6 +41,7 @@ type Params struct {
 func New(params Params) *AuthenticationHandler {
 	return &AuthenticationHandler{
 		authenticationService: params.AuthenticationService,
+		sessionService:        params.SessionService,
 		logger:                params.Logger,
 		config:                params.Config,
 		cookieHelper:          params.CookieHelper,
@@ -75,16 +78,10 @@ func (h *AuthenticationHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	//@todo проверить, нет ли у пользователя сессии, если есть, то выдать ошибку 403
-	//@todo если пользователь уже зарегистрирован, то выдать ошибку 409
 	_, err = h.authenticationService.SignUp(r.Context(), data)
 	if err != nil {
 		h.logger.Error("%s", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-
-	if data.SessionKey != "" {
-		h.cookieHelper.UnsetSession(w)
+		h.errorHelper.Error(w, err)
 	}
 
 	w.WriteHeader(http.StatusCreated)
@@ -100,7 +97,7 @@ func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	sess, mfaType, err := h.authenticationService.SignIn(r.Context(), data)
 	if err != nil {
 		h.logger.Error("%s", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.errorHelper.Error(w, err)
 	}
 
 	h.cookieHelper.SetSession(w, sess)

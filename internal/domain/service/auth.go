@@ -22,7 +22,6 @@ type SignUpData struct {
 	Password      string
 	TokenCaptcha  string
 	ActionCaptcha string
-	SessionKey    string
 }
 
 type SignInData struct {

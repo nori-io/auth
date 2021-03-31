@@ -6,7 +6,7 @@ import (
 	"github.com/nori-plugins/authentication/pkg/errors"
 )
 
-func (e errorHelper) Error(w http.ResponseWriter, r *http.Request, err error) {
+func (e errorHelper) Error(w http.ResponseWriter, err error) {
 	e.logger.Error("%s", err)
 
 	switch e := err.(type) {

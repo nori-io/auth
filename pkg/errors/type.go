@@ -7,7 +7,7 @@ const (
 	ErrUnauthorized                 // 401
 	ErrForbidden                    // 403
 	ErrNotFound                     // 404
-
-	ErrInternal // 500
+	ErrConflict                     //  409
+	ErrInternal                     // 500
 	// todo: add more types
 )

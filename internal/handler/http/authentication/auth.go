@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/nori-plugins/authentication/internal/domain/helper/cookie"
 	"github.com/nori-plugins/authentication/pkg/enum/session_status"
 
 	s "github.com/nori-io/interfaces/nori/session"
@@ -24,6 +25,7 @@ type AuthenticationHandler struct {
 	logger                logger.FieldLogger
 	config                config.Config
 	session               s.Session
+	cookieHelper          cookie.CookieHelper
 }
 
 type Params struct {
@@ -31,6 +33,7 @@ type Params struct {
 	Logger                logger.FieldLogger
 	Config                config.Config
 	Session               s.Session
+	CookieHelper          cookie.CookieHelper
 }
 
 func New(params Params) *AuthenticationHandler {
@@ -39,23 +42,24 @@ func New(params Params) *AuthenticationHandler {
 		logger:                params.Logger,
 		config:                params.Config,
 		session:               params.Session,
+		cookieHelper:          params.CookieHelper,
 	}
 }
 
 func (h *AuthenticationHandler) Session(w http.ResponseWriter, r *http.Request) {
-	sessionId, err := r.Cookie("ssid")
+	sessionId, err := h.cookieHelper.GetSessionID(r)
 	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
 	}
 
-	err = h.session.Get([]byte(sessionId.Value), session_status.Active)
+	err = h.session.Get([]byte(sessionId), session_status.Active)
 	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 	}
 
-	sess, user, err := h.authenticationService.GetSessionInfo(r.Context(), sessionId.Value)
+	sess, user, err := h.authenticationService.GetSessionInfo(r.Context(), sessionId)
 	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -103,24 +107,8 @@ func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	c := http.Cookie{
-		Name:   "ssid",
-		Value:  string(sess.SessionKey),
-		Path:   h.config.CookiesPath(),
-		Domain: h.config.CookiesDomain(),
-		//@todo Expires
-		Expires:    time.Unix(h.config.CookiesExpires(), 0),
-		RawExpires: h.config.CookiesRawExpires(),
-		MaxAge:     h.config.CookiesMaxAge(),
-		Secure:     h.config.CookiesSecure(),
-		HttpOnly:   h.config.CookiesHttpOnly(),
-		SameSite:   http.SameSite(h.config.CookiesSameSite()),
-		Raw:        h.config.CookiesRaw(),
-		Unparsed:   h.config.CookiesUnparsed(),
-	}
-
+	h.cookieHelper.SetSession(w, sess)
 	//@todo логировать положительные действия?
-	http.SetCookie(w, &c)
 	w.WriteHeader(http.StatusOK)
 
 	response.JSON(w, r, SignInResponse{
@@ -155,24 +143,7 @@ func (h *AuthenticationHandler) SignInMfa(w http.ResponseWriter, r *http.Request
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	c := http.Cookie{
-		Name:   "ssid",
-		Value:  string(sess.SessionKey),
-		Path:   h.config.CookiesPath(),
-		Domain: h.config.CookiesDomain(),
-		//@todo Expires
-		Expires:    time.Unix(h.config.CookiesExpires(), 0),
-		RawExpires: h.config.CookiesRawExpires(),
-		MaxAge:     h.config.CookiesMaxAge(),
-		Secure:     h.config.CookiesSecure(),
-		HttpOnly:   h.config.CookiesHttpOnly(),
-		SameSite:   http.SameSite(h.config.CookiesSameSite()),
-		Raw:        h.config.CookiesRaw(),
-		Unparsed:   h.config.CookiesUnparsed(),
-	}
-	http.SetCookie(w, &c)
-
-	w.WriteHeader(http.StatusOK)
+	h.cookieHelper.SetSession(w, sess)
 
 	response.JSON(w, r, SignInMfaResponse{
 		Success: true,
@@ -187,7 +158,7 @@ func (h *AuthenticationHandler) SignOut(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 	}
 
-	data:=&entity.Session{
+	data := &entity.Session{
 		ID:         0,
 		UserID:     0,
 		SessionKey: nil,
@@ -203,7 +174,9 @@ func (h *AuthenticationHandler) SignOut(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 	}
 
-	if data.Status!=session_status.Active
+	if data.Status != session_status.Active {
+
+	}
 
 	if err := h.authenticationService.SignOut(r.Context(), &entity.Session{SessionKey: []byte(sessionId.Value)}); err != nil {
 		h.logger.Error("%s", err)

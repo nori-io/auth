@@ -42,6 +42,8 @@ github.com/nori-io/interfaces/nori/http v0.0.1 h1:NiTnc2y/cTJ+5sSQM3JmA3YiQUzTfK
 github.com/nori-io/interfaces/nori/http v0.0.1/go.mod h1:UOTdJ3ZpK9O6zQEDd8D55Biv1SJKnL3Gpk54RgiEkaU=
 github.com/nori-io/interfaces/nori/session v0.0.1 h1:DjyW0Iy7U935rNze63Q+gVEpFUTl3unx7QrbhMVu0vw=
 github.com/nori-io/interfaces/nori/session v0.0.1/go.mod h1:ZzfAWsW98Ot7TlNgZ8BNZuGkChZE6k+bkOKhyYKTV3Q=
+github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
+github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=

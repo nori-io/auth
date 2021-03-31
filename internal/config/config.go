@@ -15,11 +15,8 @@ type Config struct {
 	CookiesPath            config.String
 	CookiesDomain          config.String
 	CookiesExpires         config.Int64
-	CookiesRawExpires      config.String
 	CookiesMaxAge          config.Int
 	CookiesSecure          config.Bool
 	CookiesHttpOnly        config.Bool
-	CookiesSameSite        config.Int64
-	CookiesRaw             config.String
-	CookiesUnparsed        config.SliceString
+	CookiesSameSite        config.Int
 }

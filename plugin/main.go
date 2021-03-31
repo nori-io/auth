@@ -3,9 +3,8 @@ package main
 import (
 	"context"
 
-	authentication2 "github.com/nori-plugins/authentication/pkg/authentication"
-
 	p "github.com/nori-io/common/v4/pkg/domain/plugin"
+	"github.com/nori-plugins/authentication/pkg/authentication"
 
 	"github.com/jinzhu/gorm"
 
@@ -45,7 +44,7 @@ func (p plugin) Meta() meta.Meta {
 		},
 		Dependencies: []meta.Dependency{},
 		Description:  nil,
-		Interface:    authentication2.AuthenticationInterface,
+		Interface:    authentication.AuthenticationInterface,
 		License:      nil,
 		Links:        nil,
 		Repository: m.Repository{
@@ -74,13 +73,10 @@ func (p plugin) Init(ctx context.Context, config config.Config, log logger.Field
 		CookiesPath:            config.String("cookies.path", "path of cookies"),
 		CookiesDomain:          config.String("cookies.domain", "domain of cookies"),
 		CookiesExpires:         config.Int64("cookies.expires", ""),
-		CookiesRawExpires:      config.String("cookies.rawexpires", ""),
 		CookiesMaxAge:          config.Int("cookies.maxage", ""),
 		CookiesSecure:          config.Bool("cookies.secure", ""),
 		CookiesHttpOnly:        config.Bool("cookies.httponly", ""),
 		CookiesSameSite:        config.Int("cookies.samesite", ""),
-		CookiesRaw:             config.String("cookies.raw", ""),
-		CookiesUnparsed:        config.SliceString("cookies.unparsed", ""),
 	}
 
 	p.logger = log

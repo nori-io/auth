@@ -5,6 +5,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/nori-plugins/authentication/internal/domain/entity"
+	"github.com/nori-plugins/authentication/pkg/errors"
 )
 
 type AuthenticationLogRepository struct {
@@ -17,7 +18,7 @@ func (r *AuthenticationLogRepository) Create(tx *gorm.DB, ctx context.Context, e
 	lastRecord := new(model)
 
 	if err := tx.Create(modelAuthenticationLog).Scan(&lastRecord).Error; err != nil {
-		return err
+		return errors.NewInternal(err)
 	}
 	lastRecord.Convert()
 
@@ -27,8 +28,11 @@ func (r *AuthenticationLogRepository) Create(tx *gorm.DB, ctx context.Context, e
 func (r *AuthenticationLogRepository) Update(ctx context.Context, e *entity.AuthenticationLog) error {
 	model := NewModel(e)
 	err := r.Db.Save(model).Error
+	if err != nil {
+		return errors.NewInternal(err)
+	}
 
-	return err
+	return nil
 }
 
 func (r *AuthenticationLogRepository) FindByUserId(ctx context.Context, userId uint64) (*entity.AuthenticationLog, error) {

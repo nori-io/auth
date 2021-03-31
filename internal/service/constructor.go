@@ -2,7 +2,7 @@ package service
 
 import (
 	"github.com/nori-plugins/authentication/internal/domain/service"
-	"github.com/nori-plugins/authentication/pkg"
+	"github.com/nori-plugins/authentication/pkg/authentication"
 )
 
 type Service struct {
@@ -19,7 +19,7 @@ type Params struct {
 	SettingsService        service.SettingsService
 }
 
-func New(params Params) pkg.Authentication {
+func New(params Params) authentication.Authentication {
 	return &Service{
 		authenticationService:  params.AuthenticationService,
 		mfaRecoveryCodeService: params.MfaRecoveryCodeService,

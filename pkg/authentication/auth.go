@@ -14,6 +14,7 @@ type (
 		SignInByToken(ctx context.Context, token string) (Session, error)
 
 		Token() Tokens
+		Social() Social
 		Session() Sessions
 		User() Users
 	}

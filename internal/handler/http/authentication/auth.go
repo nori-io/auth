@@ -163,5 +163,6 @@ func (h *AuthenticationHandler) SignOut(w http.ResponseWriter, r *http.Request) 
 
 	// todo: redirect
 
+	h.cookieHelper.UnsetSession(w)
 	http.Redirect(w, r, "/", 0)
 }

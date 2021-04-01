@@ -9,11 +9,11 @@ import (
 )
 
 var ServiceSet = wire.NewSet(
-	wire.Struct(new(auth.Params), "UserRepository", "AuthenticationLogRepository", "DB"),
+	wire.Struct(new(auth.Params), "userRepository", "authenticationLogRepository", "db"),
 	auth.New,
-	wire.Struct(new(mfa_recovery_code.Params), "MfaRecoveryCodeRepository", "MfaRecoveryCodeHelper", "Config"),
+	wire.Struct(new(mfa_recovery_code.Params), "mfaRecoveryCodeRepository", "MfaRecoveryCodeHelper", "config"),
 	mfa_recovery_code.New,
-	wire.Struct(new(mfa_secret.Params), "MfaSecretRepository", "UserRepository", "Config"),
+	wire.Struct(new(mfa_secret.Params), "MfaSecretRepository", "userRepository", "config"),
 	mfa_secret.New,
 	wire.Struct(new(service.Params), "AuthenticationService", "MfaRecoveryCodeService", "MfaSecretService"),
 	service.New,

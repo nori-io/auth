@@ -19,4 +19,5 @@ type Config struct {
 	CookiesSecure          config.Bool
 	CookiesHttpOnly        config.Bool
 	CookiesSameSite        config.Int
+	CookiesName            config.String
 }

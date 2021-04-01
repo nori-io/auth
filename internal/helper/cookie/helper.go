@@ -8,10 +8,6 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
-const (
-	sessionID = "ssid"
-)
-
 func (h CookieHelper) GetSessionID(r *http.Request) (string, error) {
 	cookie, err := r.Cookie("ssid")
 	if err != nil {
@@ -26,13 +22,13 @@ func (h CookieHelper) GetSessionID(r *http.Request) (string, error) {
 
 func (h CookieHelper) SetSession(w http.ResponseWriter, session *entity.Session) {
 	http.SetCookie(w, &http.Cookie{
-		Name:   sessionID,
+		Name:   h.config.CookiesName(),
 		Value:  string(session.SessionKey),
 		Path:   h.config.CookiesPath(),
 		Domain: h.config.CookiesDomain(),
 		//@todo Expires
 		Expires: time.Now().Add(time.Duration(h.config.CookiesExpires()) * time.Second),
-		//MaxAge:   h.config.CookiesMaxAge(),
+		// MaxAge:   h.config.CookiesMaxAge(),
 		Secure:   h.config.CookiesSecure(),
 		HttpOnly: h.config.CookiesHttpOnly(),
 		SameSite: http.SameSite(h.config.CookiesSameSite()),
@@ -41,7 +37,7 @@ func (h CookieHelper) SetSession(w http.ResponseWriter, session *entity.Session)
 
 func (h CookieHelper) UnsetSession(w http.ResponseWriter) {
 	http.SetCookie(w, &http.Cookie{
-		Name:   sessionID,
+		Name:   h.config.CookiesName(),
 		Value:  "",
 		Path:   h.config.CookiesPath(),
 		Domain: h.config.CookiesDomain(),

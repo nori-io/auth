@@ -37,7 +37,7 @@ func TestTxManager_Transact(t *testing.T) {
 	mock.ExpectCommit()
 
 	mock.ExpectQuery(`SELECT * FROM "users"  WHERE "users"."id" = $1`).WithArgs(1).
-		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+		WillReturnRows(sqlmock.NewRows([]string{"id", "status"}).AddRow(1, 1))
 
 	/*rows := sqlmock.NewRows([]string{"id"}).
 		AddRow(1).

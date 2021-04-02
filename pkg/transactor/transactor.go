@@ -8,13 +8,17 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+const (
+	keyTx = "tx"
+)
+
 type Transactor interface {
 	GetDB(ctx context.Context) *gorm.DB
 	Transact(ctx context.Context, txFunc func(tx context.Context) error) (err error)
 }
 
 func (t *TxManager) GetDB(ctx context.Context) *gorm.DB {
-	transaction, ok := ctx.Value("tx").(*gorm.DB)
+	transaction, ok := ctx.Value(keyTx).(*gorm.DB)
 
 	if ok {
 		return transaction
@@ -24,28 +28,30 @@ func (t *TxManager) GetDB(ctx context.Context) *gorm.DB {
 }
 
 func (t *TxManager) Transact(ctx context.Context, txFunc func(tx context.Context) error) (err error) {
-	if t.tx == nil {
-		t.tx = t.db.Begin()
-	}
+	var tx *gorm.DB
 
-	NewCtx := context.WithValue(ctx, "tx", t.tx)
+	tx, ok := ctx.Value(keyTx).(*gorm.DB)
+	if !ok || tx == nil {
+		tx = t.db.Begin()
+		ctx = context.WithValue(ctx, keyTx, tx)
+	}
 
 	defer func() {
 		if e := recover(); e != nil {
 			err = errors.New("error_recover", err.Error(), errors.ErrInternal)
 		}
 		if err != nil {
-			if e := t.tx.Rollback().Error; e != nil {
+			if e := tx.Rollback().Error; e != nil {
 				t.log.Error("%s", e)
 				return
 			}
 			return
 		}
-		if e := t.tx.Commit().Error; e != nil {
+		if e := tx.Commit().Error; e != nil {
 			t.log.Error("%s", e)
 			return
 		}
 	}()
 
-	return txFunc(NewCtx)
+	return txFunc(ctx)
 }

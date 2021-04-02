@@ -1,3 +1,5 @@
+github.com/DATA-DOG/go-sqlmock v1.5.0 h1:Shsta01QNfFxHCfpW6YH2STWB0MudeXXEWMr20OEh60=
+github.com/DATA-DOG/go-sqlmock v1.5.0/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q5eFN3EC/SaM=
 github.com/PuerkitoBio/goquery v1.5.1/go.mod h1:GsLWisAFVj4WgDibEWF4pvYnkVQBpKBKeU+7zCJoLcc=
 github.com/andybalholm/cascadia v1.1.0/go.mod h1:GsXiBklL0woXo1j/WYWtSYYC4ouU9PqHO0sqidkEA4Y=
 github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496 h1:zV3ejI06GQ59hwDQAvmK1qxOQGB3WuVTRoY0okPTAv0=
@@ -38,6 +40,8 @@ github.com/nori-io/interfaces/nori/http v0.0.1 h1:NiTnc2y/cTJ+5sSQM3JmA3YiQUzTfK
 github.com/nori-io/interfaces/nori/http v0.0.1/go.mod h1:UOTdJ3ZpK9O6zQEDd8D55Biv1SJKnL3Gpk54RgiEkaU=
 github.com/nori-io/interfaces/nori/session v0.0.1 h1:DjyW0Iy7U935rNze63Q+gVEpFUTl3unx7QrbhMVu0vw=
 github.com/nori-io/interfaces/nori/session v0.0.1/go.mod h1:ZzfAWsW98Ot7TlNgZ8BNZuGkChZE6k+bkOKhyYKTV3Q=
+github.com/nori-io/logger v0.2.3 h1:8PBld4jNDcFA4CWepyn8i9IKvhWzcPa8n+5JXbtqqig=
+github.com/nori-io/logger v0.2.3/go.mod h1:q3Y096P4UZ8LlnlkU7QdnQYpKodp50JMrzMZks7seXU=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=

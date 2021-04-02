@@ -6,7 +6,6 @@ import (
 )
 
 type TxManager struct {
-	tx  *gorm.DB
 	db  *gorm.DB
 	log logger.FieldLogger
 }

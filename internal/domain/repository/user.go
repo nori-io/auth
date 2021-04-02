@@ -3,15 +3,13 @@ package repository
 import (
 	"context"
 
-	"github.com/jinzhu/gorm"
-
 	"github.com/nori-plugins/authentication/pkg/enum/users_status"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
 type UserRepository interface {
-	Create(tx *gorm.DB, ctx context.Context, e *entity.User) error
+	Create(ctx context.Context, e *entity.User) error
 	FindById(ctx context.Context, id uint64) (*entity.User, error)
 	FindByEmail(ctx context.Context, email string) (*entity.User, error)
 	FindByPhone(ctx context.Context, phone string) (*entity.User, error)

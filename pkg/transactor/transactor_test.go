@@ -34,9 +34,11 @@ func TestTxManager_Transact(t *testing.T) {
 	mock.ExpectBegin()
 	mock.ExpectQuery(`INSERT INTO "users" ("status") VALUES ($1) RETURNING "users"."id"`).
 		WithArgs(1).WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+	mock.ExpectCommit()
 
-	/*	mock.ExpectQuery(`'SELECT * FROM "users"  WHERE "users"."id" = $1'`).WithArgs(0, 1).
-		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))*/
+	mock.ExpectQuery(`SELECT * FROM "users"  WHERE "users"."id" = $1`).WithArgs(1).
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+
 	/*rows := sqlmock.NewRows([]string{"id"}).
 		AddRow(1).
 		RowError(1, fmt.Errorf("row error"))
@@ -47,7 +49,7 @@ func TestTxManager_Transact(t *testing.T) {
 		WithArgs(1, 1, 1, 1, "1", "1", "1", "1", "1", 1, false, false, "1", AnyTime{}, AnyTime{}, AnyTime{}).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	*/
-	mock.ExpectCommit()
+	//mock.ExpectCommit()
 	gdb, err := gorm.Open("postgres", db)
 
 	txParams := transactor.Params{

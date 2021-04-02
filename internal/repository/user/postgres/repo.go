@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"log"
 
 	"github.com/nori-plugins/authentication/internal/domain/repository"
 	"github.com/nori-plugins/authentication/pkg/transactor"
@@ -26,13 +25,9 @@ func (r *UserRepository) Create(ctx context.Context, e *entity.User) error {
 
 	lastRecord := new(model)
 
-	if err := r.Tx.GetDB(ctx).Create(&modelUser).Error; err != nil {
-		// Scan(&lastRecord).Error; err != nil {
-		log.Print("LAST RECORD", lastRecord)
-
+	if err := r.Tx.GetDB(ctx).Create(&modelUser).Scan(&lastRecord).Error; err != nil {
 		return err
 	}
-	// lastRecord.Convert()
 
 	return nil
 }

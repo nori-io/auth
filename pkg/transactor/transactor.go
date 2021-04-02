@@ -14,31 +14,34 @@ type Transactor interface {
 }
 
 func (t *TxManager) GetDB(ctx context.Context) *gorm.DB {
-	if t.db != nil {
-		return t.db
+	transaction, ok := ctx.Value("tx").(*gorm.DB)
+
+	if ok {
+		return transaction
 	}
-	return ctx.Value("db")
+
+	return t.db
 }
 
 func (t *TxManager) Transact(ctx context.Context, txFunc func(tx context.Context) error) (err error) {
-	if t.db == nil {
-		t.db.Begin()
+	if t.tx == nil {
+		t.tx = t.db.Begin()
 	}
 
-	NewCtx := context.WithValue(ctx, "db", t)
+	NewCtx := context.WithValue(ctx, "tx", t.tx)
 
 	defer func() {
 		if e := recover(); e != nil {
 			err = errors.New("error_recover", err.Error(), errors.ErrInternal)
 		}
 		if err != nil {
-			if e := t.db.Rollback().Error; e != nil {
+			if e := t.tx.Rollback().Error; e != nil {
 				t.log.Error("%s", e)
 				return
 			}
 			return
 		}
-		if e := t.db.Commit().Error; e != nil {
+		if e := t.tx.Commit().Error; e != nil {
 			t.log.Error("%s", e)
 			return
 		}

@@ -2,8 +2,8 @@ package transactor_test
 
 import (
 	"context"
-	"database/sql"
 	"database/sql/driver"
+	"fmt"
 	"testing"
 	"time"
 
@@ -13,6 +13,7 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 	"github.com/nori-plugins/authentication/internal/repository/user"
 	"github.com/nori-plugins/authentication/pkg/transactor"
+	"github.com/stretchr/testify/require"
 )
 
 type AnyTime struct{}
@@ -24,16 +25,29 @@ func (a AnyTime) Match(v driver.Value) bool {
 }
 
 func TestTxManager_Transact(t *testing.T) {
-	var db *sql.DB
-	var err error
-	var mock sqlmock.Sqlmock
-	db, mock, err = sqlmock.New()
+	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	if err != nil {
+		fmt.Println("failed to open sqlmock database:", err)
+	}
 	defer db.Close()
 
 	mock.ExpectBegin()
-	mock.ExpectExec("INSERT INTO users").WithArgs(0).WillReturnResult(sqlmock.NewResult(1, 1))
-	mock.ExpectCommit()
+	mock.ExpectQuery(`INSERT INTO "users" ("status") VALUES ($1) RETURNING "users"."id"`).
+		WithArgs(1).WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 
+	/*	mock.ExpectQuery(`'SELECT * FROM "users"  WHERE "users"."id" = $1'`).WithArgs(0, 1).
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))*/
+	/*rows := sqlmock.NewRows([]string{"id"}).
+		AddRow(1).
+		RowError(1, fmt.Errorf("row error"))
+	mock.ExpectQuery("SELECT LAST_INSERT_ID()").WillReturnRows(rows)
+
+	mock.ExpectPrepare("INSERT INTO users").
+		ExpectExec().
+		WithArgs(1, 1, 1, 1, "1", "1", "1", "1", "1", 1, false, false, "1", AnyTime{}, AnyTime{}, AnyTime{}).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	*/
+	mock.ExpectCommit()
 	gdb, err := gorm.Open("postgres", db)
 
 	txParams := transactor.Params{
@@ -46,13 +60,27 @@ func TestTxManager_Transact(t *testing.T) {
 
 	err = r.Create(context.Background(), &entity.User{
 		Status: 1,
+		/*		UserType:               1,
+				MfaType:                1,
+				PhoneCountryCode:       "1",
+				PhoneNumber:            "1",
+				Email:                  "1",
+				Password:               "1",
+				Salt:                   "1",
+				HashAlgorithm:          1,
+				IsEmailVerified:        false,
+				IsPhoneVerified:        false,
+				EmailActivationCode:    "1",
+				EmailActivationCodeTTL: time.Now(),
+				CreatedAt:              time.Now(),
+				UpdatedAt:              time.Now(),*/
 	})
 	if err != nil {
-		t.Error(err)
+		require.NoError(t, err)
 	}
 
 	// we make sure that all expectations were met
 	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
+		require.NoError(t, err)
 	}
 }

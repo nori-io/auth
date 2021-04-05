@@ -32,8 +32,8 @@ func TestTxManager_Transact(t *testing.T) {
 	defer db.Close()
 
 	mock.ExpectBegin()
-	mock.ExpectQuery(`INSERT INTO "users" ("status","user_type","mfa_type","phone_country_code","phone_number","email","password","salt","hash_algorithm","is_email_verified","is_phone_verified","email_activation_code ") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING "users"."id"`).
-		WithArgs(1, 1, 1, "1", "1", "1", "1", "1", 1, false, false, "1").WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+	mock.ExpectQuery(`INSERT INTO "users" ("status","user_type","mfa_type","phone_country_code","phone_number","email","password","salt","hash_algorithm","is_email_verified","is_phone_verified","email_activation_code ","email_activation_code_ttl","created_at","updated_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING "users"."id"`).
+		WithArgs(1, 1, 1, "1", "1", "1", "1", "1", 1, false, false, "1", time.Now(), time.Now(), time.Now()).WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 	mock.ExpectCommit()
 
 	mock.ExpectQuery(`SELECT * FROM "users"  WHERE "users"."id" = $1`).WithArgs(1).
@@ -42,7 +42,8 @@ func TestTxManager_Transact(t *testing.T) {
 			"phone_country_code", "phone_number", "email",
 			"password", "salt", "hash_algorithm",
 			"is_email_verified", "is_phone_verified", "email_activation_code",
-		}).AddRow(1, 1, 1, 1, "1", "1", "1", "1", "1", 1, false, false, "1"))
+			"email_activation_code_ttl", "created_at", "updated_at",
+		}).AddRow(1, 1, 1, 1, "1", "1", "1", "1", "1", 1, false, false, "1", time.Now(), time.Now(), time.Now()))
 
 	/*rows := sqlmock.NewRows([]string{"id"}).
 		AddRow(1).
@@ -66,21 +67,21 @@ func TestTxManager_Transact(t *testing.T) {
 	r := user.New(tx)
 
 	err = r.Create(context.Background(), &entity.User{
-		Status:              1,
-		UserType:            1,
-		MfaType:             1,
-		PhoneCountryCode:    "1",
-		PhoneNumber:         "1",
-		Email:               "1",
-		Password:            "1",
-		Salt:                "1",
-		HashAlgorithm:       1,
-		IsEmailVerified:     false,
-		IsPhoneVerified:     false,
-		EmailActivationCode: "1",
-		/*	EmailActivationCodeTTL: time.Now(),
-			CreatedAt:              time.Now(),
-			UpdatedAt:              time.Now(),*/
+		Status:                 1,
+		UserType:               1,
+		MfaType:                1,
+		PhoneCountryCode:       "1",
+		PhoneNumber:            "1",
+		Email:                  "1",
+		Password:               "1",
+		Salt:                   "1",
+		HashAlgorithm:          1,
+		IsEmailVerified:        false,
+		IsPhoneVerified:        false,
+		EmailActivationCode:    "1",
+		EmailActivationCodeTTL: time.Now(),
+		CreatedAt:              time.Now(),
+		UpdatedAt:              time.Now(),
 	})
 	if err != nil {
 		require.NoError(t, err)

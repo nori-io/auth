@@ -30,9 +30,11 @@ func TestTxManager_Transact(t *testing.T) {
 		fmt.Println("failed to open sqlmock database:", err)
 	}
 	defer db.Close()
-
+	sqlInsertString := `INSERT INTO "users" ` +
+		`("status","user_type","mfa_type","phone_country_code","phone_number","email","password","salt","hash_algorithm","is_email_verified","is_phone_verified","email_activation_code ","email_activation_code_ttl","created_at","updated_at") ` +
+		`VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING "users"."id"`
 	mock.ExpectBegin()
-	mock.ExpectQuery(`INSERT INTO "users" ("status","user_type","mfa_type","phone_country_code","phone_number","email","password","salt","hash_algorithm","is_email_verified","is_phone_verified","email_activation_code ","email_activation_code_ttl","created_at","updated_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING "users"."id"`).
+	mock.ExpectQuery(sqlInsertString).
 		WithArgs(1, 1, 1, "1", "1", "1", "1", "1", 1, false, false, "1", time.Now(), time.Now(), time.Now()).WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 	mock.ExpectCommit()
 

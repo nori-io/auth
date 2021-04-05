@@ -7,15 +7,16 @@ import (
 		"github.com/nori-plugins/authentication/pkg/enum/users_type"*/
 
 	"github.com/nori-plugins/authentication/pkg/enum/users_status"
+	"github.com/nori-plugins/authentication/pkg/enum/users_type"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
 type model struct {
-	ID     uint64 `gorm:"column:id; PRIMARY_KEY; type:bigserial"`
-	Status uint8  `gorm:"column:status; type:smallint; not null" `
-	/*	UserType               uint8     `gorm:"column:user_type; type:smallint; not null"`
-		MfaType                uint8     `gorm:"column:mfa_type; type:smallint; null"`
+	ID       uint64 `gorm:"column:id; PRIMARY_KEY; type:bigserial"`
+	Status   uint8  `gorm:"column:status; type:smallint; not null" `
+	UserType uint8  `gorm:"column:user_type; type:smallint; not null"`
+	/*	MfaType                uint8     `gorm:"column:mfa_type; type:smallint; null"`
 		PhoneCountryCode       string    `gorm:"column:phone_country_code;uniqueIndex:idx_code_phone; type:VARCHAR(10)"`
 		PhoneNumber            string    `gorm:"column:phone_number; uniqueIndex:idx_code_phone; type:VARCHAR(25)"`
 		Email                  string    `gorm:"column:email; type:VARCHAR(254)"`
@@ -32,10 +33,10 @@ type model struct {
 
 func (m model) Convert() *entity.User {
 	return &entity.User{
-		ID:     m.ID,
-		Status: users_status.UserStatus(m.Status),
-		/*		UserType:               users_type.UserType(m.UserType),
-				MfaType:                mfa_type.MfaType(m.MfaType),
+		ID:       m.ID,
+		Status:   users_status.UserStatus(m.Status),
+		UserType: users_type.UserType(m.UserType),
+		/*		MfaType:                mfa_type.MfaType(m.MfaType),
 				PhoneCountryCode:       m.PhoneCountryCode,
 				PhoneNumber:            m.PhoneNumber,
 				Email:                  m.Email,
@@ -53,10 +54,10 @@ func (m model) Convert() *entity.User {
 
 func NewModel(e *entity.User) model {
 	return model{
-		ID:     e.ID,
-		Status: uint8(e.Status),
-		/*		UserType:               uint8(e.UserType),
-				MfaType:                uint8(e.MfaType),
+		ID:       e.ID,
+		Status:   uint8(e.Status),
+		UserType: uint8(e.UserType),
+		/*		MfaType:                uint8(e.MfaType),
 				PhoneCountryCode:       e.PhoneCountryCode,
 				PhoneNumber:            e.PhoneNumber,
 				Email:                  e.Email,

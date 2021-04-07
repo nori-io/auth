@@ -2,27 +2,28 @@ package transactor_test
 
 import (
 	"context"
-	"database/sql/driver"
 	"fmt"
 	"testing"
 	"time"
+
+	"github.com/golang/mock/gomock"
+	mocks "github.com/nori-io/common/v4/pkg/domain/mocks/registry"
+	config2 "github.com/nori-plugins/authentication/internal/config"
+
+	"github.com/nori-plugins/authentication/internal/domain/service"
+
+	userSrv "github.com/nori-plugins/authentication/internal/service/user"
+
+	"github.com/nori-plugins/authentication/pkg/enum/users_status"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jinzhu/gorm"
 	"github.com/nori-io/logger"
 	"github.com/nori-plugins/authentication/internal/domain/entity"
-	"github.com/nori-plugins/authentication/internal/repository/user"
+	userRepository "github.com/nori-plugins/authentication/internal/repository/user"
 	"github.com/nori-plugins/authentication/pkg/transactor"
 	"github.com/stretchr/testify/require"
 )
-
-type AnyTime struct{}
-
-// Match satisfies sqlmock.Argument interface
-func (a AnyTime) Match(v driver.Value) bool {
-	_, ok := v.(time.Time)
-	return ok
-}
 
 func TestTxManager_Transact(t *testing.T) {
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
@@ -30,46 +31,9 @@ func TestTxManager_Transact(t *testing.T) {
 		fmt.Println("failed to open sqlmock database:", err)
 	}
 	defer db.Close()
-	sqlInsertString := `INSERT INTO "users" ` +
-		`("status","user_type","mfa_type","phone_country_code","phone_number","email","password","salt","hash_algorithm","is_email_verified","is_phone_verified","email_activation_code ","email_activation_code_ttl","created_at","updated_at") ` +
-		`VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING "users"."id"`
-	mock.ExpectBegin()
-	mock.ExpectQuery(sqlInsertString).
-		WithArgs(1, 1, 1, "1", "1", "1", "1", "1", 1, false, false, "1", time.Now(), time.Now(), time.Now()).WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
-	mock.ExpectCommit()
 
-	mock.ExpectQuery(`SELECT * FROM "users"  WHERE "users"."id" = $1`).WithArgs(1).
-		WillReturnRows(sqlmock.NewRows([]string{
-			"id", "status", "user_type", "mfa_type",
-			"phone_country_code", "phone_number", "email",
-			"password", "salt", "hash_algorithm",
-			"is_email_verified", "is_phone_verified", "email_activation_code",
-			"email_activation_code_ttl", "created_at", "updated_at",
-		}).AddRow(1, 1, 1, 1, "1", "1", "1", "1", "1", 1, false, false, "1", time.Now(), time.Now(), time.Now()))
-
-	/*rows := sqlmock.NewRows([]string{"id"}).
-		AddRow(1).
-		RowError(1, fmt.Errorf("row error"))
-	mock.ExpectQuery("SELECT LAST_INSERT_ID()").WillReturnRows(rows)
-
-	mock.ExpectPrepare("INSERT INTO users").
-		ExpectExec().
-		WithArgs(1, 1, 1, 1, "1", "1", "1", "1", "1", 1, false, false, "1", AnyTime{}, AnyTime{}, AnyTime{}).
-		WillReturnResult(sqlmock.NewResult(1, 1))
-	*/
-	//mock.ExpectCommit()
-	gdb, err := gorm.Open("postgres", db)
-
-	txParams := transactor.Params{
-		Db:  gdb,
-		Log: logger.L(),
-	}
-	tx := transactor.New(txParams)
-
-	r := user.New(tx)
-
-	err = r.Create(context.Background(), &entity.User{
-		Status:                 1,
+	user := &entity.User{
+		Status:                 users_status.Active,
 		UserType:               1,
 		MfaType:                1,
 		PhoneCountryCode:       "1",
@@ -84,6 +48,53 @@ func TestTxManager_Transact(t *testing.T) {
 		EmailActivationCodeTTL: time.Now(),
 		CreatedAt:              time.Now(),
 		UpdatedAt:              time.Now(),
+	}
+	sqlInsertString := `INSERT INTO "users" ` +
+		`("status","user_type","mfa_type","phone_country_code","phone_number","email","password","salt","hash_algorithm","is_email_verified","is_phone_verified","email_activation_code ","email_activation_code_ttl","created_at","updated_at") ` +
+		`VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING "users"."id"`
+
+	mock.ExpectQuery(`SELECT * FROM "users"  WHERE (email=$1) ORDER BY "users"."id" ASC LIMIT 1`).
+		WithArgs("1").WillReturnError(gorm.ErrRecordNotFound)
+	mock.ExpectBegin()
+	mock.ExpectQuery(sqlInsertString).
+		WithArgs(user.Status, 1, 1, "1", "1", "1", "1", "1", 1, false, false, "1", time.Now(), time.Now(), time.Now()).WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+	mock.ExpectCommit()
+	mock.ExpectBegin()
+	mock.ExpectQuery(`SELECT * FROM "users"  WHERE "users"."id" = $1`).WithArgs(1).
+		WillReturnRows(sqlmock.NewRows([]string{
+			"id", "status", "user_type", "mfa_type",
+			"phone_country_code", "phone_number", "email",
+			"password", "salt", "hash_algorithm",
+			"is_email_verified", "is_phone_verified", "email_activation_code",
+			"email_activation_code_ttl", "created_at", "updated_at",
+		}).AddRow(1, user.Status, 1, 1, "1", "1", "1", "1", "1", 1, false, false, "1", time.Now(), time.Now(), time.Now()))
+
+	gdb, err := gorm.Open("postgres", db)
+
+	txParams := transactor.Params{
+		Db:  gdb,
+		Log: logger.L(),
+	}
+	tx := transactor.New(txParams)
+
+	r := userRepository.New(tx)
+
+	ctrl := &gomock.Controller{T: t}
+	conf := mocks.NewMockConfig(ctrl)
+
+	config := &config2.Config{
+		PasswordBcryptCost: conf.Int("10", "10"),
+	}
+
+	s := userSrv.New(userSrv.Params{
+		UserRepository: r,
+		Transactor:     tx,
+		Сonfig:         *config,
+	})
+
+	user, err = s.Create(context.Background(), service.UserCreateData{
+		Email:    "1",
+		Password: "1",
 	})
 	if err != nil {
 		require.NoError(t, err)

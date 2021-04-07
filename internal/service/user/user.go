@@ -17,9 +17,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (srv UserService) CreateUser(tx *gorm.DB, ctx context.Context, data service.SignUpData) (*entity.User, error) {
+func (srv UserService) Create(ctx context.Context, data service.UserCreateData) (*entity.User, error) {
 	user, err := srv.userRepository.FindByEmail(ctx, data.Email)
-	if err != nil {
+	if (err != nil) && (err != gorm.ErrRecordNotFound) {
 		return nil, errors.NewInternal(err)
 	}
 	if user != nil {
@@ -40,7 +40,7 @@ func (srv UserService) CreateUser(tx *gorm.DB, ctx context.Context, data service
 		CreatedAt:       time.Now(),
 	}
 
-	if err := srv.userRepository.Create(tx, ctx, user); err != nil {
+	if err := srv.userRepository.Create(ctx, user); err != nil {
 		return nil, errors.NewInternal(err)
 	}
 	return user, nil

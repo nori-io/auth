@@ -3,6 +3,9 @@ package postgres
 import (
 	"context"
 
+	"github.com/jinzhu/gorm"
+	"github.com/nori-plugins/authentication/pkg/errors"
+
 	"github.com/nori-plugins/authentication/internal/domain/repository"
 	"github.com/nori-plugins/authentication/pkg/transactor"
 
@@ -45,7 +48,14 @@ func (r *UserRepository) FindById(ctx context.Context, id uint64) (*entity.User,
 func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*entity.User, error) {
 	out := &model{}
 
-	err := r.Tx.GetDB(ctx).Where("email=?", email).First(out).Error
+	err := r.Tx.GetDB(ctx).Where("email=?", email).First(&out).Error
+
+	if err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, errors.NewInternal(err)
+	}
 
 	return out.Convert(), err
 }

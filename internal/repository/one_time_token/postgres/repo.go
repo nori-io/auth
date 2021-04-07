@@ -1,7 +1,7 @@
 package postgres
 
-import "github.com/jinzhu/gorm"
+import "github.com/nori-plugins/authentication/pkg/transactor"
 
 type OneTimeTokenRepository struct {
-	Db *gorm.DB
+	Tx transactor.Transactor
 }

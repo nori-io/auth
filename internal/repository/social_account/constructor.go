@@ -1,11 +1,11 @@
 package social_account
 
 import (
-	"github.com/jinzhu/gorm"
 	"github.com/nori-plugins/authentication/internal/domain/repository"
 	"github.com/nori-plugins/authentication/internal/repository/social_account/postgres"
+	"github.com/nori-plugins/authentication/pkg/transactor"
 )
 
-func New(db *gorm.DB) repository.SocialAccountRepository {
-	return &postgres.SocialAccountRepository{Db: db}
+func New(tx transactor.Transactor) repository.SocialAccountRepository {
+	return &postgres.SocialAccountRepository{Tx: tx}
 }

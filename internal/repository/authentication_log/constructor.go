@@ -1,11 +1,11 @@
 package authentication_log
 
 import (
-	"github.com/jinzhu/gorm"
 	"github.com/nori-plugins/authentication/internal/domain/repository"
 	"github.com/nori-plugins/authentication/internal/repository/authentication_log/postgres"
+	"github.com/nori-plugins/authentication/pkg/transactor"
 )
 
-func New(db *gorm.DB) repository.AuthenticationLogRepository {
-	return &postgres.AuthenticationLogRepository{Db: db}
+func New(tx transactor.Transactor) repository.AuthenticationLogRepository {
+	return &postgres.AuthenticationLogRepository{Tx: tx}
 }

@@ -1,11 +1,11 @@
 package session
 
 import (
-	"github.com/jinzhu/gorm"
 	"github.com/nori-plugins/authentication/internal/domain/repository"
 	"github.com/nori-plugins/authentication/internal/repository/session/postgres"
+	"github.com/nori-plugins/authentication/pkg/transactor"
 )
 
-func New(db *gorm.DB) repository.SessionRepository {
-	return &postgres.SessionRepository{Db: db}
+func New(tx transactor.Transactor) repository.SessionRepository {
+	return &postgres.SessionRepository{Tx: tx}
 }

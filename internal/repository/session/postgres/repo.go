@@ -3,20 +3,21 @@ package postgres
 import (
 	"context"
 
-	"github.com/jinzhu/gorm"
+	"github.com/nori-plugins/authentication/pkg/transactor"
+
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
 type SessionRepository struct {
-	Db *gorm.DB
+	Tx transactor.Transactor
 }
 
-func (r *SessionRepository) Create(tx *gorm.DB, ctx context.Context, e *entity.Session) error {
+func (r *SessionRepository) Create(ctx context.Context, e *entity.Session) error {
 	modelSession := NewModel(e)
 
 	lastRecord := new(model)
 
-	if err := tx.Create(modelSession).Scan(&lastRecord).Error; err != nil {
+	if err := r.Tx.GetDB(ctx).Create(modelSession).Scan(&lastRecord).Error; err != nil {
 		return err
 	}
 	lastRecord.Convert()
@@ -26,7 +27,7 @@ func (r *SessionRepository) Create(tx *gorm.DB, ctx context.Context, e *entity.S
 
 func (r *SessionRepository) Update(ctx context.Context, e *entity.Session) error {
 	model := NewModel(e)
-	err := r.Db.Save(model).Error
+	err := r.Tx.GetDB(ctx).Save(model).Error
 
 	return err
 }
@@ -36,7 +37,7 @@ func (r *SessionRepository) FindBySessionKey(ctx context.Context, sessionKey str
 		out = &model{}
 		e   error
 	)
-	e = r.Db.Where("session_key=?", sessionKey).First(out).Error
+	e = r.Tx.GetDB(ctx).Where("session_key=?", sessionKey).First(out).Error
 
 	return out.Convert(), e
 }

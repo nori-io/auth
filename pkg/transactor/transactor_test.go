@@ -2,12 +2,19 @@ package transactor_test
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
-	mocks "github.com/nori-io/common/v4/pkg/domain/mocks/registry"
+	"github.com/nori-plugins/authentication/pkg/enum/hash_algorithm"
+
+	"github.com/nori-plugins/authentication/pkg/enum/mfa_type"
+
+	"github.com/nori-plugins/authentication/pkg/enum/users_type"
+
+	"github.com/nori-io/common/v4/pkg/domain/config"
+
 	config2 "github.com/nori-plugins/authentication/internal/config"
 
 	"github.com/nori-plugins/authentication/internal/domain/service"
@@ -25,6 +32,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+type AnyTime struct{}
+
+// Match satisfies sqlmock.Argument interface
+func (a AnyTime) Match(v driver.Value) bool {
+	_, ok := v.(time.Time)
+	return ok
+}
+
 func TestTxManager_Transact(t *testing.T) {
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {
@@ -34,17 +49,16 @@ func TestTxManager_Transact(t *testing.T) {
 
 	user := &entity.User{
 		Status:                 users_status.Active,
-		UserType:               1,
-		MfaType:                1,
-		PhoneCountryCode:       "1",
-		PhoneNumber:            "1",
+		UserType:               users_type.User,
+		MfaType:                mfa_type.None,
+		PhoneCountryCode:       "",
+		PhoneNumber:            "",
 		Email:                  "1",
-		Password:               "1",
-		Salt:                   "1",
-		HashAlgorithm:          1,
+		Salt:                   "",
+		HashAlgorithm:          hash_algorithm.Bcrypt,
 		IsEmailVerified:        false,
 		IsPhoneVerified:        false,
-		EmailActivationCode:    "1",
+		EmailActivationCode:    "",
 		EmailActivationCodeTTL: time.Now(),
 		CreatedAt:              time.Now(),
 		UpdatedAt:              time.Now(),
@@ -57,9 +71,8 @@ func TestTxManager_Transact(t *testing.T) {
 		WithArgs("1").WillReturnError(gorm.ErrRecordNotFound)
 	mock.ExpectBegin()
 	mock.ExpectQuery(sqlInsertString).
-		WithArgs(user.Status, 1, 1, "1", "1", "1", "1", "1", 1, false, false, "1", time.Now(), time.Now(), time.Now()).WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+		WithArgs(user.Status, user.UserType, user.MfaType, user.PhoneCountryCode, user.PhoneNumber, user.Email, sqlmock.AnyArg(), user.Salt, user.HashAlgorithm, user.IsEmailVerified, user.IsPhoneVerified, user.EmailActivationCode, AnyTime{}, AnyTime{}, AnyTime{}).WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 	mock.ExpectCommit()
-	mock.ExpectBegin()
 	mock.ExpectQuery(`SELECT * FROM "users"  WHERE "users"."id" = $1`).WithArgs(1).
 		WillReturnRows(sqlmock.NewRows([]string{
 			"id", "status", "user_type", "mfa_type",
@@ -67,7 +80,7 @@ func TestTxManager_Transact(t *testing.T) {
 			"password", "salt", "hash_algorithm",
 			"is_email_verified", "is_phone_verified", "email_activation_code",
 			"email_activation_code_ttl", "created_at", "updated_at",
-		}).AddRow(1, user.Status, 1, 1, "1", "1", "1", "1", "1", 1, false, false, "1", time.Now(), time.Now(), time.Now()))
+		}).AddRow(1, user.Status, user.UserType, user.MfaType, "1", "1", "1", "1", "1", 1, false, false, "1", time.Now(), time.Now(), time.Now()))
 
 	gdb, err := gorm.Open("postgres", db)
 
@@ -79,11 +92,17 @@ func TestTxManager_Transact(t *testing.T) {
 
 	r := userRepository.New(tx)
 
-	ctrl := &gomock.Controller{T: t}
-	conf := mocks.NewMockConfig(ctrl)
-
 	config := &config2.Config{
-		PasswordBcryptCost: conf.Int("10", "10"),
+		PasswordBcryptCost: func() config.Int {
+			return func() int {
+				return 10
+			}
+		}(),
+		EmailVerification: func() config.Bool {
+			return func() bool {
+				return false
+			}
+		}(),
 	}
 
 	s := userSrv.New(userSrv.Params{

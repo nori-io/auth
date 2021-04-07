@@ -53,7 +53,7 @@ func TestTxManager_Transact(t *testing.T) {
 		MfaType:                mfa_type.None,
 		PhoneCountryCode:       "",
 		PhoneNumber:            "",
-		Email:                  "1",
+		Email:                  "test@mail.ru",
 		Salt:                   "",
 		HashAlgorithm:          hash_algorithm.Bcrypt,
 		IsEmailVerified:        false,
@@ -68,7 +68,7 @@ func TestTxManager_Transact(t *testing.T) {
 		`VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING "users"."id"`
 
 	mock.ExpectQuery(`SELECT * FROM "users"  WHERE (email=$1) ORDER BY "users"."id" ASC LIMIT 1`).
-		WithArgs("1").WillReturnError(gorm.ErrRecordNotFound)
+		WithArgs(user.Email).WillReturnError(gorm.ErrRecordNotFound)
 	mock.ExpectBegin()
 	mock.ExpectQuery(sqlInsertString).
 		WithArgs(user.Status, user.UserType, user.MfaType, user.PhoneCountryCode, user.PhoneNumber, user.Email, sqlmock.AnyArg(), user.Salt, user.HashAlgorithm, user.IsEmailVerified, user.IsPhoneVerified, user.EmailActivationCode, AnyTime{}, AnyTime{}, AnyTime{}).WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
@@ -80,7 +80,7 @@ func TestTxManager_Transact(t *testing.T) {
 			"password", "salt", "hash_algorithm",
 			"is_email_verified", "is_phone_verified", "email_activation_code",
 			"email_activation_code_ttl", "created_at", "updated_at",
-		}).AddRow(1, user.Status, user.UserType, user.MfaType, "1", "1", "1", "1", "1", 1, false, false, "1", time.Now(), time.Now(), time.Now()))
+		}).AddRow(1, user.Status, user.UserType, user.MfaType, user.PhoneCountryCode, user.PhoneNumber, user.Email, "1", user.Salt, user.HashAlgorithm, user.IsEmailVerified, user.IsPhoneVerified, user.EmailActivationCode, time.Now(), time.Now(), time.Now()))
 
 	gdb, err := gorm.Open("postgres", db)
 
@@ -112,7 +112,7 @@ func TestTxManager_Transact(t *testing.T) {
 	})
 
 	user, err = s.Create(context.Background(), service.UserCreateData{
-		Email:    "1",
+		Email:    user.Email,
 		Password: "1",
 	})
 	if err != nil {

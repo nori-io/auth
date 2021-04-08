@@ -33,18 +33,18 @@ func (r MfaRecoveryCodeRepository) Create(ctx context.Context, e []entity.MfaRec
 	return nil
 }
 
-func (r MfaRecoveryCodeRepository) FindByUserIdMfaRecoveryCode(ctx context.Context, userId uint64, code string) (bool, error) {
+func (r MfaRecoveryCodeRepository) FindByUserIdMfaRecoveryCode(ctx context.Context, userId uint64, code string) (*entity.MfaRecoveryCode, error) {
 	out := &model{}
 
 	err := r.Tx.GetDB(ctx).Where("user_id=?, code=?", userId, code).First(out).Error
 
 	if err == gorm.ErrRecordNotFound {
-		return false, nil
+		return nil, nil
 	}
 	if err != nil {
-		return false, errors.NewInternal(err)
+		return nil, errors.NewInternal(err)
 	}
-	return true, nil
+	return out.Convert(), nil
 }
 
 func (r MfaRecoveryCodeRepository) DeleteMfaRecoveryCode(ctx context.Context, userId uint64, code string) error {

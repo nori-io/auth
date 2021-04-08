@@ -3,6 +3,8 @@ package postgres
 import (
 	"context"
 
+	"github.com/jinzhu/gorm"
+
 	"github.com/nori-plugins/authentication/pkg/transactor"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
@@ -28,8 +30,7 @@ func (r *AuthenticationLogRepository) Create(ctx context.Context, e *entity.Auth
 
 func (r *AuthenticationLogRepository) Update(ctx context.Context, e *entity.AuthenticationLog) error {
 	model := NewModel(e)
-	err := r.Tx.GetDB(ctx).Save(model).Error
-	if err != nil {
+	if err := r.Tx.GetDB(ctx).Save(model).Error; err != nil {
 		return errors.NewInternal(err)
 	}
 
@@ -37,18 +38,21 @@ func (r *AuthenticationLogRepository) Update(ctx context.Context, e *entity.Auth
 }
 
 func (r *AuthenticationLogRepository) FindByUserId(ctx context.Context, userId uint64) (*entity.AuthenticationLog, error) {
-	var (
-		out = &model{}
-		e   error
-	)
-	e = r.Tx.GetDB(ctx).Where("user_id=?", userId).Last(out).Error
+	out := &model{}
+	err := r.Tx.GetDB(ctx).Where("user_id=?", userId).Last(out).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, errors.NewInternal(err)
+	}
 
-	return out.Convert(), e
+	return out.Convert(), nil
 }
 
 func (r *AuthenticationLogRepository) Delete(ctx context.Context, id uint64) error {
 	if err := r.Tx.GetDB(ctx).Delete(&model{ID: id}).Error; err != nil {
-		return err
+		errors.NewInternal(err)
 	}
 	return nil
 }

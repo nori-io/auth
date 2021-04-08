@@ -3,6 +3,10 @@ package postgres
 import (
 	"context"
 
+	"github.com/jinzhu/gorm"
+
+	"github.com/nori-plugins/authentication/pkg/errors"
+
 	"github.com/nori-plugins/authentication/pkg/transactor"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
@@ -22,23 +26,25 @@ func (r MfaRecoveryCodeRepository) Create(ctx context.Context, e []entity.MfaRec
 	lastRecord := new(model)
 
 	if err := r.Tx.GetDB(ctx).Create(mfaRecoveryCodes).Scan(&lastRecord).Error; err != nil {
-		return err
+		return errors.NewInternal(err)
 	}
 	lastRecord.Convert()
 
 	return nil
 }
 
-func (r MfaRecoveryCodeRepository) FindByUserIdMfaRecoveryCode(ctx context.Context, userId uint64, code string) bool {
+func (r MfaRecoveryCodeRepository) FindByUserIdMfaRecoveryCode(ctx context.Context, userId uint64, code string) (bool, error) {
 	out := &model{}
 
-	rows := r.Tx.GetDB(ctx).Where("user_id=?, code=?", userId, code).First(out).RowsAffected
+	err := r.Tx.GetDB(ctx).Where("user_id=?, code=?", userId, code).First(out).Error
 
-	if rows == 1 {
-		return true
+	if err == gorm.ErrRecordNotFound {
+		return false, nil
 	}
-
-	return false
+	if err != nil {
+		return false, errors.NewInternal(err)
+	}
+	return true, nil
 }
 
 func (r MfaRecoveryCodeRepository) DeleteMfaRecoveryCode(ctx context.Context, userId uint64, code string) error {

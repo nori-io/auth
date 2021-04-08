@@ -18,8 +18,11 @@ type UserRepository struct {
 
 func (r *UserRepository) Count(ctx context.Context) (uint64, error) {
 	var count uint64
-	err := r.Tx.GetDB(ctx).Count(&count).Error
-	return count, err
+	if err := r.Tx.GetDB(ctx).Count(&count).Error; err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }
 
 func (r *UserRepository) Create(ctx context.Context, e *entity.User) error {
@@ -28,7 +31,7 @@ func (r *UserRepository) Create(ctx context.Context, e *entity.User) error {
 	lastRecord := new(model)
 
 	if err := r.Tx.GetDB(ctx).Create(&modelUser).Scan(&lastRecord).Error; err != nil {
-		return err
+		return errors.NewInternal(err)
 	}
 
 	return nil
@@ -37,11 +40,18 @@ func (r *UserRepository) Create(ctx context.Context, e *entity.User) error {
 func (r *UserRepository) FindById(ctx context.Context, id uint64) (*entity.User, error) {
 	var (
 		out = &model{}
-		e   error
+		err error
 	)
-	e = r.Tx.GetDB(ctx).Where("id=?", id).First(out).Error
+	err = r.Tx.GetDB(ctx).Where("id=?", id).First(out).Error
 
-	return out.Convert(), e
+	if err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, errors.NewInternal(err)
+	}
+
+	return out.Convert(), nil
 }
 
 func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*entity.User, error) {
@@ -56,7 +66,7 @@ func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*entity
 		return nil, errors.NewInternal(err)
 	}
 
-	return out.Convert(), err
+	return out.Convert(), nil
 }
 
 func (r *UserRepository) FindByPhone(ctx context.Context, phone string) (*entity.User, error) {
@@ -64,8 +74,14 @@ func (r *UserRepository) FindByPhone(ctx context.Context, phone string) (*entity
 
 	//@todo find by phone number and country code
 	err := r.Tx.GetDB(ctx).Where("CONCAT(phone_number, phone_country_code)=?", phone).First(out).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, errors.NewInternal(err)
+	}
 
-	return out.Convert(), err
+	return out.Convert(), nil
 }
 
 func (r *UserRepository) FindByFilter(ctx context.Context, filter repository.UserFilter) ([]entity.User, error) {
@@ -86,25 +102,30 @@ func (r *UserRepository) FindByFilter(ctx context.Context, filter repository.Use
 	}
 
 	err := q.Find(&models).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
 	if err != nil {
-		return nil, err
+		return nil, errors.NewInternal(err)
 	}
 	for _, v := range models {
 		entities = append(entities, *v.Convert())
 	}
-	return entities, err
+	return entities, nil
 }
 
 func (r *UserRepository) Update(ctx context.Context, e *entity.User) error {
 	model := NewModel(e)
-	err := r.Tx.GetDB(ctx).Save(model).Error
+	if err := r.Tx.GetDB(ctx).Save(model).Error; err != nil {
+		return errors.NewInternal(err)
+	}
 
-	return err
+	return nil
 }
 
 func (r *UserRepository) Delete(ctx context.Context, id uint64) error {
 	if err := r.Tx.GetDB(ctx).Delete(&model{ID: id}).Error; err != nil {
-		return err
+		return errors.NewInternal(err)
 	}
 	return nil
 }

@@ -59,7 +59,7 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 		return nil, err
 	}
 
-	err = srv.authenticationLogService.CreateAuthenticationLog(tx, ctx, user)
+	err = srv.authenticationLogService.CreateAuthenticationLog(ctx, user)
 	if err != nil {
 		return nil, err
 	}
@@ -145,9 +145,8 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 		}
 	}
 
-	sid, err := srv.getToken()
+	sid, err := srv.getToken(ctx)
 
-	tx := srv.db.Begin()
 	if err := srv.sessionRepository.Create(ctx, &entity.Session{
 		ID:         0,
 		UserID:     session.UserID,

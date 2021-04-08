@@ -49,21 +49,20 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 	if srv.config.EmailVerification() {
 		//@todo задействовать зависимость от плагина с интерфейсом mail
 	}
-	tx := srv.db.Begin()
 
-	user, err := srv.userService.CreateUser(tx, ctx, data)
+	userCreateData := service.UserCreateData{
+		Email:    data.Email,
+		Password: data.Password,
+	}
+	user, err := srv.userService.Create(ctx, userCreateData)
 	if err != nil {
-		tx.Rollback()
 		return nil, err
 	}
 
 	err = srv.authenticationLogService.CreateAuthenticationLog(tx, ctx, user)
 	if err != nil {
-		tx.Rollback()
 		return nil, err
 	}
-
-	tx.Commit()
 
 	return user, nil
 }
@@ -87,26 +86,22 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 		return nil, nil, errors.NewInternal(err)
 	}
 
-	tx := srv.db.Begin()
-
-	if err := srv.sessionRepository.Create(tx, ctx, &entity.Session{
+	if err := srv.sessionRepository.Create(ctx, &entity.Session{
 		ID:         0,
 		UserID:     user.ID,
 		SessionKey: sid,
 		Status:     session_status.Active,
 		OpenedAt:   time.Now(),
 	}); err != nil {
-		tx.Rollback()
 		return nil, nil, errors.NewInternal(err)
 	}
 
 	session, err := srv.sessionRepository.FindBySessionKey(ctx, string(sid))
 	if err != nil {
-		tx.Rollback()
 		return nil, nil, errors.NewInternal(err)
 	}
 
-	if err = srv.authenticationLogRepository.Create(tx, ctx, &entity.AuthenticationLog{
+	if err = srv.authenticationLogRepository.Create(ctx, &entity.AuthenticationLog{
 		ID:     0,
 		UserID: user.ID,
 		Action: users_action.SignIn,
@@ -115,12 +110,8 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 		SessionID: session.ID,
 		CreatedAt: time.Now(),
 	}); err != nil {
-
-		tx.Rollback()
 		return nil, nil, errors.NewInternal(err)
 	}
-
-	tx.Commit()
 
 	mfaType := user.MfaType.String()
 
@@ -157,14 +148,13 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 	sid, err := srv.getToken()
 
 	tx := srv.db.Begin()
-	if err := srv.sessionRepository.Create(tx, ctx, &entity.Session{
+	if err := srv.sessionRepository.Create(ctx, &entity.Session{
 		ID:         0,
 		UserID:     session.UserID,
 		SessionKey: sid,
 		Status:     session_status.Active,
 		OpenedAt:   time.Now(),
 	}); err != nil {
-		tx.Rollback()
 		//@todo тут тоже возвращается ошибка, как быть?
 		//создать новый тип ошибки?
 		//и как быть в коде дальше
@@ -173,11 +163,10 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 
 	session, err = srv.sessionRepository.FindBySessionKey(ctx, string(sid))
 	if err != nil {
-		tx.Rollback()
 		return nil, err
 	}
 
-	if err = srv.authenticationLogRepository.Create(tx, ctx, &entity.AuthenticationLog{
+	if err = srv.authenticationLogRepository.Create(ctx, &entity.AuthenticationLog{
 		ID:     0,
 		UserID: session.UserID,
 		Action: users_action.SignInMfa,
@@ -186,11 +175,9 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 		SessionID: session.ID,
 		CreatedAt: time.Now(),
 	}); err != nil {
-		tx.Rollback()
 		return nil, err
 	}
 
-	tx.Commit()
 	return &entity.Session{
 		SessionKey: sid,
 	}, nil
@@ -202,31 +189,27 @@ func (srv *AuthenticationService) SignOut(ctx context.Context, sess *entity.Sess
 		return err
 	}
 
-	tx := srv.db.Begin()
 	//@todo если передать не все поля, то обнулятся ли непереданные поля в базе данных?
-	if err := srv.sessionRepository.Update(tx, ctx, &entity.Session{
+	if err := srv.sessionRepository.Update(ctx, &entity.Session{
 		ID:        session.ID,
 		UserID:    session.UserID,
 		Status:    session_status.Inactive,
 		ClosedAt:  time.Now(),
 		UpdatedAt: time.Now(),
 	}); err != nil {
-		tx.Rollback()
 		return err
 	}
 
-	if err := srv.authenticationLogRepository.Create(tx, ctx, &entity.AuthenticationLog{
+	if err := srv.authenticationLogRepository.Create(ctx, &entity.AuthenticationLog{
 		ID:        0,
 		UserID:    session.UserID,
 		Action:    users_action.SignOut,
 		SessionID: session.ID,
 		CreatedAt: time.Now(),
 	}); err != nil {
-		tx.Rollback()
 		return err
 	}
 
-	tx.Commit()
 	return err
 }
 

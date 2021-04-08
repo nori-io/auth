@@ -5,6 +5,7 @@ import (
 	"github.com/nori-plugins/authentication/internal/config"
 	"github.com/nori-plugins/authentication/internal/domain/repository"
 	"github.com/nori-plugins/authentication/internal/domain/service"
+	"github.com/nori-plugins/authentication/pkg/transactor"
 )
 
 type AuthenticationService struct {
@@ -17,6 +18,7 @@ type AuthenticationService struct {
 
 	userService              service.UserService
 	authenticationLogService service.AuthenticationLogService
+	transactor               transactor.Transactor
 }
 
 type Params struct {
@@ -28,6 +30,7 @@ type Params struct {
 	DB                          *gorm.DB
 	UserService                 service.UserService
 	AuthenticationLogService    service.AuthenticationLogService
+	Transactor                  transactor.Transactor
 }
 
 func New(params Params) service.AuthenticationService {
@@ -40,5 +43,6 @@ func New(params Params) service.AuthenticationService {
 		userService:                 params.UserService,
 		authenticationLogService:    params.AuthenticationLogService,
 		db:                          params.DB,
+		transactor:                  params.Transactor,
 	}
 }

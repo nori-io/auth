@@ -54,13 +54,22 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 		Email:    data.Email,
 		Password: data.Password,
 	}
-	user, err := srv.userService.Create(ctx, userCreateData)
-	if err != nil {
-		return nil, err
-	}
 
-	err = srv.authenticationLogService.CreateAuthenticationLog(ctx, user)
-	if err != nil {
+	var user *entity.User
+	var err error
+
+	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
+		user, err = srv.userService.Create(ctx, userCreateData)
+		if err != nil {
+			return err
+		}
+
+		err = srv.authenticationLogService.Create(ctx, user)
+		if err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
 		return nil, err
 	}
 

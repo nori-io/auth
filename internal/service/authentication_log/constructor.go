@@ -1,24 +1,24 @@
 package authentication_log
 
 import (
-	"github.com/jinzhu/gorm"
 	"github.com/nori-plugins/authentication/internal/domain/repository"
 	"github.com/nori-plugins/authentication/internal/domain/service"
+	"github.com/nori-plugins/authentication/pkg/transactor"
 )
 
 type AuthenticationLogService struct {
 	authenticationLogRepository repository.AuthenticationLogRepository
-	db                          *gorm.DB
+	transactor                  transactor.Transactor
 }
 
 type Params struct {
 	authenticationLogRepository repository.AuthenticationLogRepository
-	DB                          *gorm.DB
+	Transactor                  transactor.Transactor
 }
 
 func New(params Params) service.AuthenticationLogService {
 	return &AuthenticationLogService{
 		authenticationLogRepository: params.authenticationLogRepository,
-		db:                          params.DB,
+		transactor:                  params.Transactor,
 	}
 }

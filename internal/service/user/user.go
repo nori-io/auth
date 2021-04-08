@@ -40,8 +40,14 @@ func (srv UserService) Create(ctx context.Context, data service.UserCreateData) 
 		CreatedAt:       time.Now(),
 	}
 
-	if err := srv.userRepository.Create(ctx, user); err != nil {
-		return nil, errors.NewInternal(err)
+	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
+		if err := srv.userRepository.Create(tx, user); err != nil {
+			return errors.NewInternal(err)
+		}
+		return nil
+	}); err != nil {
+		return nil, err
 	}
+
 	return user, nil
 }

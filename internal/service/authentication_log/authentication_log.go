@@ -4,15 +4,13 @@ import (
 	"context"
 	"time"
 
-	"github.com/jinzhu/gorm"
-
 	"github.com/nori-plugins/authentication/pkg/enum/users_action"
 	"github.com/nori-plugins/authentication/pkg/errors"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
-func (srv AuthenticationLogService) CreateAuthenticationLog(tx *gorm.DB, ctx context.Context, user *entity.User) error {
+func (srv AuthenticationLogService) Create(ctx context.Context, user *entity.User) error {
 	authenticationLog := &entity.AuthenticationLog{
 		UserID: user.ID,
 		Action: users_action.SignUp,
@@ -20,8 +18,14 @@ func (srv AuthenticationLogService) CreateAuthenticationLog(tx *gorm.DB, ctx con
 		CreatedAt: time.Now(),
 	}
 
-	if err := srv.authenticationLogRepository.Create(tx, ctx, authenticationLog); err != nil {
-		return errors.NewInternal(err)
+	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
+		if err := srv.authenticationLogRepository.Create(tx, authenticationLog); err != nil {
+			return errors.NewInternal(err)
+		}
+		return nil
+	}); err != nil {
+		return err
 	}
+
 	return nil
 }

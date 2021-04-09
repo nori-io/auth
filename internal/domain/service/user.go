@@ -8,6 +8,8 @@ import (
 
 type UserService interface {
 	Create(ctx context.Context, data UserCreateData) (*entity.User, error)
+	GetByEmail(ctx context.Context, email string) (*entity.User, error)
+	GetByID(ctx context.Context, ID uint64) (*entity.User, error)
 }
 
 type UserCreateData struct {

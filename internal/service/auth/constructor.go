@@ -1,48 +1,33 @@
 package auth
 
 import (
-	"github.com/jinzhu/gorm"
 	"github.com/nori-plugins/authentication/internal/config"
-	"github.com/nori-plugins/authentication/internal/domain/repository"
 	"github.com/nori-plugins/authentication/internal/domain/service"
 	"github.com/nori-plugins/authentication/pkg/transactor"
 )
 
 type AuthenticationService struct {
-	config                      config.Config
-	authenticationLogRepository repository.AuthenticationLogRepository
-	userRepository              repository.UserRepository
-	sessionRepository           repository.SessionRepository
-	mfaRecoveryCodeRepository   repository.MfaRecoveryCodeRepository
-	db                          *gorm.DB
-
+	config                   config.Config
 	userService              service.UserService
 	authenticationLogService service.AuthenticationLogService
+	sessionService           service.SessionService
 	transactor               transactor.Transactor
 }
 
 type Params struct {
-	Config                      config.Config
-	AuthenticationLogRepository repository.AuthenticationLogRepository
-	MfaRecoveryCodeRepository   repository.MfaRecoveryCodeRepository
-	SessionRepository           repository.SessionRepository
-	UserRepository              repository.UserRepository
-	DB                          *gorm.DB
-	UserService                 service.UserService
-	AuthenticationLogService    service.AuthenticationLogService
-	Transactor                  transactor.Transactor
+	Config                   config.Config
+	UserService              service.UserService
+	AuthenticationLogService service.AuthenticationLogService
+	SessionService           service.SessionService
+	Transactor               transactor.Transactor
 }
 
 func New(params Params) service.AuthenticationService {
 	return &AuthenticationService{
-		config:                      params.Config,
-		authenticationLogRepository: params.AuthenticationLogRepository,
-		userRepository:              params.UserRepository,
-		sessionRepository:           params.SessionRepository,
-		mfaRecoveryCodeRepository:   params.MfaRecoveryCodeRepository,
-		userService:                 params.UserService,
-		authenticationLogService:    params.AuthenticationLogService,
-		db:                          params.DB,
-		transactor:                  params.Transactor,
+		config:                   params.Config,
+		userService:              params.UserService,
+		authenticationLogService: params.AuthenticationLogService,
+		sessionService:           params.SessionService,
+		transactor:               params.Transactor,
 	}
 }

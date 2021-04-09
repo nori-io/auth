@@ -12,13 +12,13 @@ type AuthenticationLogService struct {
 }
 
 type Params struct {
-	authenticationLogRepository repository.AuthenticationLogRepository
+	AuthenticationLogRepository repository.AuthenticationLogRepository
 	Transactor                  transactor.Transactor
 }
 
 func New(params Params) service.AuthenticationLogService {
 	return &AuthenticationLogService{
-		authenticationLogRepository: params.authenticationLogRepository,
+		authenticationLogRepository: params.AuthenticationLogRepository,
 		transactor:                  params.Transactor,
 	}
 }

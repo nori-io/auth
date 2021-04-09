@@ -7,5 +7,5 @@ import (
 )
 
 type AuthenticationLogService interface {
-	Create(ctx context.Context, user *entity.User) error
+	Create(ctx context.Context, user *entity.AuthenticationLog) error
 }

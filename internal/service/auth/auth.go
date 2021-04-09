@@ -5,6 +5,9 @@ import (
 	"crypto/rand"
 	"time"
 
+	"github.com/jinzhu/gorm"
+	errors2 "github.com/nori-plugins/authentication/internal/domain/errors"
+
 	"github.com/nori-plugins/authentication/pkg/errors"
 
 	"golang.org/x/crypto/bcrypt"
@@ -21,12 +24,12 @@ import (
 )
 
 func (srv *AuthenticationService) GetSessionInfo(ctx context.Context, ssid string) (*entity.Session, *entity.User, error) {
-	session, err := srv.sessionRepository.FindBySessionKey(ctx, ssid)
+	session, err := srv.sessionService.GetBySessionKey(ctx, ssid)
 	if err != nil {
 		return nil, nil, errors.NewInternal(err)
 	}
 
-	user, err := srv.userRepository.FindById(ctx, session.UserID)
+	user, err := srv.userService.GetByID(ctx, session.UserID)
 	if err != nil {
 		return nil, nil, errors.NewInternal(err)
 	}
@@ -43,7 +46,7 @@ func (srv *AuthenticationService) GetSessionInfo(ctx context.Context, ssid strin
 //@todo add checking action and token captcha
 func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUpData) (*entity.User, error) {
 	if err := data.Validate(); err != nil {
-		return nil, errors.New("invalid_data", err.Error(), errors.ErrValidation)
+		return nil, err
 	}
 
 	if srv.config.EmailVerification() {
@@ -59,12 +62,18 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 	var err error
 
 	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
-		user, err = srv.userService.Create(ctx, userCreateData)
+		user, err = srv.userService.Create(tx, userCreateData)
 		if err != nil {
 			return err
 		}
 
-		err = srv.authenticationLogService.Create(ctx, user)
+		err = srv.authenticationLogService.Create(tx, &entity.AuthenticationLog{
+			UserID: user.ID,
+			Action: users_action.SignUp,
+			//@todo заполнить метаданные айпи адресом и городом или чем-то ещё?
+			Meta:      "",
+			CreatedAt: time.Now(),
+		})
 		if err != nil {
 			return err
 		}
@@ -81,7 +90,7 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 		return nil, nil, errors.New("invalid_data", err.Error(), errors.ErrValidation)
 	}
 
-	user, err := srv.userRepository.FindByEmail(ctx, data.Email)
+	user, err := srv.userService.GetByEmail(ctx, data.Email)
 	if err != nil {
 		return nil, nil, errors.NewInternal(err)
 	}
@@ -95,31 +104,37 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 		return nil, nil, errors.NewInternal(err)
 	}
 
-	if err := srv.sessionRepository.Create(ctx, &entity.Session{
-		ID:         0,
-		UserID:     user.ID,
-		SessionKey: sid,
-		Status:     session_status.Active,
-		OpenedAt:   time.Now(),
-	}); err != nil {
-		return nil, nil, errors.NewInternal(err)
-	}
+	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
+		if err := srv.sessionService.Create(ctx, &entity.Session{
+			ID:         0,
+			UserID:     user.ID,
+			SessionKey: sid,
+			Status:     session_status.Active,
+			OpenedAt:   time.Now(),
+		}); err != nil {
+			errors.NewInternal(err)
+		}
 
-	session, err := srv.sessionRepository.FindBySessionKey(ctx, string(sid))
-	if err != nil {
-		return nil, nil, errors.NewInternal(err)
-	}
+		session, err := srv.sessionService.GetBySessionKey(ctx, string(sid))
+		if err != nil {
+			return errors.NewInternal(err)
+		}
 
-	if err = srv.authenticationLogRepository.Create(ctx, &entity.AuthenticationLog{
-		ID:     0,
-		UserID: user.ID,
-		Action: users_action.SignIn,
-		//@todo заполнить метаданные айпи адресом и городом или чем-то ещё?
-		Meta:      "",
-		SessionID: session.ID,
-		CreatedAt: time.Now(),
+		if err = srv.authenticationLogService.Create(ctx, &entity.AuthenticationLog{
+			ID:     0,
+			UserID: user.ID,
+			Action: users_action.SignIn,
+			//@todo заполнить метаданные айпи адресом и городом или чем-то ещё?
+			Meta:      "",
+			SessionID: session.ID,
+			CreatedAt: time.Now(),
+		}); err != nil {
+			return errors.NewInternal(err)
+		}
+
+		return nil
 	}); err != nil {
-		return nil, nil, errors.NewInternal(err)
+		return nil, nil, err
 	}
 
 	mfaType := user.MfaType.String()
@@ -142,12 +157,16 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 	var session *entity.Session
 
 	//@todo проверить кэш и отп
-	isCodeFounded := srv.mfaRecoveryCodeRepository.FindByUserIdMfaRecoveryCode(ctx, session.UserID, data.Code)
+	mfaRecoveryCode, err := srv.mfaRecoveryCodeRepository.FindByUserIdMfaRecoveryCode(ctx, session.UserID, data.Code)
 
-	if !isCodeFounded {
-		return nil, err
+	if (err != nil) && (err != gorm.ErrRecordNotFound) {
+		return nil, errors.NewInternal(err)
 	}
-	if isCodeFounded {
+	if mfaRecoveryCode == nil {
+		return nil, errors2.MfaRecoveryCodeNotFound
+	}
+
+	if mfaRecoveryCode != nil {
 		err = srv.mfaRecoveryCodeRepository.DeleteMfaRecoveryCode(ctx, session.UserID, data.Code)
 		if err != nil {
 			return nil, err

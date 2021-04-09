@@ -19,6 +19,8 @@ import (
 
 	"github.com/nori-plugins/authentication/internal/domain/service"
 
+	authSrv "github.com/nori-plugins/authentication/internal/service/auth"
+	authenticationLogSrv "github.com/nori-plugins/authentication/internal/service/authentication_log"
 	userSrv "github.com/nori-plugins/authentication/internal/service/user"
 
 	"github.com/nori-plugins/authentication/pkg/enum/users_status"
@@ -27,7 +29,9 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/nori-io/logger"
 	"github.com/nori-plugins/authentication/internal/domain/entity"
+	authenticationLogRepository "github.com/nori-plugins/authentication/internal/repository/authentication_log"
 	userRepository "github.com/nori-plugins/authentication/internal/repository/user"
+
 	"github.com/nori-plugins/authentication/pkg/transactor"
 	"github.com/stretchr/testify/require"
 )
@@ -150,13 +154,12 @@ func TestTxManager_TransactNested(t *testing.T) {
 	sqlInsertString := `INSERT INTO "users" ` +
 		`("status","user_type","mfa_type","phone_country_code","phone_number","email","password","salt","hash_algorithm","is_email_verified","is_phone_verified","email_activation_code ","email_activation_code_ttl","created_at","updated_at") ` +
 		`VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING "users"."id"`
-
+	mock.ExpectBegin()
 	mock.ExpectQuery(`SELECT * FROM "users"  WHERE (email=$1) ORDER BY "users"."id" ASC LIMIT 1`).
 		WithArgs(user.Email).WillReturnError(gorm.ErrRecordNotFound)
 	mock.ExpectBegin()
 	mock.ExpectQuery(sqlInsertString).
 		WithArgs(user.Status, user.UserType, user.MfaType, user.PhoneCountryCode, user.PhoneNumber, user.Email, sqlmock.AnyArg(), user.Salt, user.HashAlgorithm, user.IsEmailVerified, user.IsPhoneVerified, user.EmailActivationCode, AnyTime{}, AnyTime{}, AnyTime{}).WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
-	mock.ExpectCommit()
 	mock.ExpectQuery(`SELECT * FROM "users"  WHERE "users"."id" = $1`).WithArgs(1).
 		WillReturnRows(sqlmock.NewRows([]string{
 			"id", "status", "user_type", "mfa_type",
@@ -165,7 +168,7 @@ func TestTxManager_TransactNested(t *testing.T) {
 			"is_email_verified", "is_phone_verified", "email_activation_code",
 			"email_activation_code_ttl", "created_at", "updated_at",
 		}).AddRow(1, user.Status, user.UserType, user.MfaType, user.PhoneCountryCode, user.PhoneNumber, user.Email, "1", user.Salt, user.HashAlgorithm, user.IsEmailVerified, user.IsPhoneVerified, user.EmailActivationCode, time.Now(), time.Now(), time.Now()))
-
+	mock.ExpectCommit()
 	gdb, err := gorm.Open("postgres", db)
 
 	txParams := transactor.Params{
@@ -174,8 +177,8 @@ func TestTxManager_TransactNested(t *testing.T) {
 	}
 	tx := transactor.New(txParams)
 
-	r := userRepository.New(tx)
-
+	repoUser := userRepository.New(tx)
+	repoAuthenticationLog := authenticationLogRepository.New(tx)
 	config := &config2.Config{
 		PasswordBcryptCost: func() config.Int {
 			return func() int {
@@ -189,13 +192,25 @@ func TestTxManager_TransactNested(t *testing.T) {
 		}(),
 	}
 
-	s := userSrv.New(userSrv.Params{
-		UserRepository: r,
+	srvUser := userSrv.New(userSrv.Params{
+		UserRepository: repoUser,
 		Transactor:     tx,
 		Сonfig:         *config,
 	})
 
-	user, err = s.Create(context.Background(), service.UserCreateData{
+	srvAuthenticationLog := authenticationLogSrv.New(authenticationLogSrv.Params{
+		AuthenticationLogRepository: repoAuthenticationLog,
+		Transactor:                  tx,
+	})
+
+	srvAuth := authSrv.New(authSrv.Params{
+		Config:                   *config,
+		UserService:              srvUser,
+		AuthenticationLogService: srvAuthenticationLog,
+		Transactor:               tx,
+	})
+
+	user, err = srvAuth.SignUp(context.Background(), service.SignUpData{
 		Email:    user.Email,
 		Password: "1",
 	})

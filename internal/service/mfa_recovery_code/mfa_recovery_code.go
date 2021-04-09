@@ -28,10 +28,10 @@ func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data
 		})
 	}
 	tx := srv.db.Begin()
-	if err = srv.mfaRecoveryCodeRepository.DeleteMfaRecoveryCodes(tx, ctx, data.UserID); err != nil {
+	if err = srv.mfaRecoveryCodeRepository.DeleteMfaRecoveryCodes(ctx, data.UserID); err != nil {
 		return nil, err
 	}
-	if err = srv.mfaRecoveryCodeRepository.Create(tx, ctx, mfaRecoveryCodes); err != nil {
+	if err = srv.mfaRecoveryCodeRepository.Create(ctx, mfaRecoveryCodes); err != nil {
 		return nil, err
 	}
 

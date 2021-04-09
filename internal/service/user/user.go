@@ -4,8 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/jinzhu/gorm"
-
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 	errors2 "github.com/nori-plugins/authentication/internal/domain/errors"
 	"github.com/nori-plugins/authentication/internal/domain/service"
@@ -18,12 +16,12 @@ import (
 )
 
 func (srv UserService) Create(ctx context.Context, data service.UserCreateData) (*entity.User, error) {
-	user, err := srv.userRepository.FindByEmail(ctx, data.Email)
-	if (err != nil) && (err != gorm.ErrRecordNotFound) {
-		return nil, errors.NewInternal(err)
+	user, err := srv.GetByEmail(ctx, data.Email)
+	if err != nil && err != errors2.UserNotFound {
+		return nil, err
 	}
 	if user != nil {
-		return nil, errors2.DuplicateUser
+		return nil, errors2.EmailAlreadyTaken
 	}
 
 	password, err := bcrypt.GenerateFromPassword([]byte(data.Password), srv.config.PasswordBcryptCost())
@@ -40,8 +38,8 @@ func (srv UserService) Create(ctx context.Context, data service.UserCreateData) 
 		CreatedAt:       time.Now(),
 	}
 
-	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
-		if err := srv.userRepository.Create(tx, user); err != nil {
+	if err := srv.transactor.Transact(ctx, func(txCtx context.Context) error {
+		if err := srv.userRepository.Create(txCtx, user); err != nil {
 			return errors.NewInternal(err)
 		}
 		return nil
@@ -49,5 +47,27 @@ func (srv UserService) Create(ctx context.Context, data service.UserCreateData) 
 		return nil, err
 	}
 
+	return user, nil
+}
+
+func (srv UserService) GetByEmail(ctx context.Context, email string) (*entity.User, error) {
+	user, err := srv.userRepository.FindByEmail(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return nil, errors2.UserNotFound
+	}
+	return user, nil
+}
+
+func (srv UserService) GetByID(ctx context.Context, ID uint64) (*entity.User, error) {
+	user, err := srv.userRepository.FindById(ctx, ID)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return nil, errors2.UserNotFound
+	}
 	return user, nil
 }

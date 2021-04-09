@@ -28,12 +28,12 @@ func (t *TxManager) GetDB(ctx context.Context) *gorm.DB {
 }
 
 func (t *TxManager) Transact(ctx context.Context, txFunc func(tx context.Context) error) (err error) {
-	var tx *gorm.DB
+	var dbTx *gorm.DB
 
-	tx, ok := ctx.Value(keyTx).(*gorm.DB)
-	if !ok || tx == nil {
-		tx = t.db.Begin()
-		ctx = context.WithValue(ctx, keyTx, tx)
+	dbTx, ok := ctx.Value(keyTx).(*gorm.DB)
+	if !ok || dbTx == nil {
+		dbTx = t.db.Begin()
+		ctx = context.WithValue(ctx, keyTx, dbTx)
 	}
 
 	defer func() {
@@ -41,13 +41,13 @@ func (t *TxManager) Transact(ctx context.Context, txFunc func(tx context.Context
 			err = errors.New("error_recover", err.Error(), errors.ErrInternal)
 		}
 		if err != nil {
-			if e := tx.Rollback().Error; e != nil {
+			if e := dbTx.Rollback().Error; e != nil {
 				t.log.Error("%s", e)
 				return
 			}
 			return
 		}
-		if e := tx.Commit().Error; e != nil {
+		if e := dbTx.Commit().Error; e != nil {
 			t.log.Error("%s", e)
 			return
 		}

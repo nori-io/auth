@@ -20,7 +20,7 @@ func (e errorHelper) Error(w http.ResponseWriter, err error) {
 			http.Error(w, err.Error(), http.StatusForbidden)
 		case errors.ErrNotFound:
 			http.Error(w, err.Error(), http.StatusNotFound)
-		case errors.ErrConflict:
+		case errors.ErrAlreadyExists:
 			http.Error(w, err.Error(), http.StatusConflict)
 		case errors.ErrInternal:
 			http.Error(w, err.Error(), http.StatusInternalServerError)

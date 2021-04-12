@@ -3,6 +3,8 @@ package settings
 import (
 	"context"
 
+	"github.com/nori-plugins/authentication/internal/domain/errors"
+
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
@@ -14,9 +16,17 @@ func (srv SettingsService) ReceiveMfaStatus(ctx context.Context, sessionKey stri
 		return nil, err
 	}
 
+	if session == nil {
+		return nil, errors.SessionNotFound
+	}
+
 	user, err := srv.userRepository.FindById(ctx, session.UserID)
 	if err != nil {
 		return nil, err
+	}
+
+	if user == nil {
+		return nil, errors.UserNotFound
 	}
 
 	mfaEnabled := user.MfaType.String() != "None"

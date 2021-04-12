@@ -11,7 +11,6 @@ import (
 	"github.com/nori-plugins/authentication/pkg/enum/mfa_type"
 	"github.com/nori-plugins/authentication/pkg/enum/users_status"
 	"github.com/nori-plugins/authentication/pkg/enum/users_type"
-	"github.com/nori-plugins/authentication/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -40,7 +39,7 @@ func (srv UserService) Create(ctx context.Context, data service.UserCreateData) 
 
 	if err := srv.transactor.Transact(ctx, func(txCtx context.Context) error {
 		if err := srv.userRepository.Create(txCtx, user); err != nil {
-			return errors.NewInternal(err)
+			return err
 		}
 		return nil
 	}); err != nil {

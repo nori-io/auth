@@ -28,7 +28,7 @@ func (srv *AuthenticationService) GetSessionInfo(ctx context.Context, ssid strin
 
 	user, err := srv.userService.GetByID(ctx, session.UserID)
 	if err != nil {
-		return nil, nil, errors.NewInternal(err)
+		return nil, nil, err
 	}
 	return &entity.Session{
 			OpenedAt: session.OpenedAt,
@@ -89,7 +89,7 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 
 	user, err := srv.userService.GetByEmail(ctx, data.Email)
 	if err != nil {
-		return nil, nil, errors.NewInternal(err)
+		return nil, nil, err
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(data.Password)); err != nil {
@@ -156,7 +156,7 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 	//@todo проверить кэш и отп
 	mfaRecoveryCode, err := srv.mfaRecoveryCodeService.GetByUserId(ctx, session.UserID, data.Code)
 	if err != nil {
-		return nil, errors.NewInternal(err)
+		return nil, err
 	}
 
 	if mfaRecoveryCode != nil {
@@ -167,6 +167,9 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 	}
 
 	sid, err := srv.getToken(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
 		if err := srv.sessionService.Create(ctx, &entity.Session{
@@ -179,12 +182,12 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 			//@todo тут тоже возвращается ошибка, как быть?
 			//создать новый тип ошибки?
 			//и как быть в коде дальше
-			return errors.NewInternal(err)
+			return err
 		}
 
 		session, err = srv.sessionService.GetBySessionKey(ctx, string(sid))
 		if err != nil {
-			return errors.NewInternal(err)
+			return err
 		}
 
 		if err = srv.authenticationLogService.Create(ctx, &entity.AuthenticationLog{
@@ -196,7 +199,7 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 			SessionID: session.ID,
 			CreatedAt: time.Now(),
 		}); err != nil {
-			return errors.NewInternal(err)
+			return err
 		}
 		return nil
 	}); err != nil {
@@ -247,7 +250,7 @@ func (srv *AuthenticationService) getToken(ctx context.Context) ([]byte, error) 
 	sid := make([]byte, 32)
 
 	if _, err := rand.Read(sid); err != nil {
-		return nil, err
+		return nil, errors.NewInternal(err)
 	}
 
 	sess, err := srv.sessionService.GetBySessionKey(ctx, string(sid))

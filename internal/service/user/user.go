@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/nori-plugins/authentication/pkg/errors"
+
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 	errors2 "github.com/nori-plugins/authentication/internal/domain/errors"
 	"github.com/nori-plugins/authentication/internal/domain/service"
@@ -24,6 +26,9 @@ func (srv UserService) Create(ctx context.Context, data service.UserCreateData) 
 	}
 
 	password, err := bcrypt.GenerateFromPassword([]byte(data.Password), srv.config.PasswordBcryptCost())
+	if err != nil {
+		return nil, errors.NewInternal(err)
+	}
 
 	//@todo заполнить оставшиеся поля по мере разработки нового функционала
 	user = &entity.User{

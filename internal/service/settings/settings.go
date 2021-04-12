@@ -3,6 +3,8 @@ package settings
 import (
 	"context"
 
+	errors2 "github.com/nori-plugins/authentication/pkg/errors"
+
 	"github.com/nori-plugins/authentication/internal/domain/errors"
 
 	"golang.org/x/crypto/bcrypt"
@@ -40,6 +42,10 @@ func (srv SettingsService) DisableMfa(ctx context.Context, sessionKey string) er
 		return err
 	}
 
+	if session == nil {
+		return errors.SessionNotFound
+	}
+
 	if err := srv.userRepository.Update(ctx, &entity.User{
 		ID:      session.UserID,
 		MfaType: 0,
@@ -55,13 +61,19 @@ func (srv SettingsService) ChangePassword(ctx context.Context, sessionKey string
 	if err != nil {
 		return err
 	}
+	if session == nil {
+		return errors.SessionNotFound
+	}
 	user, err := srv.userRepository.FindById(ctx, session.UserID)
 	if err != nil {
 		return err
 	}
+	if user == nil {
+		return errors.UserNotFound
+	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(passwordOld)); err != nil {
-		return err
+		return errors2.NewInternal(err)
 	}
 
 	if err := srv.userRepository.Update(ctx, &entity.User{

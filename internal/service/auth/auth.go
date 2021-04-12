@@ -214,28 +214,33 @@ func (srv *AuthenticationService) SignOut(ctx context.Context, sess *entity.Sess
 		return err
 	}
 
-	//@todo если передать не все поля, то обнулятся ли непереданные поля в базе данных?
-	if err := srv.sessionService.Update(ctx, &entity.Session{
-		ID:        session.ID,
-		UserID:    session.UserID,
-		Status:    session_status.Inactive,
-		ClosedAt:  time.Now(),
-		UpdatedAt: time.Now(),
+	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
+		//@todo если передать не все поля, то обнулятся ли непереданные поля в базе данных?
+		if err := srv.sessionService.Update(ctx, &entity.Session{
+			ID:        session.ID,
+			UserID:    session.UserID,
+			Status:    session_status.Inactive,
+			ClosedAt:  time.Now(),
+			UpdatedAt: time.Now(),
+		}); err != nil {
+			return err
+		}
+
+		if err := srv.authenticationLogService.Create(ctx, &entity.AuthenticationLog{
+			ID:        0,
+			UserID:    session.UserID,
+			Action:    users_action.SignOut,
+			SessionID: session.ID,
+			CreatedAt: time.Now(),
+		}); err != nil {
+			return err
+		}
+		return nil
 	}); err != nil {
 		return err
 	}
 
-	if err := srv.authenticationLogService.Create(ctx, &entity.AuthenticationLog{
-		ID:        0,
-		UserID:    session.UserID,
-		Action:    users_action.SignOut,
-		SessionID: session.ID,
-		CreatedAt: time.Now(),
-	}); err != nil {
-		return err
-	}
-
-	return err
+	return nil
 }
 
 func (srv *AuthenticationService) getToken(ctx context.Context) ([]byte, error) {

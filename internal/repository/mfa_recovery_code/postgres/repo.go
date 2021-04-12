@@ -33,7 +33,7 @@ func (r MfaRecoveryCodeRepository) Create(ctx context.Context, e []entity.MfaRec
 	return nil
 }
 
-func (r MfaRecoveryCodeRepository) FindByUserIdMfaRecoveryCode(ctx context.Context, userId uint64, code string) (*entity.MfaRecoveryCode, error) {
+func (r MfaRecoveryCodeRepository) FindByUserId(ctx context.Context, userId uint64, code string) (*entity.MfaRecoveryCode, error) {
 	out := &model{}
 
 	err := r.Tx.GetDB(ctx).Where("user_id=?, code=?", userId, code).First(out).Error
@@ -47,7 +47,7 @@ func (r MfaRecoveryCodeRepository) FindByUserIdMfaRecoveryCode(ctx context.Conte
 	return out.Convert(), nil
 }
 
-func (r MfaRecoveryCodeRepository) DeleteMfaRecoveryCode(ctx context.Context, userId uint64, code string) error {
+func (r MfaRecoveryCodeRepository) Delete(ctx context.Context, userId uint64, code string) error {
 	if err := r.Tx.GetDB(ctx).Delete(&model{UserID: userId, Code: code}).Error; err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func (r MfaRecoveryCodeRepository) DeleteMfaRecoveryCode(ctx context.Context, us
 
 func (r MfaRecoveryCodeRepository) DeleteMfaRecoveryCodes(ctx context.Context, userId uint64) error {
 	if err := r.Tx.GetDB(ctx).Delete(&model{UserID: userId}).Error; err != nil {
-		return err
+		return errors.NewInternal(err)
 	}
 	return nil
 }

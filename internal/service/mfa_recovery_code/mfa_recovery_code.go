@@ -4,8 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/nori-plugins/authentication/pkg/errors"
-
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 	errors2 "github.com/nori-plugins/authentication/internal/domain/errors"
 )
@@ -33,10 +31,10 @@ func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data
 
 	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
 		if err = srv.mfaRecoveryCodeRepository.DeleteMfaRecoveryCodes(ctx, data.UserID); err != nil {
-			return errors.NewInternal(err)
+			return err
 		}
 		if err = srv.mfaRecoveryCodeRepository.Create(ctx, mfaRecoveryCodes); err != nil {
-			return errors.NewInternal(err)
+			return err
 		}
 
 		return nil
@@ -49,7 +47,7 @@ func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data
 
 func (srv *MfaRecoveryCodeService) GetByUserId(ctx context.Context, userID uint64, code string) (*entity.MfaRecoveryCode, error) {
 	//@todo проверить кэш и отп
-	mfaRecoveryCode, err := srv.mfaRecoveryCodeRepository.FindByUserIdMfaRecoveryCode(ctx, userID, code)
+	mfaRecoveryCode, err := srv.mfaRecoveryCodeRepository.FindByUserId(ctx, userID, code)
 	if err != nil {
 		return nil, err
 	}
@@ -60,8 +58,7 @@ func (srv *MfaRecoveryCodeService) GetByUserId(ctx context.Context, userID uint6
 }
 
 func (srv *MfaRecoveryCodeService) Apply(ctx context.Context, userID uint64, code string) error {
-	err := srv.mfaRecoveryCodeRepository.DeleteMfaRecoveryCode(ctx, userID, code)
-	if err != nil {
+	if err := srv.mfaRecoveryCodeRepository.Delete(ctx, userID, code); err != nil {
 		return err
 	}
 	return nil

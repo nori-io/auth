@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/nori-plugins/authentication/pkg/errors"
+
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 	errors2 "github.com/nori-plugins/authentication/internal/domain/errors"
 )
@@ -28,15 +30,19 @@ func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data
 			CreatedAt: time.Now(),
 		})
 	}
-	tx := srv.db.Begin()
-	if err = srv.mfaRecoveryCodeRepository.DeleteMfaRecoveryCodes(ctx, data.UserID); err != nil {
-		return nil, err
-	}
-	if err = srv.mfaRecoveryCodeRepository.Create(ctx, mfaRecoveryCodes); err != nil {
-		return nil, err
-	}
 
-	tx.Commit()
+	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
+		if err = srv.mfaRecoveryCodeRepository.DeleteMfaRecoveryCodes(ctx, data.UserID); err != nil {
+			return errors.NewInternal(err)
+		}
+		if err = srv.mfaRecoveryCodeRepository.Create(ctx, mfaRecoveryCodes); err != nil {
+			return errors.NewInternal(err)
+		}
+
+		return nil
+	}); err != nil {
+		return nil, err
+	}
 
 	return mfaRecoveryCodes, nil
 }

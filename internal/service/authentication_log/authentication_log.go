@@ -9,14 +9,8 @@ import (
 )
 
 func (srv AuthenticationLogService) Create(ctx context.Context, authenticationLog *entity.AuthenticationLog) error {
-	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
-		if err := srv.authenticationLogRepository.Create(tx, authenticationLog); err != nil {
-			return errors.NewInternal(err)
-		}
-		return nil
-	}); err != nil {
-		return err
+	if err := srv.authenticationLogRepository.Create(ctx, authenticationLog); err != nil {
+		return errors.NewInternal(err)
 	}
-
 	return nil
 }

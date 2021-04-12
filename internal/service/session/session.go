@@ -7,7 +7,6 @@ import (
 	errors2 "github.com/nori-plugins/authentication/internal/domain/errors"
 
 	"github.com/nori-plugins/authentication/pkg/enum/session_status"
-	"github.com/nori-plugins/authentication/pkg/errors"
 )
 
 func (srv SessionService) Create(ctx context.Context, data *entity.Session) error {
@@ -15,16 +14,11 @@ func (srv SessionService) Create(ctx context.Context, data *entity.Session) erro
 	if err != nil && err != errors2.SessionNotFound {
 		return err
 	}
-	if session != nil {
-		return errors2.SessionAlreadyExists
+	if session != nil && session.Status == session_status.Active {
+		return errors2.ActiveSessionAlreadyExists
 	}
 
-	if err := srv.transactor.Transact(ctx, func(txCtx context.Context) error {
-		if err := srv.sessionRepository.Create(txCtx, data); err != nil {
-			return errors.NewInternal(err)
-		}
-		return nil
-	}); err != nil {
+	if err := srv.sessionRepository.Create(ctx, data); err != nil {
 		return err
 	}
 
@@ -34,18 +28,18 @@ func (srv SessionService) Create(ctx context.Context, data *entity.Session) erro
 func (srv SessionService) Update(ctx context.Context, data *entity.Session) error {
 	err := srv.sessionRepository.Update(ctx, data)
 	if err != nil {
-		return errors.NewInternal(err)
+		return err
 	}
 	return nil
 }
 
-func (srv SessionService) IsSessionExist(ctx context.Context, sessionKey string) (bool, error) {
+func (srv SessionService) IsActiveSessionExist(ctx context.Context, sessionKey string) (bool, error) {
 	session, err := srv.sessionRepository.FindBySessionKey(ctx, sessionKey)
 	if err != nil {
-		return false, errors.NewInternal(err)
+		return false, err
 	}
 	if session != nil && session.Status == session_status.Active {
-		return true, errors2.SessionAlreadyExists
+		return true, nil
 	}
 	return false, nil
 }
@@ -53,7 +47,7 @@ func (srv SessionService) IsSessionExist(ctx context.Context, sessionKey string)
 func (srv SessionService) GetBySessionKey(ctx context.Context, sessionKey string) (*entity.Session, error) {
 	session, err := srv.sessionRepository.FindBySessionKey(ctx, sessionKey)
 	if err != nil {
-		return nil, errors.NewInternal(err)
+		return nil, err
 	}
 	if session == nil {
 		return nil, errors2.SessionNotFound

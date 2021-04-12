@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
+	errors2 "github.com/nori-plugins/authentication/internal/domain/errors"
 )
 
 //@todo как передать сюда всю сессию? скорее, нужно извлечь пользовательский userID из контекста
@@ -38,4 +39,24 @@ func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data
 	tx.Commit()
 
 	return mfaRecoveryCodes, nil
+}
+
+func (srv *MfaRecoveryCodeService) GetByUserId(ctx context.Context, userID uint64, code string) (*entity.MfaRecoveryCode, error) {
+	//@todo проверить кэш и отп
+	mfaRecoveryCode, err := srv.mfaRecoveryCodeRepository.FindByUserIdMfaRecoveryCode(ctx, userID, code)
+	if err != nil {
+		return nil, err
+	}
+	if mfaRecoveryCode == nil {
+		return nil, errors2.MfaRecoveryCodeNotFound
+	}
+	return mfaRecoveryCode, nil
+}
+
+func (srv *MfaRecoveryCodeService) Apply(ctx context.Context, userID uint64, code string) error {
+	err := srv.mfaRecoveryCodeRepository.DeleteMfaRecoveryCode(ctx, userID, code)
+	if err != nil {
+		return err
+	}
+	return nil
 }

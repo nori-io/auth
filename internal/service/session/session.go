@@ -31,6 +31,14 @@ func (srv SessionService) Create(ctx context.Context, data *entity.Session) erro
 	return nil
 }
 
+func (srv SessionService) Update(ctx context.Context, data *entity.Session) error {
+	err := srv.sessionRepository.Update(ctx, data)
+	if err != nil {
+		return errors.NewInternal(err)
+	}
+	return nil
+}
+
 func (srv SessionService) IsSessionExist(ctx context.Context, sessionKey string) (bool, error) {
 	session, err := srv.sessionRepository.FindBySessionKey(ctx, sessionKey)
 	if err != nil {
@@ -45,7 +53,7 @@ func (srv SessionService) IsSessionExist(ctx context.Context, sessionKey string)
 func (srv SessionService) GetBySessionKey(ctx context.Context, sessionKey string) (*entity.Session, error) {
 	session, err := srv.sessionRepository.FindBySessionKey(ctx, sessionKey)
 	if err != nil {
-		return nil, err
+		return nil, errors.NewInternal(err)
 	}
 	if session == nil {
 		return nil, errors2.SessionNotFound

@@ -1,8 +1,10 @@
 package error
 
 import (
+	"encoding/json"
 	"net/http"
 
+	v "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/nori-plugins/authentication/pkg/errors"
 )
 
@@ -25,6 +27,12 @@ func (e errorHelper) Error(w http.ResponseWriter, err error) {
 		case errors.ErrInternal:
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
+	case v.Errors:
+		data, err := json.Marshal(e)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		http.Error(w, string(data), http.StatusBadRequest)
 	default:
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

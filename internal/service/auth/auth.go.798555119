@@ -169,36 +169,38 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 	sid, err := srv.getToken(ctx)
 
 	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
-		if err := srv.sessionService.Create(ctx, &entity.Session{
-			ID:         0,
-			UserID:     session.UserID,
-			SessionKey: sid,
-			Status:     session_status.Active,
-			OpenedAt:   time.Now(),
-		}); err != nil {
-			//@todo тут тоже возвращается ошибка, как быть?
-			//создать новый тип ошибки?
-			//и как быть в коде дальше
-			return errors.NewInternal(err)
-		}
+	return nil
+	}); err != nil {
+		return nil, err
+	}
 
-		session, err = srv.sessionService.GetBySessionKey(ctx, string(sid))
-		if err != nil {
-			return errors.NewInternal(err)
-		}
 
-		if err = srv.authenticationLogService.Create(ctx, &entity.AuthenticationLog{
-			ID:     0,
-			UserID: session.UserID,
-			Action: users_action.SignInMfa,
-			//@todo заполнить метаданные айпи адресом и городом или чем-то ещё?
-			Meta:      "",
-			SessionID: session.ID,
-			CreatedAt: time.Now(),
-		}); err != nil {
-			return errors.NewInternal(err)
-		}
-		return nil
+	if err := srv.sessionService.Create(ctx, &entity.Session{
+		ID:         0,
+		UserID:     session.UserID,
+		SessionKey: sid,
+		Status:     session_status.Active,
+		OpenedAt:   time.Now(),
+	}); err != nil {
+		//@todo тут тоже возвращается ошибка, как быть?
+		//создать новый тип ошибки?
+		//и как быть в коде дальше
+		return nil, err
+	}
+
+	session, err = srv.sessionService.GetBySessionKey(ctx, string(sid))
+	if err != nil {
+		return nil, err
+	}
+
+	if err = srv.authenticationLogService.Create(ctx, &entity.AuthenticationLog{
+		ID:     0,
+		UserID: session.UserID,
+		Action: users_action.SignInMfa,
+		//@todo заполнить метаданные айпи адресом и городом или чем-то ещё?
+		Meta:      "",
+		SessionID: session.ID,
+		CreatedAt: time.Now(),
 	}); err != nil {
 		return nil, err
 	}

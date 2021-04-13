@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/nori-plugins/authentication/pkg/enum/users_action"
+
 	"github.com/nori-plugins/authentication/pkg/enum/hash_algorithm"
 
 	"github.com/nori-plugins/authentication/pkg/enum/mfa_type"
@@ -152,14 +154,22 @@ func TestTxManager_TransactNested(t *testing.T) {
 		CreatedAt:              time.Now(),
 		UpdatedAt:              time.Now(),
 	}
-	sqlInsertString := `INSERT INTO "users" ` +
-		`("status","user_type","mfa_type","phone_country_code","phone_number","email","password","salt","hash_algorithm","is_email_verified","is_phone_verified","email_activation_code ","email_activation_code_ttl","created_at","updated_at") ` +
-		`VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING "users"."id"`
+	authentication_log := &entity.AuthenticationLog{
+		UserID:    0,
+		Action:    users_action.SignUp,
+		Meta:      "",
+		CreatedAt: time.Now(),
+	}
 	mock.ExpectBegin()
 	mock.ExpectQuery(`SELECT * FROM "users"  WHERE (email=$1) ORDER BY "users"."id" ASC LIMIT 1`).
 		WithArgs(user.Email).WillReturnError(gorm.ErrRecordNotFound)
-	mock.ExpectQuery(sqlInsertString).
-		WithArgs(user.Status, user.UserType, user.MfaType, user.PhoneCountryCode, user.PhoneNumber, user.Email, sqlmock.AnyArg(), user.Salt, user.HashAlgorithm, user.IsEmailVerified, user.IsPhoneVerified, user.EmailActivationCode, AnyTime{}, AnyTime{}, AnyTime{}).WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+	sqlUserInsert := `INSERT INTO "users" ` +
+		`("status","user_type","mfa_type","phone_country_code","phone_number","email","password","salt","hash_algorithm","is_email_verified","is_phone_verified","email_activation_code ","email_activation_code_ttl","created_at","updated_at") ` +
+		`VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING "users"."id"`
+	mock.ExpectQuery(sqlUserInsert).
+		WithArgs(user.Status, user.UserType, user.MfaType, user.PhoneCountryCode, user.PhoneNumber, user.Email, sqlmock.AnyArg(), user.Salt, user.HashAlgorithm, user.IsEmailVerified, user.IsPhoneVerified, user.EmailActivationCode, AnyTime{}, AnyTime{}, AnyTime{}).
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+
 	mock.ExpectQuery(`SELECT * FROM "users"  WHERE "users"."id" = $1`).WithArgs(1).
 		WillReturnRows(sqlmock.NewRows([]string{
 			"id", "status", "user_type", "mfa_type",
@@ -168,6 +178,13 @@ func TestTxManager_TransactNested(t *testing.T) {
 			"is_email_verified", "is_phone_verified", "email_activation_code",
 			"email_activation_code_ttl", "created_at", "updated_at",
 		}).AddRow(1, user.Status, user.UserType, user.MfaType, user.PhoneCountryCode, user.PhoneNumber, user.Email, "1", user.Salt, user.HashAlgorithm, user.IsEmailVerified, user.IsPhoneVerified, user.EmailActivationCode, time.Now(), time.Now(), time.Now()))
+	sqlAuthenticationLogInsert := `INSERT INTO "authentication_log" ("user_id","action","session_id","meta","created_at") VALUES ($1,$2,$3,$4,$5) RETURNING "authentication_log"."id"`
+	mock.ExpectQuery(sqlAuthenticationLogInsert).
+		WithArgs(authentication_log.UserID, authentication_log.Action, sqlmock.AnyArg(), authentication_log.Meta, AnyTime{}).
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+	mock.ExpectQuery(`SELECT * FROM "authentication_log"  WHERE "authentication_log"."id" = $1`).WithArgs(1).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "user_id", "action", "session_id", "meta", "created_at"}).
+			AddRow(1, authentication_log.UserID, authentication_log.Action, "1", authentication_log.Meta, time.Now()))
 	mock.ExpectCommit()
 	gdb, err := gorm.Open("postgres", db)
 

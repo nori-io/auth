@@ -20,7 +20,7 @@ func (r *AuthenticationLogRepository) Create(ctx context.Context, e *entity.Auth
 
 	lastRecord := new(model)
 
-	if err := r.Tx.GetDB(ctx).Create(modelAuthenticationLog).Scan(&lastRecord).Error; err != nil {
+	if err := r.Tx.GetDB(ctx).Create(&modelAuthenticationLog).Scan(&lastRecord).Error; err != nil {
 		return errors.NewInternal(err)
 	}
 	lastRecord.Convert()

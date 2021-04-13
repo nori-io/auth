@@ -16,20 +16,20 @@ type AuthenticationLogRepository struct {
 }
 
 func (r *AuthenticationLogRepository) Create(ctx context.Context, e *entity.AuthenticationLog) error {
-	modelAuthenticationLog := NewModel(e)
+	modelAuthenticationLog := newModel(e)
 
 	lastRecord := new(model)
 
 	if err := r.Tx.GetDB(ctx).Create(&modelAuthenticationLog).Scan(&lastRecord).Error; err != nil {
 		return errors.NewInternal(err)
 	}
-	lastRecord.Convert()
+	lastRecord.convert()
 
 	return nil
 }
 
 func (r *AuthenticationLogRepository) Update(ctx context.Context, e *entity.AuthenticationLog) error {
-	model := NewModel(e)
+	model := newModel(e)
 	if err := r.Tx.GetDB(ctx).Save(model).Error; err != nil {
 		return errors.NewInternal(err)
 	}
@@ -47,7 +47,7 @@ func (r *AuthenticationLogRepository) FindByUserId(ctx context.Context, userId u
 		return nil, errors.NewInternal(err)
 	}
 
-	return out.Convert(), nil
+	return out.convert(), nil
 }
 
 func (r *AuthenticationLogRepository) Delete(ctx context.Context, id uint64) error {

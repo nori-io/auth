@@ -13,7 +13,7 @@ type model struct {
 	CreatedAt time.Time `gorm:"column:created_at; type: TIMESTAMP"`
 }
 
-func (m model) Convert() *entity.MfaRecoveryCode {
+func (m model) convert() *entity.MfaRecoveryCode {
 	return &entity.MfaRecoveryCode{
 		ID:        m.ID,
 		UserID:    m.UserID,
@@ -22,7 +22,7 @@ func (m model) Convert() *entity.MfaRecoveryCode {
 	}
 }
 
-func NewModel(e *entity.MfaRecoveryCode) model {
+func newModel(e *entity.MfaRecoveryCode) model {
 	return model{
 		ID:        e.ID,
 		UserID:    e.UserID,

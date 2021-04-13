@@ -20,7 +20,7 @@ func (r MfaRecoveryCodeRepository) Create(ctx context.Context, e []entity.MfaRec
 	var mfaRecoveryCodes []model
 
 	for _, v := range e {
-		mfaRecoveryCodes = append(mfaRecoveryCodes, NewModel(&v))
+		mfaRecoveryCodes = append(mfaRecoveryCodes, newModel(&v))
 	}
 
 	lastRecord := new(model)
@@ -28,7 +28,7 @@ func (r MfaRecoveryCodeRepository) Create(ctx context.Context, e []entity.MfaRec
 	if err := r.Tx.GetDB(ctx).Create(mfaRecoveryCodes).Scan(&lastRecord).Error; err != nil {
 		return errors.NewInternal(err)
 	}
-	lastRecord.Convert()
+	lastRecord.convert()
 
 	return nil
 }
@@ -44,7 +44,7 @@ func (r MfaRecoveryCodeRepository) FindByUserId(ctx context.Context, userId uint
 	if err != nil {
 		return nil, errors.NewInternal(err)
 	}
-	return out.Convert(), nil
+	return out.convert(), nil
 }
 
 func (r MfaRecoveryCodeRepository) DeleteMfaRecoveryCode(ctx context.Context, userId uint64, code string) error {

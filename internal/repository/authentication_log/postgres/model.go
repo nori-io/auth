@@ -17,7 +17,7 @@ type model struct {
 	CreatedAt time.Time `gorm:"column:created_at; type: TIMESTAMP; not null"`
 }
 
-func (m model) Convert() *entity.AuthenticationLog {
+func (m model) convert() *entity.AuthenticationLog {
 	return &entity.AuthenticationLog{
 		ID:        m.ID,
 		UserID:    m.UserID,
@@ -28,7 +28,7 @@ func (m model) Convert() *entity.AuthenticationLog {
 	}
 }
 
-func NewModel(e *entity.AuthenticationLog) model {
+func newModel(e *entity.AuthenticationLog) model {
 	return model{
 		ID:        e.ID,
 		UserID:    e.UserID,

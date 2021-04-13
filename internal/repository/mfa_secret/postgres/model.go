@@ -14,7 +14,7 @@ type model struct {
 	UpdatedAt time.Time `gorm:"column:updated_at; type: TIMESTAMP"`
 }
 
-func (m model) Convert() *entity.MfaSecret {
+func (m model) convert() *entity.MfaSecret {
 	return &entity.MfaSecret{
 		ID:        m.ID,
 		UserID:    m.UserID,
@@ -24,7 +24,7 @@ func (m model) Convert() *entity.MfaSecret {
 	}
 }
 
-func NewModel(e *entity.MfaSecret) model {
+func newModel(e *entity.MfaSecret) model {
 	return model{
 		ID:        e.ID,
 		UserID:    e.UserID,

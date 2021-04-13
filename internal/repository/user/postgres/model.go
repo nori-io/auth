@@ -33,7 +33,7 @@ type model struct {
 	UpdatedAt              time.Time `gorm:"column:updated_at; type: TIMESTAMP"`
 }
 
-func (m model) Convert() *entity.User {
+func (m *model) convert() *entity.User {
 	return &entity.User{
 		ID:                     m.ID,
 		Status:                 users_status.UserStatus(m.Status),
@@ -54,8 +54,8 @@ func (m model) Convert() *entity.User {
 	}
 }
 
-func NewModel(e *entity.User) model {
-	return model{
+func newModel(e *entity.User) *model {
+	return &model{
 		ID:                     e.ID,
 		Status:                 uint8(e.Status),
 		UserType:               uint8(e.UserType),

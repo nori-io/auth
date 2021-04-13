@@ -17,7 +17,7 @@ type model struct {
 	UsedAt    time.Time `gorm:"column:used_at; type: TIMESTAMP"`
 }
 
-func (m model) Convert() *entity.OneTimeToken {
+func (m model) convert() *entity.OneTimeToken {
 	return &entity.OneTimeToken{
 		ID:        m.ID,
 		UserID:    m.UserID,
@@ -29,7 +29,7 @@ func (m model) Convert() *entity.OneTimeToken {
 	}
 }
 
-func NewModel(e *entity.OneTimeToken) model {
+func newModel(e *entity.OneTimeToken) model {
 	return model{
 		ID:        e.ID,
 		UserID:    e.UserID,

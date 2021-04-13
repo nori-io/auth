@@ -17,20 +17,20 @@ type SessionRepository struct {
 }
 
 func (r *SessionRepository) Create(ctx context.Context, e *entity.Session) error {
-	modelSession := NewModel(e)
+	modelSession := newModel(e)
 
 	lastRecord := new(model)
 
 	if err := r.Tx.GetDB(ctx).Create(modelSession).Scan(&lastRecord).Error; err != nil {
 		return errors.NewInternal(err)
 	}
-	lastRecord.Convert()
+	lastRecord.convert()
 
 	return nil
 }
 
 func (r *SessionRepository) Update(ctx context.Context, e *entity.Session) error {
-	model := NewModel(e)
+	model := newModel(e)
 
 	if err := r.Tx.GetDB(ctx).Save(model).Error; err != nil {
 		return errors.NewInternal(err)
@@ -49,5 +49,5 @@ func (r *SessionRepository) FindBySessionKey(ctx context.Context, sessionKey str
 		return nil, errors.NewInternal(err)
 	}
 
-	return out.Convert(), nil
+	return out.convert(), nil
 }

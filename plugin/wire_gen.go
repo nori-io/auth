@@ -20,10 +20,15 @@ import (
 	"github.com/nori-plugins/authentication/internal/repository/authentication_log"
 	"github.com/nori-plugins/authentication/internal/repository/mfa_recovery_code"
 	"github.com/nori-plugins/authentication/internal/repository/mfa_secret"
+	"github.com/nori-plugins/authentication/internal/repository/session"
 	"github.com/nori-plugins/authentication/internal/repository/user"
 	"github.com/nori-plugins/authentication/internal/service/auth"
+	authentication_log2 "github.com/nori-plugins/authentication/internal/service/authentication_log"
 	mfa_recovery_code3 "github.com/nori-plugins/authentication/internal/service/mfa_recovery_code"
 	mfa_secret2 "github.com/nori-plugins/authentication/internal/service/mfa_secret"
+	session2 "github.com/nori-plugins/authentication/internal/service/session"
+	user2 "github.com/nori-plugins/authentication/internal/service/user"
+	"github.com/nori-plugins/authentication/pkg/transactor"
 )
 
 // Injectors from wire.go:
@@ -37,20 +42,44 @@ func Initialize(registry2 registry.Registry, config2 config.Config, logger2 logg
 	if err != nil {
 		return nil, err
 	}
-	userRepository := user.New(db)
-	authenticationLogRepository := authentication_log.New(db)
-	params := auth.Params{
-		UserRepository:              userRepository,
-		AuthenticationLogRepository: authenticationLogRepository,
-		DB:                          db,
+	params := transactor.Params{
+		Db:     db,
+		Logger: logger2,
 	}
-	authenticationService := auth.New(params)
+	transactorTransactor := transactor.New(params)
+	userRepository := user.New(transactorTransactor)
+	userParams := user2.Params{
+		UserRepository: userRepository,
+		Transactor:     transactorTransactor,
+		Config:         config2,
+	}
+	userService := user2.New(userParams)
+	authenticationLogRepository := authentication_log.New(transactorTransactor)
+	authentication_logParams := authentication_log2.Params{
+		AuthenticationLogRepository: authenticationLogRepository,
+		Transactor:                  transactorTransactor,
+	}
+	authenticationLogService := authentication_log2.New(authentication_logParams)
+	sessionRepository := session.New(transactorTransactor)
+	sessionParams := session2.Params{
+		SessionRepository: sessionRepository,
+		Transactor:        transactorTransactor,
+	}
+	sessionService := session2.New(sessionParams)
+	authParams := auth.Params{
+		Config:                   config2,
+		UserService:              userService,
+		AuthenticationLogService: authenticationLogService,
+		SessionService:           sessionService,
+		Transactor:               transactorTransactor,
+	}
+	authenticationService := auth.New(authParams)
 	authenticationParams := authentication.Params{
 		AuthenticationService: authenticationService,
 		Logger:                logger2,
 	}
 	authenticationHandler := authentication.New(authenticationParams)
-	mfaRecoveryCodeRepository := mfa_recovery_code.New(db)
+	mfaRecoveryCodeRepository := mfa_recovery_code.New(transactorTransactor)
 	mfa_recovery_codeParams := mfa_recovery_code2.Params{
 		Config: config2,
 	}
@@ -62,18 +91,22 @@ func Initialize(registry2 registry.Registry, config2 config.Config, logger2 logg
 	}
 	mfaRecoveryCodeService := mfa_recovery_code3.New(params2)
 	params3 := mfa_recovery_code4.Params{
-		mfaRecoveryCodeService: mfaRecoveryCodeService,
-		logger:                 logger2,
+		MfaRecoveryCodeService: mfaRecoveryCodeService,
+		Logger:                 logger2,
 	}
 	mfaRecoveryCodeHandler := mfa_recovery_code4.New(params3)
-	mfaSecretRepository := mfa_secret.New(db)
+	mfaSecretRepository := mfa_secret.New(transactorTransactor)
 	mfa_secretParams := mfa_secret2.Params{
 		MfaSecretRepository: mfaSecretRepository,
 		UserRepository:      userRepository,
 		Config:              config2,
 	}
 	mfaSecretService := mfa_secret2.New(mfa_secretParams)
-	mfaSecretHandler := mfa_secret3.New(mfaSecretService)
+	params4 := mfa_secret3.Params{
+		MfaSecretService: mfaSecretService,
+		Logger:           logger2,
+	}
+	mfaSecretHandler := mfa_secret3.New(params4)
 	handler := &http.Handler{
 		R:                      httpHttp,
 		AuthenticationHandler:  authenticationHandler,

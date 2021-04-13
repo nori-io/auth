@@ -91,8 +91,8 @@ func TestTxManager_Transact(t *testing.T) {
 	gdb, err := gorm.Open("postgres", db)
 
 	txParams := transactor.Params{
-		Db:  gdb,
-		Log: logger.L(),
+		Db:     gdb,
+		Logger: logger.L(),
 	}
 	tx := transactor.New(txParams)
 
@@ -114,7 +114,7 @@ func TestTxManager_Transact(t *testing.T) {
 	s := userSrv.New(userSrv.Params{
 		UserRepository: r,
 		Transactor:     tx,
-		Сonfig:         *config,
+		Config:         *config,
 	})
 
 	user, err = s.Create(context.Background(), service.UserCreateData{
@@ -189,8 +189,8 @@ func TestTxManager_TransactNested(t *testing.T) {
 	gdb, err := gorm.Open("postgres", db)
 
 	txParams := transactor.Params{
-		Db:  gdb,
-		Log: logger.L(),
+		Db:     gdb,
+		Logger: logger.L(),
 	}
 	tx := transactor.New(txParams)
 
@@ -212,7 +212,7 @@ func TestTxManager_TransactNested(t *testing.T) {
 	srvUser := userSrv.New(userSrv.Params{
 		UserRepository: repoUser,
 		Transactor:     tx,
-		Сonfig:         *config,
+		Config:         *config,
 	})
 
 	srvAuthenticationLog := authenticationLogSrv.New(authenticationLogSrv.Params{

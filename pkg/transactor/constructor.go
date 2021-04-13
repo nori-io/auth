@@ -11,13 +11,13 @@ type TxManager struct {
 }
 
 type Params struct {
-	Db  *gorm.DB
-	Log logger.FieldLogger
+	Db     *gorm.DB
+	Logger logger.FieldLogger
 }
 
 func New(params Params) Transactor {
 	return &TxManager{
 		db:  params.Db,
-		log: params.Log,
+		log: params.Logger,
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/nori-plugins/authentication/internal/app/helper"
 	"github.com/nori-plugins/authentication/internal/app/repository"
 	"github.com/nori-plugins/authentication/internal/app/service"
+	"github.com/nori-plugins/authentication/internal/app/transactor"
 )
 
-var AppSet = wire.NewSet(handler.HandlerSet, helper.HelperSet, repository.RepositorySet, service.ServiceSet)
+var AppSet = wire.NewSet(transactor.TransactorSet, handler.HandlerSet, helper.HelperSet, repository.RepositorySet, service.ServiceSet)

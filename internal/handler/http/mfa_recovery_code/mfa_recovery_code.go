@@ -15,14 +15,14 @@ type MfaRecoveryCodeHandler struct {
 }
 
 type Params struct {
-	mfaRecoveryCodeService service.MfaRecoveryCodeService
-	logger                 logger.FieldLogger
+	MfaRecoveryCodeService service.MfaRecoveryCodeService
+	Logger                 logger.FieldLogger
 }
 
 func New(params Params) *MfaRecoveryCodeHandler {
 	return &MfaRecoveryCodeHandler{
-		mfaRecoveryCodeService: params.mfaRecoveryCodeService,
-		logger:                 params.logger,
+		mfaRecoveryCodeService: params.MfaRecoveryCodeService,
+		logger:                 params.Logger,
 	}
 }
 

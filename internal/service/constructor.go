@@ -10,6 +10,7 @@ type Service struct {
 	mfaRecoveryCodeService service.MfaRecoveryCodeService
 	mfaSecretService       service.MfaSecretService
 	settingsService        service.SettingsService
+	userService            service.UserService
 }
 
 type Params struct {
@@ -17,6 +18,7 @@ type Params struct {
 	MfaRecoveryCodeService service.MfaRecoveryCodeService
 	MfaSecretService       service.MfaSecretService
 	SettingsService        service.SettingsService
+	UserService            service.UserService
 }
 
 func New(params Params) authentication.Authentication {
@@ -25,5 +27,6 @@ func New(params Params) authentication.Authentication {
 		mfaRecoveryCodeService: params.MfaRecoveryCodeService,
 		mfaSecretService:       params.MfaSecretService,
 		settingsService:        params.SettingsService,
+		userService:            params.UserService,
 	}
 }

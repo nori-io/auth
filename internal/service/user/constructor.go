@@ -9,20 +9,20 @@ import (
 
 type UserService struct {
 	userRepository repository.UserRepository
-	config         config.Config
 	transactor     transactor.Transactor
+	config         config.Config
 }
 
 type Params struct {
 	UserRepository repository.UserRepository
 	Transactor     transactor.Transactor
-	Сonfig         config.Config
+	Config         config.Config
 }
 
 func New(params Params) service.UserService {
 	return &UserService{
 		userRepository: params.UserRepository,
-		config:         params.Сonfig,
 		transactor:     params.Transactor,
+		config:         params.Config,
 	}
 }

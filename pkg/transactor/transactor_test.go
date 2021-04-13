@@ -76,6 +76,7 @@ func TestTxManager_Transact(t *testing.T) {
 	mock.ExpectBegin()
 	mock.ExpectQuery(sqlInsertString).
 		WithArgs(user.Status, user.UserType, user.MfaType, user.PhoneCountryCode, user.PhoneNumber, user.Email, sqlmock.AnyArg(), user.Salt, user.HashAlgorithm, user.IsEmailVerified, user.IsPhoneVerified, user.EmailActivationCode, AnyTime{}, AnyTime{}, AnyTime{}).WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+	mock.ExpectCommit()
 	mock.ExpectQuery(`SELECT * FROM "users"  WHERE "users"."id" = $1`).WithArgs(1).
 		WillReturnRows(sqlmock.NewRows([]string{
 			"id", "status", "user_type", "mfa_type",
@@ -84,7 +85,7 @@ func TestTxManager_Transact(t *testing.T) {
 			"is_email_verified", "is_phone_verified", "email_activation_code",
 			"email_activation_code_ttl", "created_at", "updated_at",
 		}).AddRow(1, user.Status, user.UserType, user.MfaType, user.PhoneCountryCode, user.PhoneNumber, user.Email, "1", user.Salt, user.HashAlgorithm, user.IsEmailVerified, user.IsPhoneVerified, user.EmailActivationCode, time.Now(), time.Now(), time.Now()))
-	mock.ExpectCommit()
+
 	gdb, err := gorm.Open("postgres", db)
 
 	txParams := transactor.Params{
@@ -157,7 +158,6 @@ func TestTxManager_TransactNested(t *testing.T) {
 	mock.ExpectBegin()
 	mock.ExpectQuery(`SELECT * FROM "users"  WHERE (email=$1) ORDER BY "users"."id" ASC LIMIT 1`).
 		WithArgs(user.Email).WillReturnError(gorm.ErrRecordNotFound)
-	mock.ExpectBegin()
 	mock.ExpectQuery(sqlInsertString).
 		WithArgs(user.Status, user.UserType, user.MfaType, user.PhoneCountryCode, user.PhoneNumber, user.Email, sqlmock.AnyArg(), user.Salt, user.HashAlgorithm, user.IsEmailVerified, user.IsPhoneVerified, user.EmailActivationCode, AnyTime{}, AnyTime{}, AnyTime{}).WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 	mock.ExpectQuery(`SELECT * FROM "users"  WHERE "users"."id" = $1`).WithArgs(1).

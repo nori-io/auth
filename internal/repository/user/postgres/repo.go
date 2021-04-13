@@ -37,7 +37,7 @@ func (r *UserRepository) Create(ctx context.Context, e *entity.User) error {
 	return nil
 }
 
-func (r *UserRepository) FindById(ctx context.Context, id uint64) (*entity.User, error) {
+func (r *UserRepository) FindByID(ctx context.Context, id uint64) (*entity.User, error) {
 	var (
 		out = &model{}
 		err error

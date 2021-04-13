@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 
-	"github.com/jinzhu/gorm"
 	"github.com/nori-plugins/authentication/pkg/errors"
 
 	"github.com/nori-plugins/authentication/pkg/transactor"
@@ -16,36 +15,21 @@ type MfaSecretRepository struct {
 }
 
 func (r *MfaSecretRepository) Create(ctx context.Context, e *entity.MfaSecret) error {
-	modelMfaSecret := newModel(e)
-
-	lastRecord := new(model)
-
-	if err := r.Tx.GetDB(ctx).Create(modelMfaSecret).Scan(&lastRecord).Error; err != nil {
+	m := newModel(e)
+	if err := r.Tx.GetDB(ctx).Create(m).Error; err != nil {
 		return errors.NewInternal(err)
 	}
-	lastRecord.convert()
+	*e = *m.convert()
 
 	return nil
 }
 
-func (r *MfaSecretRepository) Get(ctx context.Context, userID uint64) (*entity.MfaSecret, error) {
-	out := &model{}
-	err := r.Tx.GetDB(ctx).Where("id=?", userID).First(out).Error
-	if err == gorm.ErrRecordNotFound {
-		return nil, nil
-	}
-	if err != nil {
-		return nil, errors.NewInternal(err)
-	}
-
-	return out.convert(), nil
-}
-
 func (r *MfaSecretRepository) Update(ctx context.Context, userID uint64, e *entity.MfaSecret) error {
-	model := newModel(e)
-	if err := r.Tx.GetDB(ctx).Save(model).Error; err != nil {
+	m := newModel(e)
+	if err := r.Tx.GetDB(ctx).Save(m).Error; err != nil {
 		return errors.NewInternal(err)
 	}
+	*e = *m.convert()
 
 	return nil
 }

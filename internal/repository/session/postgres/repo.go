@@ -17,24 +17,23 @@ type SessionRepository struct {
 }
 
 func (r *SessionRepository) Create(ctx context.Context, e *entity.Session) error {
-	modelSession := newModel(e)
+	m := newModel(e)
 
-	lastRecord := new(model)
-
-	if err := r.Tx.GetDB(ctx).Create(modelSession).Scan(&lastRecord).Error; err != nil {
+	if err := r.Tx.GetDB(ctx).Create(m).Error; err != nil {
 		return errors.NewInternal(err)
 	}
-	lastRecord.convert()
+	*e = *m.convert()
 
 	return nil
 }
 
 func (r *SessionRepository) Update(ctx context.Context, e *entity.Session) error {
-	model := newModel(e)
+	m := newModel(e)
 
-	if err := r.Tx.GetDB(ctx).Save(model).Error; err != nil {
+	if err := r.Tx.GetDB(ctx).Save(m).Error; err != nil {
 		return errors.NewInternal(err)
 	}
+	*e = *m.convert()
 
 	return nil
 }

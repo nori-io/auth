@@ -22,7 +22,7 @@ func (srv SettingsService) ReceiveMfaStatus(ctx context.Context, sessionKey stri
 		return nil, errors.SessionNotFound
 	}
 
-	user, err := srv.userRepository.FindById(ctx, session.UserID)
+	user, err := srv.userRepository.FindByID(ctx, session.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (srv SettingsService) ChangePassword(ctx context.Context, sessionKey string
 	if session == nil {
 		return errors.SessionNotFound
 	}
-	user, err := srv.userRepository.FindById(ctx, session.UserID)
+	user, err := srv.userRepository.FindByID(ctx, session.UserID)
 	if err != nil {
 		return err
 	}

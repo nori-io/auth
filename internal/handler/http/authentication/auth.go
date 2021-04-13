@@ -53,6 +53,7 @@ func (h *AuthenticationHandler) Session(w http.ResponseWriter, r *http.Request) 
 	sessionId, err := h.cookieHelper.GetSessionID(r)
 	if err != nil {
 		h.logger.Error("%s", err)
+
 		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
 	}
 
@@ -156,7 +157,7 @@ func (h *AuthenticationHandler) SignOut(w http.ResponseWriter, r *http.Request) 
 	if data.Status != session_status.Active {
 	}
 
-	if err := h.authenticationService.SignOut(r.Context(), &entity.Session{SessionKey: []byte(sessionId.Value)}); err != nil {
+	if err := h.authenticationService.SignOut(r.Context(), &entity.Session{SessionKey: []byte(sessionId)}); err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

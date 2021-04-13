@@ -3,6 +3,8 @@ package mfa_secret
 import (
 	"net/http"
 
+	"github.com/nori-io/common/v4/pkg/domain/logger"
+
 	"github.com/nori-plugins/authentication/internal/handler/http/response"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
@@ -10,11 +12,20 @@ import (
 )
 
 type MfaSecretHandler struct {
-	MfaSecretService service.MfaSecretService
+	mfaSecretService service.MfaSecretService
+	logger           logger.FieldLogger
 }
 
-func New(mfaSecretService service.MfaSecretService) *MfaSecretHandler {
-	return &MfaSecretHandler{MfaSecretService: mfaSecretService}
+type Params struct {
+	MfaSecretService service.MfaSecretService
+	Logger           logger.FieldLogger
+}
+
+func New(params Params) *MfaSecretHandler {
+	return &MfaSecretHandler{
+		mfaSecretService: params.MfaSecretService,
+		logger:           params.Logger,
+	}
 }
 
 func (h *MfaSecretHandler) PutSecret(w http.ResponseWriter, r *http.Request) {
@@ -32,7 +43,7 @@ func (h *MfaSecretHandler) PutSecret(w http.ResponseWriter, r *http.Request) {
 	sessionUserId := r.Context().Value("user_id").(uint64)
 	//@todo
 	login, issuer, err :=
-		h.MfaSecretService.PutSecret(r.Context(), &service.SecretData{
+		h.mfaSecretService.PutSecret(r.Context(), &service.SecretData{
 			Secret: "",
 			Ssid:   "",
 		}, entity.Session{SessionKey: sessionId, UserID: sessionUserId})

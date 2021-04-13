@@ -58,7 +58,7 @@ func (srv *MfaRecoveryCodeService) GetByUserId(ctx context.Context, userID uint6
 }
 
 func (srv *MfaRecoveryCodeService) Apply(ctx context.Context, userID uint64, code string) error {
-	if err := srv.mfaRecoveryCodeRepository.Delete(ctx, userID, code); err != nil {
+	if err := srv.mfaRecoveryCodeRepository.DeleteMfaRecoveryCode(ctx, userID, code); err != nil {
 		return err
 	}
 	return nil

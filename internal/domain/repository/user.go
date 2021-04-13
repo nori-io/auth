@@ -10,13 +10,13 @@ import (
 
 type UserRepository interface {
 	Create(ctx context.Context, e *entity.User) error
-	FindById(ctx context.Context, id uint64) (*entity.User, error)
+	FindByID(ctx context.Context, ID uint64) (*entity.User, error)
 	FindByEmail(ctx context.Context, email string) (*entity.User, error)
 	FindByPhone(ctx context.Context, phone string) (*entity.User, error)
 	FindByFilter(ctx context.Context, filter UserFilter) ([]entity.User, error)
 	Count(ctx context.Context) (uint64, error)
 	Update(ctx context.Context, e *entity.User) error
-	Delete(ctx context.Context, id uint64) error
+	Delete(ctx context.Context, ID uint64) error
 }
 
 type UserFilter struct {

@@ -47,7 +47,7 @@ func (r MfaRecoveryCodeRepository) FindByUserId(ctx context.Context, userId uint
 	return out.Convert(), nil
 }
 
-func (r MfaRecoveryCodeRepository) Delete(ctx context.Context, userId uint64, code string) error {
+func (r MfaRecoveryCodeRepository) DeleteMfaRecoveryCode(ctx context.Context, userId uint64, code string) error {
 	if err := r.Tx.GetDB(ctx).Delete(&model{UserID: userId, Code: code}).Error; err != nil {
 		return err
 	}

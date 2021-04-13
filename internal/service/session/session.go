@@ -26,8 +26,7 @@ func (srv SessionService) Create(ctx context.Context, data *entity.Session) erro
 }
 
 func (srv SessionService) Update(ctx context.Context, data *entity.Session) error {
-	err := srv.sessionRepository.Update(ctx, data)
-	if err != nil {
+	if err := srv.sessionRepository.Update(ctx, data); err != nil {
 		return err
 	}
 	return nil

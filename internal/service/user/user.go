@@ -66,7 +66,7 @@ func (srv UserService) GetByEmail(ctx context.Context, email string) (*entity.Us
 }
 
 func (srv UserService) GetByID(ctx context.Context, ID uint64) (*entity.User, error) {
-	user, err := srv.userRepository.FindById(ctx, ID)
+	user, err := srv.userRepository.FindByID(ctx, ID)
 	if err != nil {
 		return nil, err
 	}

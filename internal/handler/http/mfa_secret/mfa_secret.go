@@ -31,6 +31,7 @@ func New(params Params) *MfaSecretHandler {
 func (h *MfaSecretHandler) PutSecret(w http.ResponseWriter, r *http.Request) {
 	data, err := newPutSecretData(r)
 	if err != nil {
+		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
@@ -38,6 +39,7 @@ func (h *MfaSecretHandler) PutSecret(w http.ResponseWriter, r *http.Request) {
 	sessionId, _ := sessionIdContext.([]byte)
 
 	if data.Ssid != sessionIdContext {
+		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 	}
 	sessionUserId := r.Context().Value("user_id").(uint64)
@@ -49,6 +51,7 @@ func (h *MfaSecretHandler) PutSecret(w http.ResponseWriter, r *http.Request) {
 		}, entity.Session{SessionKey: sessionId, UserID: sessionUserId})
 
 	if (login == "") && (issuer == "") {
+		h.logger.Error("%s", err)
 		http.Error(w, "sign up error", http.StatusInternalServerError)
 	}
 

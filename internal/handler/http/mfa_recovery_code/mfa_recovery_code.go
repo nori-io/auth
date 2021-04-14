@@ -29,10 +29,12 @@ func New(params Params) *MfaRecoveryCodeHandler {
 func (h *MfaRecoveryCodeHandler) GetMfaRecoveryCodes(w http.ResponseWriter, r *http.Request) {
 	sessionId, err := r.Cookie("ssid")
 	if err != nil {
+		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 	}
 
 	if _, err := h.mfaRecoveryCodeService.GetMfaRecoveryCodes(r.Context(), &entity.Session{SessionKey: []byte(sessionId.Value)}); err != nil {
+		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 

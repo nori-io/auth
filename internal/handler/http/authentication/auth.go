@@ -53,7 +53,6 @@ func (h *AuthenticationHandler) Session(w http.ResponseWriter, r *http.Request) 
 	sessionId, err := h.cookieHelper.GetSessionID(r)
 	if err != nil {
 		h.logger.Error("%s", err)
-
 		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
 	}
 
@@ -153,7 +152,7 @@ func (h *AuthenticationHandler) SignOut(w http.ResponseWriter, r *http.Request) 
 		ClosedAt:   time.Time{},
 		UpdatedAt:  time.Time{},
 	}
-
+	//@todo
 	if data.Status != session_status.Active {
 	}
 

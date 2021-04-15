@@ -7,8 +7,6 @@ import (
 
 	"github.com/nori-plugins/authentication/pkg/errors"
 
-	"golang.org/x/crypto/bcrypt"
-
 	"github.com/nori-plugins/authentication/pkg/enum/mfa_type"
 
 	"github.com/nori-plugins/authentication/pkg/enum/users_action"
@@ -92,8 +90,8 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 		return nil, nil, err
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(data.Password)); err != nil {
-		return nil, nil, errors.NewInternal(err)
+	if err := srv.securityHelper.ComparePassword(user.Password, data.Password); err != nil {
+		return nil, nil, err
 	}
 
 	sid, err := srv.getToken(ctx)

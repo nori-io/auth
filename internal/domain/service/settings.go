@@ -1,6 +1,8 @@
 package service
 
-import "context"
+import (
+	"context"
+)
 
 type SettingsService interface {
 	ReceiveMfaStatus(ctx context.Context, sessionKey string) (*bool, error)

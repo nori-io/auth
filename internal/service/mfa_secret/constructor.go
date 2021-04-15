@@ -8,16 +8,19 @@ import (
 
 type MfaSecretService struct {
 	MfaSecretRepository repository.MfaSecretRepository
-	UserRepository      repository.UserRepository
+	UserService         service.UserService
 	Config              config.Config
 }
 
 type Params struct {
 	MfaSecretRepository repository.MfaSecretRepository
-	UserRepository      repository.UserRepository
+	UserService         service.UserService
 	Config              config.Config
 }
 
 func New(params Params) service.MfaSecretService {
-	return &MfaSecretService{MfaSecretRepository: params.MfaSecretRepository, UserRepository: params.UserRepository}
+	return &MfaSecretService{
+		MfaSecretRepository: params.MfaSecretRepository,
+		UserService:         params.UserService,
+	}
 }

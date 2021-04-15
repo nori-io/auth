@@ -2,6 +2,7 @@ package auth
 
 import (
 	"github.com/nori-plugins/authentication/internal/config"
+	"github.com/nori-plugins/authentication/internal/domain/helper/security"
 	"github.com/nori-plugins/authentication/internal/domain/service"
 	"github.com/nori-plugins/authentication/pkg/transactor"
 )
@@ -13,6 +14,7 @@ type AuthenticationService struct {
 	sessionService           service.SessionService
 	mfaRecoveryCodeService   service.MfaRecoveryCodeService
 	transactor               transactor.Transactor
+	securityHelper           security.SecurityHelper
 }
 
 type Params struct {
@@ -22,6 +24,7 @@ type Params struct {
 	SessionService           service.SessionService
 	MfaRecoveryCodeService   service.MfaRecoveryCodeService
 	Transactor               transactor.Transactor
+	SecurityHelper           security.SecurityHelper
 }
 
 func New(params Params) service.AuthenticationService {
@@ -32,5 +35,6 @@ func New(params Params) service.AuthenticationService {
 		sessionService:           params.SessionService,
 		mfaRecoveryCodeService:   params.MfaRecoveryCodeService,
 		transactor:               params.Transactor,
+		securityHelper:           params.SecurityHelper,
 	}
 }

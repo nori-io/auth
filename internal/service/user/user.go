@@ -4,8 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/nori-plugins/authentication/pkg/errors"
-
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 	errors2 "github.com/nori-plugins/authentication/internal/domain/errors"
 	"github.com/nori-plugins/authentication/internal/domain/service"
@@ -13,7 +11,6 @@ import (
 	"github.com/nori-plugins/authentication/pkg/enum/mfa_type"
 	"github.com/nori-plugins/authentication/pkg/enum/users_status"
 	"github.com/nori-plugins/authentication/pkg/enum/users_type"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func (srv UserService) Create(ctx context.Context, data service.UserCreateData) (*entity.User, error) {
@@ -25,11 +22,10 @@ func (srv UserService) Create(ctx context.Context, data service.UserCreateData) 
 		return nil, errors2.EmailAlreadyTaken
 	}
 
-	password, err := bcrypt.GenerateFromPassword([]byte(data.Password), srv.config.PasswordBcryptCost())
+	password, err := srv.securityHelper.GenerateHash(data.Password)
 	if err != nil {
-		return nil, errors.NewInternal(err)
+		return nil, err
 	}
-
 	//@todo заполнить оставшиеся поля по мере разработки нового функционала
 	user = &entity.User{
 		Status:          users_status.Active,
@@ -47,6 +43,32 @@ func (srv UserService) Create(ctx context.Context, data service.UserCreateData) 
 	}
 
 	return user, nil
+}
+
+func (srv UserService) UpdatePassword(ctx context.Context, data service.UserUpdatePasswordData) error {
+	password, err := srv.securityHelper.GenerateHash(data.Password)
+	if err != nil {
+		return err
+	}
+	if err := srv.userRepository.Update(ctx, &entity.User{
+		ID:        data.UserID,
+		Password:  string(password),
+		UpdatedAt: time.Now(),
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (srv UserService) UpdateMfaStatus(ctx context.Context, data service.UserUpdateMfaStatusData) error {
+	if err := srv.userRepository.Update(ctx, &entity.User{
+		ID:        data.UserID,
+		MfaType:   data.MfaType,
+		UpdatedAt: time.Now(),
+	}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (srv UserService) GetByEmail(ctx context.Context, email string) (*entity.User, error) {

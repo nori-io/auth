@@ -10,18 +10,18 @@ import (
 
 //@todo как передать сюда всю сессию? скорее, нужно извлечь пользовательский userID из контекста
 //@todo что мы будем хранить в контексте?
-func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data *entity.Session) ([]entity.MfaRecoveryCode, error) {
+func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data *entity.Session) ([]*entity.MfaRecoveryCode, error) {
 	//@todo будет ли использоваться паттерн?
 	//@todo нужна ли максимальная длина, или указать всё в паттерне?
 	//@todo указать ограничение на максимальную длину, связанную с базой данных?
 
-	var mfaRecoveryCodes []entity.MfaRecoveryCode
+	var mfaRecoveryCodes []*entity.MfaRecoveryCode
 	mfa_recovery_codes, err := srv.mfaRecoveryCodeHelper.Generate()
 	if err != nil {
 		return nil, err
 	}
 	for _, v := range mfa_recovery_codes {
-		mfaRecoveryCodes = append(mfaRecoveryCodes, entity.MfaRecoveryCode{
+		mfaRecoveryCodes = append(mfaRecoveryCodes, &entity.MfaRecoveryCode{
 			ID:        0,
 			UserID:    data.UserID,
 			Code:      v,
@@ -47,7 +47,7 @@ func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data
 
 func (srv *MfaRecoveryCodeService) GetByUserId(ctx context.Context, userID uint64, code string) (*entity.MfaRecoveryCode, error) {
 	//@todo проверить кэш и отп
-	mfaRecoveryCode, err := srv.mfaRecoveryCodeRepository.FindByUserId(ctx, userID, code)
+	mfaRecoveryCode, err := srv.mfaRecoveryCodeRepository.FindByUserID(ctx, userID, code)
 	if err != nil {
 		return nil, err
 	}

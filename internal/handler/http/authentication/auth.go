@@ -56,6 +56,9 @@ func (h *AuthenticationHandler) Session(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
 	}
 
+	if sessionId == "" {
+	}
+
 	sess, user, err := h.authenticationService.GetSessionInfo(r.Context(), sessionId)
 	if err != nil {
 		h.logger.Error("%s", err)

@@ -13,15 +13,15 @@ import (
 )
 
 var ServiceSet = wire.NewSet(
-	wire.Struct(new(auth.Params), "Config", "UserService", "AuthenticationLogService", "SessionService", "Transactor"),
+	wire.Struct(new(auth.Params), "Config", "UserService", "AuthenticationLogService", "SessionService", "Transactor", "SecurityHelper"),
 	auth.New,
 	wire.Struct(new(mfa_recovery_code.Params), "MfaRecoveryCodeRepository", "MfaRecoveryCodeHelper", "Config"),
 	mfa_recovery_code.New,
-	wire.Struct(new(mfa_secret.Params), "MfaSecretRepository", "UserRepository", "Config"),
+	wire.Struct(new(mfa_secret.Params), "MfaSecretRepository", "UserService", "Config"),
 	mfa_secret.New,
-	wire.Struct(new(settings.Params), "SessionRepository", "UserRepository"),
+	wire.Struct(new(settings.Params), "SessionRepository", "UserService", "SecurityHelper"),
 	settings.New,
-	wire.Struct(new(user.Params), "UserRepository", "Transactor", "Config"),
+	wire.Struct(new(user.Params), "UserRepository", "Transactor", "Config", "SecurityHelper"),
 	user.New,
 	wire.Struct(new(authentication_log.Params), "AuthenticationLogRepository", "Transactor"),
 	authentication_log.New,

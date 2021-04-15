@@ -17,6 +17,7 @@ import (
 	mfa_recovery_code4 "github.com/nori-plugins/authentication/internal/handler/http/mfa_recovery_code"
 	mfa_secret3 "github.com/nori-plugins/authentication/internal/handler/http/mfa_secret"
 	mfa_recovery_code2 "github.com/nori-plugins/authentication/internal/helper/mfa_recovery_code"
+	"github.com/nori-plugins/authentication/internal/helper/security"
 	"github.com/nori-plugins/authentication/internal/repository/authentication_log"
 	"github.com/nori-plugins/authentication/internal/repository/mfa_recovery_code"
 	"github.com/nori-plugins/authentication/internal/repository/mfa_secret"
@@ -48,10 +49,15 @@ func Initialize(registry2 registry.Registry, config2 config.Config, logger2 logg
 	}
 	transactorTransactor := transactor.New(params)
 	userRepository := user.New(transactorTransactor)
+	securityParams := security.Params{
+		Config: config2,
+	}
+	securityHelper := security.New(securityParams)
 	userParams := user2.Params{
 		UserRepository: userRepository,
 		Transactor:     transactorTransactor,
 		Config:         config2,
+		SecurityHelper: securityHelper,
 	}
 	userService := user2.New(userParams)
 	authenticationLogRepository := authentication_log.New(transactorTransactor)
@@ -72,6 +78,7 @@ func Initialize(registry2 registry.Registry, config2 config.Config, logger2 logg
 		AuthenticationLogService: authenticationLogService,
 		SessionService:           sessionService,
 		Transactor:               transactorTransactor,
+		SecurityHelper:           securityHelper,
 	}
 	authenticationService := auth.New(authParams)
 	authenticationParams := authentication.Params{
@@ -98,7 +105,7 @@ func Initialize(registry2 registry.Registry, config2 config.Config, logger2 logg
 	mfaSecretRepository := mfa_secret.New(transactorTransactor)
 	mfa_secretParams := mfa_secret2.Params{
 		MfaSecretRepository: mfaSecretRepository,
-		UserRepository:      userRepository,
+		UserService:         userService,
 		Config:              config2,
 	}
 	mfaSecretService := mfa_secret2.New(mfa_secretParams)

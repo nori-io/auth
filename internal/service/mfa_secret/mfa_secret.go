@@ -21,11 +21,11 @@ func (srv *MfaSecretService) PutSecret(ctx context.Context, data *service.Secret
 		Secret: data.Secret,
 	}
 
-	if err := srv.MfaSecretRepository.Create(ctx, mfaSecret); err != nil {
+	if err := srv.mfaSecretRepository.Create(ctx, mfaSecret); err != nil {
 		return "", "", err
 	}
 
-	userData, err := srv.UserService.GetByID(ctx, session.UserID)
+	userData, err := srv.userService.GetByID(ctx, session.UserID)
 	if err != nil {
 		return "", "", err
 	}
@@ -35,5 +35,5 @@ func (srv *MfaSecretService) PutSecret(ctx context.Context, data *service.Secret
 	} else {
 		login = userData.PhoneCountryCode + userData.PhoneNumber
 	}
-	return login, srv.Config.Issuer(), nil
+	return login, srv.config.Issuer(), nil
 }

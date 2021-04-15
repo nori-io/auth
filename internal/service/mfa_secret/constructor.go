@@ -7,9 +7,9 @@ import (
 )
 
 type MfaSecretService struct {
-	MfaSecretRepository repository.MfaSecretRepository
-	UserService         service.UserService
-	Config              config.Config
+	mfaSecretRepository repository.MfaSecretRepository
+	userService         service.UserService
+	config              config.Config
 }
 
 type Params struct {
@@ -20,7 +20,7 @@ type Params struct {
 
 func New(params Params) service.MfaSecretService {
 	return &MfaSecretService{
-		MfaSecretRepository: params.MfaSecretRepository,
-		UserService:         params.UserService,
+		mfaSecretRepository: params.MfaSecretRepository,
+		userService:         params.UserService,
 	}
 }

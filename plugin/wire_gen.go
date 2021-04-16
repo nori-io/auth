@@ -16,18 +16,25 @@ import (
 	"github.com/nori-plugins/authentication/internal/handler/http/authentication"
 	mfa_recovery_code4 "github.com/nori-plugins/authentication/internal/handler/http/mfa_recovery_code"
 	mfa_secret3 "github.com/nori-plugins/authentication/internal/handler/http/mfa_secret"
+	settings2 "github.com/nori-plugins/authentication/internal/handler/http/settings"
+	social_provider3 "github.com/nori-plugins/authentication/internal/handler/http/social_provider"
+	"github.com/nori-plugins/authentication/internal/helper/cookie"
+	error2 "github.com/nori-plugins/authentication/internal/helper/error"
 	mfa_recovery_code2 "github.com/nori-plugins/authentication/internal/helper/mfa_recovery_code"
 	"github.com/nori-plugins/authentication/internal/helper/security"
 	"github.com/nori-plugins/authentication/internal/repository/authentication_log"
 	"github.com/nori-plugins/authentication/internal/repository/mfa_recovery_code"
 	"github.com/nori-plugins/authentication/internal/repository/mfa_secret"
 	"github.com/nori-plugins/authentication/internal/repository/session"
+	"github.com/nori-plugins/authentication/internal/repository/social_provider"
 	"github.com/nori-plugins/authentication/internal/repository/user"
 	"github.com/nori-plugins/authentication/internal/service/auth"
 	authentication_log2 "github.com/nori-plugins/authentication/internal/service/authentication_log"
 	mfa_recovery_code3 "github.com/nori-plugins/authentication/internal/service/mfa_recovery_code"
 	mfa_secret2 "github.com/nori-plugins/authentication/internal/service/mfa_secret"
 	session2 "github.com/nori-plugins/authentication/internal/service/session"
+	"github.com/nori-plugins/authentication/internal/service/settings"
+	social_provider2 "github.com/nori-plugins/authentication/internal/service/social_provider"
 	user2 "github.com/nori-plugins/authentication/internal/service/user"
 	"github.com/nori-plugins/authentication/pkg/transactor"
 )
@@ -81,9 +88,21 @@ func Initialize(registry2 registry.Registry, config2 config.Config, logger2 logg
 		SecurityHelper:           securityHelper,
 	}
 	authenticationService := auth.New(authParams)
+	cookieParams := cookie.Params{
+		Config: config2,
+	}
+	cookieHelper := cookie.New(cookieParams)
+	errorParams := error2.Params{
+		Logger: logger2,
+	}
+	errorHelper := error2.New(errorParams)
 	authenticationParams := authentication.Params{
 		AuthenticationService: authenticationService,
+		SessionService:        sessionService,
 		Logger:                logger2,
+		Config:                config2,
+		CookieHelper:          cookieHelper,
+		ErrorHelper:           errorHelper,
 	}
 	authenticationHandler := authentication.New(authenticationParams)
 	mfaRecoveryCodeRepository := mfa_recovery_code.New(transactorTransactor)
@@ -100,6 +119,8 @@ func Initialize(registry2 registry.Registry, config2 config.Config, logger2 logg
 	params3 := mfa_recovery_code4.Params{
 		MfaRecoveryCodeService: mfaRecoveryCodeService,
 		Logger:                 logger2,
+		CookieHelper:           cookieHelper,
+		ErrorHelper:            errorHelper,
 	}
 	mfaRecoveryCodeHandler := mfa_recovery_code4.New(params3)
 	mfaSecretRepository := mfa_secret.New(transactorTransactor)
@@ -112,13 +133,42 @@ func Initialize(registry2 registry.Registry, config2 config.Config, logger2 logg
 	params4 := mfa_secret3.Params{
 		MfaSecretService: mfaSecretService,
 		Logger:           logger2,
+		CookieHelper:     cookieHelper,
+		ErrorHelper:      errorHelper,
 	}
 	mfaSecretHandler := mfa_secret3.New(params4)
+	settingsParams := settings.Params{
+		SessionRepository: sessionRepository,
+		UserService:       userService,
+		SecurityHelper:    securityHelper,
+	}
+	settingsService := settings.New(settingsParams)
+	params5 := settings2.Params{
+		SettingsService: settingsService,
+		Logger:          logger2,
+		CookieHelper:    cookieHelper,
+		ErrorHelper:     errorHelper,
+	}
+	settingsHandler := settings2.New(params5)
+	socialProviderRepository := social_provider.New(transactorTransactor)
+	social_providerParams := social_provider2.Params{
+		SocialProviderRepository: socialProviderRepository,
+	}
+	socialProvider := social_provider2.New(social_providerParams)
+	params6 := social_provider3.Params{
+		SocialProviderService: socialProvider,
+		Logger:                logger2,
+		CookieHelper:          cookieHelper,
+		ErrorHelper:           errorHelper,
+	}
+	socialProviderHandler := social_provider3.New(params6)
 	handler := &http.Handler{
 		R:                      httpHttp,
 		AuthenticationHandler:  authenticationHandler,
 		MfaRecoveryCodeHandler: mfaRecoveryCodeHandler,
 		MfaSecretHandler:       mfaSecretHandler,
+		SettingsHandler:        settingsHandler,
+		SocialProviderHandler:  socialProviderHandler,
 	}
 	return handler, nil
 }

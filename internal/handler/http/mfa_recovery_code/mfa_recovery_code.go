@@ -3,8 +3,8 @@ package mfa_recovery_code
 import (
 	"net/http"
 
+	"github.com/nori-plugins/authentication/internal/domain/helper/cookie"
 	error2 "github.com/nori-plugins/authentication/internal/domain/helper/error"
-	"github.com/nori-plugins/authentication/internal/helper/cookie"
 
 	"github.com/nori-io/common/v4/pkg/domain/logger"
 

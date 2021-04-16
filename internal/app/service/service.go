@@ -9,6 +9,7 @@ import (
 	"github.com/nori-plugins/authentication/internal/service/mfa_secret"
 	"github.com/nori-plugins/authentication/internal/service/session"
 	"github.com/nori-plugins/authentication/internal/service/settings"
+	"github.com/nori-plugins/authentication/internal/service/social_provider"
 	"github.com/nori-plugins/authentication/internal/service/user"
 )
 
@@ -27,6 +28,8 @@ var ServiceSet = wire.NewSet(
 	authentication_log.New,
 	wire.Struct(new(session.Params), "SessionRepository", "Transactor"),
 	session.New,
+	wire.Struct(new(social_provider.Params), "SocialProviderRepository"),
+	social_provider.New,
 	wire.Struct(new(service.Params), "AuthenticationService", "MfaRecoveryCodeService", "MfaSecretService", "SettingsService"),
 	service.New,
 )

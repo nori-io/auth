@@ -6,12 +6,12 @@ import (
 )
 
 type SocialProviderHandler struct {
-	socialProviderService service.SocialProviderService
+	socialProviderService service.SocialProvider
 	logger                logger.FieldLogger
 }
 
 type Params struct {
-	SocialProviderService service.SocialProviderService
+	SocialProviderService service.SocialProvider
 	Logger                logger.FieldLogger
 }
 

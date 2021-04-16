@@ -1,15 +1,21 @@
 package social_provider
 
 import (
-	"github.com/nori-plugins/authentication/internal/config"
-	"github.com/nori-plugins/authentication/internal/domain/helper/security"
+	"context"
+
 	"github.com/nori-plugins/authentication/internal/domain/repository"
-	"github.com/nori-plugins/authentication/internal/domain/service"
+
+	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
-type SocialProviderService struct {
-	sessionRepository repository.SessionRepository
-	userService       service.UserService
-	config            config.Config
-	securityHelper    security.SecurityHelper
+func (s SocialProviderService) Get(ctx context.Context) ([]entity.SocialProvider, error) {
+	providers, err := s.socialProviderRepository.FindByFilter(ctx, repository.SocialProviderFilter{
+		Status: nil,
+		Offset: 0,
+		Limit:  0,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return providers, nil
 }

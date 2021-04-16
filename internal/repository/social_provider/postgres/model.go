@@ -14,9 +14,9 @@ type model struct {
 	AppSecret   string    `gorm:"column:app_secret; type:VARCHAR(256); not null"`
 	Name        string    `gorm:"column:name; type:VARCHAR(64); not null"`
 	Logo        string    `gorm:"column:logo; type:VARCHAR(254)"`
-	RedirectUrl string    `gorm:"column:redirect_url; type:VARCHAR(2048); not null"`
-	CallBackUrl string    `gorm:"column:callback_url; type:VARCHAR(2048); not null"`
-	TokenUrl    string    `gorm:"column:token_url; type:VARCHAR(2048); not null"`
+	RedirectUrl string    `gorm:"column:redirect_url; type:VARCHAR(256); not null"`
+	CallBackUrl string    `gorm:"column:callback_url; type:VARCHAR(256); not null"`
+	TokenUrl    string    `gorm:"column:token_url; type:VARCHAR(256); not null"`
 	Status      uint8     `gorm:"column:status; type:smallint; not null"`
 	CreatedAt   time.Time `gorm:"column:created_at; type: TIMESTAMP; not null"`
 	UpdatedAt   time.Time `gorm:"column:updated_at; type: TIMESTAMP"`

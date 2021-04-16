@@ -1,6 +1,12 @@
 package social_provider
 
 import (
+	"net/http"
+
+	error2 "github.com/nori-plugins/authentication/internal/domain/helper/error"
+	"github.com/nori-plugins/authentication/internal/handler/http/response"
+	"github.com/nori-plugins/authentication/internal/helper/cookie"
+
 	"github.com/nori-io/common/v4/pkg/domain/logger"
 	"github.com/nori-plugins/authentication/internal/domain/service"
 )
@@ -8,11 +14,15 @@ import (
 type SocialProviderHandler struct {
 	socialProviderService service.SocialProvider
 	logger                logger.FieldLogger
+	cookieHelper          cookie.CookieHelper
+	errorHelper           error2.ErrorHelper
 }
 
 type Params struct {
 	SocialProviderService service.SocialProvider
 	Logger                logger.FieldLogger
+	cookieHelper          cookie.CookieHelper
+	errorHelper           error2.ErrorHelper
 }
 
 func New(params Params) *SocialProviderHandler {
@@ -20,4 +30,20 @@ func New(params Params) *SocialProviderHandler {
 		socialProviderService: params.SocialProviderService,
 		logger:                params.Logger,
 	}
+}
+
+func (h *SocialProviderHandler) GetSocialProviders(w http.ResponseWriter, r *http.Request) {
+	_, err := h.cookieHelper.GetSessionID(r)
+	if err != nil {
+		h.logger.Error("%s", err)
+		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
+	}
+
+	providers, err := h.socialProviderService.Get(r.Context())
+	if err != nil {
+		h.logger.Error("%s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	response.JSON(w, r, providers)
 }

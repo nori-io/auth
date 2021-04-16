@@ -6,6 +6,7 @@ import (
 	"github.com/nori-plugins/authentication/internal/handler/http/mfa_recovery_code"
 	"github.com/nori-plugins/authentication/internal/handler/http/mfa_secret"
 	"github.com/nori-plugins/authentication/internal/handler/http/settings"
+	"github.com/nori-plugins/authentication/internal/handler/http/social_provider"
 )
 
 type Handler struct {
@@ -14,6 +15,7 @@ type Handler struct {
 	MfaRecoveryCodeHandler *mfa_recovery_code.MfaRecoveryCodeHandler
 	MfaSecretHandler       *mfa_secret.MfaSecretHandler
 	SettingsHandler        *settings.SettingsHandler
+	SocialProviderHandler  *social_provider.SocialProviderHandler
 }
 
 type Params struct {
@@ -22,6 +24,7 @@ type Params struct {
 	MfaRecoveryCodeHandler *mfa_recovery_code.MfaRecoveryCodeHandler
 	MfaSecretHandler       *mfa_secret.MfaSecretHandler
 	SettingsHandler        *settings.SettingsHandler
+	SocialProviderHandler  *social_provider.SocialProviderHandler
 }
 
 func New(params Params) *Handler {
@@ -31,6 +34,7 @@ func New(params Params) *Handler {
 		MfaRecoveryCodeHandler: params.MfaRecoveryCodeHandler,
 		MfaSecretHandler:       params.MfaSecretHandler,
 		SettingsHandler:        params.SettingsHandler,
+		SocialProviderHandler:  params.SocialProviderHandler,
 	}
 
 	// todo: add middleware
@@ -40,5 +44,6 @@ func New(params Params) *Handler {
 	handler.R.Get("/auth/signout", handler.AuthenticationHandler.SignOut)
 	handler.R.Get("/auth/session", handler.AuthenticationHandler.Session)
 	handler.R.Get("/auth/settings/mfa/recovery_codes", handler.MfaRecoveryCodeHandler.GetMfaRecoveryCodes)
+	handler.R.Get("/auth/social_providers", handler.SocialProviderHandler.GetSocialProviders)
 	return &handler
 }

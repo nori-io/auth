@@ -7,7 +7,7 @@ type Repository struct {
 	MfaRecoveryCodeRepository   repository.MfaRecoveryCodeRepository
 	MfaSecretRepository         repository.MfaSecretRepository
 	OneTimeTokenRepository      repository.OneTimeTokenRepository
-	ServiceProviderRepository   repository.ServiceProviderRepository
+	ServiceProviderRepository   repository.SocialProviderRepository
 	SessionRepository           repository.SessionRepository
 	SocialAccountRepository     repository.SocialAccountRepository
 	UserRepository              repository.UserRepository
@@ -18,7 +18,7 @@ type Params struct {
 	MfaRecoveryCodeRepository   repository.MfaRecoveryCodeRepository
 	MfaSecretRepository         repository.MfaSecretRepository
 	OneTimeTokenRepository      repository.OneTimeTokenRepository
-	ServiceProviderRepository   repository.ServiceProviderRepository
+	ServiceProviderRepository   repository.SocialProviderRepository
 	SessionRepository           repository.SessionRepository
 	SocialAccountRepository     repository.SocialAccountRepository
 	UserRepository              repository.UserRepository

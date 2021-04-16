@@ -14,8 +14,8 @@ type model struct {
 	UpdatedAt time.Time `gorm:"column:updated_at; type: TIMESTAMP"`
 }
 
-func (m *model) convert() *entity.ServiceProvider {
-	return &entity.ServiceProvider{
+func (m *model) convert() *entity.SocialProvider {
+	return &entity.SocialProvider{
 		ID:        m.ID,
 		Name:      m.Name,
 		Logo:      m.Logo,
@@ -24,7 +24,7 @@ func (m *model) convert() *entity.ServiceProvider {
 	}
 }
 
-func newModel(e *entity.ServiceProvider) *model {
+func newModel(e *entity.SocialProvider) *model {
 	return &model{
 		ID:        e.ID,
 		Name:      e.Name,

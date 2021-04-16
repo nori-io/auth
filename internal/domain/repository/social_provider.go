@@ -13,8 +13,8 @@ type SocialProviderRepository interface {
 	Update(ctx context.Context, e *entity.SocialProvider) error
 	Delete(ctx context.Context, ID uint64) error
 	FindByID(ctx context.Context, ID uint64) (*entity.SocialProvider, error)
-	FindByName(ctx context.Context, ID uint64) (*entity.SocialProvider, error)
-	FindByFilter(ctx context.Context, filter SocialProviderFilter)
+	FindByName(ctx context.Context, name string) (*entity.SocialProvider, error)
+	FindByFilter(ctx context.Context, filter SocialProviderFilter) ([]entity.SocialProvider, error)
 }
 
 type SocialProviderFilter struct {

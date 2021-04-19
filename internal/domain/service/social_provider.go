@@ -7,5 +7,5 @@ import (
 )
 
 type SocialProvider interface {
-	Get(ctx context.Context) ([]entity.SocialProvider, error)
+	GetAllActive(ctx context.Context) ([]entity.SocialProvider, error)
 }

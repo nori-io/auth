@@ -12,7 +12,7 @@ type model struct {
 	ID          uint64    `gorm:"column:id; PRIMARY_KEY; type:bigserial"`
 	AppID       string    `gorm:"column:app_id; type:VARCHAR(64); not null"`
 	AppSecret   string    `gorm:"column:app_secret; type:VARCHAR(256); not null"`
-	Name        string    `gorm:"column:name; type:VARCHAR(64); not null"`
+	Name        string    `gorm:"column:name; type:VARCHAR(64); not null; UNIQUE"`
 	Logo        string    `gorm:"column:logo; type:VARCHAR(254)"`
 	RedirectUrl string    `gorm:"column:redirect_url; type:VARCHAR(256); not null"`
 	CallBackUrl string    `gorm:"column:callback_url; type:VARCHAR(256); not null"`

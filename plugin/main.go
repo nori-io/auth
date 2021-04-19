@@ -3,9 +3,8 @@ package main
 import (
 	"context"
 
-	authentication2 "github.com/nori-plugins/authentication/pkg/authentication"
-
 	p "github.com/nori-io/common/v4/pkg/domain/plugin"
+	"github.com/nori-plugins/authentication/pkg/authentication"
 
 	"github.com/jinzhu/gorm"
 
@@ -20,6 +19,7 @@ import (
 	m "github.com/nori-io/common/v4/pkg/meta"
 
 	noriGorm "github.com/nori-io/interfaces/database/orm/gorm"
+	conf "github.com/nori-plugins/authentication/internal/config"
 )
 
 func New() p.Plugin {
@@ -28,15 +28,8 @@ func New() p.Plugin {
 
 type plugin struct {
 	instance service.AuthenticationService
-	config   conf
-}
-
-type conf struct {
-	urlPrefix                config.String
-	MfaRecoveryCodePattern   config.String
-	MfaRecoveryCodeSymbols   config.String
-	MfaRecoveryCodeMaxLength config.Int
-	Issuer                   config.String
+	config   conf.Config
+	logger   logger.FieldLogger
 }
 
 func (p plugin) Meta() meta.Meta {
@@ -51,7 +44,7 @@ func (p plugin) Meta() meta.Meta {
 		},
 		Dependencies: []meta.Dependency{},
 		Description:  nil,
-		Interface:    authentication2.AuthenticationInterface,
+		Interface:    authentication.AuthenticationInterface,
 		License:      nil,
 		Links:        nil,
 		Repository: m.Repository{
@@ -67,18 +60,33 @@ func (p plugin) Instance() interface{} {
 }
 
 func (p plugin) Init(ctx context.Context, config config.Config, log logger.FieldLogger) error {
-	p.config = conf{
-		urlPrefix:                config.String("urlPrefix", "url prefix for all handlers"),
-		MfaRecoveryCodePattern:   config.String("mfaRecoveryCodePattern", "pattern for mfa recovery codes"),
-		MfaRecoveryCodeSymbols:   config.String("mfaRecoveryCodeSymbols", "symbols that use when mfa recovery code generating"),
-		MfaRecoveryCodeMaxLength: config.Int("mfaRecoveryCodeMaxLength", "max length of mfaRecoveryCode"),
+	p.config = conf.Config{
+		EmailVerification:      config.Bool("email.verification", "verification of email"),
+		EmailActivationCodeTTL: config.UInt64("email.activationcodettl", "time to live of email activation code"),
+		UrlPrefix:              config.String("urlprefix", "url prefix for all handlers"),
+		MfaRecoveryCodePattern: config.String("mfa.recoverycode.pattern", "pattern for mfa recovery codes"),
+		MfaRecoveryCodeSymbols: config.String("mfa.recoverycode.symbols", "symbols that use when mfa recovery code generating"),
+		MfaRecoveryCodeLength:  config.Int("mfa.recoverycode.maxlength", "max length of mfaRecoveryCode"),
+		MfaRecoveryCodeCount:   config.Int("mfa.recoverycode.count", "count of mfa recovery codes"),
+		Issuer:                 config.String("mfa.issuer", "issuer"),
+		PasswordBcryptCost:     config.Int("password.bcrypt.cost", "cost passed into GenerateFromPassword func"),
+		CookiesName:            config.String("cookies.name", "name of cookies for keeping session id"),
+		CookiesPath:            config.String("cookies.path", "path of cookies"),
+		CookiesDomain:          config.String("cookies.domain", "domain of cookies"),
+		CookiesExpires:         config.Int64("cookies.expires", ""),
+		CookiesMaxAge:          config.Int("cookies.maxage", ""),
+		CookiesSecure:          config.Bool("cookies.secure", ""),
+		CookiesHttpOnly:        config.Bool("cookies.httponly", ""),
+		CookiesSameSite:        config.Int("cookies.samesite", ""),
 	}
 
+	p.logger = log
 	return nil
 }
 
 func (p plugin) Start(ctx context.Context, registry registry.Registry) error {
-	_, err := Initialize(registry, p.config.urlPrefix())
+	config := p.config
+	_, err := Initialize(registry, config, p.logger)
 	return err
 }
 
@@ -91,6 +99,7 @@ func (p plugin) Install(_ context.Context, registry registry.Registry) error {
 	if err != nil {
 		return err
 	}
+	//@todo actual sql code
 	err = db.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(`CREATE TABLE users(
 		id bigserial PRIMARY KEY,

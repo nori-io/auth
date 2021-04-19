@@ -2,18 +2,19 @@ package postgres
 
 import (
 	"time"
+	/*	"github.com/nori-plugins/authentication/pkg/enum/hash_algorithm"
 
-	"github.com/nori-plugins/authentication/pkg/enum/hash_algorithm"
-
-	"github.com/nori-plugins/authentication/pkg/enum/mfa_type"
-	"github.com/nori-plugins/authentication/pkg/enum/users_type"
-
-	"github.com/nori-plugins/authentication/pkg/enum/users_status"
+		"github.com/nori-plugins/authentication/pkg/enum/mfa_type"
+		"github.com/nori-plugins/authentication/pkg/enum/users_type"*/
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
+	"github.com/nori-plugins/authentication/pkg/enum/hash_algorithm"
+	"github.com/nori-plugins/authentication/pkg/enum/mfa_type"
+	"github.com/nori-plugins/authentication/pkg/enum/users_status"
+	"github.com/nori-plugins/authentication/pkg/enum/users_type"
 )
 
-type User struct {
+type model struct {
 	ID                     uint64    `gorm:"column:id; PRIMARY_KEY; type:bigserial"`
 	Status                 uint8     `gorm:"column:status; type:smallint; not null" `
 	UserType               uint8     `gorm:"column:user_type; type:smallint; not null"`
@@ -32,29 +33,29 @@ type User struct {
 	UpdatedAt              time.Time `gorm:"column:updated_at; type: TIMESTAMP"`
 }
 
-func (u *User) Convert() *entity.User {
+func (m *model) convert() *entity.User {
 	return &entity.User{
-		ID:                     u.ID,
-		Status:                 users_status.UserStatus(u.Status),
-		UserType:               users_type.UserType(u.UserType),
-		MfaType:                mfa_type.MfaType(u.MfaType),
-		PhoneCountryCode:       u.PhoneCountryCode,
-		PhoneNumber:            u.PhoneNumber,
-		Email:                  u.Email,
-		Password:               u.Password,
-		Salt:                   u.Salt,
-		HashAlgorithm:          hash_algorithm.HashAlgorithm(u.HashAlgorithm),
-		IsEmailVerified:        u.IsEmailVerified,
-		IsPhoneVerified:        u.IsPhoneVerified,
-		EmailActivationCode:    u.EmailActivationCode,
-		EmailActivationCodeTTL: u.EmailActivationCodeTTL,
-		CreatedAt:              u.CreatedAt,
-		UpdatedAt:              u.UpdatedAt,
+		ID:                     m.ID,
+		Status:                 users_status.UserStatus(m.Status),
+		UserType:               users_type.UserType(m.UserType),
+		MfaType:                mfa_type.MfaType(m.MfaType),
+		PhoneCountryCode:       m.PhoneCountryCode,
+		PhoneNumber:            m.PhoneNumber,
+		Email:                  m.Email,
+		Password:               m.Password,
+		Salt:                   m.Salt,
+		HashAlgorithm:          hash_algorithm.HashAlgorithm(m.HashAlgorithm),
+		IsEmailVerified:        m.IsEmailVerified,
+		IsPhoneVerified:        m.IsPhoneVerified,
+		EmailActivationCode:    m.EmailActivationCode,
+		EmailActivationCodeTTL: m.EmailActivationCodeTTL,
+		CreatedAt:              m.CreatedAt,
+		UpdatedAt:              m.UpdatedAt,
 	}
 }
 
-func NewModel(e *entity.User) *User {
-	return &User{
+func newModel(e *entity.User) *model {
+	return &model{
 		ID:                     e.ID,
 		Status:                 uint8(e.Status),
 		UserType:               uint8(e.UserType),
@@ -75,6 +76,6 @@ func NewModel(e *entity.User) *User {
 }
 
 // TableName
-func (User) TableName() string {
+func (model) TableName() string {
 	return "users"
 }

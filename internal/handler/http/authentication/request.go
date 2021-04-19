@@ -41,23 +41,17 @@ func newSignInData(r *http.Request) (service.SignInData, error) {
 	}, nil
 }
 
-type SecretDataRequest struct {
-	Secret string `json:"secret"`
+type SignInMfaRequest struct {
+	Code string `json:"code"`
 }
 
-func newPutSecretData(r *http.Request) (service.SecretData, error) {
-	var body SecretDataRequest
+func newSignInMfaData(r *http.Request) (service.SignInMfaData, error) {
+	var body SignInMfaRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		return service.SecretData{}, err
+		return service.SignInMfaData{}, err
 	}
-
-	cSsid, err := r.Cookie("ssid")
-	if err != nil {
-		return service.SecretData{}, err
-	}
-	return service.SecretData{
-		Secret: body.Secret,
-		Ssid:   cSsid.Value,
+	return service.SignInMfaData{
+		Code: body.Code,
 	}, nil
 }

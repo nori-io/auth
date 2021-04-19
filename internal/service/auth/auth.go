@@ -5,156 +5,258 @@ import (
 	"crypto/rand"
 	"time"
 
+	"github.com/nori-plugins/authentication/pkg/errors"
+
+	"github.com/nori-plugins/authentication/pkg/enum/mfa_type"
+
+	"github.com/nori-plugins/authentication/pkg/enum/users_action"
+
+	"github.com/nori-plugins/authentication/pkg/enum/session_status"
+
+	service "github.com/nori-plugins/authentication/internal/domain/service"
+
 	"github.com/nori-plugins/authentication/internal/domain/entity"
-
-	"github.com/nori-plugins/authentication/internal/domain/repository"
-
-	s "github.com/nori-io/interfaces/nori/session"
-	serv "github.com/nori-plugins/authentication/internal/domain/service"
 )
 
-type service struct {
-	session                   s.Session
-	userRepository            repository.UserRepository
-	mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository
-	mfaSecretRepository       repository.MfaSecretRepository
-	configData                configData
-}
-
-type configData struct {
-	Issuer string
-}
-
-func New(sessionInstance s.Session,
-	userRepositoryInstance repository.UserRepository,
-	mfaRecoveryCodeRepositoryInstance repository.MfaRecoveryCodeRepository,
-	mfaSecretRepositoryInstance repository.MfaSecretRepository,
-	configData configData) serv.AuthenticationService {
-	return &service{
-		configData:                configData,
-		session:                   sessionInstance,
-		userRepository:            userRepositoryInstance,
-		mfaRecoveryCodeRepository: mfaRecoveryCodeRepositoryInstance,
-		mfaSecretRepository:       mfaRecoveryCodeRepositoryInstance,
+func (srv *AuthenticationService) GetSessionInfo(ctx context.Context, ssid string) (*entity.Session, *entity.User, error) {
+	session, err := srv.sessionService.GetBySessionKey(ctx, ssid)
+	if err != nil {
+		return nil, nil, err
 	}
+
+	user, err := srv.userService.GetByID(ctx, session.UserID)
+	if err != nil {
+		return nil, nil, err
+	}
+	return &entity.Session{
+			OpenedAt: session.OpenedAt,
+		},
+		&entity.User{
+			PhoneCountryCode: user.PhoneCountryCode,
+			PhoneNumber:      user.PhoneNumber,
+			Email:            user.Email,
+		}, nil
 }
 
-func (srv *service) SignUp(ctx context.Context, data serv.SignUpData) (*entity.User, error) {
+//@todo add checking action and token captcha
+func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUpData) (*entity.User, error) {
 	if err := data.Validate(); err != nil {
 		return nil, err
 	}
 
-	var user *entity.User
+	if srv.config.EmailVerification() {
+		//@todo задействовать зависимость от плагина с интерфейсом mail
+	}
 
-	user = &entity.User{
+	userCreateData := service.UserCreateData{
 		Email:    data.Email,
 		Password: data.Password,
 	}
 
-	if err := srv.userRepository.Create(ctx, user); err != nil {
+	var user *entity.User
+	var err error
+
+	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
+		user, err = srv.userService.Create(tx, userCreateData)
+		if err != nil {
+			return err
+		}
+
+		err = srv.authenticationLogService.Create(tx, &entity.AuthenticationLog{
+			UserID: user.ID,
+			Action: users_action.SignUp,
+			//@todo заполнить метаданные айпи адресом и городом или чем-то ещё?
+			Meta:      "",
+			CreatedAt: time.Now(),
+		})
+		if err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
 		return nil, err
 	}
 
 	return user, nil
 }
 
-func (srv *service) SignIn(ctx context.Context, data serv.SignInData) (*entity.Session, error) {
+func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignInData) (*entity.Session, *string, error) {
 	if err := data.Validate(); err != nil {
+		return nil, nil, err
+	}
+
+	user, err := srv.userService.GetByEmail(ctx, data.Email)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if err := srv.securityHelper.ComparePassword(user.Password, data.Password); err != nil {
+		return nil, nil, err
+	}
+
+	sid, err := srv.getToken(ctx)
+	if err != nil {
+		return nil, nil, errors.NewInternal(err)
+	}
+
+	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
+		if err := srv.sessionService.Create(ctx, &entity.Session{
+			ID:         0,
+			UserID:     user.ID,
+			SessionKey: sid,
+			Status:     session_status.Active,
+			OpenedAt:   time.Now(),
+		}); err != nil {
+			errors.NewInternal(err)
+		}
+
+		session, err := srv.sessionService.GetBySessionKey(ctx, string(sid))
+		if err != nil {
+			return errors.NewInternal(err)
+		}
+
+		if err = srv.authenticationLogService.Create(ctx, &entity.AuthenticationLog{
+			ID:     0,
+			UserID: user.ID,
+			Action: users_action.SignIn,
+			//@todo заполнить метаданные айпи адресом и городом или чем-то ещё?
+			Meta:      "",
+			SessionID: session.ID,
+			CreatedAt: time.Now(),
+		}); err != nil {
+			return errors.NewInternal(err)
+		}
+
+		return nil
+	}); err != nil {
+		return nil, nil, err
+	}
+
+	mfaType := user.MfaType.String()
+
+	if mfaType == mfa_type.Phone.String() {
+		//@todo послать смс на номер пользователя
+	}
+
+	return &entity.Session{
+		SessionKey: sid,
+	}, &mfaType, nil
+}
+
+func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.SignInMfaData) (*entity.Session, error) {
+	var err error
+	if err = data.Validate(); err != nil {
 		return nil, err
 	}
 
-	user := &entity.User{
-		Email:    data.Email,
-		Password: data.Password,
-	}
+	var session *entity.Session
 
-	var err error
-	user, err = srv.userRepository.GetByEmail(ctx, user.Email)
+	//@todo проверить кэш и отп
+	mfaRecoveryCode, err := srv.mfaRecoveryCodeService.GetByUserId(ctx, session.UserID, data.Code)
 	if err != nil {
 		return nil, err
 	}
 
-	sid, err := srv.getToken()
-	if err != nil {
-		return nil, err
-	}
-	return &entity.Session{SessionKey: sid}, nil
-}
-
-func (srv *service) SignOut(ctx context.Context, data *entity.Session) error {
-	err := srv.session.Delete([]byte(data.SessionKey))
-	return err
-}
-
-func (srv *service) GetMfaRecoveryCodes(ctx context.Context, data *entity.Session) ([]entity.MfaRecoveryCode, error) {
-	var codes []entity.MfaRecoveryCode
-	var err error
-	var mfaRecoveryCode *entity.MfaRecoveryCode
-	//@todo read count of symbols from config
-	//@todo read pattenn from config
-	//@todo read symbol sequence from config
-	//@todo generating of specify sequence
-	//@todo нужна ли максимальная длина, или указать всё в паттерне?
-	for i := 0; i < 10; i++ {
-		sid := make([]byte, 32)
-
-		if _, err := rand.Read(sid); err != nil {
+	if mfaRecoveryCode != nil {
+		err = srv.mfaRecoveryCodeService.Apply(ctx, session.UserID, data.Code)
+		if err != nil {
 			return nil, err
 		}
-		mfaRecoveryCode = &entity.MfaRecoveryCode{
-			UserID:    data.UserID,
-			Code:      string(sid),
-			CreatedAt: time.Now(),
-		}
-		err = srv.mfaRecoveryCodeRepository.Create(ctx, data.UserID, mfaRecoveryCode)
-		if err != nil {
-			break
-		}
-		codes = append(codes, *mfaRecoveryCode)
-	}
-	return codes, err
-}
-
-func (srv *service) PutSecret(
-	ctx context.Context, data *serv.SecretData, session entity.Session) (
-	login string, issuer string, err error) {
-	if err := data.Validate(); err != nil {
-		return "", "", err
 	}
 
-	var mfaSecret *entity.MfaSecret
-
-	mfaSecret = &entity.MfaSecret{
-		UserID: session.UserID,
-		Secret: data.Secret,
-	}
-
-	if err := srv.mfaSecretRepository.Create(ctx, mfaSecret); err != nil {
-		return "", "", err
-	}
-
-	userData, err := srv.userRepository.Get(ctx, session.UserID)
+	sid, err := srv.getToken(ctx)
 	if err != nil {
-		return "", "", err
+		return nil, err
 	}
 
-	if userData.Email != "" {
-		login = userData.Email
-	} else {
-		login = userData.PhoneCountryCode + userData.PhoneNumber
+	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
+		if err := srv.sessionService.Create(ctx, &entity.Session{
+			ID:         0,
+			UserID:     session.UserID,
+			SessionKey: sid,
+			Status:     session_status.Active,
+			OpenedAt:   time.Now(),
+		}); err != nil {
+			//@todo тут тоже возвращается ошибка, как быть?
+			//создать новый тип ошибки?
+			//и как быть в коде дальше
+			return err
+		}
+
+		session, err = srv.sessionService.GetBySessionKey(ctx, string(sid))
+		if err != nil {
+			return err
+		}
+
+		if err = srv.authenticationLogService.Create(ctx, &entity.AuthenticationLog{
+			ID:     0,
+			UserID: session.UserID,
+			Action: users_action.SignInMfa,
+			//@todo заполнить метаданные айпи адресом и городом или чем-то ещё?
+			Meta:      "",
+			SessionID: session.ID,
+			CreatedAt: time.Now(),
+		}); err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
+		return nil, err
 	}
-	return login, srv.configData.Issuer, nil
+
+	return &entity.Session{
+		SessionKey: sid,
+	}, nil
 }
 
-func (srv *service) getToken() ([]byte, error) {
+func (srv *AuthenticationService) SignOut(ctx context.Context, sess *entity.Session) error {
+	session, err := srv.sessionService.GetBySessionKey(ctx, string(sess.SessionKey))
+	if err != nil {
+		return err
+	}
+
+	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
+		//@todo если передать не все поля, то обнулятся ли непереданные поля в базе данных?
+		if err := srv.sessionService.Update(ctx, &entity.Session{
+			ID:        session.ID,
+			UserID:    session.UserID,
+			Status:    session_status.Inactive,
+			ClosedAt:  time.Now(),
+			UpdatedAt: time.Now(),
+		}); err != nil {
+			return err
+		}
+
+		if err := srv.authenticationLogService.Create(ctx, &entity.AuthenticationLog{
+			ID:        0,
+			UserID:    session.UserID,
+			Action:    users_action.SignOut,
+			SessionID: session.ID,
+			CreatedAt: time.Now(),
+		}); err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (srv *AuthenticationService) getToken(ctx context.Context) ([]byte, error) {
 	sid := make([]byte, 32)
 
 	if _, err := rand.Read(sid); err != nil {
+		return nil, errors.NewInternal(err)
+	}
+
+	sess, err := srv.sessionService.GetBySessionKey(ctx, string(sid))
+	if err != nil {
 		return nil, err
 	}
-	if err := srv.session.Get(sid, s.SessionActive); err != nil {
-		srv.session.Save(sid, s.SessionActive, 0)
-		return sid, nil
+	if sess != nil && sess.Status == session_status.Active {
+		return srv.getToken(ctx)
 	}
-	return srv.getToken()
+	return sid, nil
 }

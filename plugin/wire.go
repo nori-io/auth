@@ -4,26 +4,20 @@ package main
 
 import (
 	"github.com/google/wire"
-	httpHandler "github.com/nori-io/authentication/internal/handler/http"
-	"github.com/nori-io/authentication/internal/repository/user"
-	"github.com/nori-io/authentication/internal/service/auth"
+	"github.com/nori-io/common/v4/pkg/domain/logger"
 	"github.com/nori-io/common/v4/pkg/domain/registry"
 	noriGorm "github.com/nori-io/interfaces/database/orm/gorm"
 	noriHttp "github.com/nori-io/interfaces/nori/http"
-	"github.com/nori-io/interfaces/nori/session"
+	"github.com/nori-plugins/authentication/internal/app"
+	"github.com/nori-plugins/authentication/internal/config"
+	httpHandler "github.com/nori-plugins/authentication/internal/handler/http"
 )
 
-var set1 = wire.NewSet(
-	auth.New,
-	// authentication.New,
+var set = wire.NewSet(
 	noriGorm.GetGorm,
-	session.GetSession,
-	user.New,
-	wire.Struct(new(httpHandler.Handler), "R", "Auth", "UrlPrefix"),
-	noriHttp.GetHttp,
-)
+	noriHttp.GetHttp)
 
-func Initialize(registry registry.Registry, urlPrefix string) (*httpHandler.Handler, error) {
-	wire.Build(set1)
+func Initialize(registry registry.Registry, config config.Config, logger logger.FieldLogger) (*httpHandler.Handler, error) {
+	wire.Build(app.AppSet, set)
 	return &httpHandler.Handler{}, nil
 }

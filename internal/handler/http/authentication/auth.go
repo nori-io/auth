@@ -2,104 +2,167 @@ package authentication
 
 import (
 	"net/http"
+	"time"
+
+	error2 "github.com/nori-plugins/authentication/internal/domain/helper/error"
+
+	"github.com/nori-plugins/authentication/internal/domain/helper/cookie"
+	"github.com/nori-plugins/authentication/pkg/enum/session_status"
+
+	"github.com/nori-plugins/authentication/internal/config"
+
+	"github.com/nori-plugins/authentication/internal/handler/http/response"
+
+	"github.com/nori-io/common/v4/pkg/domain/logger"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 
 	"github.com/nori-plugins/authentication/internal/domain/service"
 )
 
-type AuthHandler struct {
-	Auth service.AuthenticationService
+type AuthenticationHandler struct {
+	authenticationService service.AuthenticationService
+	sessionService        service.SessionService
+	logger                logger.FieldLogger
+	config                config.Config
+	cookieHelper          cookie.CookieHelper
+	errorHelper           error2.ErrorHelper
 }
 
-func New(auth service.AuthenticationService) *AuthHandler {
-	return &AuthHandler{Auth: auth}
+type Params struct {
+	AuthenticationService service.AuthenticationService
+	SessionService        service.SessionService
+	Logger                logger.FieldLogger
+	Config                config.Config
+	CookieHelper          cookie.CookieHelper
+	ErrorHelper           error2.ErrorHelper
 }
 
-func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
+func New(params Params) *AuthenticationHandler {
+	return &AuthenticationHandler{
+		authenticationService: params.AuthenticationService,
+		sessionService:        params.SessionService,
+		logger:                params.Logger,
+		config:                params.Config,
+		cookieHelper:          params.CookieHelper,
+		errorHelper:           params.ErrorHelper,
+	}
+}
+
+func (h *AuthenticationHandler) Session(w http.ResponseWriter, r *http.Request) {
+	sessionId, err := h.cookieHelper.GetSessionID(r)
+	if err != nil {
+		h.logger.Error("%s", err)
+		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
+	}
+
+	sess, user, err := h.authenticationService.GetSessionInfo(r.Context(), sessionId)
+	if err != nil {
+		h.logger.Error("%s", err)
+		h.errorHelper.Error(w, err)
+	}
+
+	response.JSON(w, r, SessionResponse{
+		Success:  true,
+		Message:  "session exists",
+		Email:    user.Email,
+		Phone:    user.PhoneCountryCode + user.PhoneNumber,
+		OpenedAt: sess.OpenedAt,
+	})
+}
+
+func (h *AuthenticationHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	data, err := newSignUpData(r)
 	if err != nil {
+		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	user, err := h.Auth.SignUp(r.Context(), data)
+	_, err = h.authenticationService.SignUp(r.Context(), data)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.logger.Error("%s", err)
+		h.errorHelper.Error(w, err)
 	}
-	if user == nil {
-		http.Error(w, "sign up error", http.StatusInternalServerError)
-	}
-	JSON(w, r, SignUpResponse{
-		ID:    user.ID,
-		Email: user.Email,
-	})
+
+	w.WriteHeader(http.StatusCreated)
 }
 
-func (h *AuthHandler) SigIn(w http.ResponseWriter, r *http.Request) {
+func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	data, err := newSignInData(r)
 	if err != nil {
+		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	sess, err := h.Auth.SignIn(r.Context(), data)
+	sess, mfaType, err := h.authenticationService.SignIn(r.Context(), data)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.logger.Error("%s", err)
+		h.errorHelper.Error(w, err)
 	}
-	JSON(w, r, SignInResponse{
-		SessionID: string(sess.SessionKey),
+
+	h.cookieHelper.SetSession(w, sess)
+
+	response.JSON(w, r, SignInResponse{
+		Success: true,
+		Message: "User sign in",
+		MfaType: *mfaType,
 	})
 }
 
-func (h *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
-	// todo: extract session ID from context
-	sessionIdContext := r.Context().Value("session_id")
+func (h *AuthenticationHandler) SignInMfa(w http.ResponseWriter, r *http.Request) {
+	_, err := h.cookieHelper.GetSessionID(r)
+	if err != nil {
+		h.logger.Error("%s", err)
+		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
+	}
 
-	sessionId, _ := sessionIdContext.([]byte)
+	data, err := newSignInMfaData(r)
+	if err != nil {
+		h.logger.Error("%s", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
 
-	if err := h.Auth.SignOut(r.Context(), &entity.Session{SessionKey: sessionId}); err != nil {
+	sess, err := h.authenticationService.SignInMfa(r.Context(), data)
+	if err != nil {
+		h.logger.Error("%s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	h.cookieHelper.SetSession(w, sess)
+
+	response.JSON(w, r, SignInMfaResponse{
+		Success: true,
+		Message: "User sign in by mfa",
+	})
+}
+
+func (h *AuthenticationHandler) SignOut(w http.ResponseWriter, r *http.Request) {
+	sessionId, err := h.cookieHelper.GetSessionID(r)
+	if err != nil {
+		h.logger.Error("%s", err)
+		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
+	}
+
+	data := &entity.Session{
+		ID:         0,
+		UserID:     0,
+		SessionKey: nil,
+		Status:     0,
+		OpenedAt:   time.Time{},
+		ClosedAt:   time.Time{},
+		UpdatedAt:  time.Time{},
+	}
+	//@todo
+	if data.Status != session_status.Active {
+	}
+
+	if err := h.authenticationService.SignOut(r.Context(), &entity.Session{SessionKey: []byte(sessionId)}); err != nil {
+		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
 	// todo: redirect
 
+	h.cookieHelper.UnsetSession(w)
 	http.Redirect(w, r, "/", 0)
-}
-
-func (h *AuthHandler) GetMfaRecoveryCodes(w http.ResponseWriter, r *http.Request) {
-	sessionIdContext := r.Context().Value("session_id")
-
-	sessionId, _ := sessionIdContext.([]byte)
-
-	if err := h.Auth.GetMfaRecoveryCodes(r.Context(), &entity.Session{SessionKey: sessionId}); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-
-	//@todo path
-	http.Redirect(w, r, "/", 0)
-}
-
-func (h *AuthHandler) PutSecret(w http.ResponseWriter, r *http.Request) {
-	data, err := newPutSecretData(r)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	}
-
-	sessionIdContext := r.Context().Value("session_id")
-	sessionId, _ := sessionIdContext.([]byte)
-
-	if data.Ssid != sessionIdContext {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
-	}
-	sessionUserId := r.Context().Value("user_id").(uint64)
-	login, issuer, err :=
-		h.Auth.PutSecret(r.Context(), &entity.Session{SessionKey: sessionId, UserID: sessionUserId})
-
-	if (login == "") && (issuer == "") {
-		http.Error(w, "sign up error", http.StatusInternalServerError)
-	}
-
-	JSON(w, r, MfaSecretResponse{
-		Login:  login,
-		Issuer: issuer,
-	})
 }

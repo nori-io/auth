@@ -2,38 +2,48 @@ package http
 
 import (
 	"github.com/nori-io/interfaces/nori/http"
-	"github.com/nori-plugins/authentication/internal/domain/service"
 	"github.com/nori-plugins/authentication/internal/handler/http/authentication"
+	"github.com/nori-plugins/authentication/internal/handler/http/mfa_recovery_code"
+	"github.com/nori-plugins/authentication/internal/handler/http/mfa_secret"
+	"github.com/nori-plugins/authentication/internal/handler/http/settings"
+	"github.com/nori-plugins/authentication/internal/handler/http/social_provider"
 )
 
 type Handler struct {
-	R         http.Http
-	Auth      service.AuthenticationService
-	UrlPrefix string
+	R                      http.Http
+	AuthenticationHandler  *authentication.AuthenticationHandler
+	MfaRecoveryCodeHandler *mfa_recovery_code.MfaRecoveryCodeHandler
+	MfaSecretHandler       *mfa_secret.MfaSecretHandler
+	SettingsHandler        *settings.SettingsHandler
+	SocialProviderHandler  *social_provider.SocialProviderHandler
 }
 
-func New(h Handler) *Handler {
+type Params struct {
+	R                      http.Http
+	AuthenticationHandler  *authentication.AuthenticationHandler
+	MfaRecoveryCodeHandler *mfa_recovery_code.MfaRecoveryCodeHandler
+	MfaSecretHandler       *mfa_secret.MfaSecretHandler
+	SettingsHandler        *settings.SettingsHandler
+	SocialProviderHandler  *social_provider.SocialProviderHandler
+}
+
+func New(params Params) *Handler {
 	handler := Handler{
-		R:         h.R,
-		Auth:      h.Auth,
-		UrlPrefix: h.UrlPrefix,
+		R:                      params.R,
+		AuthenticationHandler:  params.AuthenticationHandler,
+		MfaRecoveryCodeHandler: params.MfaRecoveryCodeHandler,
+		MfaSecretHandler:       params.MfaSecretHandler,
+		SettingsHandler:        params.SettingsHandler,
+		SocialProviderHandler:  params.SocialProviderHandler,
 	}
+
 	// todo: add middleware
-	Start(h)
+	handler.R.Post("/auth/signup", handler.AuthenticationHandler.SignUp)
+	handler.R.Post("/auth/signin", handler.AuthenticationHandler.SignIn)
+	handler.R.Post("/auth/signin/mfa", handler.AuthenticationHandler.SignInMfa)
+	handler.R.Get("/auth/signout", handler.AuthenticationHandler.SignOut)
+	handler.R.Get("/auth/session", handler.AuthenticationHandler.Session)
+	handler.R.Get("/auth/settings/mfa/recovery_codes", handler.MfaRecoveryCodeHandler.GetMfaRecoveryCodes)
+	handler.R.Get("/auth/social_providers", handler.SocialProviderHandler.GetSocialProviders)
 	return &handler
-}
-
-func Start(h Handler) {
-	authHandler := authentication.New(h.Auth)
-
-	h.R.Get("/auth/signup", handler.SignUp)
-	h.R.Get("/auth/signin", handler.SigIn)
-	h.R.Get("/auth/signout", handler.SignOut)
-	h.R.Get("/auth/settings/mfa/recovery_codes", handler.GetMfaRecoveryCodes)
-
-	// mfa
-	h.R.Get("/auth/settings/mfa", nil)
-	h.R.Get("/auth/settings/mfa/verify?", handler.PutSecret)
-
-	// h.R.Put("/mfa/recovery_codes", authHandler.MfaRecoveryCodes)
 }

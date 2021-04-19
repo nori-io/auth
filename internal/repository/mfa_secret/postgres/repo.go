@@ -3,47 +3,40 @@ package postgres
 import (
 	"context"
 
-	"github.com/jinzhu/gorm"
+	"github.com/nori-plugins/authentication/pkg/errors"
+
+	"github.com/nori-plugins/authentication/pkg/transactor"
+
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
 type MfaSecretRepository struct {
-	Db *gorm.DB
+	Tx transactor.Transactor
 }
 
 func (r *MfaSecretRepository) Create(ctx context.Context, e *entity.MfaSecret) error {
-	model := NewModel(e)
-
-	lastRecord := new(MfaSecret)
-
-	if err := r.Db.Create(model).Scan(&lastRecord).Error; err != nil {
-		return err
+	m := newModel(e)
+	if err := r.Tx.GetDB(ctx).Create(m).Error; err != nil {
+		return errors.NewInternal(err)
 	}
-	lastRecord.Convert()
+	*e = *m.convert()
 
 	return nil
 }
 
-func (r *MfaSecretRepository) Get(ctx context.Context, userID uint64) (*entity.MfaSecret, error) {
-	var (
-		out = &MfaSecret{}
-		e   error
-	)
-	e = r.Db.Where("id=?", userID).First(out).Error
-
-	return out.Convert(), e
-}
-
 func (r *MfaSecretRepository) Update(ctx context.Context, userID uint64, e *entity.MfaSecret) error {
-	model := NewModel(e)
-	err := r.Db.Save(model).Error
+	m := newModel(e)
+	if err := r.Tx.GetDB(ctx).Save(m).Error; err != nil {
+		return errors.NewInternal(err)
+	}
+	*e = *m.convert()
 
-	return err
+	return nil
 }
 
 func (r *MfaSecretRepository) Delete(ctx context.Context, userID uint64) error {
-	if err := r.Db.Delete(&MfaSecret{UserID: userID}).Error; err != nil {
-		return err
+	if err := r.Tx.GetDB(ctx).Delete(&model{UserID: userID}).Error; err != nil {
+		return errors.NewInternal(err)
 	}
 	return nil
 }

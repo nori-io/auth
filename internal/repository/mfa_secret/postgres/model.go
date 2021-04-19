@@ -6,15 +6,15 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
-type MfaSecret struct {
+type model struct {
 	ID        uint64    `gorm:"column:id; PRIMARY_KEY; type:bigserial"`
-	UserID    uint64    `gorm:"column:user_id; type: bigint; gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	UserID    uint64    `gorm:"column:user_id; type: bigint; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Secret    string    `gorm:"column:email; type: VARCHAR(128); UNIQUE"`
 	CreatedAt time.Time `gorm:"column:created_at; type: TIMESTAMP"`
 	UpdatedAt time.Time `gorm:"column:updated_at; type: TIMESTAMP"`
 }
 
-func (m *MfaSecret) Convert() *entity.MfaSecret {
+func (m *model) convert() *entity.MfaSecret {
 	return &entity.MfaSecret{
 		ID:        m.ID,
 		UserID:    m.UserID,
@@ -24,8 +24,8 @@ func (m *MfaSecret) Convert() *entity.MfaSecret {
 	}
 }
 
-func NewModel(e *entity.MfaSecret) *MfaSecret {
-	return &MfaSecret{
+func newModel(e *entity.MfaSecret) *model {
+	return &model{
 		ID:        e.ID,
 		UserID:    e.UserID,
 		Secret:    e.Secret,
@@ -35,6 +35,6 @@ func NewModel(e *entity.MfaSecret) *MfaSecret {
 }
 
 // Table Name
-func (MfaSecret) TableName() string {
+func (model) TableName() string {
 	return "mfa_secrets"
 }

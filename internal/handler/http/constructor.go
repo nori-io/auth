@@ -45,5 +45,8 @@ func New(params Params) *Handler {
 	handler.R.Get("/auth/session", handler.AuthenticationHandler.Session)
 	handler.R.Get("/auth/settings/mfa/recovery_codes", handler.MfaRecoveryCodeHandler.GetMfaRecoveryCodes)
 	handler.R.Get("/auth/social_providers", handler.SocialProviderHandler.GetSocialProviders)
+	handler.R.Get("/auth/social/{social_provider}", handler.SocialProviderHandler.HandleSocialProvider)
+	handler.R.Get("/auth/social/{social_provider}/callback", handler.SocialProviderHandler.HandleSocialProviderCallBack)
+	// handler.R.Get("/auth/social/{social_provider}/logout", handler.AuthenticationHandler.)
 	return &handler
 }

@@ -17,6 +17,7 @@ import (
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 
+	"github.com/go-chi/chi"
 	"github.com/nori-plugins/authentication/internal/domain/service"
 )
 

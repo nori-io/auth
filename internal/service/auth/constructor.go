@@ -13,6 +13,7 @@ type AuthenticationService struct {
 	authenticationLogService service.AuthenticationLogService
 	sessionService           service.SessionService
 	mfaRecoveryCodeService   service.MfaRecoveryCodeService
+	socialProviderService    service.SocialProvider
 	transactor               transactor.Transactor
 	securityHelper           security.SecurityHelper
 }
@@ -23,6 +24,7 @@ type Params struct {
 	AuthenticationLogService service.AuthenticationLogService
 	SessionService           service.SessionService
 	MfaRecoveryCodeService   service.MfaRecoveryCodeService
+	SocialProviderService    service.SocialProvider
 	Transactor               transactor.Transactor
 	SecurityHelper           security.SecurityHelper
 }
@@ -36,5 +38,6 @@ func New(params Params) service.AuthenticationService {
 		mfaRecoveryCodeService:   params.MfaRecoveryCodeService,
 		transactor:               params.Transactor,
 		securityHelper:           params.SecurityHelper,
+		socialProviderService:    params.SocialProviderService,
 	}
 }

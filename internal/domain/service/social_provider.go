@@ -8,4 +8,5 @@ import (
 
 type SocialProvider interface {
 	GetAllActive(ctx context.Context) ([]entity.SocialProvider, error)
+	IsSocialProviderEnabled(ctx context.Context, name string) error
 }

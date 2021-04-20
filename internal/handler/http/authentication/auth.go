@@ -1,6 +1,10 @@
 package authentication
 
 import (
+	"fmt"
+	"github.com/markbates/goth/gothic"
+	"github.com/nori-plugins/authentication/internal/domain/errors"
+	"github.com/nori-plugins/authentication/pkg/enum/social_provider_status"
 	"net/http"
 	"time"
 
@@ -28,6 +32,7 @@ type AuthenticationHandler struct {
 	config                config.Config
 	cookieHelper          cookie.CookieHelper
 	errorHelper           error2.ErrorHelper
+	socialProviderService service.SocialProvider
 }
 
 type Params struct {
@@ -37,6 +42,8 @@ type Params struct {
 	Config                config.Config
 	CookieHelper          cookie.CookieHelper
 	ErrorHelper           error2.ErrorHelper
+	SocialProviderService service.SocialProvider
+
 }
 
 func New(params Params) *AuthenticationHandler {
@@ -167,3 +174,46 @@ func (h *AuthenticationHandler) SignOut(w http.ResponseWriter, r *http.Request) 
 	h.cookieHelper.UnsetSession(w)
 	http.Redirect(w, r, "/", 0)
 }
+
+func (h *AuthenticationHandler) HandleSocialProvider(w http.ResponseWriter, r *http.Request) {
+	name := chi.URLParam(r, "social_provider")
+	//@todo name is empty
+
+	provider, err := h.socialProviderService.GetByName(r.Context(), name)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	if provider.Status!=social_provider_status.Enabled{
+		http.Error(w, errors.SocialProviderNotFound.Error(), http.StatusBadRequest)
+	}
+
+	if gothUser, err := gothic.CompleteUserAuth(w, r); err == nil {
+		t, _ := template.New("foo").Parse(userTemplate)
+		t.Execute(w, gothUser)
+	} else {
+		gothic.BeginAuthHandler(w, r)
+	}
+}
+
+func (h *AuthenticationHandler) HandleSocialProviderCallBack(w http.ResponseWriter, r *http.Request) {
+	name := chi.URLParam(r, "social_provider")
+	//@todo name is empty
+	provider, err := h.socialProviderService.GetByName(r.Context(), name)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	if provider.Status!=social_provider_status.Enabled{
+		http.Error(w, errors.SocialProviderNotFound.Error(), http.StatusBadRequest)
+	}
+
+	user, err := gothic.CompleteUserAuth(w, r)
+	if err != nil {
+		fmt.Fprintln(w, err)
+		return
+	}
+	t, _ := template.New("foo").Parse(userTemplate)
+	t.Execute(w, user)
+}
+

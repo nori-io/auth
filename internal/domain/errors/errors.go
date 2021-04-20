@@ -8,5 +8,5 @@ var (
 	SessionNotFound               = errors.New("session.session_not_found", "session not found", errors.ErrNotFound)
 	MfaRecoveryCodeNotFound       = errors.New("mfa.recovery_code_not_found", "mfa recovery code not found", errors.ErrNotFound)
 	EmailAlreadyTaken             = errors.New("authentication.email_already_taken", "email already taken", errors.ErrAlreadyExists)
-	EnabledSocialProviderNotFound = errors.New("social_provider_not_found", "social_provider_not_found", errors.ErrNotFound)
+	SocialProviderNotFound = errors.New("social_provider_not_found", "social_provider_not_found", errors.ErrNotFound)
 )

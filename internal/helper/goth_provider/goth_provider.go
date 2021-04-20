@@ -59,98 +59,96 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
-type GothProviderHelper struct{}
-
 func (h GothProviderHelper) Use(provider *entity.SocialProvider) {
 	var p goth.Provider
 	switch provider.Name {
 	case "amazon":
-		p=amazon.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = amazon.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "bitbucket":
-		p=bitbucket.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = bitbucket.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "box":
-		p=box.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = box.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "dailymotion":
-		p=dailymotion.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = dailymotion.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "deezer":
-		p=deezer.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = deezer.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "digitalocean":
-		p=digitalocean.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = digitalocean.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "discord":
-		p=discord.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = discord.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "dropbox":
-		p=dropbox.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = dropbox.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "eveonline":
-		p=eveonline.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = eveonline.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "facebook":
-		p=facebook.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = facebook.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "fitbit":
-		p=fitbit.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = fitbit.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "gitea":
-		p=gitea.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = gitea.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "github":
-		p=github.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = github.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "gitlab":
-		p=gitlab.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = gitlab.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "google":
-		p=google.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = google.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "gplus":
-		p=gplus.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = gplus.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "shopify":
-		p=shopify.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = shopify.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "soundcloud":
-		p=soundcloud.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = soundcloud.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "spotify":
-		p=spotify.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = spotify.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "steam":
-		p=steam.New(provider.AppID, provider.RedirectUrl)
+		p = steam.New(provider.AppID, provider.RedirectUrl)
 	case "stripe":
-		p=stripe.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = stripe.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "twitch":
-		p=twitch.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = twitch.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "uber":
-		p=uber.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = uber.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "wepay":
-		p=wepay.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = wepay.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "yahoo":
-		p=yahoo.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = yahoo.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "yammer":
-		p=yammer.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = yammer.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "heroku":
-		p=heroku.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = heroku.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "instagram":
-		p=instagram.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = instagram.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "intercom":
-		p=intercom.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = intercom.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "kakao":
-		p=kakao.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = kakao.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "lastfm":
-		p=lastfm.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = lastfm.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "linkedin":
-		p=linkedin.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = linkedin.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "line":
-		p=line.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = line.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "onedrive":
-		p=onedrive.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = onedrive.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "azuread":
 		//@todo resources
-		p=azuread.New(provider.AppID, provider.AppSecret, provider.RedirectUrl,nil ,provider.Scopes )
+		p = azuread.New(provider.AppID, provider.AppSecret, provider.RedirectUrl, nil, provider.Scopes)
 	case "microsoftonline":
-		p=microsoftonline.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = microsoftonline.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "battlenet":
-		p=battlenet.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = battlenet.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "paypal":
-		p=paypal.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = paypal.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "twitter":
-		p=twitter.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = twitter.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "salesforce":
-		p=salesforce.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = salesforce.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "typetalk":
-		p=typetalk.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = typetalk.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "slack":
-		p=slack.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = slack.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "meetup":
-		p=meetup.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = meetup.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "auth0":
 		//@todo
 		//p=auth0.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
@@ -162,31 +160,30 @@ func (h GothProviderHelper) Use(provider *entity.SocialProvider) {
 	case "vk":
 		p = vk.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "naver":
-		p=naver.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = naver.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "yandex":
-		p=yandex.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = yandex.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "nextcloud":
-		p=nextcloud.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = nextcloud.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "seatalk":
-		p=seatalk.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = seatalk.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "apple":
 		//@todo
-		p=apple.New(provider.AppID, provider.AppSecret, provider.RedirectUrl, nil, provider.Scopes)
+		p = apple.New(provider.AppID, provider.AppSecret, provider.RedirectUrl, nil, provider.Scopes)
 	case "strava":
-		p=strava.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = strava.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "okta":
-		p=okta.New(provider.AppID, provider.AppSecret, provider.RedirectUrl, provider.Scopes)
+		p = okta.New(provider.AppID, provider.AppSecret, provider.RedirectUrl, provider.Scopes)
 	case "mastodon":
-		p=mastodon.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p = mastodon.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	}
-	if p!=nil{
+	if p != nil {
 		goth.UseProviders(p)
 	}
 }
 
 func (h GothProviderHelper) UseAll(providers []entity.SocialProvider) {
-	for _,v:=range providers{
+	for _, v := range providers {
 		h.Use(&v)
 	}
 }
-

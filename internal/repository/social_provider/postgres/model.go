@@ -17,6 +17,7 @@ type model struct {
 	RedirectUrl string    `gorm:"column:redirect_url; type:VARCHAR(256); not null"`
 	CallBackUrl string    `gorm:"column:callback_url; type:VARCHAR(256); not null"`
 	TokenUrl    string    `gorm:"column:token_url; type:VARCHAR(256); not null"`
+	Scopes      string    `gorm:"column:scopes; type: VARCHAR (256)"`
 	Status      uint8     `gorm:"column:status; type:smallint; not null"`
 	CreatedAt   time.Time `gorm:"column:created_at; type: TIMESTAMP; not null"`
 	UpdatedAt   time.Time `gorm:"column:updated_at; type: TIMESTAMP"`
@@ -32,6 +33,7 @@ func (m *model) convert() *entity.SocialProvider {
 		RedirectUrl: m.RedirectUrl,
 		CallBackUrl: m.CallBackUrl,
 		TokenUrl:    m.TokenUrl,
+		Scopes:      m.Scopes,
 		Status:      social_provider_status.Status(m.Status),
 		CreatedAt:   m.CreatedAt,
 		UpdatedAt:   m.UpdatedAt,
@@ -48,6 +50,7 @@ func newModel(e *entity.SocialProvider) *model {
 		RedirectUrl: e.RedirectUrl,
 		CallBackUrl: e.CallBackUrl,
 		TokenUrl:    e.TokenUrl,
+		Scopes:      e.Scopes,
 		Status:      uint8(e.Status),
 		CreatedAt:   e.CreatedAt,
 		UpdatedAt:   e.UpdatedAt,

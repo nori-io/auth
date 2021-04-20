@@ -4,7 +4,6 @@ import (
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/providers/amazon"
 	"github.com/markbates/goth/providers/apple"
-	"github.com/markbates/goth/providers/auth0"
 	"github.com/markbates/goth/providers/azuread"
 	"github.com/markbates/goth/providers/battlenet"
 	"github.com/markbates/goth/providers/bitbucket"
@@ -134,7 +133,8 @@ func (h GothProviderHelper) Use(provider *entity.SocialProvider) {
 	case "onedrive":
 		p=onedrive.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "azuread":
-		p=azuread.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		//@todo resources
+		p=azuread.New(provider.AppID, provider.AppSecret, provider.RedirectUrl,nil ,provider.Scopes )
 	case "microsoftonline":
 		p=microsoftonline.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "battlenet":
@@ -152,9 +152,11 @@ func (h GothProviderHelper) Use(provider *entity.SocialProvider) {
 	case "meetup":
 		p=meetup.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "auth0":
-		p=auth0.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		//@todo
+		//p=auth0.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "openid-connect":
-		openidConnect.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		//@todo
+		openidConnect.New(provider.AppID, provider.AppSecret, provider.RedirectUrl, "", provider.Scopes)
 	case "xero":
 		xero.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "vk":
@@ -168,11 +170,12 @@ func (h GothProviderHelper) Use(provider *entity.SocialProvider) {
 	case "seatalk":
 		p=seatalk.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "apple":
-		p=apple.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		//@todo
+		p=apple.New(provider.AppID, provider.AppSecret, provider.RedirectUrl, nil, provider.Scopes)
 	case "strava":
 		p=strava.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "okta":
-		p=okta.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+		p=okta.New(provider.AppID, provider.AppSecret, provider.RedirectUrl, provider.Scopes)
 	case "mastodon":
 		p=mastodon.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	}

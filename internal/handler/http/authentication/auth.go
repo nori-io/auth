@@ -5,6 +5,7 @@ import (
 	"github.com/markbates/goth/gothic"
 	"github.com/nori-plugins/authentication/internal/domain/errors"
 	"github.com/nori-plugins/authentication/pkg/enum/social_provider_status"
+	"html/template"
 	"net/http"
 	"time"
 
@@ -217,3 +218,16 @@ func (h *AuthenticationHandler) HandleSocialProviderCallBack(w http.ResponseWrit
 	t.Execute(w, user)
 }
 
+var userTemplate = `
+<p><a href="/logout/{{.Provider}}">logout</a></p>
+<p>Name: {{.Name}} [{{.LastName}}, {{.FirstName}}]</p>
+<p>Email: {{.Email}}</p>
+<p>NickName: {{.NickName}}</p>
+<p>Location: {{.Location}}</p>
+<p>AvatarURL: {{.AvatarURL}} <img src="{{.AvatarURL}}"></p>
+<p>Description: {{.Description}}</p>
+<p>UserID: {{.UserID}}</p>
+<p>AccessToken: {{.AccessToken}}</p>
+<p>ExpiresAt: {{.ExpiresAt}}</p>
+<p>RefreshToken: {{.RefreshToken}}</p>
+`

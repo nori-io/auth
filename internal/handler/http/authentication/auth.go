@@ -179,16 +179,7 @@ func (h *AuthenticationHandler) SignOut(w http.ResponseWriter, r *http.Request) 
 func (h *AuthenticationHandler) HandleSocialProvider(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "social_provider")
 
-	data := service.GetByNameData{Name: name}
-
-	provider, err := h.socialProviderService.GetByName(r.Context(), data)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	}
-
-	if provider.Status != social_provider_status.Enabled {
-		http.Error(w, errors.SocialProviderNotFound.Error(), http.StatusBadRequest)
-	}
+	h.checkProviderName(w, r, name)
 
 	if gothUser, err := gothic.CompleteUserAuth(w, r); err == nil {
 		t, _ := template.New("foo").Parse(userTemplate)
@@ -201,16 +192,7 @@ func (h *AuthenticationHandler) HandleSocialProvider(w http.ResponseWriter, r *h
 func (h *AuthenticationHandler) HandleSocialProviderCallBack(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "social_provider")
 
-	data := service.GetByNameData{Name: name}
-
-	provider, err := h.socialProviderService.GetByName(r.Context(), data)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	}
-
-	if provider.Status != social_provider_status.Enabled {
-		http.Error(w, errors.SocialProviderNotFound.Error(), http.StatusBadRequest)
-	}
+	h.checkProviderName(w, r, name)
 
 	user, err := gothic.CompleteUserAuth(w, r)
 	if err != nil {
@@ -224,16 +206,7 @@ func (h *AuthenticationHandler) HandleSocialProviderCallBack(w http.ResponseWrit
 func (h *AuthenticationHandler) HandleSocialProviderLogout(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "social_provider")
 
-	data := service.GetByNameData{Name: name}
-
-	provider, err := h.socialProviderService.GetByName(r.Context(), data)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	}
-
-	if provider.Status != social_provider_status.Enabled {
-		http.Error(w, errors.SocialProviderNotFound.Error(), http.StatusBadRequest)
-	}
+	h.checkProviderName(w, r, name)
 
 	gothic.Logout(w, r)
 	w.Header().Set("Location", "/")
@@ -253,3 +226,16 @@ var userTemplate = `
 <p>ExpiresAt: {{.ExpiresAt}}</p>
 <p>RefreshToken: {{.RefreshToken}}</p>
 `
+
+func (h *AuthenticationHandler) checkProviderName(w http.ResponseWriter, r *http.Request, name string) {
+	data := service.GetByNameData{Name: name}
+
+	provider, err := h.socialProviderService.GetByName(r.Context(), data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	if provider.Status != social_provider_status.Enabled {
+		http.Error(w, errors.SocialProviderNotFound.Error(), http.StatusBadRequest)
+	}
+}

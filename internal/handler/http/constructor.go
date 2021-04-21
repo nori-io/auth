@@ -1,7 +1,11 @@
 package http
 
 import (
+	"context"
+
 	"github.com/nori-io/interfaces/nori/http"
+	"github.com/nori-plugins/authentication/internal/domain/helper/goth_provider"
+	"github.com/nori-plugins/authentication/internal/domain/service"
 	"github.com/nori-plugins/authentication/internal/handler/http/authentication"
 	"github.com/nori-plugins/authentication/internal/handler/http/mfa_recovery_code"
 	"github.com/nori-plugins/authentication/internal/handler/http/mfa_secret"
@@ -16,6 +20,8 @@ type Handler struct {
 	MfaSecretHandler       *mfa_secret.MfaSecretHandler
 	SettingsHandler        *settings.SettingsHandler
 	SocialProviderHandler  *social_provider.SocialProviderHandler
+	GothProviderHelper     goth_provider.GothProviderHelper
+	SocialProviderService  service.SocialProvider
 }
 
 type Params struct {
@@ -25,6 +31,8 @@ type Params struct {
 	MfaSecretHandler       *mfa_secret.MfaSecretHandler
 	SettingsHandler        *settings.SettingsHandler
 	SocialProviderHandler  *social_provider.SocialProviderHandler
+	GothProviderHelper     goth_provider.GothProviderHelper
+	SocialProviderService  service.SocialProvider
 }
 
 func New(params Params) *Handler {
@@ -35,7 +43,15 @@ func New(params Params) *Handler {
 		MfaSecretHandler:       params.MfaSecretHandler,
 		SettingsHandler:        params.SettingsHandler,
 		SocialProviderHandler:  params.SocialProviderHandler,
+		GothProviderHelper:     params.GothProviderHelper,
+		SocialProviderService:  params.SocialProviderService,
 	}
+
+	providers, err := handler.SocialProviderService.GetAllActive(context.Background())
+	if err != nil {
+		return nil
+	}
+	handler.GothProviderHelper.UseAll(providers)
 
 	// todo: add middleware
 	handler.R.Post("/auth/signup", handler.AuthenticationHandler.SignUp)

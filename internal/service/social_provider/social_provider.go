@@ -3,6 +3,8 @@ package social_provider
 import (
 	"context"
 
+	"github.com/nori-plugins/authentication/internal/domain/service"
+
 	errors2 "github.com/nori-plugins/authentication/internal/domain/errors"
 
 	"github.com/nori-plugins/authentication/pkg/enum/social_provider_status"
@@ -26,13 +28,16 @@ func (s SocialProviderService) GetAllActive(ctx context.Context) ([]entity.Socia
 	return providers, nil
 }
 
+func (srv *SocialProviderService) GetByName(ctx context.Context, data service.GetByNameData) (*entity.SocialProvider, error) {
+	if err := data.Validate(); err != nil {
+		return nil, err
+	}
 
-func (srv *SocialProviderService) GetByName(ctx context.Context, name string) (*entity.SocialProvider, error) {
-	provider, err := srv.socialProviderRepository.FindByName(ctx, name)
+	provider, err := srv.socialProviderRepository.FindByName(ctx, data.Name)
 	if err != nil {
 		return nil, err
 	}
-	if provider == nil  {
+	if provider == nil {
 		return nil, errors2.SocialProviderNotFound
 	}
 

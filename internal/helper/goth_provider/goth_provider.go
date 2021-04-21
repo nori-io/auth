@@ -1,10 +1,12 @@
 package goth_provider
 
 import (
+	"net/http"
+	"time"
+
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/providers/amazon"
 	"github.com/markbates/goth/providers/apple"
-	"github.com/markbates/goth/providers/azuread"
 	"github.com/markbates/goth/providers/battlenet"
 	"github.com/markbates/goth/providers/bitbucket"
 	"github.com/markbates/goth/providers/box"
@@ -35,7 +37,6 @@ import (
 	"github.com/markbates/goth/providers/nextcloud"
 	"github.com/markbates/goth/providers/okta"
 	"github.com/markbates/goth/providers/onedrive"
-	"github.com/markbates/goth/providers/openidConnect"
 	"github.com/markbates/goth/providers/paypal"
 	"github.com/markbates/goth/providers/salesforce"
 	"github.com/markbates/goth/providers/seatalk"
@@ -132,7 +133,7 @@ func (h GothProviderHelper) Use(provider *entity.SocialProvider) {
 		p = onedrive.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "azuread":
 		//@todo resources
-		p = azuread.New(provider.AppID, provider.AppSecret, provider.RedirectUrl, nil, provider.Scopes)
+		//p = azuread.New(provider.AppID, provider.AppSecret, provider.RedirectUrl, nil, provider.Scopes)
 	case "microsoftonline":
 		p = microsoftonline.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "battlenet":
@@ -149,12 +150,10 @@ func (h GothProviderHelper) Use(provider *entity.SocialProvider) {
 		p = slack.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "meetup":
 		p = meetup.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
-	case "auth0":
-		//@todo
-		//p=auth0.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
-	case "openid-connect":
-		//@todo
-		openidConnect.New(provider.AppID, provider.AppSecret, provider.RedirectUrl, "", provider.Scopes)
+	//case "auth0":
+	//@todo	p = auth0.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
+	//case "openid-connect":
+	//@todo openidConnect.New(provider.AppID, provider.AppSecret, provider.RedirectUrl, "", provider.Scopes)
 	case "xero":
 		xero.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "vk":
@@ -168,8 +167,16 @@ func (h GothProviderHelper) Use(provider *entity.SocialProvider) {
 	case "seatalk":
 		p = seatalk.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "apple":
-		//@todo
-		p = apple.New(provider.AppID, provider.AppSecret, provider.RedirectUrl, nil, provider.Scopes)
+		p = apple.New(provider.AppID, provider.AppSecret, provider.RedirectUrl, &http.Client{
+			Transport: &http.Transport{
+				MaxIdleConns:       10,
+				IdleConnTimeout:    30 * time.Second,
+				DisableCompression: true,
+			},
+			CheckRedirect: nil,
+			Jar:           nil,
+			Timeout:       5 * time.Second,
+		}, provider.Scopes)
 	case "strava":
 		p = strava.New(provider.AppID, provider.AppSecret, provider.RedirectUrl)
 	case "okta":

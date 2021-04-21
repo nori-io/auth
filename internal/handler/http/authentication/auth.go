@@ -2,12 +2,13 @@ package authentication
 
 import (
 	"fmt"
-	"github.com/markbates/goth/gothic"
-	"github.com/nori-plugins/authentication/internal/domain/errors"
-	"github.com/nori-plugins/authentication/pkg/enum/social_provider_status"
 	"html/template"
 	"net/http"
 	"time"
+
+	"github.com/markbates/goth/gothic"
+	"github.com/nori-plugins/authentication/internal/domain/errors"
+	"github.com/nori-plugins/authentication/pkg/enum/social_provider_status"
 
 	error2 "github.com/nori-plugins/authentication/internal/domain/helper/error"
 
@@ -44,7 +45,6 @@ type Params struct {
 	CookieHelper          cookie.CookieHelper
 	ErrorHelper           error2.ErrorHelper
 	SocialProviderService service.SocialProvider
-
 }
 
 func New(params Params) *AuthenticationHandler {
@@ -178,14 +178,15 @@ func (h *AuthenticationHandler) SignOut(w http.ResponseWriter, r *http.Request) 
 
 func (h *AuthenticationHandler) HandleSocialProvider(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "social_provider")
-	//@todo name is empty
 
-	provider, err := h.socialProviderService.GetByName(r.Context(), name)
+	data := service.GetByNameData{Name: name}
+
+	provider, err := h.socialProviderService.GetByName(r.Context(), data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	if provider.Status!=social_provider_status.Enabled{
+	if provider.Status != social_provider_status.Enabled {
 		http.Error(w, errors.SocialProviderNotFound.Error(), http.StatusBadRequest)
 	}
 
@@ -199,13 +200,15 @@ func (h *AuthenticationHandler) HandleSocialProvider(w http.ResponseWriter, r *h
 
 func (h *AuthenticationHandler) HandleSocialProviderCallBack(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "social_provider")
-	//@todo name is empty
-	provider, err := h.socialProviderService.GetByName(r.Context(), name)
+
+	data := service.GetByNameData{Name: name}
+
+	provider, err := h.socialProviderService.GetByName(r.Context(), data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	if provider.Status!=social_provider_status.Enabled{
+	if provider.Status != social_provider_status.Enabled {
 		http.Error(w, errors.SocialProviderNotFound.Error(), http.StatusBadRequest)
 	}
 

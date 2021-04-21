@@ -63,6 +63,6 @@ func New(params Params) *Handler {
 	handler.R.Get("/auth/social_providers", handler.SocialProviderHandler.GetSocialProviders)
 	handler.R.Get("/auth/social/{social_provider}", handler.AuthenticationHandler.HandleSocialProvider)
 	handler.R.Get("/auth/social/{social_provider}/callback", handler.AuthenticationHandler.HandleSocialProviderCallBack)
-	// handler.R.Get("/auth/social/{social_provider}/logout", handler.AuthenticationHandler.)
+	handler.R.Get("/auth/social/{social_provider}/logout", handler.AuthenticationHandler.HandleSocialProviderLogout)
 	return &handler
 }

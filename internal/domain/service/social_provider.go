@@ -18,6 +18,6 @@ type GetByNameData struct {
 
 func (d GetByNameData) Validate() error {
 	return v.Errors{
-		"name": v.Validate(d.Name, v.Required, v.Length(2, 254)),
+		"name": v.Validate(d.Name, v.Required, v.Length(2, 32)),
 	}.Filter()
 }

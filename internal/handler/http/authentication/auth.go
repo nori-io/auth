@@ -221,6 +221,25 @@ func (h *AuthenticationHandler) HandleSocialProviderCallBack(w http.ResponseWrit
 	t.Execute(w, user)
 }
 
+func (h *AuthenticationHandler) HandleSocialProviderLogout(w http.ResponseWriter, r *http.Request) {
+	name := chi.URLParam(r, "social_provider")
+
+	data := service.GetByNameData{Name: name}
+
+	provider, err := h.socialProviderService.GetByName(r.Context(), data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	if provider.Status != social_provider_status.Enabled {
+		http.Error(w, errors.SocialProviderNotFound.Error(), http.StatusBadRequest)
+	}
+
+	gothic.Logout(w, r)
+	w.Header().Set("Location", "/")
+	w.WriteHeader(http.StatusTemporaryRedirect)
+}
+
 var userTemplate = `
 <p><a href="/logout/{{.Provider}}">logout</a></p>
 <p>Name: {{.Name}} [{{.LastName}}, {{.FirstName}}]</p>

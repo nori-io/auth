@@ -4,6 +4,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gorilla/sessions"
+	"github.com/markbates/goth/gothic"
+
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/providers/amazon"
 	"github.com/markbates/goth/providers/apple"
@@ -193,4 +196,5 @@ func (h GothProviderHelper) UseAll(providers []entity.SocialProvider) {
 	for _, v := range providers {
 		h.Use(&v)
 	}
+	gothic.Store = sessions.NewCookieStore([]byte("<your secret here>"))
 }

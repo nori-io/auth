@@ -8,6 +8,7 @@ require (
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/wire v0.5.0
+	github.com/gorilla/sessions v1.1.1
 	github.com/jinzhu/gorm v1.9.16
 	github.com/markbates/goth v1.67.1
 	github.com/nori-io/common/v4 v4.0.1-0.20210406114423-a94f240aa60a

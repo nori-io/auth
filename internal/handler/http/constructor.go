@@ -60,9 +60,11 @@ func New(params Params) *Handler {
 	handler.R.Get("/auth/signout", handler.AuthenticationHandler.SignOut)
 	handler.R.Get("/auth/session", handler.AuthenticationHandler.Session)
 	handler.R.Get("/auth/settings/mfa/recovery_codes", handler.MfaRecoveryCodeHandler.GetMfaRecoveryCodes)
+	handler.R.Post("/auth/settings/password", handler.SettingsHandler.ChangePassword)
+	handler.R.Get("/auth/settings/mfa", handler.SettingsHandler.ReceiveMfaStatus)
 	handler.R.Get("/auth/social_providers", handler.SocialProviderHandler.GetSocialProviders)
 	handler.R.Get("/auth/social/{social_provider}", handler.AuthenticationHandler.HandleSocialProvider)
-	handler.R.Get("/auth/social/{social_provider}/callback", handler.AuthenticationHandler.HandleSocialProviderCallBack)
+	handler.R.Post("/auth/social/{social_provider}/callback", handler.AuthenticationHandler.HandleSocialProviderCallBack)
 	handler.R.Get("/auth/social/{social_provider}/logout", handler.AuthenticationHandler.HandleSocialProviderLogout)
 	return &handler
 }

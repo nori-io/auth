@@ -1,6 +1,9 @@
 package mfa_secret
 
 type MfaSecretResponse struct {
-	Login  string
-	Issuer string
+	Success bool
+	Message string
+	Login   string
+	Issuer  string
+	Secret  string
 }

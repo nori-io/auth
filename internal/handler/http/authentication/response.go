@@ -13,6 +13,11 @@ type SignInMfaResponse struct {
 	Message string
 }
 
+type SignInOutResponse struct {
+	Success bool
+	Message string
+}
+
 type SessionResponse struct {
 	Success  bool
 	Message  string

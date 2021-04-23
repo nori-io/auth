@@ -6,8 +6,6 @@ import (
 
 	"github.com/nori-plugins/authentication/pkg/enum/users_status"
 
-	"github.com/nori-plugins/authentication/internal/domain/repository"
-
 	"github.com/go-chi/chi"
 
 	"github.com/nori-plugins/authentication/internal/handler/http/response"
@@ -72,7 +70,7 @@ func (h *AdminHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	users, err := h.userService.GetAll(r.Context(), repository.UserFilter{
+	users, err := h.userService.GetAll(r.Context(), service.UserFilter{
 		EmailPattern: &email,
 		PhonePattern: &phone,
 		UserStatus:   &userStatus,

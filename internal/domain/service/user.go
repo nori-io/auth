@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/nori-plugins/authentication/internal/domain/repository"
+	"github.com/nori-plugins/authentication/pkg/enum/users_status"
 
 	v "github.com/go-ozzo/ozzo-validation/v4"
 
@@ -18,7 +18,7 @@ type UserService interface {
 	UpdateMfaStatus(ctx context.Context, data UserUpdateMfaStatusData) error
 	GetByEmail(ctx context.Context, email string) (*entity.User, error)
 	GetByID(ctx context.Context, data GetByIdData) (*entity.User, error)
-	GetAll(ctx context.Context, filter repository.UserFilter) ([]entity.User, error)
+	GetAll(ctx context.Context, filter UserFilter) ([]entity.User, error)
 }
 
 type UserCreateData struct {
@@ -44,4 +44,12 @@ func (d GetByIdData) Validate() error {
 	return v.Errors{
 		"id": v.Validate(d.Id, v.Required),
 	}.Filter()
+}
+
+type UserFilter struct {
+	EmailPattern *string
+	PhonePattern *string
+	UserStatus   *users_status.UserStatus
+	Offset       int
+	Limit        int
 }

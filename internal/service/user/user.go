@@ -99,7 +99,7 @@ func (srv UserService) GetByID(ctx context.Context, data service.GetByIdData) (*
 	return user, nil
 }
 
-func (srv UserService) GetAll(ctx context.Context, filter repository.UserFilter) ([]entity.User, error) {
+func (srv UserService) GetAll(ctx context.Context, filter service.UserFilter) ([]entity.User, error) {
 	users, err := srv.userRepository.FindByFilter(ctx, repository.UserFilter{
 		EmailPattern: filter.EmailPattern,
 		PhonePattern: filter.PhonePattern,

@@ -1,13 +1,17 @@
 package administrator
 
-import "github.com/nori-plugins/authentication/internal/domain/entity"
+import (
+	"time"
+
+	"github.com/nori-plugins/authentication/internal/domain/entity"
+)
 
 type UserResponse struct {
-	ID      uint64 `json:"name"`
-	Status  string `json:"status"`
-	Email   string `json:"email"`
-	Phone   string `json:"phone"`
-	Created string `json:"created"`
+	ID      uint64    `json:"name"`
+	Status  string    `json:"status"`
+	Email   string    `json:"email"`
+	Phone   string    `json:"phone"`
+	Created time.Time `json:"created"`
 }
 
 func convertAll(entities []entity.User) []UserResponse {
@@ -24,6 +28,6 @@ func convert(e entity.User) UserResponse {
 		Status:  string(e.Status),
 		Email:   e.Email,
 		Phone:   e.PhoneCountryCode + e.PhoneNumber,
-		Created: e.CreatedAt.String(),
+		Created: e.CreatedAt,
 	}
 }

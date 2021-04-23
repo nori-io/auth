@@ -99,13 +99,13 @@ func (srv UserService) GetByID(ctx context.Context, data service.GetByIdData) (*
 	return user, nil
 }
 
-func (srv UserService) GetAll(ctx context.Context) ([]entity.User, error) {
+func (srv UserService) GetAll(ctx context.Context, filter repository.UserFilter) ([]entity.User, error) {
 	users, err := srv.userRepository.FindByFilter(ctx, repository.UserFilter{
-		EmailPattern: nil,
-		PhonePattern: nil,
-		UserStatus:   nil,
-		Offset:       0,
-		Limit:        0,
+		EmailPattern: filter.EmailPattern,
+		PhonePattern: filter.PhonePattern,
+		UserStatus:   filter.UserStatus,
+		Offset:       filter.Offset,
+		Limit:        filter.Limit,
 	})
 	if err != nil {
 		return nil, err

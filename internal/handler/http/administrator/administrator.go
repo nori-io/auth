@@ -4,6 +4,10 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/nori-plugins/authentication/pkg/enum/users_status"
+
+	"github.com/nori-plugins/authentication/internal/domain/repository"
+
 	"github.com/go-chi/chi"
 
 	"github.com/nori-plugins/authentication/internal/handler/http/response"
@@ -45,13 +49,42 @@ func (h *AdminHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
 	}
 
-	users, err := h.userService.GetAll(r.Context())
+	offset := r.URL.Query().Get("offset")
+	limit := r.URL.Query().Get("limit")
+	status := r.URL.Query().Get("status")
+	email := r.URL.Query().Get("email")
+	phone := r.URL.Query().Get("phone")
+
+	u, err := strconv.ParseUint(status, 10, 8)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	userStatus := users_status.UserStatus(u)
+
+	offsetInt, err := strconv.ParseInt(offset, 10, 64)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	limitInt, err := strconv.ParseInt(limit, 10, 64)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	users, err := h.userService.GetAll(r.Context(), repository.UserFilter{
+		EmailPattern: &email,
+		PhonePattern: &phone,
+		UserStatus:   &userStatus,
+		Offset:       int(offsetInt),
+		Limit:        int(limitInt),
+	})
 	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	response.JSON(w, r, users)
+	response.JSON(w, r, convertAll(users))
 }
 
 func (h *AdminHandler) GetUserById(w http.ResponseWriter, r *http.Request) {
@@ -73,5 +106,5 @@ func (h *AdminHandler) GetUserById(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	response.JSON(w, r, user)
+	response.JSON(w, r, convert(*user))
 }

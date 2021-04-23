@@ -3,6 +3,8 @@ package http
 import (
 	"context"
 
+	administrator "github.com/nori-plugins/authentication/internal/handler/http/administator"
+
 	"github.com/nori-io/interfaces/nori/http"
 	"github.com/nori-plugins/authentication/internal/domain/helper/goth_provider"
 	"github.com/nori-plugins/authentication/internal/domain/service"
@@ -15,6 +17,7 @@ import (
 
 type Handler struct {
 	R                      http.Http
+	AdminHandler           *administrator.AdminHandler
 	AuthenticationHandler  *authentication.AuthenticationHandler
 	MfaRecoveryCodeHandler *mfa_recovery_code.MfaRecoveryCodeHandler
 	MfaSecretHandler       *mfa_secret.MfaSecretHandler
@@ -26,6 +29,7 @@ type Handler struct {
 
 type Params struct {
 	R                      http.Http
+	AdminHandler           *administrator.AdminHandler
 	AuthenticationHandler  *authentication.AuthenticationHandler
 	MfaRecoveryCodeHandler *mfa_recovery_code.MfaRecoveryCodeHandler
 	MfaSecretHandler       *mfa_secret.MfaSecretHandler
@@ -38,6 +42,7 @@ type Params struct {
 func New(params Params) *Handler {
 	handler := Handler{
 		R:                      params.R,
+		AdminHandler:           params.AdminHandler,
 		AuthenticationHandler:  params.AuthenticationHandler,
 		MfaRecoveryCodeHandler: params.MfaRecoveryCodeHandler,
 		MfaSecretHandler:       params.MfaSecretHandler,
@@ -66,5 +71,7 @@ func New(params Params) *Handler {
 	handler.R.Get("/auth/social/{social_provider}", handler.AuthenticationHandler.HandleSocialProvider)
 	handler.R.Post("/auth/social/{social_provider}/callback", handler.AuthenticationHandler.HandleSocialProviderCallBack)
 	handler.R.Get("/auth/social/{social_provider}/logout", handler.AuthenticationHandler.HandleSocialProviderLogout)
+	handler.R.Get("/admin/users", handler.AdminHandler.GetAllUsers)
+	handler.R.Get("/admin/users/{id}", handler.AdminHandler.GetUserById)
 	return &handler
 }

@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 
+	v "github.com/go-ozzo/ozzo-validation/v4"
+
 	"github.com/nori-plugins/authentication/pkg/enum/mfa_type"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
@@ -13,7 +15,8 @@ type UserService interface {
 	UpdatePassword(ctx context.Context, data UserUpdatePasswordData) error
 	UpdateMfaStatus(ctx context.Context, data UserUpdateMfaStatusData) error
 	GetByEmail(ctx context.Context, email string) (*entity.User, error)
-	GetByID(ctx context.Context, ID uint64) (*entity.User, error)
+	GetByID(ctx context.Context, data GetByIdData) (*entity.User, error)
+	GetAll(ctx context.Context) ([]entity.User, error)
 }
 
 type UserCreateData struct {
@@ -29,4 +32,14 @@ type UserUpdateMfaStatusData struct {
 type UserUpdatePasswordData struct {
 	UserID   uint64
 	Password string
+}
+
+type GetByIdData struct {
+	Id uint64
+}
+
+func (d GetByIdData) Validate() error {
+	return v.Errors{
+		"id": v.Validate(d.Id, v.Required),
+	}.Filter()
 }

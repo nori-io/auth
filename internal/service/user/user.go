@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/nori-plugins/authentication/internal/domain/repository"
+
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 	errors2 "github.com/nori-plugins/authentication/internal/domain/errors"
 	"github.com/nori-plugins/authentication/internal/domain/service"
@@ -82,8 +84,12 @@ func (srv UserService) GetByEmail(ctx context.Context, email string) (*entity.Us
 	return user, nil
 }
 
-func (srv UserService) GetByID(ctx context.Context, ID uint64) (*entity.User, error) {
-	user, err := srv.userRepository.FindByID(ctx, ID)
+func (srv UserService) GetByID(ctx context.Context, data service.GetByIdData) (*entity.User, error) {
+	if err := data.Validate(); err != nil {
+		return nil, err
+	}
+
+	user, err := srv.userRepository.FindByID(ctx, data.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -91,4 +97,21 @@ func (srv UserService) GetByID(ctx context.Context, ID uint64) (*entity.User, er
 		return nil, errors2.UserNotFound
 	}
 	return user, nil
+}
+
+func (srv UserService) GetAll(ctx context.Context) ([]entity.User, error) {
+	users, err := srv.userRepository.FindByFilter(ctx, repository.UserFilter{
+		EmailPattern: nil,
+		PhonePattern: nil,
+		UserStatus:   nil,
+		Offset:       0,
+		Limit:        0,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if users == nil {
+		return nil, errors2.UserNotFound
+	}
+	return users, nil
 }

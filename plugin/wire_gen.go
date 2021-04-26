@@ -20,6 +20,7 @@ import (
 	social_provider3 "github.com/nori-plugins/authentication/internal/handler/http/social_provider"
 	"github.com/nori-plugins/authentication/internal/helper/cookie"
 	error2 "github.com/nori-plugins/authentication/internal/helper/error"
+	"github.com/nori-plugins/authentication/internal/helper/goth_provider"
 	mfa_recovery_code2 "github.com/nori-plugins/authentication/internal/helper/mfa_recovery_code"
 	"github.com/nori-plugins/authentication/internal/helper/security"
 	"github.com/nori-plugins/authentication/internal/repository/authentication_log"
@@ -162,6 +163,7 @@ func Initialize(registry2 registry.Registry, config2 config.Config, logger2 logg
 		ErrorHelper:           errorHelper,
 	}
 	socialProviderHandler := social_provider3.New(params6)
+	gothProviderHelper := goth_provider.New()
 	handler := &http.Handler{
 		R:                      httpHttp,
 		AuthenticationHandler:  authenticationHandler,
@@ -169,6 +171,8 @@ func Initialize(registry2 registry.Registry, config2 config.Config, logger2 logg
 		MfaSecretHandler:       mfaSecretHandler,
 		SettingsHandler:        settingsHandler,
 		SocialProviderHandler:  socialProviderHandler,
+		GothProviderHelper:     gothProviderHelper,
+		SocialProviderService:  socialProvider,
 	}
 	return handler, nil
 }

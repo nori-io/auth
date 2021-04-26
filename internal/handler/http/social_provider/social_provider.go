@@ -41,11 +41,14 @@ func (h *SocialProviderHandler) GetSocialProviders(w http.ResponseWriter, r *htt
 		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
 	}
 
-	providers, err := h.socialProviderService.Get(r.Context())
+	providers, err := h.socialProviderService.GetAllActive(r.Context())
 	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	response.JSON(w, r, providers)
+	response.JSON(w, r, convertAll(providers))
 }
+
+
+

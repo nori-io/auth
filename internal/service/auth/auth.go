@@ -24,7 +24,7 @@ func (srv *AuthenticationService) GetSessionInfo(ctx context.Context, ssid strin
 		return nil, nil, err
 	}
 
-	user, err := srv.userService.GetByID(ctx, session.UserID)
+	user, err := srv.userService.GetByID(ctx, service.GetByIdData{Id: session.UserID})
 	if err != nil {
 		return nil, nil, err
 	}

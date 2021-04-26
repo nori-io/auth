@@ -35,17 +35,17 @@ paths:
         explode: true
         schema:
           type: string
-      - name: emailPattern
+      - name: email
         in: query
-        description: status - active, blocked, deleted, locked
+        description: pattern of email
         required: false
         style: form
         explode: true
         schema:
           type: string
-      - name: phonePattern
+      - name: phone
         in: query
-        description: status - active, blocked, deleted, locked
+        description: pattern of phone
         required: false
         style: form
         explode: true
@@ -53,7 +53,7 @@ paths:
           type: string
       - name: ssid
         in: cookie
-        description: user session id
+        description: admin session id
         required: true
         style: form
         explode: true
@@ -80,10 +80,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /admin/users/{login}:
+      security:
+      - cookieAuth: []
+  /admin/users/{id}:
     get:
       parameters:
-      - name: login
+      - name: id
         in: path
         description: user status
         required: true
@@ -93,7 +95,7 @@ paths:
           type: string
       - name: ssid
         in: cookie
-        description: user session id
+        description: admin session id
         required: true
         style: form
         explode: true
@@ -120,18 +122,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+      security:
+      - cookieAuth: []
     put:
-      summary: update user's status (active, blocked, locked, deleted)
+      summary: update status (active, blocked, locked, deleted)
       parameters:
       - name: ssid
         in: cookie
-        description: user session id
+        description: admin session id
         required: true
         style: form
         explode: true
         schema:
           type: string
-      - name: login
+      - name: id
         in: path
         required: true
         style: simple
@@ -162,6 +166,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+      security:
+      - cookieAuth: []
     delete:
       summary: delete user's record hardly
       parameters:
@@ -173,7 +179,7 @@ paths:
         explode: true
         schema:
           type: string
-      - name: login
+      - name: id
         in: path
         required: true
         style: simple
@@ -197,6 +203,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+      security:
+      - cookieAuth: []
 components:
   schemas:
     Error:
@@ -217,11 +225,11 @@ components:
         $ref: '#/components/schemas/UserResponse'
     UserResponse:
       required:
-      - login
+      - id
       - status
       type: object
       properties:
-        login:
+        id:
           type: string
         status:
           type: string
@@ -238,3 +246,8 @@ components:
           type: string
         message:
           type: string
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      name: ssid
+      in: cookie

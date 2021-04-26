@@ -69,7 +69,10 @@ func (h *MfaSecretHandler) PutSecret(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.JSON(w, r, MfaSecretResponse{
-		Login:  login,
-		Issuer: issuer,
+		Success: true,
+		Message: "secret",
+		Login:   login,
+		Issuer:  issuer,
+		Secret:  "",
 	})
 }

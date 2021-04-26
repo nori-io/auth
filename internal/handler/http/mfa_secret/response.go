@@ -1,6 +1,9 @@
 package mfa_secret
 
 type MfaSecretResponse struct {
-	Login  string
-	Issuer string
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+	Login   string `json:"login"`
+	Issuer  string `json:"issuer"`
+	Secret  string `json:"secret"`
 }

@@ -15,6 +15,7 @@ type SocialProvider struct {
 	RedirectUrl string
 	CallBackUrl string
 	TokenUrl    string
+	Scopes string
 	Status      social_provider_status.Status
 	CreatedAt   time.Time
 	UpdatedAt   time.Time

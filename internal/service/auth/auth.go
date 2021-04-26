@@ -88,7 +88,7 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 		return nil, nil, err
 	}
 
-	user, err := srv.userService.GetByEmail(ctx, data.Email)
+	user, err := srv.userService.GetByEmail(ctx, service.GetByEmail{Email: data.Email})
 	if err != nil {
 		return nil, nil, err
 	}

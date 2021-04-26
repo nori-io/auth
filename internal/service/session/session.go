@@ -11,6 +11,10 @@ import (
 )
 
 func (srv SessionService) Create(ctx context.Context, data service.SessionCreateData) error {
+	if err := data.Validate(); err != nil {
+		return err
+	}
+
 	session, err := srv.GetBySessionKey(ctx, service.GetBySessionKeyData{SessionKey: data.SessionKey})
 	if err != nil && err != errors2.SessionNotFound {
 		return err
@@ -32,6 +36,10 @@ func (srv SessionService) Create(ctx context.Context, data service.SessionCreate
 }
 
 func (srv SessionService) Update(ctx context.Context, data service.SessionUpdateData) error {
+	if err := data.Validate(); err != nil {
+		return err
+	}
+
 	if err := srv.sessionRepository.Update(ctx, &entity.Session{
 		UserID:     data.UserID,
 		SessionKey: []byte(data.SessionKey),
@@ -45,6 +53,9 @@ func (srv SessionService) Update(ctx context.Context, data service.SessionUpdate
 }
 
 func (srv SessionService) GetBySessionKey(ctx context.Context, data service.GetBySessionKeyData) (*entity.Session, error) {
+	if err := data.Validate(); err != nil {
+		return nil, err
+	}
 	session, err := srv.sessionRepository.FindBySessionKey(ctx, data.SessionKey)
 	if err != nil {
 		return nil, err

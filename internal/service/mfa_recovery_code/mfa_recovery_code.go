@@ -16,7 +16,9 @@ func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data
 	//@todo будет ли использоваться паттерн?
 	//@todo нужна ли максимальная длина, или указать всё в паттерне?
 	//@todo указать ограничение на максимальную длину, связанную с базой данных?
-
+	if err := data.Validate(); err != nil {
+		return nil, err
+	}
 	var mfaRecoveryCodes []*entity.MfaRecoveryCode
 	mfa_recovery_codes, err := srv.mfaRecoveryCodeHelper.Generate()
 	if err != nil {
@@ -49,6 +51,9 @@ func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data
 
 func (srv *MfaRecoveryCodeService) Apply(ctx context.Context, data service.ApplyData) error {
 	//@todo проверить кэш и отп
+	if err := data.Validate(); err != nil {
+		return err
+	}
 	mfaRecoveryCode, err := srv.mfaRecoveryCodeRepository.FindByUserID(ctx, data.UserID, data.Code)
 	if err != nil {
 		return err

@@ -16,7 +16,11 @@ import (
 )
 
 func (srv UserService) Create(ctx context.Context, data service.UserCreateData) (*entity.User, error) {
-	user, err := srv.GetByEmail(ctx, data.Email)
+	if err := data.Validate(); err != nil {
+		return nil, err
+	}
+
+	user, err := srv.GetByEmail(ctx, service.GetByEmailData{Email: data.Email})
 	if err != nil && err != errors2.UserNotFound {
 		return nil, err
 	}
@@ -48,6 +52,10 @@ func (srv UserService) Create(ctx context.Context, data service.UserCreateData) 
 }
 
 func (srv UserService) UpdatePassword(ctx context.Context, data service.UserUpdatePasswordData) error {
+	if err := data.Validate(); err != nil {
+		return err
+	}
+
 	password, err := srv.securityHelper.GenerateHash(data.Password)
 	if err != nil {
 		return err
@@ -63,6 +71,10 @@ func (srv UserService) UpdatePassword(ctx context.Context, data service.UserUpda
 }
 
 func (srv UserService) UpdateMfaStatus(ctx context.Context, data service.UserUpdateMfaStatusData) error {
+	if err := data.Validate(); err != nil {
+		return err
+	}
+
 	if err := srv.userRepository.Update(ctx, &entity.User{
 		ID:        data.UserID,
 		MfaType:   data.MfaType,
@@ -73,8 +85,12 @@ func (srv UserService) UpdateMfaStatus(ctx context.Context, data service.UserUpd
 	return nil
 }
 
-func (srv UserService) GetByEmail(ctx context.Context, email string) (*entity.User, error) {
-	user, err := srv.userRepository.FindByEmail(ctx, email)
+func (srv UserService) GetByEmail(ctx context.Context, data service.GetByEmailData) (*entity.User, error) {
+	if err := data.Validate(); err != nil {
+		return nil, err
+	}
+
+	user, err := srv.userRepository.FindByEmail(ctx, data.Email)
 	if err != nil {
 		return nil, err
 	}

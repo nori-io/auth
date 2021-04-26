@@ -8,6 +8,10 @@ import (
 )
 
 func (srv AuthenticationLogService) Create(ctx context.Context, data service.AuthenticationLogCreateData) error {
+	if err := data.Validate(); err != nil {
+		return err
+	}
+
 	if err := srv.authenticationLogRepository.Create(ctx, &entity.AuthenticationLog{
 		UserID:    data.UserID,
 		Action:    data.Action,

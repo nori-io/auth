@@ -9,10 +9,10 @@ import (
 )
 
 type AuthenticationLogService interface {
-	Create(ctx context.Context, data CreateData) error
+	Create(ctx context.Context, data AuthenticationLogCreateData) error
 }
 
-type CreateData struct {
+type AuthenticationLogCreateData struct {
 	UserID    uint64
 	Action    users_action.Action
 	SessionID uint64
@@ -20,7 +20,7 @@ type CreateData struct {
 	CreatedAt time.Time
 }
 
-func (d CreateData) Validate() error {
+func (d AuthenticationLogCreateData) Validate() error {
 	return v.Errors{
 		"user_ID":    v.Validate(d.UserID, v.Required),
 		"action":     v.Validate(d.Action, v.Required),

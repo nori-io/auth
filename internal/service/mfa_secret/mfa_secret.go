@@ -8,7 +8,7 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
-func (srv *MfaSecretService) PutSecret(ctx context.Context, data *service.SecretData, session entity.Session) (
+func (srv *MfaSecretService) PutSecret(ctx context.Context, data service.SecretData) (
 	login string, issuer string, err error) {
 	if err := data.Validate(); err != nil {
 		return "", "", err
@@ -16,24 +16,23 @@ func (srv *MfaSecretService) PutSecret(ctx context.Context, data *service.Secret
 
 	var mfaSecret *entity.MfaSecret
 
-	mfaSecret = &entity.MfaSecret{
-		UserID: session.UserID,
-		Secret: data.Secret,
-	}
-
 	if err := srv.mfaSecretRepository.Create(ctx, mfaSecret); err != nil {
 		return "", "", err
 	}
 
-	userData, err := srv.userService.GetByID(ctx, service.GetByIdData{Id: 0})
+	user, err := srv.userService.GetByID(ctx, service.GetByIdData{Id: 0})
 	if err != nil {
 		return "", "", err
 	}
 
-	if userData.Email != "" {
-		login = userData.Email
+	mfaSecret = &entity.MfaSecret{
+		UserID: user.ID,
+		Secret: data.Secret,
+	}
+	if user.Email != "" {
+		login = user.Email
 	} else {
-		login = userData.PhoneCountryCode + userData.PhoneNumber
+		login = user.PhoneCountryCode + user.PhoneNumber
 	}
 	return login, srv.config.Issuer(), nil
 }

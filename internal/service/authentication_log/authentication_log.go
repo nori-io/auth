@@ -7,7 +7,7 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/service"
 )
 
-func (srv AuthenticationLogService) Create(ctx context.Context, data service.CreateData) error {
+func (srv AuthenticationLogService) Create(ctx context.Context, data service.AuthenticationLogCreateData) error {
 	if err := srv.authenticationLogRepository.Create(ctx, &entity.AuthenticationLog{
 		UserID:    data.UserID,
 		Action:    data.Action,

@@ -23,7 +23,7 @@ func (srv *AuthenticationService) GetSessionData(ctx context.Context, data servi
 		return nil, nil, err
 	}
 
-	session, err := srv.sessionService.GetBySessionKey(ctx, data.SessionKey)
+	session, err := srv.sessionService.GetBySessionKey(ctx, service.GetBySessionKeyData{SessionKey: data.SessionKey})
 	if err != nil {
 		return nil, nil, err
 	}
@@ -66,7 +66,7 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 			return err
 		}
 
-		err = srv.authenticationLogService.Create(tx, service.CreateData{
+		err = srv.authenticationLogService.Create(tx, service.AuthenticationLogCreateData{
 			UserID:    user.ID,
 			Action:    users_action.SignUp,
 			Meta:      "",
@@ -103,22 +103,21 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 	}
 
 	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
-		if err := srv.sessionService.Create(ctx, &entity.Session{
-			ID:         0,
-			UserID:     user.ID,
-			SessionKey: sid,
-			Status:     session_status.Active,
-			OpenedAt:   time.Now(),
+		if err := srv.sessionService.Create(ctx, service.SessionCreateData{
+			UserID:     0,
+			SessionKey: "",
+			Status:     0,
+			OpenedAt:   time.Time{},
 		}); err != nil {
 			errors.NewInternal(err)
 		}
 
-		session, err := srv.sessionService.GetBySessionKey(ctx, string(sid))
+		session, err := srv.sessionService.GetBySessionKey(ctx, service.GetBySessionKeyData{SessionKey: string(sid)})
 		if err != nil {
 			return errors.NewInternal(err)
 		}
 
-		if err = srv.authenticationLogService.Create(ctx, service.CreateData{
+		if err = srv.authenticationLogService.Create(ctx, service.AuthenticationLogCreateData{
 			UserID:    user.ID,
 			Action:    users_action.SignIn,
 			SessionID: session.ID,
@@ -149,7 +148,7 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 		return nil, err
 	}
 
-	session, err := srv.sessionService.GetBySessionKey(ctx, data.SessionKey)
+	session, err := srv.sessionService.GetBySessionKey(ctx, service.GetBySessionKeyData{SessionKey: data.SessionKey})
 	if err != nil {
 		return nil, err
 	}
@@ -167,10 +166,9 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 	}
 
 	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
-		if err := srv.sessionService.Create(ctx, &entity.Session{
-			ID:         0,
+		if err := srv.sessionService.Create(ctx, service.SessionCreateData{
 			UserID:     session.UserID,
-			SessionKey: sid,
+			SessionKey: string(sid),
 			Status:     session_status.Active,
 			OpenedAt:   time.Now(),
 		}); err != nil {
@@ -180,12 +178,12 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 			return err
 		}
 
-		session, err = srv.sessionService.GetBySessionKey(ctx, string(sid))
+		session, err = srv.sessionService.GetBySessionKey(ctx, service.GetBySessionKeyData{SessionKey: string(sid)})
 		if err != nil {
 			return err
 		}
 
-		if err = srv.authenticationLogService.Create(ctx, service.CreateData{
+		if err = srv.authenticationLogService.Create(ctx, service.AuthenticationLogCreateData{
 			UserID:    session.UserID,
 			Action:    users_action.SignInMfa,
 			SessionID: session.ID,
@@ -209,24 +207,24 @@ func (srv *AuthenticationService) SignOut(ctx context.Context, data service.Sign
 		return err
 	}
 
-	session, err := srv.sessionService.GetBySessionKey(ctx, data.SessionKey)
+	session, err := srv.sessionService.GetBySessionKey(ctx, service.GetBySessionKeyData{SessionKey: data.SessionKey})
 	if err != nil {
 		return err
 	}
 
 	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
 		//@todo если передать не все поля, то обнулятся ли непереданные поля в базе данных?
-		if err := srv.sessionService.Update(ctx, &entity.Session{
-			ID:        session.ID,
-			UserID:    session.UserID,
-			Status:    session_status.Inactive,
-			ClosedAt:  time.Now(),
-			UpdatedAt: time.Now(),
+		if err := srv.sessionService.Update(ctx, service.SessionUpdateData{
+			UserID:     session.UserID,
+			SessionKey: data.SessionKey,
+			Status:     session_status.Inactive,
+			ClosedAt:   time.Now(),
+			UpdatedAt:  time.Now(),
 		}); err != nil {
 			return err
 		}
 
-		if err := srv.authenticationLogService.Create(ctx, service.CreateData{
+		if err := srv.authenticationLogService.Create(ctx, service.AuthenticationLogCreateData{
 			UserID:    session.UserID,
 			Action:    users_action.SignOut,
 			SessionID: session.ID,
@@ -250,7 +248,7 @@ func (srv *AuthenticationService) getToken(ctx context.Context) ([]byte, error) 
 		return nil, errors.NewInternal(err)
 	}
 
-	sess, err := srv.sessionService.GetBySessionKey(ctx, string(sid))
+	sess, err := srv.sessionService.GetBySessionKey(ctx, service.GetBySessionKeyData{SessionKey: string(sid)})
 	if err != nil {
 		return nil, err
 	}

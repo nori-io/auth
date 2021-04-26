@@ -5,12 +5,13 @@ import (
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 	errors2 "github.com/nori-plugins/authentication/internal/domain/errors"
+	"github.com/nori-plugins/authentication/internal/domain/service"
 
 	"github.com/nori-plugins/authentication/pkg/enum/session_status"
 )
 
-func (srv SessionService) Create(ctx context.Context, data *entity.Session) error {
-	session, err := srv.GetBySessionKey(ctx, string(data.SessionKey))
+func (srv SessionService) Create(ctx context.Context, data service.SessionCreateData) error {
+	session, err := srv.GetBySessionKey(ctx, service.GetBySessionKeyData{SessionKey: data.SessionKey})
 	if err != nil && err != errors2.SessionNotFound {
 		return err
 	}
@@ -18,33 +19,33 @@ func (srv SessionService) Create(ctx context.Context, data *entity.Session) erro
 		return errors2.ActiveSessionAlreadyExists
 	}
 
-	if err := srv.sessionRepository.Create(ctx, data); err != nil {
+	if err := srv.sessionRepository.Create(ctx, &entity.Session{
+		UserID:     data.UserID,
+		SessionKey: []byte(data.SessionKey),
+		Status:     data.Status,
+		OpenedAt:   data.OpenedAt,
+	}); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (srv SessionService) Update(ctx context.Context, data *entity.Session) error {
-	if err := srv.sessionRepository.Update(ctx, data); err != nil {
+func (srv SessionService) Update(ctx context.Context, data service.SessionUpdateData) error {
+	if err := srv.sessionRepository.Update(ctx, &entity.Session{
+		UserID:     data.UserID,
+		SessionKey: []byte(data.SessionKey),
+		Status:     data.Status,
+		ClosedAt:   data.ClosedAt,
+		UpdatedAt:  data.UpdatedAt,
+	}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (srv SessionService) IsActiveSessionExist(ctx context.Context, sessionKey string) (bool, error) {
-	session, err := srv.sessionRepository.FindBySessionKey(ctx, sessionKey)
-	if err != nil {
-		return false, err
-	}
-	if session != nil && session.Status == session_status.Active {
-		return true, nil
-	}
-	return false, nil
-}
-
-func (srv SessionService) GetBySessionKey(ctx context.Context, sessionKey string) (*entity.Session, error) {
-	session, err := srv.sessionRepository.FindBySessionKey(ctx, sessionKey)
+func (srv SessionService) GetBySessionKey(ctx context.Context, data service.GetBySessionKeyData) (*entity.Session, error) {
+	session, err := srv.sessionRepository.FindBySessionKey(ctx, data.SessionKey)
 	if err != nil {
 		return nil, err
 	}

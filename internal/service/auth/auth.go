@@ -66,10 +66,9 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 			return err
 		}
 
-		err = srv.authenticationLogService.Create(tx, &entity.AuthenticationLog{
-			UserID: user.ID,
-			Action: users_action.SignUp,
-			//@todo заполнить метаданные айпи адресом и городом или чем-то ещё?
+		err = srv.authenticationLogService.Create(tx, service.CreateData{
+			UserID:    user.ID,
+			Action:    users_action.SignUp,
 			Meta:      "",
 			CreatedAt: time.Now(),
 		})
@@ -119,14 +118,12 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 			return errors.NewInternal(err)
 		}
 
-		if err = srv.authenticationLogService.Create(ctx, &entity.AuthenticationLog{
-			ID:     0,
-			UserID: user.ID,
-			Action: users_action.SignIn,
-			//@todo заполнить метаданные айпи адресом и городом или чем-то ещё?
-			Meta:      "",
+		if err = srv.authenticationLogService.Create(ctx, service.CreateData{
+			UserID:    user.ID,
+			Action:    users_action.SignIn,
 			SessionID: session.ID,
-			CreatedAt: time.Now(),
+			Meta:      "",
+			CreatedAt: time.Time{},
 		}); err != nil {
 			return errors.NewInternal(err)
 		}
@@ -191,13 +188,11 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 			return err
 		}
 
-		if err = srv.authenticationLogService.Create(ctx, &entity.AuthenticationLog{
-			ID:     0,
-			UserID: session.UserID,
-			Action: users_action.SignInMfa,
-			//@todo заполнить метаданные айпи адресом и городом или чем-то ещё?
-			Meta:      "",
+		if err = srv.authenticationLogService.Create(ctx, service.CreateData{
+			UserID:    session.UserID,
+			Action:    users_action.SignInMfa,
 			SessionID: session.ID,
+			Meta:      "",
 			CreatedAt: time.Now(),
 		}); err != nil {
 			return err
@@ -234,11 +229,11 @@ func (srv *AuthenticationService) SignOut(ctx context.Context, data service.Sign
 			return err
 		}
 
-		if err := srv.authenticationLogService.Create(ctx, &entity.AuthenticationLog{
-			ID:        0,
+		if err := srv.authenticationLogService.Create(ctx, service.CreateData{
 			UserID:    session.UserID,
 			Action:    users_action.SignOut,
 			SessionID: session.ID,
+			Meta:      "",
 			CreatedAt: time.Now(),
 		}); err != nil {
 			return err

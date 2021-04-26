@@ -22,7 +22,7 @@ func (srv SettingsService) ReceiveMfaStatus(ctx context.Context, data service.Re
 		return nil, errors.SessionNotFound
 	}
 
-	user, err := srv.userService.GetByID(ctx, session.UserID)
+	user, err := srv.userService.GetByID(ctx, service.GetByIdData{Id: session.ID})
 	if err != nil {
 		return nil, err
 	}

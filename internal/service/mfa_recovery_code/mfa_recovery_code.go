@@ -4,13 +4,15 @@ import (
 	"context"
 	"time"
 
+	"github.com/nori-plugins/authentication/internal/domain/service"
+
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 	errors2 "github.com/nori-plugins/authentication/internal/domain/errors"
 )
 
 //@todo как передать сюда всю сессию? скорее, нужно извлечь пользовательский userID из контекста
 //@todo что мы будем хранить в контексте?
-func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data *entity.Session) ([]*entity.MfaRecoveryCode, error) {
+func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data service.GetMfaRecoveryCodes) ([]*entity.MfaRecoveryCode, error) {
 	//@todo будет ли использоваться паттерн?
 	//@todo нужна ли максимальная длина, или указать всё в паттерне?
 	//@todo указать ограничение на максимальную длину, связанную с базой данных?
@@ -45,20 +47,16 @@ func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data
 	return mfaRecoveryCodes, nil
 }
 
-func (srv *MfaRecoveryCodeService) GetByUserId(ctx context.Context, userID uint64, code string) (*entity.MfaRecoveryCode, error) {
+func (srv *MfaRecoveryCodeService) Apply(ctx context.Context, data service.ApplyData) error {
 	//@todo проверить кэш и отп
-	mfaRecoveryCode, err := srv.mfaRecoveryCodeRepository.FindByUserID(ctx, userID, code)
+	mfaRecoveryCode, err := srv.mfaRecoveryCodeRepository.FindByUserID(ctx, data.UserID, data.Code)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if mfaRecoveryCode == nil {
-		return nil, errors2.MfaRecoveryCodeNotFound
+		return errors2.MfaRecoveryCodeNotFound
 	}
-	return mfaRecoveryCode, nil
-}
-
-func (srv *MfaRecoveryCodeService) Apply(ctx context.Context, userID uint64, code string) error {
-	if err := srv.mfaRecoveryCodeRepository.DeleteMfaRecoveryCode(ctx, userID, code); err != nil {
+	if err := srv.mfaRecoveryCodeRepository.DeleteMfaRecoveryCode(ctx, data.UserID, data.Code); err != nil {
 		return err
 	}
 	return nil

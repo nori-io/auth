@@ -149,19 +149,16 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 		return nil, err
 	}
 
-	var session *entity.Session
-
-	//@todo проверить кэш и отп
-	mfaRecoveryCode, err := srv.mfaRecoveryCodeService.GetByUserId(ctx, session.UserID, data.Code)
+	session, err := srv.sessionService.GetBySessionKey(ctx, data.SessionKey)
 	if err != nil {
 		return nil, err
 	}
 
-	if mfaRecoveryCode != nil {
-		err = srv.mfaRecoveryCodeService.Apply(ctx, session.UserID, data.Code)
-		if err != nil {
-			return nil, err
-		}
+	if err = srv.mfaRecoveryCodeService.Apply(ctx, service.ApplyData{
+		UserID: session.UserID,
+		Code:   data.Code,
+	}); err != nil {
+		return nil, err
 	}
 
 	sid, err := srv.getToken(ctx)

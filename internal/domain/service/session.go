@@ -17,3 +17,8 @@ type SessionCreateData struct {
 	Email    string
 	Password string
 }
+
+type SessionUpdateData struct {
+	Email    string
+	Password string
+}

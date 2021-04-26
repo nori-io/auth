@@ -2,18 +2,16 @@ package service
 
 import (
 	"context"
-
-	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
 type MfaSecretService interface {
-	PutSecret(ctx context.Context, data *SecretData, session entity.Session) (
+	PutSecret(ctx context.Context, data SecretData) (
 		string, string, error)
 }
 
 type SecretData struct {
-	Secret string
-	Ssid   string
+	Secret     string
+	SessionKey string
 }
 
 func (d SecretData) Validate() error {

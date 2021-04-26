@@ -40,7 +40,7 @@ func (h *SettingsHandler) DisableMfa(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
 	}
 
-	err = h.settingsService.DisableMfa(r.Context(), sessionId)
+	err = h.settingsService.DisableMfa(r.Context(), service.DisableMfaData{SessionKey: sessionId})
 	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -65,7 +65,11 @@ func (h *SettingsHandler) ChangePassword(w http.ResponseWriter, r *http.Request)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	err = h.settingsService.ChangePassword(r.Context(), sessionId, data.passwordOld, data.passwordNew)
+	err = h.settingsService.ChangePassword(r.Context(), service.ChangePasswordData{
+		SessionKey:  sessionId,
+		PasswordOld: data.passwordOld,
+		PasswordNew: data.passwordNew,
+	})
 	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -81,7 +85,7 @@ func (h *SettingsHandler) ReceiveMfaStatus(w http.ResponseWriter, r *http.Reques
 		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
 	}
 
-	enabled, err := h.settingsService.ReceiveMfaStatus(r.Context(), sessionId)
+	enabled, err := h.settingsService.ReceiveMfaStatus(r.Context(), service.ReceiveMfaStatusData{SessionKey: sessionId})
 	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)

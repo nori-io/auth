@@ -25,7 +25,7 @@ func (srv *MfaSecretService) PutSecret(ctx context.Context, data *service.Secret
 		return "", "", err
 	}
 
-	userData, err := srv.userService.GetByID(ctx, session.UserID)
+	userData, err := srv.userService.GetByID(ctx, service.GetByIdData{Id: 0})
 	if err != nil {
 		return "", "", err
 	}

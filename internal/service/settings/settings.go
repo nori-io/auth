@@ -8,8 +8,12 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/errors"
 )
 
-func (srv SettingsService) ReceiveMfaStatus(ctx context.Context, sessionKey string) (*bool, error) {
-	session, err := srv.sessionRepository.FindBySessionKey(ctx, sessionKey)
+func (srv SettingsService) ReceiveMfaStatus(ctx context.Context, data service.ReceiveMfaStatusData) (*bool, error) {
+	if err := data.Validate(); err != nil {
+		return nil, err
+	}
+
+	session, err := srv.sessionRepository.FindBySessionKey(ctx, data.SessionKey)
 	if err != nil {
 		return nil, err
 	}
@@ -32,8 +36,12 @@ func (srv SettingsService) ReceiveMfaStatus(ctx context.Context, sessionKey stri
 	return &mfaEnabled, err
 }
 
-func (srv SettingsService) DisableMfa(ctx context.Context, sessionKey string) error {
-	session, err := srv.sessionRepository.FindBySessionKey(ctx, sessionKey)
+func (srv SettingsService) DisableMfa(ctx context.Context, data service.DisableMfaData) error {
+	if err := data.Validate(); err != nil {
+		return err
+	}
+
+	session, err := srv.sessionRepository.FindBySessionKey(ctx, data.SessionKey)
 	if err != nil {
 		return err
 	}
@@ -52,15 +60,19 @@ func (srv SettingsService) DisableMfa(ctx context.Context, sessionKey string) er
 	return nil
 }
 
-func (srv SettingsService) ChangePassword(ctx context.Context, sessionKey string, passwordOld string, passwordNew string) error {
-	session, err := srv.sessionRepository.FindBySessionKey(ctx, sessionKey)
+func (srv SettingsService) ChangePassword(ctx context.Context, data service.ChangePasswordData) error {
+	if err := data.Validate(); err != nil {
+		return err
+	}
+
+	session, err := srv.sessionRepository.FindBySessionKey(ctx, data.SessionKey)
 	if err != nil {
 		return err
 	}
 	if session == nil {
 		return errors.SessionNotFound
 	}
-	user, err := srv.userService.GetByID(ctx, session.UserID)
+	user, err := srv.userService.GetByID(ctx, service.GetByIdData{Id: session.UserID})
 	if err != nil {
 		return err
 	}
@@ -68,13 +80,13 @@ func (srv SettingsService) ChangePassword(ctx context.Context, sessionKey string
 		return errors.UserNotFound
 	}
 
-	if err := srv.securityHelper.ComparePassword(passwordOld, user.Password); err != nil {
+	if err := srv.securityHelper.ComparePassword(data.PasswordOld, user.Password); err != nil {
 		return err
 	}
 
 	if err := srv.userService.UpdatePassword(ctx, service.UserUpdatePasswordData{
 		UserID:   session.UserID,
-		Password: passwordNew,
+		Password: data.PasswordNew,
 	}); err != nil {
 		return err
 	}

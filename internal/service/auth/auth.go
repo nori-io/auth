@@ -18,8 +18,12 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
-func (srv *AuthenticationService) GetSessionInfo(ctx context.Context, ssid string) (*entity.Session, *entity.User, error) {
-	session, err := srv.sessionService.GetBySessionKey(ctx, ssid)
+func (srv *AuthenticationService) GetSessionData(ctx context.Context, data service.GetSessionData) (*entity.Session, *entity.User, error) {
+	if err := data.Validate(); err != nil {
+		return nil, nil, err
+	}
+
+	session, err := srv.sessionService.GetBySessionKey(ctx, data.SessionKey)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -144,8 +148,7 @@ func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignI
 }
 
 func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.SignInMfaData) (*entity.Session, error) {
-	var err error
-	if err = data.Validate(); err != nil {
+	if err := data.Validate(); err != nil {
 		return nil, err
 	}
 
@@ -209,8 +212,12 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 	}, nil
 }
 
-func (srv *AuthenticationService) SignOut(ctx context.Context, sess *entity.Session) error {
-	session, err := srv.sessionService.GetBySessionKey(ctx, string(sess.SessionKey))
+func (srv *AuthenticationService) SignOut(ctx context.Context, data service.SignOutData) error {
+	if err := data.Validate(); err != nil {
+		return err
+	}
+
+	session, err := srv.sessionService.GetBySessionKey(ctx, data.SessionKey)
 	if err != nil {
 		return err
 	}

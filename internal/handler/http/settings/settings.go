@@ -75,10 +75,13 @@ func (h *SettingsHandler) ChangePassword(w http.ResponseWriter, r *http.Request)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	response.JSON(w, r, http.StatusOK)
+	response.JSON(w, r, ChangePasswordResponse{
+		Success: true,
+		Message: "password was changed",
+	})
 }
 
-func (h *SettingsHandler) ReceiveMfaStatus(w http.ResponseWriter, r *http.Request) {
+func (h *SettingsHandler) GetMfaStatus(w http.ResponseWriter, r *http.Request) {
 	sessionId, err := h.cookieHelper.GetSessionID(r)
 	if err != nil {
 		h.logger.Error("%s", err)

@@ -8,12 +8,12 @@ import (
 )
 
 func newDisableMfaData(r *http.Request) (service.SecretData, error) {
-	cSsid, err := r.Cookie("ssid")
+	ssid, err := r.Cookie("ssid")
 	if err != nil {
 		return service.SecretData{}, err
 	}
 	return service.SecretData{
-		Ssid: cSsid.Value,
+		SessionKey: ssid.Value,
 	}, nil
 }
 

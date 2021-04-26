@@ -13,12 +13,12 @@ type MfaRecoveryCodeService interface {
 }
 
 type GetMfaRecoveryCodes struct {
-	UserID uint64
+	SessionKey string
 }
 
 func (d GetMfaRecoveryCodes) Validate() error {
 	return v.Errors{
-		"user_ID": v.Validate(d.UserID, v.Required),
+		"session_key": v.Validate(d.SessionKey, v.Required, v.Length(128, 128)),
 	}.Filter()
 }
 

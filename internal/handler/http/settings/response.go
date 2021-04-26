@@ -10,3 +10,8 @@ type ReceiveMfaResponse struct {
 	Message string `json:"message"`
 	Status  bool   `json:"status"`
 }
+
+type ChangePasswordResponse struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}

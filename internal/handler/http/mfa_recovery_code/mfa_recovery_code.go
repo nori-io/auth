@@ -3,12 +3,15 @@ package mfa_recovery_code
 import (
 	"net/http"
 
+	"github.com/nori-plugins/authentication/internal/domain/entity"
+
+	"github.com/nori-plugins/authentication/internal/handler/http/response"
+
 	"github.com/nori-plugins/authentication/internal/domain/helper/cookie"
 	error2 "github.com/nori-plugins/authentication/internal/domain/helper/error"
 
 	"github.com/nori-io/common/v4/pkg/domain/logger"
 
-	"github.com/nori-plugins/authentication/internal/domain/entity"
 	"github.com/nori-plugins/authentication/internal/domain/service"
 )
 
@@ -42,11 +45,29 @@ func (h *MfaRecoveryCodeHandler) GetMfaRecoveryCodes(w http.ResponseWriter, r *h
 		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
 	}
 
-	if _, err := h.mfaRecoveryCodeService.GetMfaRecoveryCodes(r.Context(), &entity.Session{SessionKey: []byte(sessionId)}); err != nil {
+	mfaCodes, err := h.mfaRecoveryCodeService.GetMfaRecoveryCodes(r.Context(), service.GetMfaRecoveryCodes{SessionKey: sessionId})
+	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	//@todo path
-	http.Redirect(w, r, "/", 0)
+	codes := convertAll(mfaCodes)
+
+	response.JSON(w, r, MfaRecoveryCodesResponse{
+		success: true,
+		message: "mfa recovery codes generated",
+		codes:   codes,
+	})
+}
+
+func convertAll(entities []*entity.MfaRecoveryCode) []string {
+	codes := make([]string, 0)
+	for _, v := range entities {
+		codes = append(codes, convert(*v))
+	}
+	return codes
+}
+
+func convert(e entity.MfaRecoveryCode) string {
+	return e.Code
 }

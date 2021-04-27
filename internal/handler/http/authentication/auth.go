@@ -96,14 +96,14 @@ func (h *AuthenticationHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
+func (h *AuthenticationHandler) LogIn(w http.ResponseWriter, r *http.Request) {
 	data, err := newSignInData(r)
 	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	sess, mfaType, err := h.authenticationService.SignIn(r.Context(), data)
+	sess, mfaType, err := h.authenticationService.LogIn(r.Context(), data)
 	if err != nil {
 		h.logger.Error("%s", err)
 		h.errorHelper.Error(w, err)
@@ -118,7 +118,7 @@ func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (h *AuthenticationHandler) SignInMfa(w http.ResponseWriter, r *http.Request) {
+func (h *AuthenticationHandler) LogInMfa(w http.ResponseWriter, r *http.Request) {
 	_, err := h.cookieHelper.GetSessionID(r)
 	if err != nil {
 		h.logger.Error("%s", err)
@@ -131,7 +131,7 @@ func (h *AuthenticationHandler) SignInMfa(w http.ResponseWriter, r *http.Request
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	sess, err := h.authenticationService.SignInMfa(r.Context(), data)
+	sess, err := h.authenticationService.LogInMfa(r.Context(), data)
 	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -145,7 +145,7 @@ func (h *AuthenticationHandler) SignInMfa(w http.ResponseWriter, r *http.Request
 	})
 }
 
-func (h *AuthenticationHandler) SignOut(w http.ResponseWriter, r *http.Request) {
+func (h *AuthenticationHandler) LogOut(w http.ResponseWriter, r *http.Request) {
 	sessionId, err := h.cookieHelper.GetSessionID(r)
 	if err != nil {
 		h.logger.Error("%s", err)
@@ -165,15 +165,14 @@ func (h *AuthenticationHandler) SignOut(w http.ResponseWriter, r *http.Request) 
 	if data.Status != session_status.Active {
 	}
 
-	if err := h.authenticationService.SignOut(r.Context(), service.SignOutData{SessionKey: sessionId}); err != nil {
+	if err := h.authenticationService.LogOut(r.Context(), service.LogOutData{SessionKey: sessionId}); err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	// todo: redirect
-
 	h.cookieHelper.UnsetSession(w)
 
+	// todo: redirect
 	http.Redirect(w, r, "/", 0)
 }
 

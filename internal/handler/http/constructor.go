@@ -58,11 +58,17 @@ func New(params Params) *Handler {
 	}
 	handler.GothProviderHelper.UseAll(providers)
 
-	// todo: add middleware
+	// @todo: add middleware
+
+	handler.R.Post("/auth/login", handler.AuthenticationHandler.LogIn)
+	handler.R.Post("/auth/login/mfa", handler.AuthenticationHandler.LogInMfa)
+	handler.R.Get("/auth/logout", handler.AuthenticationHandler.LogOut)
 
 	// handler.R.Post("/auth/password/restore",)
 	// handler.R.Put("/auth/password/restore",)
+
 	handler.R.Get("/auth/session", handler.AuthenticationHandler.Session)
+
 	handler.R.Get("/auth/settings/mfa", handler.SettingsHandler.GetMfaStatus)
 	handler.R.Post("/auth/settings/mfa/disable", handler.SettingsHandler.DisableMfa)
 	// handler.R.Get("/auth/settings/mfa/otp", handler.MfaSecretHandler.PutSecret)
@@ -70,14 +76,14 @@ func New(params Params) *Handler {
 	// handler.R.Post("/auth/settings/mfa/sms")
 	// handler.R.Post("/auth/settings/mfa/verify")
 	handler.R.Post("/auth/settings/password", handler.SettingsHandler.ChangePassword)
+
 	handler.R.Post("/auth/signup", handler.AuthenticationHandler.SignUp)
-	handler.R.Post("/auth/signin", handler.AuthenticationHandler.SignIn)
-	handler.R.Post("/auth/signin/mfa", handler.AuthenticationHandler.SignInMfa)
-	handler.R.Get("/auth/signout", handler.AuthenticationHandler.SignOut)
+
 	handler.R.Get("/auth/social_providers", handler.SocialProviderHandler.GetSocialProviders)
 	handler.R.Get("/auth/social/{social_provider}", handler.AuthenticationHandler.HandleSocialProvider)
 	handler.R.Post("/auth/social/{social_provider}/callback", handler.AuthenticationHandler.HandleSocialProviderCallBack)
 	handler.R.Get("/auth/social/{social_provider}/logout", handler.AuthenticationHandler.HandleSocialProviderLogout)
+
 	handler.R.Get("/admin/users", handler.AdminHandler.GetAllUsers)
 	handler.R.Get("/admin/users/{id}", handler.AdminHandler.GetUserById)
 	return &handler

@@ -10,7 +10,6 @@ import (
 
 	"github.com/nori-plugins/authentication/internal/handler/http/response"
 
-	"github.com/nori-plugins/authentication/internal/domain/entity"
 	"github.com/nori-plugins/authentication/internal/domain/service"
 )
 
@@ -36,7 +35,7 @@ func New(params Params) *MfaSecretHandler {
 }
 
 func (h *MfaSecretHandler) PutSecret(w http.ResponseWriter, r *http.Request) {
-	_, err := h.cookieHelper.GetSessionID(r)
+	sessionId, err := h.cookieHelper.GetSessionID(r)
 	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
@@ -48,20 +47,12 @@ func (h *MfaSecretHandler) PutSecret(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	sessionIdContext := r.Context().Value("session_id")
-	sessionId, _ := sessionIdContext.([]byte)
-
-	if data.Ssid != sessionIdContext {
-		h.logger.Error("%s", err)
-		http.Error(w, err.Error(), http.StatusUnauthorized)
-	}
-	sessionUserId := r.Context().Value("user_id").(uint64)
 	//@todo
 	login, issuer, err :=
-		h.mfaSecretService.PutSecret(r.Context(), &service.SecretData{
-			Secret: "",
-			Ssid:   "",
-		}, entity.Session{SessionKey: sessionId, UserID: sessionUserId})
+		h.mfaSecretService.PutSecret(r.Context(), service.SecretData{
+			Secret:     data.Secret,
+			SessionKey: sessionId,
+		})
 
 	if (login == "") && (issuer == "") {
 		h.logger.Error("%s", err)

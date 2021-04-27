@@ -83,7 +83,7 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 	return user, nil
 }
 
-func (srv *AuthenticationService) SignIn(ctx context.Context, data service.SignInData) (*entity.Session, *string, error) {
+func (srv *AuthenticationService) LogIn(ctx context.Context, data service.SignInData) (*entity.Session, *string, error) {
 	if err := data.Validate(); err != nil {
 		return nil, nil, err
 	}

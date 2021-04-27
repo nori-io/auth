@@ -85,6 +85,21 @@ func (srv UserService) UpdateMfaStatus(ctx context.Context, data service.UserUpd
 	return nil
 }
 
+func (srv UserService) UpdateUserStatus(ctx context.Context, data service.UserUpdateStatusData) error {
+	if err := data.Validate(); err != nil {
+		return err
+	}
+
+	if err := srv.userRepository.Update(ctx, &entity.User{
+		ID:        data.UserID,
+		Status:    data.Status,
+		UpdatedAt: time.Now(),
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (srv UserService) GetByEmail(ctx context.Context, data service.GetByEmailData) (*entity.User, error) {
 	if err := data.Validate(); err != nil {
 		return nil, err

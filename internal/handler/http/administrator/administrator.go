@@ -106,3 +106,39 @@ func (h *AdminHandler) GetUserById(w http.ResponseWriter, r *http.Request) {
 
 	response.JSON(w, r, convert(*user))
 }
+
+func (h *AdminHandler) UpdateUserStatus(w http.ResponseWriter, r *http.Request) {
+	_, err := h.cookieHelper.GetSessionID(r)
+	if err != nil {
+		h.logger.Error("%s", err)
+		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
+	}
+
+	id := chi.URLParam(r, "id")
+	u, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	userStatus := chi.URLParam(r, "user_status")
+	u, err = strconv.ParseUint(userStatus, 10, 8)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	user, err := h.userService.GetByID(r.Context(), service.GetByIdData{Id: u})
+	if err != nil {
+		h.logger.Error("%s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	if err := h.userService.UpdateUserStatus(r.Context(), service.UserUpdateStatusData{
+		UserID: user.ID,
+		Status: users_status.UserStatus(u),
+	}); err != nil {
+		h.logger.Error("%s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	response.JSON(w, r, convert(*user))
+}

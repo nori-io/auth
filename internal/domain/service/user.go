@@ -18,6 +18,7 @@ type UserService interface {
 	Create(ctx context.Context, data UserCreateData) (*entity.User, error)
 	UpdatePassword(ctx context.Context, data UserUpdatePasswordData) error
 	UpdateMfaStatus(ctx context.Context, data UserUpdateMfaStatusData) error
+	UpdateUserStatus(ctx context.Context, data UserUpdateStatusData) error
 	GetByEmail(ctx context.Context, data GetByEmailData) (*entity.User, error)
 	GetByID(ctx context.Context, data GetByIdData) (*entity.User, error)
 	GetAll(ctx context.Context, data UserFilter) ([]entity.User, error)
@@ -54,8 +55,20 @@ type UserUpdatePasswordData struct {
 
 func (d UserUpdatePasswordData) Validate() error {
 	return v.Errors{
-		"email":    v.Validate(d.UserID, v.Required),
+		"user_ID":  v.Validate(d.UserID, v.Required),
 		"password": v.Validate(d.Password, v.Required),
+	}.Filter()
+}
+
+type UserUpdateStatusData struct {
+	UserID uint64
+	Status users_status.UserStatus
+}
+
+func (d UserUpdateStatusData) Validate() error {
+	return v.Errors{
+		"user_ID": v.Validate(d.UserID, v.Required),
+		"status":  v.Validate(d.Status, v.Required),
 	}.Filter()
 }
 

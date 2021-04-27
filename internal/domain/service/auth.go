@@ -11,9 +11,9 @@ import (
 
 type AuthenticationService interface {
 	SignUp(ctx context.Context, data SignUpData) (*entity.User, error)
-	SignIn(ctx context.Context, data SignInData) (*entity.Session, *string, error)
-	SignInMfa(ctx context.Context, data SignInMfaData) (*entity.Session, error)
-	SignOut(ctx context.Context, data SignOutData) error
+	LogIn(ctx context.Context, data LogInData) (*entity.Session, *string, error)
+	LogInMfa(ctx context.Context, data LogInMfaData) (*entity.Session, error)
+	LogOut(ctx context.Context, data LogOutData) error
 	GetSessionData(ctx context.Context, data GetSessionData) (*entity.Session, *entity.User, error)
 }
 
@@ -31,35 +31,35 @@ func (d SignUpData) Validate() error {
 	}.Filter()
 }
 
-type SignInData struct {
+type LogInData struct {
 	Email    string
 	Password string
 }
 
-func (d SignInData) Validate() error {
+func (d LogInData) Validate() error {
 	return v.Errors{
 		"email":    v.Validate(d.Email, v.Required, v.Length(3, 254), is.Email),
 		"password": v.Validate(d.Password, v.Required),
 	}.Filter()
 }
 
-type SignInMfaData struct {
+type LogInMfaData struct {
 	SessionKey string
 	Code       string
 }
 
-func (d SignInMfaData) Validate() error {
+func (d LogInMfaData) Validate() error {
 	return v.Errors{
 		"session_key": v.Validate(d.SessionKey, v.Required, v.Length(128, 128)),
 		"code":        v.Validate(d.Code, v.Required, v.Length(6, 6)),
 	}.Filter()
 }
 
-type SignOutData struct {
+type LogOutData struct {
 	SessionKey string
 }
 
-func (d SignOutData) Validate() error {
+func (d LogOutData) Validate() error {
 	return v.Errors{
 		"session_key": v.Validate(d.SessionKey, v.Required, v.Length(128, 128)),
 	}.Filter()

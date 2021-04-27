@@ -13,7 +13,7 @@ type SignInMfaResponse struct {
 	Message string `json:"message"`
 }
 
-type SignInOutResponse struct {
+type LogOutResponse struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
 }

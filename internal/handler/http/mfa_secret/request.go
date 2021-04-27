@@ -18,12 +18,7 @@ func newPutSecretData(r *http.Request) (service.SecretData, error) {
 		return service.SecretData{}, err
 	}
 
-	cSsid, err := r.Cookie("ssid")
-	if err != nil {
-		return service.SecretData{}, err
-	}
 	return service.SecretData{
 		Secret: body.Secret,
-		Ssid:   cSsid.Value,
 	}, nil
 }

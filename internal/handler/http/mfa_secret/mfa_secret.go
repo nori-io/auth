@@ -34,23 +34,15 @@ func New(params Params) *MfaSecretHandler {
 	}
 }
 
-func (h *MfaSecretHandler) PutSecret(w http.ResponseWriter, r *http.Request) {
+func (h *MfaSecretHandler) GetSecret(w http.ResponseWriter, r *http.Request) {
 	sessionId, err := h.cookieHelper.GetSessionID(r)
 	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
 	}
 
-	data, err := newPutSecretData(r)
-	if err != nil {
-		h.logger.Error("%s", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	}
-
-	//@todo
 	email, issuer, err :=
-		h.mfaSecretService.PutSecret(r.Context(), service.SecretData{
-			Secret:     data.Secret,
+		h.mfaSecretService.GetSecret(r.Context(), service.SecretData{
 			SessionKey: sessionId,
 		})
 

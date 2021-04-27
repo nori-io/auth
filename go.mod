@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
+	github.com/boombuler/barcode v1.0.1 // indirect
 	github.com/go-chi/chi v1.5.4
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/golang/protobuf v1.5.2 // indirect
@@ -16,6 +17,7 @@ require (
 	github.com/nori-io/interfaces/nori/http v0.0.1
 	github.com/nori-io/logger v0.2.3
 	github.com/pkg/errors v0.9.1
+	github.com/pquerna/otp v1.3.0 // indirect
 	github.com/stretchr/testify v1.6.1
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 	golang.org/x/net v0.0.0-20210415231046-e915ea6b2b7d // indirect

@@ -12,7 +12,7 @@ import (
 
 var HandlerSet = wire.NewSet(
 	wire.Struct(new(httpHandler.Handler), "R", "AuthenticationHandler", "MfaRecoveryCodeHandler",
-		"MfaSecretHandler", "SettingsHandler", "SocialProviderHandler", "GothProviderHelper", "SocialProviderService"),
+		"MfaTotpHandler", "SettingsHandler", "SocialProviderHandler", "GothProviderHelper", "SocialProviderService"),
 	wire.Struct(new(authentication.Params), "AuthenticationService", "SessionService", "Logger",
 		"Config", "CookieHelper", "ErrorHelper"),
 	authentication.New,

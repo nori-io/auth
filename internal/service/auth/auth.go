@@ -143,7 +143,7 @@ func (srv *AuthenticationService) LogIn(ctx context.Context, data service.LogInD
 	}, &mfaType, nil
 }
 
-func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.LogInMfaData) (*entity.Session, error) {
+func (srv *AuthenticationService) LogInMfa(ctx context.Context, data service.LogInMfaData) (*entity.Session, error) {
 	if err := data.Validate(); err != nil {
 		return nil, err
 	}
@@ -202,7 +202,7 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Lo
 	}, nil
 }
 
-func (srv *AuthenticationService) SignOut(ctx context.Context, data service.LogOutData) error {
+func (srv *AuthenticationService) LogOut(ctx context.Context, data service.LogOutData) error {
 	if err := data.Validate(); err != nil {
 		return err
 	}

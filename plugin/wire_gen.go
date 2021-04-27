@@ -9,7 +9,7 @@ import (
 	"github.com/google/wire"
 	"github.com/nori-io/common/v4/pkg/domain/logger"
 	"github.com/nori-io/common/v4/pkg/domain/registry"
-	"github.com/nori-io/interfaces/database/orm/gorm"
+	pg "github.com/nori-io/interfaces/database/orm/gorm"
 	http2 "github.com/nori-io/interfaces/nori/http"
 	"github.com/nori-plugins/authentication/internal/config"
 	"github.com/nori-plugins/authentication/internal/handler/http"
@@ -168,7 +168,7 @@ func Initialize(registry2 registry.Registry, config2 config.Config, logger2 logg
 		R:                      httpHttp,
 		AuthenticationHandler:  authenticationHandler,
 		MfaRecoveryCodeHandler: mfaRecoveryCodeHandler,
-		MfaSecretHandler:       mfaSecretHandler,
+		MfaTotpHandler:         mfaSecretHandler,
 		SettingsHandler:        settingsHandler,
 		SocialProviderHandler:  socialProviderHandler,
 		GothProviderHelper:     gothProviderHelper,

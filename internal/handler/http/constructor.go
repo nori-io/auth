@@ -20,7 +20,7 @@ type Handler struct {
 	AdminHandler           *administrator.AdminHandler
 	AuthenticationHandler  *authentication.AuthenticationHandler
 	MfaRecoveryCodeHandler *mfa_recovery_code.MfaRecoveryCodeHandler
-	MfaSecretHandler       *mfa_secret.MfaSecretHandler
+	MfaTotpHandler         *mfa_secret.MfaSecretHandler
 	SettingsHandler        *settings.SettingsHandler
 	SocialProviderHandler  *social_provider.SocialProviderHandler
 	GothProviderHelper     goth_provider.GothProviderHelper
@@ -45,7 +45,7 @@ func New(params Params) *Handler {
 		AdminHandler:           params.AdminHandler,
 		AuthenticationHandler:  params.AuthenticationHandler,
 		MfaRecoveryCodeHandler: params.MfaRecoveryCodeHandler,
-		MfaSecretHandler:       params.MfaSecretHandler,
+		MfaTotpHandler:         params.MfaSecretHandler,
 		SettingsHandler:        params.SettingsHandler,
 		SocialProviderHandler:  params.SocialProviderHandler,
 		GothProviderHelper:     params.GothProviderHelper,
@@ -60,6 +60,11 @@ func New(params Params) *Handler {
 
 	// @todo: add middleware
 
+	handler.R.Get("/admin/users", handler.AdminHandler.GetAllUsers)
+	handler.R.Get("/admin/users/{id}", handler.AdminHandler.GetUserById)
+	handler.R.Put("/admin/users/{id}", handler.AdminHandler.UpdateUserStatus)
+	// hardDelete handler.R.Delete("/admin/users/{id}", handler.AdminHandler.DeleteUser)
+
 	handler.R.Post("/auth/login", handler.AuthenticationHandler.LogIn)
 	handler.R.Post("/auth/login/mfa", handler.AuthenticationHandler.LogInMfa)
 	handler.R.Get("/auth/logout", handler.AuthenticationHandler.LogOut)
@@ -71,7 +76,7 @@ func New(params Params) *Handler {
 
 	handler.R.Get("/auth/settings/mfa", handler.SettingsHandler.GetMfaStatus)
 	handler.R.Post("/auth/settings/mfa/disable", handler.SettingsHandler.DisableMfa)
-	// handler.R.Get("/auth/settings/mfa/otp", handler.MfaSecretHandler.PutSecret)
+	handler.R.Get("/auth/settings/mfa/totp", handler.MfaTotpHandler.GetSecret)
 	handler.R.Get("/auth/settings/mfa/recovery_codes", handler.MfaRecoveryCodeHandler.GetMfaRecoveryCodes)
 	// handler.R.Post("/auth/settings/mfa/sms")
 	// handler.R.Post("/auth/settings/mfa/verify")
@@ -83,12 +88,6 @@ func New(params Params) *Handler {
 	handler.R.Get("/auth/social/{social_provider}", handler.AuthenticationHandler.HandleSocialProvider)
 	handler.R.Post("/auth/social/{social_provider}/callback", handler.AuthenticationHandler.HandleSocialProviderCallBack)
 	handler.R.Get("/auth/social/{social_provider}/logout", handler.AuthenticationHandler.HandleSocialProviderLogout)
-
-	handler.R.Get("/admin/users", handler.AdminHandler.GetAllUsers)
-	handler.R.Get("/admin/users/{id}", handler.AdminHandler.GetUserById)
-	handler.R.Put("/admin/users/{id}", handler.AdminHandler.UpdateUserStatus)
-
-	// hardDelete handler.R.Delete("/admin/users/{id}", handler.AdminHandler.DeleteUser)
 
 	return &handler
 }

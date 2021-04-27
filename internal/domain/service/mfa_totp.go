@@ -7,12 +7,11 @@ import (
 )
 
 type MfaSecretService interface {
-	PutSecret(ctx context.Context, data SecretData) (
-		string, string, error)
+	GetSecret(ctx context.Context, data SecretData) (
+		string, error)
 }
 
 type SecretData struct {
-	Secret     string
 	SessionKey string
 }
 

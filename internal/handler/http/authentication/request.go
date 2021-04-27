@@ -29,7 +29,7 @@ type LogInRequest struct {
 	Password string `json:"password"`
 }
 
-func newSignInData(r *http.Request) (service.LogInData, error) {
+func newLogInData(r *http.Request) (service.LogInData, error) {
 	var body LogInRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
@@ -41,12 +41,12 @@ func newSignInData(r *http.Request) (service.LogInData, error) {
 	}, nil
 }
 
-type SignInMfaRequest struct {
+type LogInMfaRequest struct {
 	Code string `json:"code"`
 }
 
-func newSignInMfaData(r *http.Request) (service.LogInMfaData, error) {
-	var body SignInMfaRequest
+func newLogInMfaData(r *http.Request) (service.LogInMfaData, error) {
+	var body LogInMfaRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		return service.LogInMfaData{}, err

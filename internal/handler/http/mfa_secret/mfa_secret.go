@@ -48,13 +48,13 @@ func (h *MfaSecretHandler) PutSecret(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//@todo
-	login, issuer, err :=
+	email, issuer, err :=
 		h.mfaSecretService.PutSecret(r.Context(), service.SecretData{
 			Secret:     data.Secret,
 			SessionKey: sessionId,
 		})
 
-	if (login == "") && (issuer == "") {
+	if (email == "") && (issuer == "") {
 		h.logger.Error("%s", err)
 		http.Error(w, "sign up error", http.StatusInternalServerError)
 	}
@@ -62,7 +62,7 @@ func (h *MfaSecretHandler) PutSecret(w http.ResponseWriter, r *http.Request) {
 	response.JSON(w, r, MfaSecretResponse{
 		Success: true,
 		Message: "secret",
-		Login:   login,
+		Email:   email,
 		Issuer:  issuer,
 		Secret:  "",
 	})

@@ -5,13 +5,13 @@ type DisableMfaResponse struct {
 	Message string `json:"message"`
 }
 
-type ReceiveMfaResponse struct {
+type MfaStatusResponse struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
 	Status  bool   `json:"status"`
 }
 
-type ChangePasswordResponse struct {
+type PasswordChangeResponse struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
 }

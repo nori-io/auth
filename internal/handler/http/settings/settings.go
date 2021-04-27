@@ -75,7 +75,7 @@ func (h *SettingsHandler) ChangePassword(w http.ResponseWriter, r *http.Request)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	response.JSON(w, r, ChangePasswordResponse{
+	response.JSON(w, r, PasswordChangeResponse{
 		Success: true,
 		Message: "password was changed",
 	})
@@ -94,7 +94,7 @@ func (h *SettingsHandler) GetMfaStatus(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	response.JSON(w, r, ReceiveMfaResponse{
+	response.JSON(w, r, MfaStatusResponse{
 		Success: true,
 		Message: "mfa status received",
 		Status:  *enabled,

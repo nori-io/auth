@@ -83,12 +83,12 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 	return user, nil
 }
 
-func (srv *AuthenticationService) LogIn(ctx context.Context, data service.SignInData) (*entity.Session, *string, error) {
+func (srv *AuthenticationService) LogIn(ctx context.Context, data service.LogInData) (*entity.Session, *string, error) {
 	if err := data.Validate(); err != nil {
 		return nil, nil, err
 	}
 
-	user, err := srv.userService.GetByEmail(ctx, service.GetByEmail{Email: data.Email})
+	user, err := srv.userService.GetByEmail(ctx, service.GetByEmailData{Email: data.Email})
 	if err != nil {
 		return nil, nil, err
 	}
@@ -119,7 +119,7 @@ func (srv *AuthenticationService) LogIn(ctx context.Context, data service.SignIn
 
 		if err = srv.authenticationLogService.Create(ctx, service.AuthenticationLogCreateData{
 			UserID:    user.ID,
-			Action:    users_action.SignIn,
+			Action:    users_action.LogIn,
 			SessionID: session.ID,
 			Meta:      "",
 			CreatedAt: time.Time{},
@@ -143,7 +143,7 @@ func (srv *AuthenticationService) LogIn(ctx context.Context, data service.SignIn
 	}, &mfaType, nil
 }
 
-func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.SignInMfaData) (*entity.Session, error) {
+func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.LogInMfaData) (*entity.Session, error) {
 	if err := data.Validate(); err != nil {
 		return nil, err
 	}
@@ -185,7 +185,7 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 
 		if err = srv.authenticationLogService.Create(ctx, service.AuthenticationLogCreateData{
 			UserID:    session.UserID,
-			Action:    users_action.SignInMfa,
+			Action:    users_action.LogInMfa,
 			SessionID: session.ID,
 			Meta:      "",
 			CreatedAt: time.Now(),
@@ -202,7 +202,7 @@ func (srv *AuthenticationService) SignInMfa(ctx context.Context, data service.Si
 	}, nil
 }
 
-func (srv *AuthenticationService) SignOut(ctx context.Context, data service.SignOutData) error {
+func (srv *AuthenticationService) SignOut(ctx context.Context, data service.LogOutData) error {
 	if err := data.Validate(); err != nil {
 		return err
 	}
@@ -226,7 +226,7 @@ func (srv *AuthenticationService) SignOut(ctx context.Context, data service.Sign
 
 		if err := srv.authenticationLogService.Create(ctx, service.AuthenticationLogCreateData{
 			UserID:    session.UserID,
-			Action:    users_action.SignOut,
+			Action:    users_action.LogOut,
 			SessionID: session.ID,
 			Meta:      "",
 			CreatedAt: time.Now(),

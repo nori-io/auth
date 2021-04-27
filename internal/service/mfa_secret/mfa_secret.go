@@ -9,7 +9,7 @@ import (
 )
 
 func (srv *MfaSecretService) PutSecret(ctx context.Context, data service.SecretData) (
-	login string, issuer string, err error) {
+	email string, issuer string, err error) {
 	if err := data.Validate(); err != nil {
 		return "", "", err
 	}
@@ -30,9 +30,9 @@ func (srv *MfaSecretService) PutSecret(ctx context.Context, data service.SecretD
 		Secret: data.Secret,
 	}
 	if user.Email != "" {
-		login = user.Email
+		email = user.Email
 	} else {
-		login = user.PhoneCountryCode + user.PhoneNumber
+		email = user.PhoneCountryCode + user.PhoneNumber
 	}
-	return login, srv.config.Issuer(), nil
+	return email, srv.config.Issuer(), nil
 }

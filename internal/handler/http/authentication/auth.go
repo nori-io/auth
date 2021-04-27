@@ -97,7 +97,7 @@ func (h *AuthenticationHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AuthenticationHandler) LogIn(w http.ResponseWriter, r *http.Request) {
-	data, err := newSignInData(r)
+	data, err := newLogInData(r)
 	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -111,7 +111,7 @@ func (h *AuthenticationHandler) LogIn(w http.ResponseWriter, r *http.Request) {
 
 	h.cookieHelper.SetSession(w, sess)
 
-	response.JSON(w, r, SignInResponse{
+	response.JSON(w, r, LogInResponse{
 		Success: true,
 		Message: "User sign in",
 		MfaType: *mfaType,
@@ -125,7 +125,7 @@ func (h *AuthenticationHandler) LogInMfa(w http.ResponseWriter, r *http.Request)
 		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
 	}
 
-	data, err := newSignInMfaData(r)
+	data, err := newLogInMfaData(r)
 	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -139,7 +139,7 @@ func (h *AuthenticationHandler) LogInMfa(w http.ResponseWriter, r *http.Request)
 
 	h.cookieHelper.SetSession(w, sess)
 
-	response.JSON(w, r, SignInMfaResponse{
+	response.JSON(w, r, LogInMfaResponse{
 		Success: true,
 		Message: "User sign in by mfa",
 	})

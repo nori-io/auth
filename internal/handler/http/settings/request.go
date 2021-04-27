@@ -17,18 +17,18 @@ func newDisableMfaData(r *http.Request) (service.SecretData, error) {
 	}, nil
 }
 
-type ChangePasswordData struct {
+type PasswordChangeRequest struct {
 	passwordOld string `json:"password_old"`
 	passwordNew string `json:"password_new"`
 }
 
-func newChangePasswordData(r *http.Request) (ChangePasswordData, error) {
-	var body ChangePasswordData
+func newChangePasswordData(r *http.Request) (PasswordChangeRequest, error) {
+	var body PasswordChangeRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		return ChangePasswordData{}, err
+		return PasswordChangeRequest{}, err
 	}
-	return ChangePasswordData{
+	return PasswordChangeRequest{
 		passwordOld: body.passwordOld,
 		passwordNew: body.passwordNew,
 	}, nil

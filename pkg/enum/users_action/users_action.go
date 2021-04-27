@@ -6,9 +6,9 @@ const (
 	EnableMfa Action = iota
 	DisableMfa
 	SignUp
-	SignIn
-	SignInMfa
-	SignOut
+	LogIn
+	LogInMfa
+	LogOut
 )
 
 func (u Action) Value() uint8 {

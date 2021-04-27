@@ -61,15 +61,6 @@ func (p plugin) Instance() interface{} {
 
 func (p plugin) Init(ctx context.Context, config config.Config, log logger.FieldLogger) error {
 	p.config = conf.Config{
-		EmailVerification:      config.Bool("email.verification", "verification of email"),
-		EmailActivationCodeTTL: config.UInt64("email.activationcodettl", "time to live of email activation code"),
-		UrlPrefix:              config.String("urlprefix", "url prefix for all handlers"),
-		MfaRecoveryCodePattern: config.String("mfa.recoverycode.pattern", "pattern for mfa recovery codes"),
-		MfaRecoveryCodeSymbols: config.String("mfa.recoverycode.symbols", "symbols that use when mfa recovery code generating"),
-		MfaRecoveryCodeLength:  config.Int("mfa.recoverycode.maxlength", "max length of mfaRecoveryCode"),
-		MfaRecoveryCodeCount:   config.Int("mfa.recoverycode.count", "count of mfa recovery codes"),
-		Issuer:                 config.String("mfa.issuer", "issuer"),
-		PasswordBcryptCost:     config.Int("password.bcrypt.cost", "cost passed into GenerateFromPassword func"),
 		CookiesName:            config.String("cookies.name", "name of cookies for keeping session id"),
 		CookiesPath:            config.String("cookies.path", "path of cookies"),
 		CookiesDomain:          config.String("cookies.domain", "domain of cookies"),
@@ -78,6 +69,16 @@ func (p plugin) Init(ctx context.Context, config config.Config, log logger.Field
 		CookiesSecure:          config.Bool("cookies.secure", ""),
 		CookiesHttpOnly:        config.Bool("cookies.httponly", ""),
 		CookiesSameSite:        config.Int("cookies.samesite", ""),
+		EmailVerification:      config.Bool("email.verification", "verification of email"),
+		EmailActivationCodeTTL: config.UInt64("email.activationcodettl", "time to live of email activation code"),
+		UrlPrefix:              config.String("url.prefix", "url prefix for all handlers"),
+		UrlLogoutRedirect:      config.String("url.logout.redirect", "url for logout redirect"),
+		MfaRecoveryCodePattern: config.String("mfa.recoverycode.pattern", "pattern for mfa recovery codes"),
+		MfaRecoveryCodeSymbols: config.String("mfa.recoverycode.symbols", "symbols that use when mfa recovery code generating"),
+		MfaRecoveryCodeLength:  config.Int("mfa.recoverycode.maxlength", "max length of mfaRecoveryCode"),
+		MfaRecoveryCodeCount:   config.Int("mfa.recoverycode.count", "count of mfa recovery codes"),
+		Issuer:                 config.String("mfa.issuer", "issuer"),
+		PasswordBcryptCost:     config.Int("password.bcrypt.cost", "cost passed into GenerateFromPassword func"),
 	}
 
 	p.logger = log

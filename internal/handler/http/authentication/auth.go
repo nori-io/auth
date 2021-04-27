@@ -173,7 +173,7 @@ func (h *AuthenticationHandler) LogOut(w http.ResponseWriter, r *http.Request) {
 	h.cookieHelper.UnsetSession(w)
 
 	// todo: redirect
-	http.Redirect(w, r, "/", 0)
+	http.Redirect(w, r, h.config.UrlLogoutRedirect(), 0)
 }
 
 func (h *AuthenticationHandler) HandleSocialProvider(w http.ResponseWriter, r *http.Request) {
@@ -209,7 +209,7 @@ func (h *AuthenticationHandler) HandleSocialProviderLogout(w http.ResponseWriter
 	h.checkProviderName(w, r, name)
 
 	gothic.Logout(w, r)
-	w.Header().Set("Location", "/")
+	w.Header().Set("Location", h.config.UrlLogoutRedirect())
 	w.WriteHeader(http.StatusTemporaryRedirect)
 }
 

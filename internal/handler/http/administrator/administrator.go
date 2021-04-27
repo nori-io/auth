@@ -140,5 +140,5 @@ func (h *AdminHandler) UpdateUserStatus(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	response.JSON(w, r, convert(*user))
+	response.JSON(w, r, http.StatusOK)
 }

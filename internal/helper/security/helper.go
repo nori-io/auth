@@ -1,6 +1,8 @@
 package security
 
 import (
+	"crypto/rand"
+
 	"github.com/nori-plugins/authentication/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -18,4 +20,12 @@ func (h securityHelper) ComparePassword(hash, password string) error {
 		return errors.NewInternal(err)
 	}
 	return nil
+}
+
+func (h securityHelper) GenerateToken(length uint8) (string, error) {
+	token := make([]byte, length)
+	if _, err := rand.Read(token); err != nil {
+		return "", errors.NewInternal(err)
+	}
+	return string(token), nil
 }

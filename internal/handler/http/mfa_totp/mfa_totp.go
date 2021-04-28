@@ -43,7 +43,7 @@ func (h *MfaTotpHandler) GetUrl(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
 	}
 
-	url, err := h.mfaTotpService.GetUrl(r.Context(), service.MfaTotpData{
+	url, err := h.mfaTotpService.GetUrl(r.Context(), service.MfaGetUrlData{
 		SessionKey: sessionId,
 	})
 	if err != nil {
@@ -53,7 +53,7 @@ func (h *MfaTotpHandler) GetUrl(w http.ResponseWriter, r *http.Request) {
 
 	response.JSON(w, r, MfaTotpResponse{
 		Success: true,
-		Message: "totp url",
+		Message: "",
 		Url:     url,
 	})
 }

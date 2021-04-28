@@ -10,8 +10,6 @@ import (
 	errors2 "github.com/nori-plugins/authentication/internal/domain/errors"
 )
 
-//@todo как передать сюда всю сессию? скорее, нужно извлечь пользовательский userID из контекста
-//@todo что мы будем хранить в контексте?
 func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data service.GetMfaRecoveryCodes) ([]*entity.MfaRecoveryCode, error) {
 	//@todo будет ли использоваться паттерн?
 	//@todo нужна ли максимальная длина, или указать всё в паттерне?
@@ -60,7 +58,6 @@ func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data
 }
 
 func (srv *MfaRecoveryCodeService) Apply(ctx context.Context, data service.ApplyData) error {
-	//@todo проверить кэш и отп
 	if err := data.Validate(); err != nil {
 		return err
 	}

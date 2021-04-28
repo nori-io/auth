@@ -3,6 +3,8 @@ package http
 import (
 	"context"
 
+	"github.com/nori-plugins/authentication/internal/handler/http/reset_password"
+
 	administrator "github.com/nori-plugins/authentication/internal/handler/http/administrator"
 
 	"github.com/nori-io/interfaces/nori/http"
@@ -21,6 +23,7 @@ type Handler struct {
 	AuthenticationHandler  *authentication.AuthenticationHandler
 	MfaRecoveryCodeHandler *mfa_recovery_code.MfaRecoveryCodeHandler
 	MfaTotpHandler         *mfa_totp.MfaTotpHandler
+	ResetPasswordHandler   reset_password.ResetPasswordHandler
 	SettingsHandler        *settings.SettingsHandler
 	SocialProviderHandler  *social_provider.SocialProviderHandler
 	GothProviderHelper     goth_provider.GothProviderHelper
@@ -33,6 +36,7 @@ type Params struct {
 	AuthenticationHandler  *authentication.AuthenticationHandler
 	MfaRecoveryCodeHandler *mfa_recovery_code.MfaRecoveryCodeHandler
 	MfaTotpHandler         *mfa_totp.MfaTotpHandler
+	ResetPasswordHandler   reset_password.ResetPasswordHandler
 	SettingsHandler        *settings.SettingsHandler
 	SocialProviderHandler  *social_provider.SocialProviderHandler
 	GothProviderHelper     goth_provider.GothProviderHelper
@@ -46,6 +50,7 @@ func New(params Params) *Handler {
 		AuthenticationHandler:  params.AuthenticationHandler,
 		MfaRecoveryCodeHandler: params.MfaRecoveryCodeHandler,
 		MfaTotpHandler:         params.MfaTotpHandler,
+		ResetPasswordHandler:   params.ResetPasswordHandler,
 		SettingsHandler:        params.SettingsHandler,
 		SocialProviderHandler:  params.SocialProviderHandler,
 		GothProviderHelper:     params.GothProviderHelper,
@@ -69,7 +74,7 @@ func New(params Params) *Handler {
 	handler.R.Post("/auth/login/mfa", handler.AuthenticationHandler.LogInMfa)
 	handler.R.Get("/auth/logout", handler.AuthenticationHandler.LogOut)
 
-	// handler.R.Post("/auth/password/restore",)
+	handler.R.Post("/auth/password/restore", handler.ResetPasswordHandler.RequestResetPasswordEmail)
 	// handler.R.Put("/auth/password/restore",)
 
 	handler.R.Get("/auth/session", handler.AuthenticationHandler.Session)

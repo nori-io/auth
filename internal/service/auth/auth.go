@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"crypto/rand"
 	"time"
 
 	"github.com/nori-plugins/authentication/pkg/errors"
@@ -251,18 +250,14 @@ func (srv *AuthenticationService) LogOut(ctx context.Context, data service.LogOu
 }
 
 func (srv *AuthenticationService) getToken(ctx context.Context) ([]byte, error) {
-	sid := make([]byte, 32)
+	token, err := srv.securityHelper.GenerateToken(32)
 
-	if _, err := rand.Read(sid); err != nil {
-		return nil, errors.NewInternal(err)
-	}
-
-	sess, err := srv.sessionService.GetBySessionKey(ctx, service.GetBySessionKeyData{SessionKey: string(sid)})
+	sess, err := srv.sessionService.GetBySessionKey(ctx, service.GetBySessionKeyData{SessionKey: token})
 	if err != nil {
 		return nil, err
 	}
 	if sess != nil && sess.Status == session_status.Active {
 		return srv.getToken(ctx)
 	}
-	return sid, nil
+	return []byte(token), nil
 }

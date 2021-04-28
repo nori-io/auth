@@ -11,6 +11,7 @@ type Repository struct {
 	SessionRepository           repository.SessionRepository
 	SocialAccountRepository     repository.SocialAccountRepository
 	UserRepository              repository.UserRepository
+	ResetPasswordRepository     repository.ResetPasswordRepository
 }
 
 type Params struct {
@@ -22,6 +23,7 @@ type Params struct {
 	SessionRepository           repository.SessionRepository
 	SocialAccountRepository     repository.SocialAccountRepository
 	UserRepository              repository.UserRepository
+	ResetPasswordRepository     repository.ResetPasswordRepository
 }
 
 func New(params Params) *Repository {
@@ -34,6 +36,7 @@ func New(params Params) *Repository {
 		SessionRepository:           params.SessionRepository,
 		SocialAccountRepository:     params.SocialAccountRepository,
 		UserRepository:              params.UserRepository,
+		ResetPasswordRepository:     params.ResetPasswordRepository,
 	}
 	return &repository
 }

@@ -1,4 +1,4 @@
-package totp
+package mfa_totp
 
 import "github.com/nori-plugins/authentication/internal/config"
 

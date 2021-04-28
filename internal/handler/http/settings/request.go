@@ -7,12 +7,12 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/service"
 )
 
-func newDisableMfaData(r *http.Request) (service.SecretData, error) {
+func newDisableMfaData(r *http.Request) (service.MfaTotpData, error) {
 	ssid, err := r.Cookie("ssid")
 	if err != nil {
-		return service.SecretData{}, err
+		return service.MfaTotpData{}, err
 	}
-	return service.SecretData{
+	return service.MfaTotpData{
 		SessionKey: ssid.Value,
 	}, nil
 }

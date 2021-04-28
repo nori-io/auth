@@ -2,33 +2,33 @@ package mfa_totp
 
 import (
 	"github.com/nori-plugins/authentication/internal/config"
-	"github.com/nori-plugins/authentication/internal/domain/helper/totp"
+	"github.com/nori-plugins/authentication/internal/domain/helper/mfa_totp"
 	"github.com/nori-plugins/authentication/internal/domain/repository"
 	service "github.com/nori-plugins/authentication/internal/domain/service"
 )
 
 type MfaTotpService struct {
-	mfaSecretRepository repository.MfaSecretRepository
-	userService         service.UserService
-	config              config.Config
-	totpHelper          totp.TotpHelper
-	sessionService      service.SessionService
+	mfaTotpRepository repository.MfaTotpRepository
+	userService       service.UserService
+	config            config.Config
+	mfaTotpHelper     mfa_totp.MfaTotpHelper
+	sessionService    service.SessionService
 }
 
 type Params struct {
-	MfaSecretRepository repository.MfaSecretRepository
-	UserService         service.UserService
-	Config              config.Config
-	TotpHelper          totp.TotpHelper
-	sessionService      service.SessionService
+	MfaTotpRepository repository.MfaTotpRepository
+	UserService       service.UserService
+	Config            config.Config
+	mfaTotpHelper     mfa_totp.MfaTotpHelper
+	sessionService    service.SessionService
 }
 
-func New(params Params) service.MfaSecretService {
+func New(params Params) service.MfaTotpService {
 	return &MfaTotpService{
-		mfaSecretRepository: params.MfaSecretRepository,
-		userService:         params.UserService,
-		config:              params.Config,
-		totpHelper:          params.TotpHelper,
-		sessionService:      params.sessionService,
+		mfaTotpRepository: params.MfaTotpRepository,
+		userService:       params.UserService,
+		config:            params.Config,
+		mfaTotpHelper:     params.mfaTotpHelper,
+		sessionService:    params.sessionService,
 	}
 }

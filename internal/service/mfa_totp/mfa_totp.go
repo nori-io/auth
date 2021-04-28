@@ -11,7 +11,7 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
-func (srv *MfaTotpService) GetSecret(ctx context.Context, data service.SecretData) (
+func (srv *MfaTotpService) GetUrl(ctx context.Context, data service.MfaTotpData) (
 	string, error) {
 	if err := data.Validate(); err != nil {
 		return "", err
@@ -35,16 +35,16 @@ func (srv *MfaTotpService) GetSecret(ctx context.Context, data service.SecretDat
 		return "", errors2.UserNotFound
 	}
 
-	secret, err := srv.totpHelper.Generate(user.Email)
+	url, secret, err := srv.mfaTotpHelper.Generate(user.Email)
 	if err != nil {
 		return "", err
 	}
 
-	if err := srv.mfaSecretRepository.Delete(ctx, user.ID); err != nil {
+	if err := srv.mfaTotpRepository.Delete(ctx, user.ID); err != nil {
 		return "", nil
 	}
 
-	if err := srv.mfaSecretRepository.Create(ctx, &entity.MfaSecret{
+	if err := srv.mfaTotpRepository.Create(ctx, &entity.MfaTotp{
 		UserID:    user.ID,
 		Secret:    secret,
 		CreatedAt: time.Now(),
@@ -52,5 +52,5 @@ func (srv *MfaTotpService) GetSecret(ctx context.Context, data service.SecretDat
 		return "", err
 	}
 
-	return secret, nil
+	return url, nil
 }

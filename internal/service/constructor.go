@@ -8,7 +8,7 @@ import (
 type Service struct {
 	authenticationService  service.AuthenticationService
 	mfaRecoveryCodeService service.MfaRecoveryCodeService
-	mfaSecretService       service.MfaSecretService
+	mfaTotpService         service.MfaTotpService
 	settingsService        service.SettingsService
 	userService            service.UserService
 }
@@ -16,7 +16,7 @@ type Service struct {
 type Params struct {
 	AuthenticationService  service.AuthenticationService
 	MfaRecoveryCodeService service.MfaRecoveryCodeService
-	MfaSecretService       service.MfaSecretService
+	MfaTotpService         service.MfaTotpService
 	SettingsService        service.SettingsService
 	UserService            service.UserService
 }
@@ -25,7 +25,7 @@ func New(params Params) authentication.Authentication {
 	return &Service{
 		authenticationService:  params.AuthenticationService,
 		mfaRecoveryCodeService: params.MfaRecoveryCodeService,
-		mfaSecretService:       params.MfaSecretService,
+		mfaTotpService:         params.MfaTotpService,
 		settingsService:        params.SettingsService,
 		userService:            params.UserService,
 	}

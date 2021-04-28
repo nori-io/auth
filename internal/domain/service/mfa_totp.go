@@ -6,16 +6,15 @@ import (
 	v "github.com/go-ozzo/ozzo-validation/v4"
 )
 
-type MfaSecretService interface {
-	GetSecret(ctx context.Context, data SecretData) (
-		string, error)
+type MfaTotpService interface {
+	GetUrl(ctx context.Context, data MfaTotpData) (string, error)
 }
 
-type SecretData struct {
+type MfaTotpData struct {
 	SessionKey string
 }
 
-func (d SecretData) Validate() error {
+func (d MfaTotpData) Validate() error {
 	return v.Errors{
 		"session_key": v.Validate(d.SessionKey, v.Required, v.Length(128, 128)),
 	}.Filter()

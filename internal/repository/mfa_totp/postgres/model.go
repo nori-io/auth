@@ -13,8 +13,8 @@ type model struct {
 	CreatedAt time.Time `gorm:"column:created_at; type: TIMESTAMP"`
 }
 
-func (m *model) convert() *entity.MfaSecret {
-	return &entity.MfaSecret{
+func (m *model) convert() *entity.MfaTotp {
+	return &entity.MfaTotp{
 		ID:        m.ID,
 		UserID:    m.UserID,
 		Secret:    m.Secret,
@@ -22,7 +22,7 @@ func (m *model) convert() *entity.MfaSecret {
 	}
 }
 
-func newModel(e *entity.MfaSecret) *model {
+func newModel(e *entity.MfaTotp) *model {
 	return &model{
 		ID:        e.ID,
 		UserID:    e.UserID,
@@ -33,5 +33,5 @@ func newModel(e *entity.MfaSecret) *model {
 
 // Table Name
 func (model) TableName() string {
-	return "mfa_secrets"
+	return "mfa_totp"
 }

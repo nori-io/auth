@@ -2,7 +2,7 @@ package entity
 
 import "time"
 
-type MfaSecret struct {
+type MfaTotp struct {
 	ID        uint64
 	UserID    uint64
 	Secret    string

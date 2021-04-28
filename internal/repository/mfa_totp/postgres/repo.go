@@ -10,11 +10,11 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 )
 
-type MfaSecretRepository struct {
+type MfaTotpRepository struct {
 	Tx transactor.Transactor
 }
 
-func (r *MfaSecretRepository) Create(ctx context.Context, e *entity.MfaSecret) error {
+func (r *MfaTotpRepository) Create(ctx context.Context, e *entity.MfaTotp) error {
 	m := newModel(e)
 	if err := r.Tx.GetDB(ctx).Create(m).Error; err != nil {
 		return errors.NewInternal(err)
@@ -24,7 +24,7 @@ func (r *MfaSecretRepository) Create(ctx context.Context, e *entity.MfaSecret) e
 	return nil
 }
 
-func (r *MfaSecretRepository) Update(ctx context.Context, userID uint64, e *entity.MfaSecret) error {
+func (r *MfaTotpRepository) Update(ctx context.Context, e *entity.MfaTotp) error {
 	m := newModel(e)
 	if err := r.Tx.GetDB(ctx).Save(m).Error; err != nil {
 		return errors.NewInternal(err)
@@ -34,7 +34,7 @@ func (r *MfaSecretRepository) Update(ctx context.Context, userID uint64, e *enti
 	return nil
 }
 
-func (r *MfaSecretRepository) Delete(ctx context.Context, userID uint64) error {
+func (r *MfaTotpRepository) Delete(ctx context.Context, userID uint64) error {
 	if err := r.Tx.GetDB(ctx).Delete(&model{UserID: userID}).Error; err != nil {
 		return errors.NewInternal(err)
 	}

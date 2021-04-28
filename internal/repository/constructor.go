@@ -5,7 +5,7 @@ import "github.com/nori-plugins/authentication/internal/domain/repository"
 type Repository struct {
 	AuthenticationLogRepository repository.AuthenticationLogRepository
 	MfaRecoveryCodeRepository   repository.MfaRecoveryCodeRepository
-	MfaSecretRepository         repository.MfaSecretRepository
+	MfaTotpRepository           repository.MfaTotpRepository
 	OneTimeTokenRepository      repository.OneTimeTokenRepository
 	ServiceProviderRepository   repository.SocialProviderRepository
 	SessionRepository           repository.SessionRepository
@@ -16,7 +16,7 @@ type Repository struct {
 type Params struct {
 	AuthenticationLogRepository repository.AuthenticationLogRepository
 	MfaRecoveryCodeRepository   repository.MfaRecoveryCodeRepository
-	MfaSecretRepository         repository.MfaSecretRepository
+	MfaTotpRepository           repository.MfaTotpRepository
 	OneTimeTokenRepository      repository.OneTimeTokenRepository
 	ServiceProviderRepository   repository.SocialProviderRepository
 	SessionRepository           repository.SessionRepository
@@ -28,7 +28,7 @@ func New(params Params) *Repository {
 	repository := Repository{
 		AuthenticationLogRepository: params.AuthenticationLogRepository,
 		MfaRecoveryCodeRepository:   params.MfaRecoveryCodeRepository,
-		MfaSecretRepository:         params.MfaSecretRepository,
+		MfaTotpRepository:           params.MfaTotpRepository,
 		OneTimeTokenRepository:      params.OneTimeTokenRepository,
 		ServiceProviderRepository:   params.ServiceProviderRepository,
 		SessionRepository:           params.SessionRepository,

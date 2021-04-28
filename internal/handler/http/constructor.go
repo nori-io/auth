@@ -10,7 +10,7 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/service"
 	"github.com/nori-plugins/authentication/internal/handler/http/authentication"
 	"github.com/nori-plugins/authentication/internal/handler/http/mfa_recovery_code"
-	"github.com/nori-plugins/authentication/internal/handler/http/mfa_secret"
+	"github.com/nori-plugins/authentication/internal/handler/http/mfa_totp"
 	"github.com/nori-plugins/authentication/internal/handler/http/settings"
 	"github.com/nori-plugins/authentication/internal/handler/http/social_provider"
 )
@@ -20,7 +20,7 @@ type Handler struct {
 	AdminHandler           *administrator.AdminHandler
 	AuthenticationHandler  *authentication.AuthenticationHandler
 	MfaRecoveryCodeHandler *mfa_recovery_code.MfaRecoveryCodeHandler
-	MfaTotpHandler         *mfa_secret.MfaSecretHandler
+	MfaTotpHandler         *mfa_totp.MfaTotpHandler
 	SettingsHandler        *settings.SettingsHandler
 	SocialProviderHandler  *social_provider.SocialProviderHandler
 	GothProviderHelper     goth_provider.GothProviderHelper
@@ -32,7 +32,7 @@ type Params struct {
 	AdminHandler           *administrator.AdminHandler
 	AuthenticationHandler  *authentication.AuthenticationHandler
 	MfaRecoveryCodeHandler *mfa_recovery_code.MfaRecoveryCodeHandler
-	MfaSecretHandler       *mfa_secret.MfaSecretHandler
+	MfaTotpHandler         *mfa_totp.MfaTotpHandler
 	SettingsHandler        *settings.SettingsHandler
 	SocialProviderHandler  *social_provider.SocialProviderHandler
 	GothProviderHelper     goth_provider.GothProviderHelper
@@ -45,7 +45,7 @@ func New(params Params) *Handler {
 		AdminHandler:           params.AdminHandler,
 		AuthenticationHandler:  params.AuthenticationHandler,
 		MfaRecoveryCodeHandler: params.MfaRecoveryCodeHandler,
-		MfaTotpHandler:         params.MfaSecretHandler,
+		MfaTotpHandler:         params.MfaTotpHandler,
 		SettingsHandler:        params.SettingsHandler,
 		SocialProviderHandler:  params.SocialProviderHandler,
 		GothProviderHelper:     params.GothProviderHelper,
@@ -76,7 +76,7 @@ func New(params Params) *Handler {
 
 	handler.R.Get("/auth/settings/mfa", handler.SettingsHandler.GetMfaStatus)
 	handler.R.Post("/auth/settings/mfa/disable", handler.SettingsHandler.DisableMfa)
-	handler.R.Get("/auth/settings/mfa/totp", handler.MfaTotpHandler.GetSecret)
+	handler.R.Get("/auth/settings/mfa/totp", handler.MfaTotpHandler.GetUrl)
 	handler.R.Get("/auth/settings/mfa/recovery_codes", handler.MfaRecoveryCodeHandler.GetMfaRecoveryCodes)
 	// handler.R.Post("/auth/settings/mfa/sms")
 	// handler.R.Post("/auth/settings/mfa/verify")
@@ -90,4 +90,3 @@ func New(params Params) *Handler {
 	handler.R.Get("/auth/social/{social_provider}/logout", handler.AuthenticationHandler.HandleSocialProviderLogout)
 
 	return &handler
-}

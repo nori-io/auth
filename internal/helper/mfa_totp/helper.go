@@ -1,10 +1,10 @@
-package totp
+package mfa_totp
 
 import (
 	"github.com/pquerna/otp/totp"
 )
 
-func (h totpHelper) Generate(email string) (string, error) {
+func (h totpHelper) Generate(email string) (url string, secret string, err error) {
 	opts := totp.GenerateOpts{
 		Issuer:      h.config.Issuer(),
 		AccountName: email,
@@ -12,7 +12,8 @@ func (h totpHelper) Generate(email string) (string, error) {
 
 	key, err := totp.Generate(opts)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
-	return key.Secret(), nil
+
+	return key.String(), key.Secret(), nil
 }

@@ -39,6 +39,11 @@ func (srv *MfaTotpService) GetSecret(ctx context.Context, data service.SecretDat
 	if err != nil {
 		return "", err
 	}
+
+	if err := srv.mfaSecretRepository.Delete(ctx, user.ID); err != nil {
+		return "", nil
+	}
+
 	if err := srv.mfaSecretRepository.Create(ctx, &entity.MfaSecret{
 		UserID:    user.ID,
 		Secret:    secret,

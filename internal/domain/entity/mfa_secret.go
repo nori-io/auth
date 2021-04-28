@@ -7,5 +7,4 @@ type MfaSecret struct {
 	UserID    uint64
 	Secret    string
 	CreatedAt time.Time
-	UpdatedAt time.Time
 }

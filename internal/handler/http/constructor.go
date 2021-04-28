@@ -90,3 +90,4 @@ func New(params Params) *Handler {
 	handler.R.Get("/auth/social/{social_provider}/logout", handler.AuthenticationHandler.HandleSocialProviderLogout)
 
 	return &handler
+}

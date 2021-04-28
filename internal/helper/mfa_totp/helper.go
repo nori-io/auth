@@ -17,3 +17,7 @@ func (h totpHelper) Generate(email string) (url string, secret string, err error
 
 	return key.String(), key.Secret(), nil
 }
+
+func (h totpHelper) Validate(passcode string, secret string) bool {
+	return totp.Validate(passcode, secret)
+}

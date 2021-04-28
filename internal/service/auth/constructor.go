@@ -2,6 +2,7 @@ package auth
 
 import (
 	"github.com/nori-plugins/authentication/internal/config"
+	"github.com/nori-plugins/authentication/internal/domain/helper/mfa_totp"
 	"github.com/nori-plugins/authentication/internal/domain/helper/security"
 	"github.com/nori-plugins/authentication/internal/domain/service"
 	"github.com/nori-plugins/authentication/pkg/transactor"
@@ -16,6 +17,7 @@ type AuthenticationService struct {
 	socialProviderService    service.SocialProvider
 	transactor               transactor.Transactor
 	securityHelper           security.SecurityHelper
+	mfaTotpService           service.MfaTotpService
 }
 
 type Params struct {
@@ -27,6 +29,7 @@ type Params struct {
 	SocialProviderService    service.SocialProvider
 	Transactor               transactor.Transactor
 	SecurityHelper           security.SecurityHelper
+	mfaTotpService           service.MfaTotpService
 }
 
 func New(params Params) service.AuthenticationService {
@@ -39,5 +42,6 @@ func New(params Params) service.AuthenticationService {
 		transactor:               params.Transactor,
 		securityHelper:           params.SecurityHelper,
 		socialProviderService:    params.SocialProviderService,
+		mfaTotpService:           params.mfaTotpService,
 	}
 }

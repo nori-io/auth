@@ -10,4 +10,5 @@ type MfaTotpRepository interface {
 	Create(ctx context.Context, mfaTotp *entity.MfaTotp) error
 	Update(ctx context.Context, mfaTotp *entity.MfaTotp) error
 	Delete(ctx context.Context, userID uint64) error
+	FindByUserId(ctx context.Context, userID uint64) (*entity.MfaTotp, error)
 }

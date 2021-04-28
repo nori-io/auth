@@ -153,13 +153,22 @@ func (srv *AuthenticationService) LogInMfa(ctx context.Context, data service.Log
 		return nil, err
 	}
 
-	if err = srv.mfaRecoveryCodeService.Apply(ctx, service.ApplyData{
-		UserID: session.UserID,
-		Code:   data.Code,
-	}); err != nil {
+	isValid, err := srv.mfaTotpService.Validate(ctx, service.MfaTotpValidateData{
+		UserID:   session.UserID,
+		PassCode: data.Code,
+	})
+	if err != nil {
 		return nil, err
 	}
 
+	if isValid != true {
+		if err = srv.mfaRecoveryCodeService.Apply(ctx, service.ApplyData{
+			UserID: session.UserID,
+			Code:   data.Code,
+		}); err != nil {
+			return nil, err
+		}
+	}
 	sid, err := srv.getToken(ctx)
 	if err != nil {
 		return nil, err

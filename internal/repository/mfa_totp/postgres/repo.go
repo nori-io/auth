@@ -3,6 +3,8 @@ package postgres
 import (
 	"context"
 
+	"github.com/jinzhu/gorm"
+
 	"github.com/nori-plugins/authentication/pkg/errors"
 
 	"github.com/nori-plugins/authentication/pkg/transactor"
@@ -39,4 +41,18 @@ func (r *MfaTotpRepository) Delete(ctx context.Context, userID uint64) error {
 		return errors.NewInternal(err)
 	}
 	return nil
+}
+
+func (r *MfaTotpRepository) FindByUserId(ctx context.Context, userID uint64) (*entity.MfaTotp, error) {
+	out := &model{}
+
+	err := r.Tx.GetDB(ctx).Where("user_id=?", userID).First(out).Error
+
+	if err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, errors.NewInternal(err)
+	}
+	return out.convert(), nil
 }

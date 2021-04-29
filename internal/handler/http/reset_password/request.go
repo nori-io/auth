@@ -21,3 +21,17 @@ func newRequestResetPasswordEmailData(r *http.Request) (service.RequestResetPass
 		Email: body.Email,
 	}, nil
 }
+
+type RestorePasswordSetRequest struct {
+	token    string `json:"token"`
+	password string `json:"password"`
+}
+
+func NewSetNewPasswordByRestorePasswordEmailToken(r *http.Request) (service.SetNewPasswordByRestorePasswordEmailTokenData, error) {
+	var body RestorePasswordSetRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		return service.SetNewPasswordByRestorePasswordEmailTokenData{}, err
+	}
+	return service.SetNewPasswordByRestorePasswordEmailTokenData{}, nil
+}

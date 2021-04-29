@@ -75,7 +75,7 @@ func New(params Params) *Handler {
 	handler.R.Get("/auth/logout", handler.AuthenticationHandler.LogOut)
 
 	handler.R.Post("/auth/password/restore", handler.ResetPasswordHandler.RequestResetPasswordEmail)
-	// handler.R.Put("/auth/password/restore",)
+	handler.R.Put("/auth/password/restore", handler.ResetPasswordHandler.SetNewPasswordByRestorePasswordEmailToken)
 
 	handler.R.Get("/auth/session", handler.AuthenticationHandler.Session)
 

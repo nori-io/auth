@@ -9,4 +9,5 @@ import (
 type ResetPasswordRepository interface {
 	Create(ctx context.Context, resetPassword *entity.ResetPassword) error
 	Delete(ctx context.Context, userID uint64) error
+	FindByToken(ctx context.Context, token string) (*entity.ResetPassword, error)
 }

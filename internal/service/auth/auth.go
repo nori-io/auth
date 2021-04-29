@@ -162,8 +162,9 @@ func (srv *AuthenticationService) LogInMfa(ctx context.Context, data service.Log
 
 	if isValid != true {
 		if err = srv.mfaRecoveryCodeService.Apply(ctx, service.ApplyData{
-			UserID: session.UserID,
-			Code:   data.Code,
+			UserID:     session.UserID,
+			Code:       data.Code,
+			SessionKey: data.SessionKey,
 		}); err != nil {
 			return nil, err
 		}

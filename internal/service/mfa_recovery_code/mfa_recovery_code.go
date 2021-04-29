@@ -60,7 +60,7 @@ func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data
 		if user.MfaType != mfa_type.None {
 			if err := srv.authenticationLogService.Create(ctx, service.AuthenticationLogCreateData{
 				UserID:    user.ID,
-				Action:    users_action.GenerateMfaRecoveryCodes,
+				Action:    users_action.MfaRecoveryCodesGenerate,
 				SessionID: session.ID,
 				Meta:      "",
 				CreatedAt: time.Now(),
@@ -81,6 +81,16 @@ func (srv *MfaRecoveryCodeService) Apply(ctx context.Context, data service.Apply
 	if err := data.Validate(); err != nil {
 		return err
 	}
+
+	session, err := srv.sessionService.GetBySessionKey(ctx, service.GetBySessionKeyData{SessionKey: data.SessionKey})
+	if err != nil {
+		return err
+	}
+
+	if session == nil {
+		return errors2.SessionNotFound
+	}
+
 	mfaRecoveryCode, err := srv.mfaRecoveryCodeRepository.FindByUserID(ctx, data.UserID, data.Code)
 	if err != nil {
 		return err
@@ -88,7 +98,22 @@ func (srv *MfaRecoveryCodeService) Apply(ctx context.Context, data service.Apply
 	if mfaRecoveryCode == nil {
 		return errors2.MfaRecoveryCodeNotFound
 	}
-	if err := srv.mfaRecoveryCodeRepository.DeleteMfaRecoveryCode(ctx, data.UserID, data.Code); err != nil {
+
+	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
+		if err := srv.mfaRecoveryCodeRepository.DeleteMfaRecoveryCode(ctx, data.UserID, data.Code); err != nil {
+			return err
+		}
+		if err := srv.authenticationLogService.Create(ctx, service.AuthenticationLogCreateData{
+			UserID:    mfaRecoveryCode.UserID,
+			Action:    users_action.MfaRecoveryCodeApply,
+			SessionID: session.ID,
+			Meta:      "",
+			CreatedAt: time.Now(),
+		}); err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
 		return err
 	}
 	return nil

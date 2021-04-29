@@ -23,8 +23,9 @@ func (d GetMfaRecoveryCodes) Validate() error {
 }
 
 type ApplyData struct {
-	UserID uint64
-	Code   string
+	UserID     uint64
+	Code       string
+	SessionKey string
 }
 
 func (d ApplyData) Validate() error {

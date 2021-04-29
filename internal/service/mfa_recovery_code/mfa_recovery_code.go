@@ -4,6 +4,9 @@ import (
 	"context"
 	"time"
 
+	"github.com/nori-plugins/authentication/pkg/enum/mfa_type"
+	"github.com/nori-plugins/authentication/pkg/enum/users_action"
+
 	"github.com/nori-plugins/authentication/internal/domain/service"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
@@ -47,6 +50,23 @@ func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data
 		}
 		if err = srv.mfaRecoveryCodeRepository.Create(ctx, mfaRecoveryCodes); err != nil {
 			return err
+		}
+
+		user, err := srv.userService.GetByID(ctx, service.GetByIdData{Id: session.UserID})
+		if err != nil {
+			return err
+		}
+
+		if user.MfaType != mfa_type.None {
+			if err := srv.authenticationLogService.Create(ctx, service.AuthenticationLogCreateData{
+				UserID:    user.ID,
+				Action:    users_action.GenerateMfaRecoveryCodes,
+				SessionID: session.ID,
+				Meta:      "",
+				CreatedAt: time.Now(),
+			}); err != nil {
+				return err
+			}
 		}
 
 		return nil

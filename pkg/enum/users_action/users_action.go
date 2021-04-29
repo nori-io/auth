@@ -6,6 +6,7 @@ const (
 	ChangePassword Action = iota
 	DisableMfa
 	EnableMfa
+	GenerateMfaRecoveryCodes
 	LogIn
 	LogInMfa
 	LogOut

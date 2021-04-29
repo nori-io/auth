@@ -3,16 +3,16 @@ package users_action
 type Action uint8
 
 const (
-	ChangePassword Action = iota
-	DisableMfa
-	EnableMfa
+	PasswordChanged Action = iota
+	PasswordRestored
+	MfaDisabled
+	MfaEnabled
 	MfaRecoveryCodeApply
 	MfaRecoveryCodesGenerate
 	LogIn
 	LogInMfa
 	LogOut
 	SignUp
-	RestorePassword
 )
 
 func (u Action) Value() uint8 {

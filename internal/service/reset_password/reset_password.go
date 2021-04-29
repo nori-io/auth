@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/nori-plugins/authentication/pkg/enum/users_action"
+
 	errors2 "github.com/nori-plugins/authentication/internal/domain/errors"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
@@ -30,11 +32,14 @@ func (srv ResetPasswordService) RequestResetPasswordEmail(ctx context.Context, d
 	}
 	//@todo send to email
 	fmt.Println(token)
-	srv.resetPasswordRepository.Create(ctx, &entity.ResetPassword{
+	if srv.resetPasswordRepository.Create(ctx, &entity.ResetPassword{
 		UserID:    user.ID,
 		Token:     token,
 		ExpiresAt: time.Now().Add(time.Duration(srv.config.EmailActivationCodeTTLSeconds()) * time.Second),
-	})
+	}); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -54,9 +59,25 @@ func (srv ResetPasswordService) SetNewPasswordByRestorePasswordEmailToken(ctx co
 		return errors2.TokenNotFound
 	}
 
-	if err := srv.userService.UpdatePassword(ctx, service.UserUpdatePasswordData{
-		UserID:   resetPassword.UserID,
-		Password: data.Password,
+	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
+		if err := srv.userService.UpdatePassword(ctx, service.UserUpdatePasswordData{
+			UserID:   resetPassword.UserID,
+			Password: data.Password,
+		}); err != nil {
+			return err
+		}
+		return nil
+
+		if err := srv.authenticationLogService.Create(ctx, service.AuthenticationLogCreateData{
+			UserID:    resetPassword.UserID,
+			Action:    users_action.PasswordRestored,
+			SessionID: 0,
+			Meta:      "",
+			CreatedAt: time.Now(),
+		}); err != nil {
+			return err
+		}
+		return nil
 	}); err != nil {
 		return err
 	}

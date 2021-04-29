@@ -4,7 +4,7 @@ type Action uint8
 
 const (
 	PasswordChanged Action = iota
-	PasswordRestored
+	PasswordReseted
 	MfaDisabled
 	MfaOtpEnabled
 	MfaPhoneEnabled

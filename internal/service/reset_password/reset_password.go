@@ -43,7 +43,7 @@ func (srv ResetPasswordService) RequestResetPasswordEmail(ctx context.Context, d
 	return nil
 }
 
-func (srv ResetPasswordService) SetNewPasswordByRestorePasswordEmailToken(ctx context.Context, data service.SetNewPasswordByRestorePasswordEmailTokenData) error {
+func (srv ResetPasswordService) SetNewPasswordByResetPasswordEmailToken(ctx context.Context, data service.SetNewPasswordByResetPasswordEmailTokenData) error {
 	if err := data.Validate(); err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func (srv ResetPasswordService) SetNewPasswordByRestorePasswordEmailToken(ctx co
 
 		if err := srv.authenticationLogService.Create(ctx, service.AuthenticationLogCreateData{
 			UserID:    resetPassword.UserID,
-			Action:    users_action.PasswordRestored,
+			Action:    users_action.PasswordReseted,
 			SessionID: 0,
 			Meta:      "",
 			CreatedAt: time.Now(),

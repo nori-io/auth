@@ -45,20 +45,20 @@ func (h *ResetPasswordHandler) RequestResetPasswordEmail(w http.ResponseWriter, 
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	response.JSON(w, r, RestorePasswordResponse{
+	response.JSON(w, r, ResetPasswordResponse{
 		Success: true,
 		Message: "",
 	})
 }
 
-func (h *ResetPasswordHandler) SetNewPasswordByRestorePasswordEmailToken(w http.ResponseWriter, r *http.Request) {
-	data, err := NewSetNewPasswordByRestorePasswordEmailToken(r)
+func (h *ResetPasswordHandler) SetNewPasswordByResetPasswordEmailToken(w http.ResponseWriter, r *http.Request) {
+	data, err := NewSetNewPasswordByResetPasswordEmailToken(r)
 	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	err = h.resetPasswordService.SetNewPasswordByRestorePasswordEmailToken(r.Context(), service.SetNewPasswordByRestorePasswordEmailTokenData{
+	err = h.resetPasswordService.SetNewPasswordByResetPasswordEmailToken(r.Context(), service.SetNewPasswordByResetPasswordEmailTokenData{
 		Token:    data.Token,
 		Password: data.Password,
 	})
@@ -72,7 +72,7 @@ func (h *ResetPasswordHandler) SetNewPasswordByRestorePasswordEmailToken(w http.
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	response.JSON(w, r, SetPasswordResponse{
+	response.JSON(w, r, ResetPasswordSetResponse{
 		Success: true,
 		Message: "password was changed",
 	})

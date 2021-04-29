@@ -1,11 +1,11 @@
 package reset_password
 
-type RestorePasswordResponse struct {
+type ResetPasswordResponse struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
 }
 
-type SetPasswordResponse struct {
+type ResetPasswordSetResponse struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
 }

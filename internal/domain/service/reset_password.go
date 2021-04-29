@@ -9,7 +9,7 @@ import (
 
 type ResetPasswordService interface {
 	RequestResetPasswordEmail(ctx context.Context, data RequestResetPasswordEmailData) error
-	SetNewPasswordByRestorePasswordEmailToken(ctx context.Context, data SetNewPasswordByRestorePasswordEmailTokenData) error
+	SetNewPasswordByResetPasswordEmailToken(ctx context.Context, data SetNewPasswordByResetPasswordEmailTokenData) error
 }
 
 type RequestResetPasswordEmailData struct {
@@ -22,12 +22,12 @@ func (d RequestResetPasswordEmailData) Validate() error {
 	}.Filter()
 }
 
-type SetNewPasswordByRestorePasswordEmailTokenData struct {
+type SetNewPasswordByResetPasswordEmailTokenData struct {
 	Token    string
 	Password string
 }
 
-func (d SetNewPasswordByRestorePasswordEmailTokenData) Validate() error {
+func (d SetNewPasswordByResetPasswordEmailTokenData) Validate() error {
 	return v.Errors{
 		"token":    v.Validate(d.Token, v.Required),
 		"password": v.Validate(d.Password, v.Required),

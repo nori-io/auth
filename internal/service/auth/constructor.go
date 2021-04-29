@@ -28,7 +28,7 @@ type Params struct {
 	SocialProviderService    service.SocialProvider
 	Transactor               transactor.Transactor
 	SecurityHelper           security.SecurityHelper
-	mfaTotpService           service.MfaTotpService
+	MfaTotpService           service.MfaTotpService
 }
 
 func New(params Params) service.AuthenticationService {
@@ -41,6 +41,6 @@ func New(params Params) service.AuthenticationService {
 		transactor:               params.Transactor,
 		securityHelper:           params.SecurityHelper,
 		socialProviderService:    params.SocialProviderService,
-		mfaTotpService:           params.mfaTotpService,
+		mfaTotpService:           params.MfaTotpService,
 	}
 }

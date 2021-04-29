@@ -7,12 +7,12 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/service"
 )
 
-type RestorePasswordRequest struct {
+type ResetPasswordRequest struct {
 	Email string `json:"email"`
 }
 
 func newRequestResetPasswordEmailData(r *http.Request) (service.RequestResetPasswordEmailData, error) {
-	var body RestorePasswordRequest
+	var body ResetPasswordRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		return service.RequestResetPasswordEmailData{}, err
@@ -22,16 +22,16 @@ func newRequestResetPasswordEmailData(r *http.Request) (service.RequestResetPass
 	}, nil
 }
 
-type RestorePasswordSetRequest struct {
+type ResetPasswordSetRequest struct {
 	token    string `json:"token"`
 	password string `json:"password"`
 }
 
-func NewSetNewPasswordByRestorePasswordEmailToken(r *http.Request) (service.SetNewPasswordByRestorePasswordEmailTokenData, error) {
-	var body RestorePasswordSetRequest
+func NewSetNewPasswordByResetPasswordEmailToken(r *http.Request) (service.SetNewPasswordByResetPasswordEmailTokenData, error) {
+	var body ResetPasswordSetRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		return service.SetNewPasswordByRestorePasswordEmailTokenData{}, err
+		return service.SetNewPasswordByResetPasswordEmailTokenData{}, err
 	}
-	return service.SetNewPasswordByRestorePasswordEmailTokenData{}, nil
+	return service.SetNewPasswordByResetPasswordEmailTokenData{}, nil
 }

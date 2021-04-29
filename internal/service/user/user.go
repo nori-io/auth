@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/nori-plugins/authentication/pkg/enum/users_action"
+
 	"github.com/nori-plugins/authentication/internal/domain/repository"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
@@ -90,10 +92,24 @@ func (srv UserService) UpdateUserStatus(ctx context.Context, data service.UserUp
 		return err
 	}
 
-	if err := srv.userRepository.Update(ctx, &entity.User{
-		ID:        data.UserID,
-		Status:    data.Status,
-		UpdatedAt: time.Now(),
+	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
+		if err := srv.userRepository.Update(ctx, &entity.User{
+			ID:        data.UserID,
+			Status:    data.Status,
+			UpdatedAt: time.Now(),
+		}); err != nil {
+			return err
+		}
+		if err := srv.authenticationLogService.Create(ctx, service.AuthenticationLogCreateData{
+			UserID:    data.UserID,
+			Action:    users_action.UserStatusChanged,
+			Meta:      "",
+			CreatedAt: time.Now(),
+		}); err != nil {
+			return err
+		}
+
+		return nil
 	}); err != nil {
 		return err
 	}

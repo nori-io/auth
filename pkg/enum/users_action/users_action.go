@@ -6,13 +6,15 @@ const (
 	PasswordChanged Action = iota
 	PasswordRestored
 	MfaDisabled
-	MfaEnabled
+	MfaOtpEnabled
+	MfaPhoneEnabled
 	MfaRecoveryCodeApply
 	MfaRecoveryCodesGenerate
 	LogIn
 	LogInMfa
 	LogOut
 	SignUp
+	UserStatusChanged
 )
 
 func (u Action) Value() uint8 {

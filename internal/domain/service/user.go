@@ -61,14 +61,16 @@ func (d UserUpdatePasswordData) Validate() error {
 }
 
 type UserUpdateStatusData struct {
-	UserID uint64
-	Status users_status.UserStatus
+	UserID     uint64
+	Status     users_status.UserStatus
+	SessionKey string
 }
 
 func (d UserUpdateStatusData) Validate() error {
 	return v.Errors{
-		"user_ID": v.Validate(d.UserID, v.Required),
-		"status":  v.Validate(d.Status, v.Required),
+		"user_ID":     v.Validate(d.UserID, v.Required),
+		"status":      v.Validate(d.Status, v.Required),
+		"session_key": v.Validate(d.SessionKey, v.Required, v.Length(128, 128)),
 	}.Filter()
 }
 

@@ -22,13 +22,15 @@ func (d MfaGetUrlData) Validate() error {
 }
 
 type MfaTotpValidateData struct {
-	UserID   uint64
-	PassCode string
+	UserID     uint64
+	PassCode   string
+	SessionKey string
 }
 
 func (d MfaTotpValidateData) Validate() error {
 	return v.Errors{
-		"user_ID":  v.Validate(d.UserID, v.Required),
-		"passcode": v.Validate(d.PassCode, v.Required, v.Length(6, 6)),
+		"user_ID":     v.Validate(d.UserID, v.Required),
+		"passcode":    v.Validate(d.PassCode, v.Required, v.Length(6, 6)),
+		"session_key": v.Validate(d.SessionKey, v.Required, v.Length(128, 128)),
 	}.Filter()
 }

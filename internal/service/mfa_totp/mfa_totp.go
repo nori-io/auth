@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/nori-plugins/authentication/pkg/enum/users_action"
+
 	errors2 "github.com/nori-plugins/authentication/internal/domain/errors"
 
 	"github.com/nori-plugins/authentication/internal/domain/service"
@@ -40,14 +42,20 @@ func (srv *MfaTotpService) GetUrl(ctx context.Context, data service.MfaGetUrlDat
 		return "", err
 	}
 
-	if err := srv.mfaTotpRepository.Delete(ctx, user.ID); err != nil {
-		return "", nil
-	}
+	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
+		if err := srv.mfaTotpRepository.Delete(ctx, user.ID); err != nil {
+			return nil
+		}
 
-	if err := srv.mfaTotpRepository.Create(ctx, &entity.MfaTotp{
-		UserID:    user.ID,
-		Secret:    secret,
-		CreatedAt: time.Now(),
+		if err := srv.mfaTotpRepository.Create(ctx, &entity.MfaTotp{
+			UserID:    user.ID,
+			Secret:    secret,
+			CreatedAt: time.Now(),
+		}); err != nil {
+			return err
+		}
+
+		return nil
 	}); err != nil {
 		return "", err
 	}
@@ -60,6 +68,15 @@ func (srv *MfaTotpService) Validate(ctx context.Context, data service.MfaTotpVal
 		return false, err
 	}
 
+	session, err := srv.sessionService.GetBySessionKey(ctx, service.GetBySessionKeyData{SessionKey: data.SessionKey})
+	if err != nil {
+		return false, err
+	}
+
+	if session == nil {
+		return false, errors2.SessionNotFound
+	}
+
 	mfaTotp, err := srv.mfaTotpRepository.FindByUserId(ctx, data.UserID)
 	if err != nil {
 		return false, err
@@ -67,7 +84,20 @@ func (srv *MfaTotpService) Validate(ctx context.Context, data service.MfaTotpVal
 	if mfaTotp == nil {
 		return false, errors2.MfaTotpSecretNotFound
 	}
-	srv.mfaTotpHelper.Validate(data.PassCode, mfaTotp.Secret)
 
-	return srv.mfaTotpHelper.Validate(data.PassCode, mfaTotp.Secret), nil
+	isTokenValid := srv.mfaTotpHelper.Validate(data.PassCode, mfaTotp.Secret)
+
+	if isTokenValid {
+		if err := srv.authenticationLogService.Create(ctx, service.AuthenticationLogCreateData{
+			UserID:    mfaTotp.UserID,
+			Action:    users_action.EnableMfa,
+			SessionID: session.ID,
+			Meta:      "",
+			CreatedAt: time.Now(),
+		}); err != nil {
+			return false, err
+		}
+	}
+
+	return isTokenValid, nil
 }

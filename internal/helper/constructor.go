@@ -6,13 +6,13 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/helper/mfa_recovery_code"
 	"github.com/nori-plugins/authentication/internal/domain/helper/mfa_totp"
 	"github.com/nori-plugins/authentication/internal/domain/helper/security"
-	gothProviderHelper "github.com/nori-plugins/authentication/internal/helper/goth_provider"
+	"github.com/nori-plugins/authentication/internal/helper/goth_provider"
 )
 
 type Helper struct {
 	CookieHelper          cookie.CookieHelper
 	ErrorHelper           error2.ErrorHelper
-	GothProviderHelper    gothProviderHelper.GothProviderHelper
+	GothProviderHelper    goth_provider.GothProviderHelper
 	MfaRecoveryCodeHelper mfa_recovery_code.MfaRecoveryCodesHelper
 	MfaTotpHelper         mfa_totp.MfaTotpHelper
 	SecurityHelper        security.SecurityHelper
@@ -21,7 +21,7 @@ type Helper struct {
 type Params struct {
 	CookieHelper          cookie.CookieHelper
 	ErrorHelper           error2.ErrorHelper
-	GothProviderHelper    gothProviderHelper.GothProviderHelper
+	GothProviderHelper    goth_provider.GothProviderHelper
 	MfaRecoveryCodeHelper mfa_recovery_code.MfaRecoveryCodesHelper
 	MfaTotpHelper         mfa_totp.MfaTotpHelper
 	SecurityHelper        security.SecurityHelper

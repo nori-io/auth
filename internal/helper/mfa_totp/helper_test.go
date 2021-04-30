@@ -13,7 +13,7 @@ func Test_totpHelper_Generate(t *testing.T) {
 		},
 	}
 
-	h := New(Params{config: conf})
+	h := New(Params{Config: conf})
 	image, key, err := h.Generate("test@mail.ru")
 
 	t.Log(image)

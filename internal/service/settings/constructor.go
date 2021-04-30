@@ -23,7 +23,7 @@ type Params struct {
 	SessionRepository        repository.SessionRepository
 	SecurityHelper           security.SecurityHelper
 	Config                   config.Config
-	transactor               transactor.Transactor
+	Transactor               transactor.Transactor
 }
 
 func New(params Params) service.SettingsService {
@@ -33,6 +33,6 @@ func New(params Params) service.SettingsService {
 		sessionRepository:        params.SessionRepository,
 		securityHelper:           params.SecurityHelper,
 		config:                   params.Config,
-		transactor:               params.transactor,
+		transactor:               params.Transactor,
 	}
 }

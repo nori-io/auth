@@ -1,15 +1,18 @@
 package mfa_totp
 
-import "github.com/nori-plugins/authentication/internal/config"
+import (
+	"github.com/nori-plugins/authentication/internal/config"
+	"github.com/nori-plugins/authentication/internal/domain/helper/mfa_totp"
+)
 
-type totpHelper struct {
+type mfaTotpHelper struct {
 	config config.Config
 }
 
 type Params struct {
-	config config.Config
+	Config config.Config
 }
 
-func New(params Params) totpHelper {
-	return totpHelper{config: params.config}
+func New(params Params) mfa_totp.MfaTotpHelper {
+	return mfaTotpHelper{config: params.Config}
 }

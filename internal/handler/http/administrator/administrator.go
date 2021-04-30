@@ -14,18 +14,17 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/helper/cookie"
 	error2 "github.com/nori-plugins/authentication/internal/domain/helper/error"
 	"github.com/nori-plugins/authentication/internal/domain/service"
-	"github.com/nori-plugins/authentication/internal/service/user"
 )
 
 type AdminHandler struct {
-	userService  user.UserService
+	userService  service.UserService
 	cookieHelper cookie.CookieHelper
 	errorHelper  error2.ErrorHelper
 	logger       logger.FieldLogger
 }
 
 type Params struct {
-	UserService  user.UserService
+	UserService  service.UserService
 	CookieHelper cookie.CookieHelper
 	ErrorHelper  error2.ErrorHelper
 	Logger       logger.FieldLogger

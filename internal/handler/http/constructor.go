@@ -23,7 +23,7 @@ type Handler struct {
 	AuthenticationHandler  *authentication.AuthenticationHandler
 	MfaRecoveryCodeHandler *mfa_recovery_code.MfaRecoveryCodeHandler
 	MfaTotpHandler         *mfa_totp.MfaTotpHandler
-	ResetPasswordHandler   reset_password.ResetPasswordHandler
+	ResetPasswordHandler   *reset_password.ResetPasswordHandler
 	SettingsHandler        *settings.SettingsHandler
 	SocialProviderHandler  *social_provider.SocialProviderHandler
 	SocialProviderService  service.SocialProvider
@@ -36,7 +36,7 @@ type Params struct {
 	AuthenticationHandler  *authentication.AuthenticationHandler
 	MfaRecoveryCodeHandler *mfa_recovery_code.MfaRecoveryCodeHandler
 	MfaTotpHandler         *mfa_totp.MfaTotpHandler
-	ResetPasswordHandler   reset_password.ResetPasswordHandler
+	ResetPasswordHandler   *reset_password.ResetPasswordHandler
 	SettingsHandler        *settings.SettingsHandler
 	SocialProviderHandler  *social_provider.SocialProviderHandler
 	SocialProviderService  service.SocialProvider

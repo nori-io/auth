@@ -17,7 +17,7 @@ type UserService struct {
 }
 
 type Params struct {
-	authenticationLogService service.AuthenticationLogService
+	AuthenticationLogService service.AuthenticationLogService
 	UserRepository           repository.UserRepository
 	SecurityHelper           security.SecurityHelper
 	Transactor               transactor.Transactor
@@ -26,7 +26,7 @@ type Params struct {
 
 func New(params Params) service.UserService {
 	return &UserService{
-		authenticationLogService: params.authenticationLogService,
+		authenticationLogService: params.AuthenticationLogService,
 		userRepository:           params.UserRepository,
 		securityHelper:           params.SecurityHelper,
 		transactor:               params.Transactor,

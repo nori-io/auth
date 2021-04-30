@@ -9,4 +9,4 @@ import (
 	"github.com/nori-plugins/authentication/internal/app/transactor"
 )
 
-var AppSet = wire.NewSet(transactor.TransactorSet, handler.HandlerSet, helper.HelperSet, repository.RepositorySet, service.ServiceSet)
+var AppSet = wire.NewSet(transactor.TransactorSet, repository.RepositorySet, helper.HelperSet, service.ServiceSet, handler.HandlerSet)

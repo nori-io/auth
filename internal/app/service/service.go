@@ -4,7 +4,6 @@ import (
 	"github.com/google/wire"
 	"github.com/nori-plugins/authentication/internal/service"
 	"github.com/nori-plugins/authentication/internal/service/auth"
-	"github.com/nori-plugins/authentication/internal/service/authentication_log"
 	"github.com/nori-plugins/authentication/internal/service/mfa_recovery_code"
 	"github.com/nori-plugins/authentication/internal/service/mfa_totp"
 	"github.com/nori-plugins/authentication/internal/service/reset_password"
@@ -12,11 +11,12 @@ import (
 	"github.com/nori-plugins/authentication/internal/service/settings"
 	"github.com/nori-plugins/authentication/internal/service/social_provider"
 	"github.com/nori-plugins/authentication/internal/service/user"
+	"github.com/nori-plugins/authentication/internal/service/user_log"
 )
 
 var ServiceSet = wire.NewSet(
 	wire.Struct(new(auth.Params),
-		"AuthenticationLogService",
+		"UserLogService",
 		"MfaRecoveryCodeService",
 		"MfaTotpService",
 		"SessionService",
@@ -26,12 +26,12 @@ var ServiceSet = wire.NewSet(
 		"Config",
 		"Transactor"),
 	auth.New,
-	wire.Struct(new(authentication_log.Params),
-		"AuthenticationLogRepository",
+	wire.Struct(new(user_log.Params),
+		"UserLogRepository",
 		"Transactor"),
-	authentication_log.New,
+	user_log.New,
 	wire.Struct(new(mfa_recovery_code.Params),
-		"AuthenticationLogService",
+		"UserLogService",
 		"SessionService",
 		"UserService",
 		"MfaRecoveryCodeRepository",
@@ -40,7 +40,7 @@ var ServiceSet = wire.NewSet(
 		"Transactor"),
 	mfa_recovery_code.New,
 	wire.Struct(new(mfa_totp.Params),
-		"AuthenticationLogService",
+		"UserLogService",
 		"SessionService",
 		"UserService",
 		"MfaTotpRepository",
@@ -49,7 +49,7 @@ var ServiceSet = wire.NewSet(
 		"Transactor"),
 	mfa_totp.New,
 	wire.Struct(new(reset_password.Params),
-		"AuthenticationLogService",
+		"UserLogService",
 		"UserService",
 		"ResetPasswordRepository",
 		"SecurityHelper",
@@ -59,7 +59,7 @@ var ServiceSet = wire.NewSet(
 	wire.Struct(new(session.Params), "SessionRepository", "Transactor"),
 	session.New,
 	wire.Struct(new(settings.Params),
-		"AuthenticationLogService",
+		"UserLogService",
 		"UserService",
 		"SessionRepository",
 		"SecurityHelper",
@@ -69,7 +69,7 @@ var ServiceSet = wire.NewSet(
 	wire.Struct(new(social_provider.Params), "SocialProviderRepository"),
 	social_provider.New,
 	wire.Struct(new(user.Params),
-		"AuthenticationLogService",
+		"UserLogService",
 		"UserRepository",
 		"SecurityHelper",
 		"Transactor",
@@ -77,7 +77,7 @@ var ServiceSet = wire.NewSet(
 	user.New,
 	wire.Struct(new(service.Params),
 		"AuthenticationService",
-		"AuthenticationLogService",
+		"UserLogService",
 		"MfaRecoveryCodeService",
 		"MfaTotpService",
 		"ResetPasswordService",

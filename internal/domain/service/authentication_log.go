@@ -8,11 +8,11 @@ import (
 	"github.com/nori-plugins/authentication/pkg/enum/users_action"
 )
 
-type AuthenticationLogService interface {
-	Create(ctx context.Context, data AuthenticationLogCreateData) error
+type UserLogService interface {
+	Create(ctx context.Context, data UserLogCreateData) error
 }
 
-type AuthenticationLogCreateData struct {
+type UserLogCreateData struct {
 	UserID    uint64
 	Action    users_action.Action
 	SessionID uint64
@@ -20,7 +20,7 @@ type AuthenticationLogCreateData struct {
 	CreatedAt time.Time
 }
 
-func (d AuthenticationLogCreateData) Validate() error {
+func (d UserLogCreateData) Validate() error {
 	return v.Errors{
 		"user_ID":    v.Validate(d.UserID, v.Required),
 		"action":     v.Validate(d.Action, v.Required),

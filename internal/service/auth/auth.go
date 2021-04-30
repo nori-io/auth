@@ -65,7 +65,7 @@ func (srv AuthenticationService) SignUp(ctx context.Context, data service.SignUp
 			return err
 		}
 
-		err = srv.authenticationLogService.Create(tx, service.AuthenticationLogCreateData{
+		err = srv.userLogService.Create(tx, service.UserLogCreateData{
 			UserID:    user.ID,
 			Action:    users_action.SignUp,
 			Meta:      "",
@@ -116,7 +116,7 @@ func (srv *AuthenticationService) LogIn(ctx context.Context, data service.LogInD
 			return errors.NewInternal(err)
 		}
 
-		if err = srv.authenticationLogService.Create(ctx, service.AuthenticationLogCreateData{
+		if err = srv.userLogService.Create(ctx, service.UserLogCreateData{
 			UserID:    user.ID,
 			Action:    users_action.LogIn,
 			SessionID: session.ID,
@@ -192,7 +192,7 @@ func (srv *AuthenticationService) LogInMfa(ctx context.Context, data service.Log
 			return err
 		}
 
-		if err = srv.authenticationLogService.Create(ctx, service.AuthenticationLogCreateData{
+		if err = srv.userLogService.Create(ctx, service.UserLogCreateData{
 			UserID:    session.UserID,
 			Action:    users_action.LogInMfa,
 			SessionID: session.ID,
@@ -233,7 +233,7 @@ func (srv *AuthenticationService) LogOut(ctx context.Context, data service.LogOu
 			return err
 		}
 
-		if err := srv.authenticationLogService.Create(ctx, service.AuthenticationLogCreateData{
+		if err := srv.userLogService.Create(ctx, service.UserLogCreateData{
 			UserID:    session.UserID,
 			Action:    users_action.LogOut,
 			SessionID: session.ID,

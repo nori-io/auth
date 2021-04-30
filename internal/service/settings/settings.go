@@ -61,7 +61,7 @@ func (srv SettingsService) DisableMfa(ctx context.Context, data service.DisableM
 			return err
 		}
 
-		if err := srv.authenticationLogService.Create(ctx, service.AuthenticationLogCreateData{
+		if err := srv.userLogService.Create(ctx, service.UserLogCreateData{
 			UserID:    session.UserID,
 			Action:    users_action.MfaDisabled,
 			SessionID: session.ID,
@@ -110,7 +110,7 @@ func (srv SettingsService) ChangePassword(ctx context.Context, data service.Chan
 			return err
 		}
 
-		if err := srv.authenticationLogService.Create(ctx, service.AuthenticationLogCreateData{
+		if err := srv.userLogService.Create(ctx, service.UserLogCreateData{
 			UserID:    session.UserID,
 			Action:    users_action.PasswordChanged,
 			SessionID: session.ID,

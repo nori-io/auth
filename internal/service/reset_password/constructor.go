@@ -9,30 +9,30 @@ import (
 )
 
 type ResetPasswordService struct {
-	authenticationLogService service.AuthenticationLogService
-	userService              service.UserService
-	resetPasswordRepository  repository.ResetPasswordRepository
-	securityHelper           security.SecurityHelper
-	config                   config.Config
-	transactor               transactor.Transactor
+	userLogService          service.UserLogService
+	userService             service.UserService
+	resetPasswordRepository repository.ResetPasswordRepository
+	securityHelper          security.SecurityHelper
+	config                  config.Config
+	transactor              transactor.Transactor
 }
 
 type Params struct {
-	AuthenticationLogService service.AuthenticationLogService
-	UserService              service.UserService
-	ResetPasswordRepository  repository.ResetPasswordRepository
-	SecurityHelper           security.SecurityHelper
-	Config                   config.Config
-	Transactor               transactor.Transactor
+	UserLogService          service.UserLogService
+	UserService             service.UserService
+	ResetPasswordRepository repository.ResetPasswordRepository
+	SecurityHelper          security.SecurityHelper
+	Config                  config.Config
+	Transactor              transactor.Transactor
 }
 
 func New(params Params) service.ResetPasswordService {
 	return &ResetPasswordService{
-		authenticationLogService: params.AuthenticationLogService,
-		userService:              params.UserService,
-		resetPasswordRepository:  params.ResetPasswordRepository,
-		securityHelper:           params.SecurityHelper,
-		config:                   params.Config,
-		transactor:               params.Transactor,
+		userLogService:          params.UserLogService,
+		userService:             params.UserService,
+		resetPasswordRepository: params.ResetPasswordRepository,
+		securityHelper:          params.SecurityHelper,
+		config:                  params.Config,
+		transactor:              params.Transactor,
 	}
 }

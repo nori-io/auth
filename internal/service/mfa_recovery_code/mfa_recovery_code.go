@@ -58,7 +58,7 @@ func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data
 		}
 
 		if user.MfaType != mfa_type.None {
-			if err := srv.authenticationLogService.Create(ctx, service.AuthenticationLogCreateData{
+			if err := srv.userLogService.Create(ctx, service.UserLogCreateData{
 				UserID:    user.ID,
 				Action:    users_action.MfaRecoveryCodesGenerate,
 				SessionID: session.ID,
@@ -103,7 +103,7 @@ func (srv *MfaRecoveryCodeService) Apply(ctx context.Context, data service.Apply
 		if err := srv.mfaRecoveryCodeRepository.DeleteMfaRecoveryCode(ctx, data.UserID, data.Code); err != nil {
 			return err
 		}
-		if err := srv.authenticationLogService.Create(ctx, service.AuthenticationLogCreateData{
+		if err := srv.userLogService.Create(ctx, service.UserLogCreateData{
 			UserID:    mfaRecoveryCode.UserID,
 			Action:    users_action.MfaRecoveryCodeApply,
 			SessionID: session.ID,

@@ -63,8 +63,7 @@ func New(params Params) *Handler {
 	}
 	handler.GothProviderHelper.UseAll(providers)
 
-	// @todo: add middleware
-
+	// @todo: add middleware handler.R.Use - httpPlugin, interfaces
 	handler.R.Get("/admin/users", handler.AdminHandler.GetAllUsers)
 	handler.R.Get("/admin/users/{id}", handler.AdminHandler.GetUserById)
 	handler.R.Put("/admin/users/{id}", handler.AdminHandler.UpdateUserStatus)

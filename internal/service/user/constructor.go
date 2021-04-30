@@ -9,27 +9,27 @@ import (
 )
 
 type UserService struct {
-	authenticationLogService service.AuthenticationLogService
-	userRepository           repository.UserRepository
-	securityHelper           security.SecurityHelper
-	transactor               transactor.Transactor
-	config                   config.Config
+	userLogService service.UserLogService
+	userRepository repository.UserRepository
+	securityHelper security.SecurityHelper
+	transactor     transactor.Transactor
+	config         config.Config
 }
 
 type Params struct {
-	AuthenticationLogService service.AuthenticationLogService
-	UserRepository           repository.UserRepository
-	SecurityHelper           security.SecurityHelper
-	Transactor               transactor.Transactor
-	Config                   config.Config
+	UserLogService service.UserLogService
+	UserRepository repository.UserRepository
+	SecurityHelper security.SecurityHelper
+	Transactor     transactor.Transactor
+	Config         config.Config
 }
 
 func New(params Params) service.UserService {
 	return &UserService{
-		authenticationLogService: params.AuthenticationLogService,
-		userRepository:           params.UserRepository,
-		securityHelper:           params.SecurityHelper,
-		transactor:               params.Transactor,
-		config:                   params.Config,
+		userLogService: params.UserLogService,
+		userRepository: params.UserRepository,
+		securityHelper: params.SecurityHelper,
+		transactor:     params.Transactor,
+		config:         params.Config,
 	}
 }

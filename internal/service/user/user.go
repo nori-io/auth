@@ -100,7 +100,7 @@ func (srv UserService) UpdateUserStatus(ctx context.Context, data service.UserUp
 		}); err != nil {
 			return err
 		}
-		if err := srv.authenticationLogService.Create(ctx, service.AuthenticationLogCreateData{
+		if err := srv.userLogService.Create(ctx, service.UserLogCreateData{
 			UserID:    data.UserID,
 			Action:    users_action.UserStatusChanged,
 			Meta:      "",

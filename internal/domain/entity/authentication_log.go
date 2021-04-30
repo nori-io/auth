@@ -6,7 +6,7 @@ import (
 	"github.com/nori-plugins/authentication/pkg/enum/users_action"
 )
 
-type AuthenticationLog struct {
+type UserLog struct {
 	ID        uint64
 	UserID    uint64
 	Action    users_action.Action

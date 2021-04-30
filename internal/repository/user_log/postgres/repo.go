@@ -11,11 +11,11 @@ import (
 	"github.com/nori-plugins/authentication/pkg/errors"
 )
 
-type AuthenticationLogRepository struct {
+type UserLogRepository struct {
 	Tx transactor.Transactor
 }
 
-func (r *AuthenticationLogRepository) Create(ctx context.Context, e *entity.AuthenticationLog) error {
+func (r *UserLogRepository) Create(ctx context.Context, e *entity.UserLog) error {
 	m := newModel(e)
 
 	if err := r.Tx.GetDB(ctx).Create(m).Error; err != nil {
@@ -26,7 +26,7 @@ func (r *AuthenticationLogRepository) Create(ctx context.Context, e *entity.Auth
 	return nil
 }
 
-func (r *AuthenticationLogRepository) Update(ctx context.Context, e *entity.AuthenticationLog) error {
+func (r *UserLogRepository) Update(ctx context.Context, e *entity.UserLog) error {
 	m := newModel(e)
 	if err := r.Tx.GetDB(ctx).Save(m).Error; err != nil {
 		return errors.NewInternal(err)
@@ -36,14 +36,14 @@ func (r *AuthenticationLogRepository) Update(ctx context.Context, e *entity.Auth
 	return nil
 }
 
-func (r *AuthenticationLogRepository) Delete(ctx context.Context, id uint64) error {
+func (r *UserLogRepository) Delete(ctx context.Context, id uint64) error {
 	if err := r.Tx.GetDB(ctx).Delete(&model{ID: id}).Error; err != nil {
 		errors.NewInternal(err)
 	}
 	return nil
 }
 
-func (r *AuthenticationLogRepository) FindByUserID(ctx context.Context, userId uint64) (*entity.AuthenticationLog, error) {
+func (r *UserLogRepository) FindByUserID(ctx context.Context, userId uint64) (*entity.UserLog, error) {
 	out := &model{}
 	err := r.Tx.GetDB(ctx).Where("user_id=?", userId).Last(out).Error
 	if err == gorm.ErrRecordNotFound {

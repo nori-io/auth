@@ -88,7 +88,7 @@ func (srv *MfaTotpService) Validate(ctx context.Context, data service.MfaTotpVal
 	isTokenValid := srv.mfaTotpHelper.Validate(data.PassCode, mfaTotp.Secret)
 
 	if isTokenValid {
-		if err := srv.authenticationLogService.Create(ctx, service.AuthenticationLogCreateData{
+		if err := srv.authenticationLogService.Create(ctx, service.UserLogCreateData{
 			UserID:    mfaTotp.UserID,
 			Action:    users_action.MfaOtpEnabled,
 			SessionID: session.ID,

@@ -1,4 +1,4 @@
-package authentication_log
+package user_log
 
 import (
 	"context"
@@ -7,12 +7,12 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/service"
 )
 
-func (srv AuthenticationLogService) Create(ctx context.Context, data service.AuthenticationLogCreateData) error {
+func (srv UserLogService) Create(ctx context.Context, data service.UserLogCreateData) error {
 	if err := data.Validate(); err != nil {
 		return err
 	}
 
-	if err := srv.authenticationLogRepository.Create(ctx, &entity.AuthenticationLog{
+	if err := srv.userLogRepository.Create(ctx, &entity.UserLog{
 		UserID:    data.UserID,
 		Action:    data.Action,
 		SessionID: data.SessionID,

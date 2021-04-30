@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	securityHelper2 "github.com/nori-plugins/authentication/internal/helper/security"
+
 	"github.com/nori-plugins/authentication/pkg/enum/users_action"
 
 	"github.com/nori-plugins/authentication/pkg/enum/hash_algorithm"
@@ -22,8 +24,8 @@ import (
 	"github.com/nori-plugins/authentication/internal/domain/service"
 
 	authSrv "github.com/nori-plugins/authentication/internal/service/auth"
-	authenticationLogSrv "github.com/nori-plugins/authentication/internal/service/authentication_log"
 	userSrv "github.com/nori-plugins/authentication/internal/service/user"
+	userLogSrv "github.com/nori-plugins/authentication/internal/service/user_log"
 
 	"github.com/nori-plugins/authentication/pkg/enum/users_status"
 
@@ -31,8 +33,8 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/nori-io/logger"
 	"github.com/nori-plugins/authentication/internal/domain/entity"
-	authenticationLogRepository "github.com/nori-plugins/authentication/internal/repository/authentication_log"
 	userRepository "github.com/nori-plugins/authentication/internal/repository/user"
+	userLogRepository "github.com/nori-plugins/authentication/internal/repository/user_log"
 
 	"github.com/nori-plugins/authentication/pkg/transactor"
 	"github.com/stretchr/testify/require"
@@ -102,8 +104,12 @@ func TestTxManager_Transact(t *testing.T) {
 		}(),
 	}
 
+	securityHelper := securityHelper2.New(securityHelper2.Params{Config: *config})
+
 	s := userSrv.New(userSrv.Params{
+		UserLogService: nil,
 		UserRepository: r,
+		SecurityHelper: securityHelper,
 		Transactor:     tx,
 		Config:         *config,
 	})
@@ -145,7 +151,7 @@ func TestTxManager_TransactNested(t *testing.T) {
 		CreatedAt:              time.Now(),
 		UpdatedAt:              time.Now(),
 	}
-	authentication_log := &entity.AuthenticationLog{
+	user_log := &entity.UserLog{
 		UserID:    1,
 		Action:    users_action.SignUp,
 		Meta:      "",
@@ -161,9 +167,9 @@ func TestTxManager_TransactNested(t *testing.T) {
 		WithArgs(user.Status, user.UserType, user.MfaType, user.PhoneCountryCode, user.PhoneNumber, user.Email, sqlmock.AnyArg(), user.Salt, user.HashAlgorithm, user.IsEmailVerified, user.IsPhoneVerified, user.EmailActivationCode, AnyTime{}, AnyTime{}, AnyTime{}).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 
-	sqlAuthenticationLogInsert := `INSERT INTO "authentication_log" ("user_id","action","session_id","meta","created_at") VALUES ($1,$2,$3,$4,$5) RETURNING "authentication_log"."id"`
+	sqlAuthenticationLogInsert := `INSERT INTO "nori_authentication_user_log" ("user_id","action","session_id","meta","created_at") VALUES ($1,$2,$3,$4,$5) RETURNING "nori_authentication_user_log"."id"`
 	mock.ExpectQuery(sqlAuthenticationLogInsert).
-		WithArgs(authentication_log.UserID, authentication_log.Action, sqlmock.AnyArg(), authentication_log.Meta, AnyTime{}).
+		WithArgs(user_log.UserID, user_log.Action, sqlmock.AnyArg(), user_log.Meta, AnyTime{}).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 	mock.ExpectCommit()
 	gdb, err := gorm.Open("postgres", db)
@@ -175,7 +181,7 @@ func TestTxManager_TransactNested(t *testing.T) {
 	tx := transactor.New(txParams)
 
 	repoUser := userRepository.New(tx)
-	repoAuthenticationLog := authenticationLogRepository.New(tx)
+	repoUserLog := userLogRepository.New(tx)
 	config := &config2.Config{
 		PasswordBcryptCost: func() config.Int {
 			return func() int {
@@ -188,23 +194,26 @@ func TestTxManager_TransactNested(t *testing.T) {
 			}
 		}(),
 	}
+	securityHelper := securityHelper2.New(securityHelper2.Params{Config: *config})
+
+	srvUserLog := userLogSrv.New(userLogSrv.Params{
+		UserLogRepository: repoUserLog,
+		Transactor:        tx,
+	})
 
 	srvUser := userSrv.New(userSrv.Params{
+		UserLogService: srvUserLog,
 		UserRepository: repoUser,
+		SecurityHelper: securityHelper,
 		Transactor:     tx,
 		Config:         *config,
 	})
 
-	srvAuthenticationLog := authenticationLogSrv.New(authenticationLogSrv.Params{
-		AuthenticationLogRepository: repoAuthenticationLog,
-		Transactor:                  tx,
-	})
-
 	srvAuth := authSrv.New(authSrv.Params{
-		Config:                   *config,
-		UserService:              srvUser,
-		AuthenticationLogService: srvAuthenticationLog,
-		Transactor:               tx,
+		Config:         *config,
+		UserService:    srvUser,
+		UserLogService: srvUserLog,
+		Transactor:     tx,
 	})
 
 	user, err = srvAuth.SignUp(context.Background(), service.SignUpData{

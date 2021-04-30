@@ -9,33 +9,33 @@ import (
 )
 
 type MfaTotpService struct {
-	authenticationLogService service.AuthenticationLogService
-	sessionService           service.SessionService
-	userService              service.UserService
-	mfaTotpRepository        repository.MfaTotpRepository
-	mfaTotpHelper            mfa_totp.MfaTotpHelper
-	config                   config.Config
-	transactor               transactor.Transactor
+	userLogService    service.UserLogService
+	sessionService    service.SessionService
+	userService       service.UserService
+	mfaTotpRepository repository.MfaTotpRepository
+	mfaTotpHelper     mfa_totp.MfaTotpHelper
+	config            config.Config
+	transactor        transactor.Transactor
 }
 
 type Params struct {
-	AuthenticationLogService service.AuthenticationLogService
-	SessionService           service.SessionService
-	UserService              service.UserService
-	MfaTotpRepository        repository.MfaTotpRepository
-	MfaTotpHelper            mfa_totp.MfaTotpHelper
-	Config                   config.Config
-	Transactor               transactor.Transactor
+	UserLogService    service.UserLogService
+	SessionService    service.SessionService
+	UserService       service.UserService
+	MfaTotpRepository repository.MfaTotpRepository
+	MfaTotpHelper     mfa_totp.MfaTotpHelper
+	Config            config.Config
+	Transactor        transactor.Transactor
 }
 
 func New(params Params) service.MfaTotpService {
 	return &MfaTotpService{
-		authenticationLogService: params.AuthenticationLogService,
-		sessionService:           params.SessionService,
-		userService:              params.UserService,
-		mfaTotpRepository:        params.MfaTotpRepository,
-		mfaTotpHelper:            params.MfaTotpHelper,
-		config:                   params.Config,
-		transactor:               params.Transactor,
+		userLogService:    params.UserLogService,
+		sessionService:    params.SessionService,
+		userService:       params.UserService,
+		mfaTotpRepository: params.MfaTotpRepository,
+		mfaTotpHelper:     params.MfaTotpHelper,
+		config:            params.Config,
+		transactor:        params.Transactor,
 	}
 }

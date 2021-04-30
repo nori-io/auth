@@ -68,7 +68,7 @@ func (srv ResetPasswordService) SetNewPasswordByResetPasswordEmailToken(ctx cont
 		}
 		return nil
 
-		if err := srv.authenticationLogService.Create(ctx, service.AuthenticationLogCreateData{
+		if err := srv.userLogService.Create(ctx, service.UserLogCreateData{
 			UserID:    resetPassword.UserID,
 			Action:    users_action.PasswordReseted,
 			SessionID: 0,

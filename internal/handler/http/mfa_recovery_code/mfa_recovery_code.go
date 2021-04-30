@@ -17,24 +17,24 @@ import (
 
 type MfaRecoveryCodeHandler struct {
 	mfaRecoveryCodeService service.MfaRecoveryCodeService
-	logger                 logger.FieldLogger
 	cookieHelper           cookie.CookieHelper
 	errorHelper            error2.ErrorHelper
+	logger                 logger.FieldLogger
 }
 
 type Params struct {
 	MfaRecoveryCodeService service.MfaRecoveryCodeService
-	Logger                 logger.FieldLogger
 	CookieHelper           cookie.CookieHelper
 	ErrorHelper            error2.ErrorHelper
+	Logger                 logger.FieldLogger
 }
 
 func New(params Params) *MfaRecoveryCodeHandler {
 	return &MfaRecoveryCodeHandler{
 		mfaRecoveryCodeService: params.MfaRecoveryCodeService,
-		logger:                 params.Logger,
 		cookieHelper:           params.CookieHelper,
 		errorHelper:            params.ErrorHelper,
+		logger:                 params.Logger,
 	}
 }
 

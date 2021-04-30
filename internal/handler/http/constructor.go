@@ -26,8 +26,8 @@ type Handler struct {
 	ResetPasswordHandler   reset_password.ResetPasswordHandler
 	SettingsHandler        *settings.SettingsHandler
 	SocialProviderHandler  *social_provider.SocialProviderHandler
-	GothProviderHelper     goth_provider.GothProviderHelper
 	SocialProviderService  service.SocialProvider
+	GothProviderHelper     goth_provider.GothProviderHelper
 }
 
 type Params struct {
@@ -39,8 +39,8 @@ type Params struct {
 	ResetPasswordHandler   reset_password.ResetPasswordHandler
 	SettingsHandler        *settings.SettingsHandler
 	SocialProviderHandler  *social_provider.SocialProviderHandler
-	GothProviderHelper     goth_provider.GothProviderHelper
 	SocialProviderService  service.SocialProvider
+	GothProviderHelper     goth_provider.GothProviderHelper
 }
 
 func New(params Params) *Handler {
@@ -53,8 +53,8 @@ func New(params Params) *Handler {
 		ResetPasswordHandler:   params.ResetPasswordHandler,
 		SettingsHandler:        params.SettingsHandler,
 		SocialProviderHandler:  params.SocialProviderHandler,
-		GothProviderHelper:     params.GothProviderHelper,
 		SocialProviderService:  params.SocialProviderService,
+		GothProviderHelper:     params.GothProviderHelper,
 	}
 
 	providers, err := handler.SocialProviderService.GetAllActive(context.Background())

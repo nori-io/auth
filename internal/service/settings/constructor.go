@@ -10,29 +10,29 @@ import (
 
 type SettingsService struct {
 	authenticationLogService service.AuthenticationLogService
-	sessionRepository        repository.SessionRepository
 	userService              service.UserService
-	config                   config.Config
+	sessionRepository        repository.SessionRepository
 	securityHelper           security.SecurityHelper
+	config                   config.Config
 	transactor               transactor.Transactor
 }
 
 type Params struct {
-	authenticationLogService service.AuthenticationLogService
-	SessionRepository        repository.SessionRepository
+	AuthenticationLogService service.AuthenticationLogService
 	UserService              service.UserService
-	Config                   config.Config
+	SessionRepository        repository.SessionRepository
 	SecurityHelper           security.SecurityHelper
-	Transactor               transactor.Transactor
+	Config                   config.Config
+	transactor               transactor.Transactor
 }
 
 func New(params Params) service.SettingsService {
 	return &SettingsService{
-		authenticationLogService: params.authenticationLogService,
-		sessionRepository:        params.SessionRepository,
+		authenticationLogService: params.AuthenticationLogService,
 		userService:              params.UserService,
-		config:                   params.Config,
+		sessionRepository:        params.SessionRepository,
 		securityHelper:           params.SecurityHelper,
-		transactor:               params.Transactor,
+		config:                   params.Config,
+		transactor:               params.transactor,
 	}
 }

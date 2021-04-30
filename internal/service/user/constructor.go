@@ -11,25 +11,25 @@ import (
 type UserService struct {
 	authenticationLogService service.AuthenticationLogService
 	userRepository           repository.UserRepository
+	securityHelper           security.SecurityHelper
 	transactor               transactor.Transactor
 	config                   config.Config
-	securityHelper           security.SecurityHelper
 }
 
 type Params struct {
 	authenticationLogService service.AuthenticationLogService
 	UserRepository           repository.UserRepository
+	SecurityHelper           security.SecurityHelper
 	Transactor               transactor.Transactor
 	Config                   config.Config
-	SecurityHelper           security.SecurityHelper
 }
 
 func New(params Params) service.UserService {
 	return &UserService{
 		authenticationLogService: params.authenticationLogService,
 		userRepository:           params.UserRepository,
+		securityHelper:           params.SecurityHelper,
 		transactor:               params.Transactor,
 		config:                   params.Config,
-		securityHelper:           params.SecurityHelper,
 	}
 }

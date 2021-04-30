@@ -14,21 +14,23 @@ import (
 
 type SettingsHandler struct {
 	settingsService service.SettingsService
-	logger          logger.FieldLogger
 	cookieHelper    cookie.CookieHelper
 	errorHelper     error2.ErrorHelper
+	logger          logger.FieldLogger
 }
 
 type Params struct {
 	SettingsService service.SettingsService
-	Logger          logger.FieldLogger
 	CookieHelper    cookie.CookieHelper
 	ErrorHelper     error2.ErrorHelper
+	Logger          logger.FieldLogger
 }
 
 func New(params Params) *SettingsHandler {
 	return &SettingsHandler{
 		settingsService: params.SettingsService,
+		cookieHelper:    params.CookieHelper,
+		errorHelper:     params.ErrorHelper,
 		logger:          params.Logger,
 	}
 }

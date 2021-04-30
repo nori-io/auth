@@ -13,24 +13,24 @@ import (
 
 type SocialProviderHandler struct {
 	socialProviderService service.SocialProvider
-	logger                logger.FieldLogger
 	cookieHelper          cookie.CookieHelper
 	errorHelper           error2.ErrorHelper
+	logger                logger.FieldLogger
 }
 
 type Params struct {
 	SocialProviderService service.SocialProvider
-	Logger                logger.FieldLogger
 	CookieHelper          cookie.CookieHelper
 	ErrorHelper           error2.ErrorHelper
+	Logger                logger.FieldLogger
 }
 
 func New(params Params) *SocialProviderHandler {
 	return &SocialProviderHandler{
 		socialProviderService: params.SocialProviderService,
-		logger:                params.Logger,
 		cookieHelper:          params.CookieHelper,
 		errorHelper:           params.ErrorHelper,
+		logger:                params.Logger,
 	}
 }
 
@@ -49,6 +49,3 @@ func (h *SocialProviderHandler) GetSocialProviders(w http.ResponseWriter, r *htt
 
 	response.JSON(w, r, convertAll(providers))
 }
-
-
-

@@ -13,21 +13,21 @@ import (
 
 type ResetPasswordHandler struct {
 	resetPasswordService service.ResetPasswordService
-	logger               logger.FieldLogger
 	errorHelper          error2.ErrorHelper
+	logger               logger.FieldLogger
 }
 
 type Params struct {
 	ResetPasswordService service.ResetPasswordService
-	Logger               logger.FieldLogger
 	ErrorHelper          error2.ErrorHelper
+	Logger               logger.FieldLogger
 }
 
 func New(params Params) *ResetPasswordHandler {
 	return &ResetPasswordHandler{
 		resetPasswordService: params.ResetPasswordService,
-		logger:               params.Logger,
 		errorHelper:          params.ErrorHelper,
+		logger:               params.Logger,
 	}
 }
 

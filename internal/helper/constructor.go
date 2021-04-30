@@ -15,17 +15,17 @@ type Helper struct {
 }
 
 type Params struct {
-	CookieHelper    cookie.CookieHelper
-	ErrorHelper     error2.ErrorHelper
-	MfaRecoveryCode mfa_recovery_code.MfaRecoveryCodesHelper
-	SecurityHelper  security.SecurityHelper
+	CookieHelper          cookie.CookieHelper
+	ErrorHelper           error2.ErrorHelper
+	MfaRecoveryCodeHelper mfa_recovery_code.MfaRecoveryCodesHelper
+	SecurityHelper        security.SecurityHelper
 }
 
 func New(params Params) *Helper {
 	helper := Helper{
 		CookieHelper:          params.CookieHelper,
 		ErrorHelper:           params.ErrorHelper,
-		MfaRecoveryCodeHelper: params.MfaRecoveryCode,
+		MfaRecoveryCodeHelper: params.MfaRecoveryCodeHelper,
 		SecurityHelper:        params.SecurityHelper,
 	}
 	return &helper

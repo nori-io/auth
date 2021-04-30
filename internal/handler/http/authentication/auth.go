@@ -30,31 +30,32 @@ import (
 type AuthenticationHandler struct {
 	authenticationService service.AuthenticationService
 	sessionService        service.SessionService
-	logger                logger.FieldLogger
-	config                config.Config
+	socialProviderService service.SocialProvider
 	cookieHelper          cookie.CookieHelper
 	errorHelper           error2.ErrorHelper
-	socialProviderService service.SocialProvider
+	config                config.Config
+	logger                logger.FieldLogger
 }
 
 type Params struct {
 	AuthenticationService service.AuthenticationService
 	SessionService        service.SessionService
-	Logger                logger.FieldLogger
-	Config                config.Config
+	SocialProviderService service.SocialProvider
 	CookieHelper          cookie.CookieHelper
 	ErrorHelper           error2.ErrorHelper
-	SocialProviderService service.SocialProvider
+	Config                config.Config
+	Logger                logger.FieldLogger
 }
 
 func New(params Params) *AuthenticationHandler {
 	return &AuthenticationHandler{
 		authenticationService: params.AuthenticationService,
 		sessionService:        params.SessionService,
-		logger:                params.Logger,
-		config:                params.Config,
+		socialProviderService: params.SocialProviderService,
 		cookieHelper:          params.CookieHelper,
 		errorHelper:           params.ErrorHelper,
+		config:                params.Config,
+		logger:                params.Logger,
 	}
 }
 

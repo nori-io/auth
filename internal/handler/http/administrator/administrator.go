@@ -19,24 +19,24 @@ import (
 
 type AdminHandler struct {
 	userService  user.UserService
-	logger       logger.FieldLogger
 	cookieHelper cookie.CookieHelper
 	errorHelper  error2.ErrorHelper
+	logger       logger.FieldLogger
 }
 
 type Params struct {
 	UserService  user.UserService
-	Logger       logger.FieldLogger
 	CookieHelper cookie.CookieHelper
 	ErrorHelper  error2.ErrorHelper
+	Logger       logger.FieldLogger
 }
 
 func New(params Params) *AdminHandler {
 	return &AdminHandler{
 		userService:  params.UserService,
-		logger:       params.Logger,
 		cookieHelper: params.CookieHelper,
 		errorHelper:  params.ErrorHelper,
+		logger:       params.Logger,
 	}
 }
 

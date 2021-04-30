@@ -15,24 +15,24 @@ import (
 
 type MfaTotpHandler struct {
 	mfaTotpService service.MfaTotpService
-	logger         logger.FieldLogger
 	cookieHelper   cookie.CookieHelper
 	errorHelper    error2.ErrorHelper
+	logger         logger.FieldLogger
 }
 
 type Params struct {
 	MfaTotpService service.MfaTotpService
-	Logger         logger.FieldLogger
 	CookieHelper   cookie.CookieHelper
 	ErrorHelper    error2.ErrorHelper
+	Logger         logger.FieldLogger
 }
 
 func New(params Params) *MfaTotpHandler {
 	return &MfaTotpHandler{
 		mfaTotpService: params.MfaTotpService,
-		logger:         params.Logger,
 		cookieHelper:   params.CookieHelper,
 		errorHelper:    params.ErrorHelper,
+		logger:         params.Logger,
 	}
 }
 

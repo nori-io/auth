@@ -35,7 +35,7 @@ func New(params Params) *SocialProviderHandler {
 }
 
 func (h *SocialProviderHandler) GetSocialProviders(w http.ResponseWriter, r *http.Request) {
-	_, err := h.cookieHelper.GetSessionID(r)
+	sessionId, err := h.cookieHelper.GetSessionID(r)
 	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)

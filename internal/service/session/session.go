@@ -40,6 +40,15 @@ func (srv SessionService) Update(ctx context.Context, data service.SessionUpdate
 		return err
 	}
 
+	session, err := srv.GetBySessionKey(ctx, service.GetBySessionKeyData{SessionKey: data.SessionKey})
+	if err != nil {
+		return err
+	}
+
+	if session == nil {
+		return errors2.SessionNotFound
+	}
+
 	if err := srv.sessionRepository.Update(ctx, &entity.Session{
 		UserID:     data.UserID,
 		SessionKey: []byte(data.SessionKey),

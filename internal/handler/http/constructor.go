@@ -67,7 +67,7 @@ func New(params Params) *Handler {
 	handler.R.Get("/admin/users", handler.AdminHandler.GetAllUsers)
 	handler.R.Get("/admin/users/{id}", handler.AdminHandler.GetUserById)
 	handler.R.Put("/admin/users/{id}", handler.AdminHandler.UpdateUserStatus)
-	// hardDelete handler.R.Delete("/admin/users/{id}", handler.AdminHandler.DeleteUser)
+	handler.R.Delete("/admin/users/{id}", handler.AdminHandler.DeleteUser)
 
 	handler.R.Post("/auth/login", handler.AuthenticationHandler.LogIn)
 	handler.R.Post("/auth/login/mfa", handler.AuthenticationHandler.LogInMfa)

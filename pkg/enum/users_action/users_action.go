@@ -15,6 +15,7 @@ const (
 	LogOut
 	SignUp
 	UserStatusChanged
+	UserDeleted
 )
 
 func (u Action) Value() uint8 {

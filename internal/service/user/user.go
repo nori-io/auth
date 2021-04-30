@@ -116,6 +116,31 @@ func (srv UserService) UpdateUserStatus(ctx context.Context, data service.UserUp
 	return nil
 }
 
+func (srv UserService) DeleteUser(ctx context.Context, data service.UserUpdateStatusData) error {
+	if err := data.Validate(); err != nil {
+		return err
+	}
+
+	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
+		if err := srv.userRepository.Delete(ctx, data.UserID); err != nil {
+			return err
+		}
+		if err := srv.userLogService.Create(ctx, service.UserLogCreateData{
+			UserID:    data.UserID,
+			Action:    users_action.UserDeleted,
+			Meta:      "",
+			CreatedAt: time.Now(),
+		}); err != nil {
+			return err
+		}
+
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (srv UserService) GetByEmail(ctx context.Context, data service.GetByEmailData) (*entity.User, error) {
 	if err := data.Validate(); err != nil {
 		return nil, err

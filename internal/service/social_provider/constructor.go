@@ -6,15 +6,18 @@ import (
 )
 
 type SocialProviderService struct {
+	sessionService           service.SessionService
 	socialProviderRepository repository.SocialProviderRepository
 }
 
 type Params struct {
+	SessionService           service.SessionService
 	SocialProviderRepository repository.SocialProviderRepository
 }
 
 func New(params Params) service.SocialProvider {
 	return &SocialProviderService{
+		sessionService:           params.SessionService,
 		socialProviderRepository: params.SocialProviderRepository,
 	}
 }

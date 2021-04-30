@@ -8,7 +8,6 @@ import (
 
 type Service struct {
 	authenticationService  service.AuthenticationService
-	userLogService         user_log.UserLogService
 	mfaRecoveryCodeService service.MfaRecoveryCodeService
 	mfaTotpService         service.MfaTotpService
 	resetPasswordService   service.ResetPasswordService
@@ -16,11 +15,11 @@ type Service struct {
 	settingsService        service.SettingsService
 	socialProviderService  service.SocialProvider
 	userService            service.UserService
+	userLogService         user_log.UserLogService
 }
 
 type Params struct {
 	AuthenticationService  service.AuthenticationService
-	UserLogService         user_log.UserLogService
 	MfaRecoveryCodeService service.MfaRecoveryCodeService
 	MfaTotpService         service.MfaTotpService
 	ResetPasswordService   service.ResetPasswordService
@@ -28,12 +27,12 @@ type Params struct {
 	SettingsService        service.SettingsService
 	SocialProviderService  service.SocialProvider
 	UserService            service.UserService
+	UserLogService         user_log.UserLogService
 }
 
 func New(params Params) authentication.Authentication {
 	return &Service{
 		authenticationService:  params.AuthenticationService,
-		userLogService:         params.UserLogService,
 		mfaRecoveryCodeService: params.MfaRecoveryCodeService,
 		mfaTotpService:         params.MfaTotpService,
 		resetPasswordService:   params.ResetPasswordService,
@@ -41,5 +40,6 @@ func New(params Params) authentication.Authentication {
 		settingsService:        params.SettingsService,
 		socialProviderService:  params.SocialProviderService,
 		userService:            params.UserService,
+		userLogService:         params.UserLogService,
 	}
 }

@@ -77,5 +77,5 @@ func newModel(e *entity.User) *model {
 
 // TableName
 func (model) TableName() string {
-	return "users"
+	return "nori_authentication_users"
 }

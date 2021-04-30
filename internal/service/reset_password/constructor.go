@@ -9,8 +9,8 @@ import (
 )
 
 type ResetPasswordService struct {
-	userLogService          service.UserLogService
 	userService             service.UserService
+	userLogService          service.UserLogService
 	resetPasswordRepository repository.ResetPasswordRepository
 	securityHelper          security.SecurityHelper
 	config                  config.Config
@@ -18,8 +18,8 @@ type ResetPasswordService struct {
 }
 
 type Params struct {
-	UserLogService          service.UserLogService
 	UserService             service.UserService
+	UserLogService          service.UserLogService
 	ResetPasswordRepository repository.ResetPasswordRepository
 	SecurityHelper          security.SecurityHelper
 	Config                  config.Config
@@ -28,8 +28,8 @@ type Params struct {
 
 func New(params Params) service.ResetPasswordService {
 	return &ResetPasswordService{
-		userLogService:          params.UserLogService,
 		userService:             params.UserService,
+		userLogService:          params.UserLogService,
 		resetPasswordRepository: params.ResetPasswordRepository,
 		securityHelper:          params.SecurityHelper,
 		config:                  params.Config,

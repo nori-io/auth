@@ -43,5 +43,5 @@ func newModel(e *entity.OneTimeToken) *model {
 
 // TableName
 func (model) TableName() string {
-	return "one_time_tokens"
+	return "nori_authentication_one_time_tokens"
 }

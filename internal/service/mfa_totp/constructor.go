@@ -9,9 +9,9 @@ import (
 )
 
 type MfaTotpService struct {
-	userLogService    service.UserLogService
 	sessionService    service.SessionService
 	userService       service.UserService
+	userLogService    service.UserLogService
 	mfaTotpRepository repository.MfaTotpRepository
 	mfaTotpHelper     mfa_totp.MfaTotpHelper
 	config            config.Config
@@ -19,9 +19,9 @@ type MfaTotpService struct {
 }
 
 type Params struct {
-	UserLogService    service.UserLogService
 	SessionService    service.SessionService
 	UserService       service.UserService
+	UserLogService    service.UserLogService
 	MfaTotpRepository repository.MfaTotpRepository
 	MfaTotpHelper     mfa_totp.MfaTotpHelper
 	Config            config.Config
@@ -30,9 +30,9 @@ type Params struct {
 
 func New(params Params) service.MfaTotpService {
 	return &MfaTotpService{
-		userLogService:    params.UserLogService,
 		sessionService:    params.SessionService,
 		userService:       params.UserService,
+		userLogService:    params.UserLogService,
 		mfaTotpRepository: params.MfaTotpRepository,
 		mfaTotpHelper:     params.MfaTotpHelper,
 		config:            params.Config,

@@ -15,7 +15,6 @@ import (
 )
 
 var RepositorySet = wire.NewSet(
-	user_log.New,
 	mfa_recovery_code.New,
 	mfa_totp.New,
 	one_time_token.New,
@@ -24,5 +23,6 @@ var RepositorySet = wire.NewSet(
 	social_account.New,
 	social_provider.New,
 	user.New,
+	user_log.New,
 	repository.New,
 )

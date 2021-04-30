@@ -33,5 +33,5 @@ func newModel(e *entity.MfaTotp) *model {
 
 // TableName for gorm
 func (model) TableName() string {
-	return "mfa_totp"
+	return "nori_authentication_mfa_totp"
 }

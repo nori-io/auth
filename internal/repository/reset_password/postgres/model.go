@@ -33,5 +33,5 @@ func newModel(e *entity.ResetPassword) *model {
 
 // TableName
 func (model) TableName() string {
-	return "reset_password"
+	return "nori_authentication_reset_password"
 }

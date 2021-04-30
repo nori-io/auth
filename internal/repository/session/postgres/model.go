@@ -45,5 +45,5 @@ func newModel(e *entity.Session) *model {
 
 // TableName
 func (model) TableName() string {
-	return "sessions"
+	return "nori_authentication_sessions"
 }

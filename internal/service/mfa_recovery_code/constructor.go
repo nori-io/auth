@@ -9,9 +9,9 @@ import (
 )
 
 type MfaRecoveryCodeService struct {
-	userLogService            service.UserLogService
 	sessionService            service.SessionService
 	userService               service.UserService
+	userLogService            service.UserLogService
 	mfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository
 	mfaRecoveryCodeHelper     mfa_recovery_code.MfaRecoveryCodesHelper
 	config                    config.Config
@@ -19,9 +19,9 @@ type MfaRecoveryCodeService struct {
 }
 
 type Params struct {
-	UserLogService            service.UserLogService
 	SessionService            service.SessionService
 	UserService               service.UserService
+	UserLogService            service.UserLogService
 	MfaRecoveryCodeRepository repository.MfaRecoveryCodeRepository
 	MfaRecoveryCodeHelper     mfa_recovery_code.MfaRecoveryCodesHelper
 	Config                    config.Config
@@ -30,9 +30,9 @@ type Params struct {
 
 func New(params Params) service.MfaRecoveryCodeService {
 	return &MfaRecoveryCodeService{
-		userLogService:            params.UserLogService,
-		userService:               params.UserService,
 		sessionService:            params.SessionService,
+		userService:               params.UserService,
+		userLogService:            params.UserLogService,
 		mfaRecoveryCodeRepository: params.MfaRecoveryCodeRepository,
 		mfaRecoveryCodeHelper:     params.MfaRecoveryCodeHelper,
 		config:                    params.Config,

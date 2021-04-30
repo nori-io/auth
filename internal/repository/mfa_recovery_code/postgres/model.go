@@ -33,5 +33,5 @@ func newModel(e *entity.MfaRecoveryCode) *model {
 
 // TableName
 func (model) TableName() string {
-	return "mfa_recovery_codes"
+	return "nori_authentication_mfa_recovery_codes"
 }

@@ -71,11 +71,11 @@ func TestTxManager_Transact(t *testing.T) {
 		CreatedAt:              time.Now(),
 		UpdatedAt:              time.Now(),
 	}
-	sqlInsertString := `INSERT INTO "users" ` +
+	sqlInsertString := `INSERT INTO "nori_authentication_users" ` +
 		`("status","user_type","mfa_type","phone_country_code","phone_number","email","password","salt","hash_algorithm","is_email_verified","is_phone_verified","email_activation_code ","email_activation_code_ttl","created_at","updated_at") ` +
-		`VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING "users"."id"`
+		`VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING "nori_authentication_users"."id"`
 
-	mock.ExpectQuery(`SELECT * FROM "users"  WHERE (email=$1) ORDER BY "users"."id" ASC LIMIT 1`).
+	mock.ExpectQuery(`SELECT * FROM "nori_authentication_users"  WHERE (email=$1) ORDER BY "nori_authentication_users"."id" ASC LIMIT 1`).
 		WithArgs(user.Email).WillReturnError(gorm.ErrRecordNotFound)
 	mock.ExpectBegin()
 	mock.ExpectQuery(sqlInsertString).
@@ -158,11 +158,11 @@ func TestTxManager_TransactNested(t *testing.T) {
 		CreatedAt: time.Now(),
 	}
 	mock.ExpectBegin()
-	mock.ExpectQuery(`SELECT * FROM "users"  WHERE (email=$1) ORDER BY "users"."id" ASC LIMIT 1`).
+	mock.ExpectQuery(`SELECT * FROM "nori_authentication_users"  WHERE (email=$1) ORDER BY "nori_authentication_users"."id" ASC LIMIT 1`).
 		WithArgs(user.Email).WillReturnError(gorm.ErrRecordNotFound)
-	sqlUserInsert := `INSERT INTO "users" ` +
+	sqlUserInsert := `INSERT INTO "nori_authentication_users" ` +
 		`("status","user_type","mfa_type","phone_country_code","phone_number","email","password","salt","hash_algorithm","is_email_verified","is_phone_verified","email_activation_code ","email_activation_code_ttl","created_at","updated_at") ` +
-		`VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING "users"."id"`
+		`VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING "nori_authentication_users"."id"`
 	mock.ExpectQuery(sqlUserInsert).
 		WithArgs(user.Status, user.UserType, user.MfaType, user.PhoneCountryCode, user.PhoneNumber, user.Email, sqlmock.AnyArg(), user.Salt, user.HashAlgorithm, user.IsEmailVerified, user.IsPhoneVerified, user.EmailActivationCode, AnyTime{}, AnyTime{}, AnyTime{}).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))

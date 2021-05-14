@@ -16,15 +16,15 @@ import (
 
 func (srv SocialProviderService) GetAllActive(ctx context.Context) ([]entity.SocialProvider, error) {
 	status := social_provider_status.Enabled
-
-	session, err := srv.sessionService.GetBySessionKey(ctx, service.GetBySessionKeyData{SessionKey: data.SessionKey})
+	//@todo replace session checking to middleware
+	/*session, err := srv.sessionService.GetBySessionKey(ctx, service.GetBySessionKeyData{SessionKey: data.SessionKey})
 	if err != nil {
 		return nil, err
 	}
 
 	if session == nil {
 		return nil, errors2.SessionNotFound
-	}
+	}*/
 
 	providers, err := srv.socialProviderRepository.FindByFilter(ctx, repository.SocialProviderFilter{
 		Status: &status,

@@ -13,11 +13,13 @@ type SocialProvider interface {
 }
 
 type GetByNameData struct {
-	Name string
+	Name       string
+	SessionKey string
 }
 
 func (d GetByNameData) Validate() error {
 	return v.Errors{
-		"name": v.Validate(d.Name, v.Required, v.Length(2, 32)),
+		"name":        v.Validate(d.Name, v.Required, v.Length(2, 32)),
+		"session_key": v.Validate(d.SessionKey, v.Required, v.Length(128, 128)),
 	}.Filter()
 }

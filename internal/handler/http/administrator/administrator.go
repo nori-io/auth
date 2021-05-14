@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"strconv"
 
+	http2 "github.com/nori-io/interfaces/nori/http"
+
 	"github.com/nori-plugins/authentication/pkg/enum/session_status"
 
 	"github.com/nori-plugins/authentication/pkg/enum/users_status"
-
-	"github.com/go-chi/chi"
 
 	"github.com/nori-plugins/authentication/internal/handler/http/response"
 
@@ -19,6 +19,7 @@ import (
 )
 
 type AdminHandler struct {
+	R              http2.Http
 	sessionService service.SessionService
 	userService    service.UserService
 	cookieHelper   cookie.CookieHelper
@@ -27,6 +28,7 @@ type AdminHandler struct {
 }
 
 type Params struct {
+	R              http2.Http
 	SessionService service.SessionService
 	UserService    service.UserService
 	CookieHelper   cookie.CookieHelper
@@ -36,6 +38,7 @@ type Params struct {
 
 func New(params Params) *AdminHandler {
 	return &AdminHandler{
+		R:              params.R,
 		sessionService: params.SessionService,
 		userService:    params.UserService,
 		cookieHelper:   params.CookieHelper,
@@ -107,7 +110,7 @@ func (h *AdminHandler) GetUserById(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
 	}
 
-	id := chi.URLParam(r, "id")
+	id := h.R.URLParam(r, "id")
 	u, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -129,13 +132,13 @@ func (h *AdminHandler) UpdateUserStatus(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
 	}
 
-	id := chi.URLParam(r, "id")
+	id := h.R.URLParam(r, "id")
 	u, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	userStatus := chi.URLParam(r, "user_status")
+	userStatus := h.R.URLParam(r, "user_status")
 	u, err = strconv.ParseUint(userStatus, 10, 8)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -165,7 +168,7 @@ func (h *AdminHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
 		}
 
-		id := chi.URLParam(r, "id")
+		id := h.R.URLParam(r, "id")
 		u, err := strconv.ParseUint(id, 10, 64)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)

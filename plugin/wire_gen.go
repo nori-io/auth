@@ -89,6 +89,7 @@ func Initialize(registry2 registry.Registry, config2 config.Config, logger2 logg
 	}
 	errorHelper := error2.New(errorParams)
 	administratorParams := administrator.Params{
+		R:            httpHttp,
 		UserService:  userService,
 		CookieHelper: cookieHelper,
 		ErrorHelper:  errorHelper,
@@ -149,6 +150,7 @@ func Initialize(registry2 registry.Registry, config2 config.Config, logger2 logg
 	}
 	authenticationService := auth.New(authParams)
 	authenticationParams := authentication.Params{
+		R:                     httpHttp,
 		AuthenticationService: authenticationService,
 		SessionService:        sessionService,
 		SocialProviderService: socialProvider,

@@ -65,8 +65,6 @@ github.com/envoyproxy/go-control-plane v0.9.4/go.mod h1:6rpuAdCZL397s3pYoYcLgu1m
 github.com/envoyproxy/protoc-gen-validate v0.1.0/go.mod h1:iSmxcyjqTsJpI2R4NaDN7+kN2VEUnK/pcBlmesArF7c=
 github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 h1:Yzb9+7DPaBjB8zlTR87/ElzFsnQfuHnVUVqpZZIcV5Y=
 github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5/go.mod h1:a2zkGnVExMxdzMo3M0Hi/3sEU+cWnZpSni0O6/Yb/P0=
-github.com/go-chi/chi v1.5.4 h1:QHdzF2szwjqVV4wmByUnTcsbIg7UGaQ0tPF2t5GcAIs=
-github.com/go-chi/chi v1.5.4/go.mod h1:uaf8YgoFazUOkPBG7fxPftUylNumIev9awIWOENIuEg=
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20191125211704-12ad95a8df72/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20200222043503-6f7a984d4dc4/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
@@ -138,6 +136,7 @@ github.com/gorilla/context v1.1.1 h1:AWwleXJkX/nhcU9bZSnZoi3h/qGYqQAGhq6zZe/aQW8
 github.com/gorilla/context v1.1.1/go.mod h1:kBGZzfjB9CEq2AlWe17Uuf7NDRt0dE0s8S51q0aT7Yg=
 github.com/gorilla/mux v1.6.2 h1:Pgr17XVTNXAk3q/r4CpKzC5xBM/qW1uVLV+IhRZpIIk=
 github.com/gorilla/mux v1.6.2/go.mod h1:1lud6UwP+6orDFRuTfBEV8e9/aOM/c4fVVCaMa2zaAs=
+github.com/gorilla/pat v0.0.0-20180118222023-199c85a7f6d1 h1:LqbZZ9sNMWVjeXS4NN5oVvhMjDyLhmA1LG86oSo+IqY=
 github.com/gorilla/pat v0.0.0-20180118222023-199c85a7f6d1/go.mod h1:YeAe0gNeiNT5hoiZRI4yiOky6jVdNvfO2N6Kav/HmxY=
 github.com/gorilla/securecookie v1.1.1 h1:miw7JPhV+b/lAHSXz4qd/nN9jRiAFV5FwjeKyCS8BvQ=
 github.com/gorilla/securecookie v1.1.1/go.mod h1:ra0sb63/xPlUeL+yeDciTfxMRAA+MP+HVt/4epWDjd4=
@@ -182,12 +181,8 @@ github.com/nori-io/interfaces/database/orm/gorm v0.0.1 h1:eXWmVQRgM1LLQ9xs9v3U3d
 github.com/nori-io/interfaces/database/orm/gorm v0.0.1/go.mod h1:Fvj3QsnL5AN4RhvUhIaJSYXwmpY0OWrh2wYjEz1AR9c=
 github.com/nori-io/interfaces/nori/http v0.0.0-20210514092307-515380204685 h1:z1xB/0sr5dEMQvfd+GglY+E5x3KxeuxrNe1xrFjRi4Q=
 github.com/nori-io/interfaces/nori/http v0.0.0-20210514092307-515380204685/go.mod h1:UOTdJ3ZpK9O6zQEDd8D55Biv1SJKnL3Gpk54RgiEkaU=
-github.com/nori-io/interfaces/nori/http v0.0.1 h1:NiTnc2y/cTJ+5sSQM3JmA3YiQUzTfKRtva0Mo77IcqA=
-github.com/nori-io/interfaces/nori/http v0.0.1/go.mod h1:UOTdJ3ZpK9O6zQEDd8D55Biv1SJKnL3Gpk54RgiEkaU=
 github.com/nori-io/logger v0.2.3 h1:8PBld4jNDcFA4CWepyn8i9IKvhWzcPa8n+5JXbtqqig=
 github.com/nori-io/logger v0.2.3/go.mod h1:q3Y096P4UZ8LlnlkU7QdnQYpKodp50JMrzMZks7seXU=
-github.com/nori-plugins/http v0.0.0-20210514094605-cdc94a91edab h1:zX/NMkxUOlTFv+RqrHmODKYDL/Fxe/qUVCmIx/OaFzw=
-github.com/nori-plugins/http v0.0.0-20210514094605-cdc94a91edab/go.mod h1:8vkNWczdU1X7n3ywjoJtQA7nAKhnv5xH7NiOiZUKe3Y=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=

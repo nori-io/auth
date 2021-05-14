@@ -5,7 +5,7 @@ import (
 
 	"github.com/nori-plugins/authentication/internal/handler/http/reset_password"
 
-	administrator "github.com/nori-plugins/authentication/internal/handler/http/administrator"
+	"github.com/nori-plugins/authentication/internal/handler/http/administrator"
 
 	"github.com/nori-io/interfaces/nori/http"
 	"github.com/nori-plugins/authentication/internal/domain/helper/goth_provider"

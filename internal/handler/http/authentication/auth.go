@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"time"
 
+	http2 "github.com/nori-io/interfaces/nori/http"
+
 	"github.com/markbates/goth/gothic"
 	"github.com/nori-plugins/authentication/internal/domain/errors"
 	"github.com/nori-plugins/authentication/pkg/enum/social_provider_status"
@@ -23,11 +25,11 @@ import (
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 
-	"github.com/go-chi/chi"
 	"github.com/nori-plugins/authentication/internal/domain/service"
 )
 
 type AuthenticationHandler struct {
+	R                     http2.Http
 	authenticationService service.AuthenticationService
 	sessionService        service.SessionService
 	socialProviderService service.SocialProvider
@@ -38,6 +40,7 @@ type AuthenticationHandler struct {
 }
 
 type Params struct {
+	R                     http2.Http
 	AuthenticationService service.AuthenticationService
 	SessionService        service.SessionService
 	SocialProviderService service.SocialProvider
@@ -49,6 +52,7 @@ type Params struct {
 
 func New(params Params) *AuthenticationHandler {
 	return &AuthenticationHandler{
+		R:                     params.R,
 		authenticationService: params.AuthenticationService,
 		sessionService:        params.SessionService,
 		socialProviderService: params.SocialProviderService,
@@ -178,7 +182,7 @@ func (h *AuthenticationHandler) LogOut(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AuthenticationHandler) HandleSocialProvider(w http.ResponseWriter, r *http.Request) {
-	name := chi.URLParam(r, "social_provider")
+	name := h.R.URLParam(r, "social_provider")
 
 	h.checkProviderName(w, r, name)
 
@@ -191,7 +195,7 @@ func (h *AuthenticationHandler) HandleSocialProvider(w http.ResponseWriter, r *h
 }
 
 func (h *AuthenticationHandler) HandleSocialProviderCallBack(w http.ResponseWriter, r *http.Request) {
-	name := chi.URLParam(r, "social_provider")
+	name := h.R.URLParam(r, "social_provider")
 
 	h.checkProviderName(w, r, name)
 
@@ -205,7 +209,7 @@ func (h *AuthenticationHandler) HandleSocialProviderCallBack(w http.ResponseWrit
 }
 
 func (h *AuthenticationHandler) HandleSocialProviderLogout(w http.ResponseWriter, r *http.Request) {
-	name := chi.URLParam(r, "social_provider")
+	name := h.R.URLParam(r, "social_provider")
 
 	h.checkProviderName(w, r, name)
 

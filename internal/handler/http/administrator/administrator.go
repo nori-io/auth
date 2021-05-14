@@ -1,10 +1,10 @@
 package administrator
 
 import (
-	errors2 "github.com/nori-plugins/authentication/internal/domain/errors"
-	"github.com/nori-plugins/authentication/pkg/enum/session_status"
 	"net/http"
 	"strconv"
+
+	"github.com/nori-plugins/authentication/pkg/enum/session_status"
 
 	"github.com/nori-plugins/authentication/pkg/enum/users_status"
 
@@ -20,27 +20,27 @@ import (
 
 type AdminHandler struct {
 	sessionService service.SessionService
-	userService  service.UserService
-	cookieHelper cookie.CookieHelper
-	errorHelper  error2.ErrorHelper
-	logger       logger.FieldLogger
+	userService    service.UserService
+	cookieHelper   cookie.CookieHelper
+	errorHelper    error2.ErrorHelper
+	logger         logger.FieldLogger
 }
 
 type Params struct {
 	SessionService service.SessionService
-	UserService  service.UserService
-	CookieHelper cookie.CookieHelper
-	ErrorHelper  error2.ErrorHelper
-	Logger       logger.FieldLogger
+	UserService    service.UserService
+	CookieHelper   cookie.CookieHelper
+	ErrorHelper    error2.ErrorHelper
+	Logger         logger.FieldLogger
 }
 
 func New(params Params) *AdminHandler {
 	return &AdminHandler{
 		sessionService: params.SessionService,
-		userService:  params.UserService,
-		cookieHelper: params.CookieHelper,
-		errorHelper:  params.ErrorHelper,
-		logger:       params.Logger,
+		userService:    params.UserService,
+		cookieHelper:   params.CookieHelper,
+		errorHelper:    params.ErrorHelper,
+		logger:         params.Logger,
 	}
 }
 
@@ -51,13 +51,13 @@ func (h *AdminHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
 	}
 
-	session, err:= h.sessionService.GetBySessionKey(r.Context(), service.GetBySessionKeyData{SessionKey: sessionId})
+	session, err := h.sessionService.GetBySessionKey(r.Context(), service.GetBySessionKeyData{SessionKey: sessionId})
 	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 	}
 
-	if session.Status==session_status.Active{
+	if session.Status == session_status.Active {
 		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 	}
@@ -159,31 +159,31 @@ func (h *AdminHandler) UpdateUserStatus(w http.ResponseWriter, r *http.Request) 
 }
 
 func (h *AdminHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
-	_, err := h.cookieHelper.GetSessionID(r)
-	if err != nil {
-		h.logger.Error("%s", err)
-		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
-	}
+	/*	_, err := h.cookieHelper.GetSessionID(r)
+		if err != nil {
+			h.logger.Error("%s", err)
+			http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
+		}
 
-	id := chi.URLParam(r, "id")
-	u, err := strconv.ParseUint(id, 10, 64)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	}
+		id := chi.URLParam(r, "id")
+		u, err := strconv.ParseUint(id, 10, 64)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}*/
 
-	user, err := h.userService.GetByID(r.Context(), service.GetByIdData{Id: u})
-	if err != nil {
-		h.logger.Error("%s", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	/*	user, err := h.userService.GetByID(r.Context(), service.GetByIdData{Id: u})
+		if err != nil {
+			h.logger.Error("%s", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}*/
 
-	if err := h.userService.(r.Context(), service.UserUpdateStatusData{
-		UserID: user.ID,
-		Status: users_status.UserStatus(u),
-	}); err != nil {
-		h.logger.Error("%s", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	/*	if err := h.userService.(r.Context(), service.UserUpdateStatusData{
+			UserID: user.ID,
+			Status: users_status.UserStatus(u),
+		}); err != nil {
+			h.logger.Error("%s", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}*/
 
 	response.JSON(w, r, http.StatusOK)
 }

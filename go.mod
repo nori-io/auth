@@ -14,8 +14,9 @@ require (
 	github.com/markbates/goth v1.67.1
 	github.com/nori-io/common/v4 v4.0.1-0.20210406114423-a94f240aa60a
 	github.com/nori-io/interfaces/database/orm/gorm v0.0.1
-	github.com/nori-io/interfaces/nori/http v0.0.1
+	github.com/nori-io/interfaces/nori/http v0.0.0-20210514092307-515380204685
 	github.com/nori-io/logger v0.2.3
+	github.com/nori-plugins/http v0.0.0-20210514094605-cdc94a91edab // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/pquerna/otp v1.3.0
 	github.com/stretchr/testify v1.6.1

@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 
+	"github.com/nori-io/interfaces/nori/http"
+
 	p "github.com/nori-io/common/v4/pkg/domain/plugin"
 	"github.com/nori-plugins/authentication/pkg/authentication"
 
@@ -32,33 +34,6 @@ type plugin struct {
 	logger   logger.FieldLogger
 }
 
-func (p plugin) Meta() meta.Meta {
-	return m.Meta{
-		ID: m.ID{
-			ID:      "",
-			Version: "",
-		},
-		Author: m.Author{
-			Name: "",
-			URL:  "",
-		},
-		Dependencies: []meta.Dependency{},
-		Description:  nil,
-		Interface:    authentication.AuthenticationInterface,
-		License:      nil,
-		Links:        nil,
-		Repository: m.Repository{
-			Type: em.Git,
-			URL:  "github.com/nori-io/http",
-		},
-		Tags: nil,
-	}
-}
-
-func (p plugin) Instance() interface{} {
-	return p.instance
-}
-
 func (p plugin) Init(ctx context.Context, config config.Config, log logger.FieldLogger) error {
 	p.config = conf.Config{
 		CookiesName:                   config.String("cookies.name", "name of cookies for keeping session id"),
@@ -83,6 +58,36 @@ func (p plugin) Init(ctx context.Context, config config.Config, log logger.Field
 
 	p.logger = log
 	return nil
+}
+
+func (p plugin) Instance() interface{} {
+	return p.instance
+}
+
+func (p plugin) Meta() meta.Meta {
+	return m.Meta{
+		ID: m.ID{
+			ID:      "",
+			Version: "",
+		},
+		Author: m.Author{
+			Name: "",
+			URL:  "",
+		},
+		Dependencies: []meta.Dependency{
+			http.HttpInterface,
+			noriGorm.GormInterface,
+		},
+		Description: nil,
+		Interface:   authentication.AuthenticationInterface,
+		License:     nil,
+		Links:       nil,
+		Repository: m.Repository{
+			Type: em.Git,
+			URL:  "github.com/nori-plugins/authentication",
+		},
+		Tags: nil,
+	}
 }
 
 func (p plugin) Start(ctx context.Context, registry registry.Registry) error {

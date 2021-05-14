@@ -180,10 +180,14 @@ github.com/nori-io/common/v4 v4.0.1-0.20210406114423-a94f240aa60a h1:7gFo63hEsrW
 github.com/nori-io/common/v4 v4.0.1-0.20210406114423-a94f240aa60a/go.mod h1:kZjN7+TwE71l/S/NqPlqYjy39ql2XlFqtjg1MshSqig=
 github.com/nori-io/interfaces/database/orm/gorm v0.0.1 h1:eXWmVQRgM1LLQ9xs9v3U3dJL6VbbbuxVIkZ6mMpc6g0=
 github.com/nori-io/interfaces/database/orm/gorm v0.0.1/go.mod h1:Fvj3QsnL5AN4RhvUhIaJSYXwmpY0OWrh2wYjEz1AR9c=
+github.com/nori-io/interfaces/nori/http v0.0.0-20210514092307-515380204685 h1:z1xB/0sr5dEMQvfd+GglY+E5x3KxeuxrNe1xrFjRi4Q=
+github.com/nori-io/interfaces/nori/http v0.0.0-20210514092307-515380204685/go.mod h1:UOTdJ3ZpK9O6zQEDd8D55Biv1SJKnL3Gpk54RgiEkaU=
 github.com/nori-io/interfaces/nori/http v0.0.1 h1:NiTnc2y/cTJ+5sSQM3JmA3YiQUzTfKRtva0Mo77IcqA=
 github.com/nori-io/interfaces/nori/http v0.0.1/go.mod h1:UOTdJ3ZpK9O6zQEDd8D55Biv1SJKnL3Gpk54RgiEkaU=
 github.com/nori-io/logger v0.2.3 h1:8PBld4jNDcFA4CWepyn8i9IKvhWzcPa8n+5JXbtqqig=
 github.com/nori-io/logger v0.2.3/go.mod h1:q3Y096P4UZ8LlnlkU7QdnQYpKodp50JMrzMZks7seXU=
+github.com/nori-plugins/http v0.0.0-20210514094605-cdc94a91edab h1:zX/NMkxUOlTFv+RqrHmODKYDL/Fxe/qUVCmIx/OaFzw=
+github.com/nori-plugins/http v0.0.0-20210514094605-cdc94a91edab/go.mod h1:8vkNWczdU1X7n3ywjoJtQA7nAKhnv5xH7NiOiZUKe3Y=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=

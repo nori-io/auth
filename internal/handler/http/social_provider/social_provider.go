@@ -3,8 +3,8 @@ package social_provider
 import (
 	"net/http"
 
-	"github.com/nori-plugins/authentication/internal/domain/helper/cookie"
-	error2 "github.com/nori-plugins/authentication/internal/domain/helper/error"
+	"github.com/nori-plugins/authentication/internal/domain/helper"
+
 	"github.com/nori-plugins/authentication/internal/handler/http/response"
 
 	"github.com/nori-io/common/v5/pkg/domain/logger"
@@ -13,15 +13,15 @@ import (
 
 type SocialProviderHandler struct {
 	socialProviderService service.SocialProvider
-	cookieHelper          cookie.CookieHelper
-	errorHelper           error2.ErrorHelper
+	cookieHelper          helper.CookieHelper
+	errorHelper           helper.ErrorHelper
 	logger                logger.FieldLogger
 }
 
 type Params struct {
 	SocialProviderService service.SocialProvider
-	CookieHelper          cookie.CookieHelper
-	ErrorHelper           error2.ErrorHelper
+	CookieHelper          helper.CookieHelper
+	ErrorHelper           helper.ErrorHelper
 	Logger                logger.FieldLogger
 }
 

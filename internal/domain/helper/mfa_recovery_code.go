@@ -1,4 +1,4 @@
-package mfa_recovery_code
+package helper
 
 type MfaRecoveryCodesHelper interface {
 	Generate() ([]string, error)

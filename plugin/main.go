@@ -61,6 +61,10 @@ func (p plugin) Init(ctx context.Context, config config.Config, log logger.Field
 }
 
 func (p plugin) Instance() interface{} {
+	return p.getInstance()
+}
+
+func (p plugin) getInstance() service.AuthenticationService {
 	return p.instance
 }
 

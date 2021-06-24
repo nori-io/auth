@@ -3,8 +3,7 @@ package settings
 import (
 	"net/http"
 
-	"github.com/nori-plugins/authentication/internal/domain/helper/cookie"
-	error2 "github.com/nori-plugins/authentication/internal/domain/helper/error"
+	"github.com/nori-plugins/authentication/internal/domain/helper"
 
 	"github.com/nori-plugins/authentication/internal/handler/http/response"
 
@@ -14,15 +13,15 @@ import (
 
 type SettingsHandler struct {
 	settingsService service.SettingsService
-	cookieHelper    cookie.CookieHelper
-	errorHelper     error2.ErrorHelper
+	cookieHelper    helper.CookieHelper
+	errorHelper     helper.ErrorHelper
 	logger          logger.FieldLogger
 }
 
 type Params struct {
 	SettingsService service.SettingsService
-	CookieHelper    cookie.CookieHelper
-	ErrorHelper     error2.ErrorHelper
+	CookieHelper    helper.CookieHelper
+	ErrorHelper     helper.ErrorHelper
 	Logger          logger.FieldLogger
 }
 

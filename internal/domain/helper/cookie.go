@@ -1,4 +1,4 @@
-package cookie
+package helper
 
 import (
 	"net/http"

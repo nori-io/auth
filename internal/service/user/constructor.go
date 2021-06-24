@@ -2,7 +2,7 @@ package user
 
 import (
 	"github.com/nori-plugins/authentication/internal/config"
-	"github.com/nori-plugins/authentication/internal/domain/helper/security"
+	"github.com/nori-plugins/authentication/internal/domain/helper"
 	"github.com/nori-plugins/authentication/internal/domain/repository"
 	"github.com/nori-plugins/authentication/internal/domain/service"
 	"github.com/nori-plugins/authentication/pkg/transactor"
@@ -11,7 +11,7 @@ import (
 type UserService struct {
 	userLogService service.UserLogService
 	userRepository repository.UserRepository
-	securityHelper security.SecurityHelper
+	securityHelper helper.SecurityHelper
 	transactor     transactor.Transactor
 	config         config.Config
 }
@@ -19,7 +19,7 @@ type UserService struct {
 type Params struct {
 	UserLogService service.UserLogService
 	UserRepository repository.UserRepository
-	SecurityHelper security.SecurityHelper
+	SecurityHelper helper.SecurityHelper
 	Transactor     transactor.Transactor
 	Config         config.Config
 }

@@ -3,8 +3,7 @@ package mfa_totp
 import (
 	"net/http"
 
-	"github.com/nori-plugins/authentication/internal/domain/helper/cookie"
-	error2 "github.com/nori-plugins/authentication/internal/domain/helper/error"
+	"github.com/nori-plugins/authentication/internal/domain/helper"
 
 	"github.com/nori-io/common/v5/pkg/domain/logger"
 
@@ -15,15 +14,15 @@ import (
 
 type MfaTotpHandler struct {
 	mfaTotpService service.MfaTotpService
-	cookieHelper   cookie.CookieHelper
-	errorHelper    error2.ErrorHelper
+	cookieHelper   helper.CookieHelper
+	errorHelper    helper.ErrorHelper
 	logger         logger.FieldLogger
 }
 
 type Params struct {
 	MfaTotpService service.MfaTotpService
-	CookieHelper   cookie.CookieHelper
-	ErrorHelper    error2.ErrorHelper
+	CookieHelper   helper.CookieHelper
+	ErrorHelper    helper.ErrorHelper
 	Logger         logger.FieldLogger
 }
 

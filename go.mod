@@ -5,6 +5,7 @@ go 1.15
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/boombuler/barcode v1.0.1 // indirect
+	github.com/go-chi/chi/v5 v5.0.3 // indirect
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/wire v0.5.0

@@ -6,15 +6,14 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/nori-plugins/authentication/internal/domain/helper"
+
 	http2 "github.com/nori-io/interfaces/nori/http/v2"
 
 	"github.com/markbates/goth/gothic"
 	"github.com/nori-plugins/authentication/internal/domain/errors"
 	"github.com/nori-plugins/authentication/pkg/enum/social_provider_status"
 
-	error2 "github.com/nori-plugins/authentication/internal/domain/helper/error"
-
-	"github.com/nori-plugins/authentication/internal/domain/helper/cookie"
 	"github.com/nori-plugins/authentication/pkg/enum/session_status"
 
 	"github.com/nori-plugins/authentication/internal/config"
@@ -33,8 +32,8 @@ type AuthenticationHandler struct {
 	authenticationService service.AuthenticationService
 	sessionService        service.SessionService
 	socialProviderService service.SocialProvider
-	cookieHelper          cookie.CookieHelper
-	errorHelper           error2.ErrorHelper
+	cookieHelper          helper.CookieHelper
+	errorHelper           helper.ErrorHelper
 	config                config.Config
 	logger                logger.FieldLogger
 }
@@ -44,8 +43,8 @@ type Params struct {
 	AuthenticationService service.AuthenticationService
 	SessionService        service.SessionService
 	SocialProviderService service.SocialProvider
-	CookieHelper          cookie.CookieHelper
-	ErrorHelper           error2.ErrorHelper
+	CookieHelper          helper.CookieHelper
+	ErrorHelper           helper.ErrorHelper
 	Config                config.Config
 	Logger                logger.FieldLogger
 }

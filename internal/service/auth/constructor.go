@@ -2,8 +2,9 @@ package auth
 
 import (
 	"github.com/nori-plugins/authentication/internal/config"
-	"github.com/nori-plugins/authentication/internal/domain/helper/security"
+	"github.com/nori-plugins/authentication/internal/domain/helper"
 	"github.com/nori-plugins/authentication/internal/domain/service"
+	cookieHelper "github.com/nori-plugins/authentication/internal/helper/cookie"
 	"github.com/nori-plugins/authentication/pkg/transactor"
 )
 
@@ -14,7 +15,8 @@ type AuthenticationService struct {
 	socialProviderService  service.SocialProvider
 	userService            service.UserService
 	userLogService         service.UserLogService
-	securityHelper         security.SecurityHelper
+	cookieHelper           cookieHelper.CookieHelper
+	securityHelper         helper.SecurityHelper
 	config                 config.Config
 	transactor             transactor.Transactor
 }
@@ -26,7 +28,7 @@ type Params struct {
 	SocialProviderService  service.SocialProvider
 	UserService            service.UserService
 	UserLogService         service.UserLogService
-	SecurityHelper         security.SecurityHelper
+	SecurityHelper         helper.SecurityHelper
 	Config                 config.Config
 	Transactor             transactor.Transactor
 }

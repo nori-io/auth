@@ -3,12 +3,13 @@ package http
 import (
 	"context"
 
+	"github.com/nori-plugins/authentication/internal/domain/helper"
+
 	"github.com/nori-plugins/authentication/internal/handler/http/reset_password"
 
 	"github.com/nori-plugins/authentication/internal/handler/http/administrator"
 
 	"github.com/nori-io/interfaces/nori/http/v2"
-	"github.com/nori-plugins/authentication/internal/domain/helper/goth_provider"
 	"github.com/nori-plugins/authentication/internal/domain/service"
 	"github.com/nori-plugins/authentication/internal/handler/http/authentication"
 	"github.com/nori-plugins/authentication/internal/handler/http/mfa_recovery_code"
@@ -27,7 +28,7 @@ type Handler struct {
 	SettingsHandler        *settings.SettingsHandler
 	SocialProviderHandler  *social_provider.SocialProviderHandler
 	SocialProviderService  service.SocialProvider
-	GothProviderHelper     goth_provider.GothProviderHelper
+	GothProviderHelper     helper.GothProviderHelper
 }
 
 type Params struct {
@@ -40,7 +41,7 @@ type Params struct {
 	SettingsHandler        *settings.SettingsHandler
 	SocialProviderHandler  *social_provider.SocialProviderHandler
 	SocialProviderService  service.SocialProvider
-	GothProviderHelper     goth_provider.GothProviderHelper
+	GothProviderHelper     helper.GothProviderHelper
 }
 
 func New(params Params) *Handler {

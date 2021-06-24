@@ -3,23 +3,24 @@ package reset_password
 import (
 	"net/http"
 
+	"github.com/nori-plugins/authentication/internal/domain/helper"
+
 	"github.com/nori-plugins/authentication/internal/domain/errors"
 
 	"github.com/nori-io/common/v5/pkg/domain/logger"
-	error2 "github.com/nori-plugins/authentication/internal/domain/helper/error"
 	"github.com/nori-plugins/authentication/internal/domain/service"
 	"github.com/nori-plugins/authentication/internal/handler/http/response"
 )
 
 type ResetPasswordHandler struct {
 	resetPasswordService service.ResetPasswordService
-	errorHelper          error2.ErrorHelper
+	errorHelper          helper.ErrorHelper
 	logger               logger.FieldLogger
 }
 
 type Params struct {
 	ResetPasswordService service.ResetPasswordService
-	ErrorHelper          error2.ErrorHelper
+	ErrorHelper          helper.ErrorHelper
 	Logger               logger.FieldLogger
 }
 

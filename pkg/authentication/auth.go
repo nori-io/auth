@@ -13,8 +13,8 @@ type (
 	Authentication interface {
 		SignUp(ctx context.Context, data SignUpData) (User, error)
 		SignInByToken(ctx context.Context, token string) (Session, error)
-		BasicAuth(sessionID string) func(next http.Handler) http.Handler
-		//BasicAuth(realm string, creds map[string]string) func(next http.Handler) http.Handler
+		IsAuthenticated(r *http.Request) func(next http.Handler) http.Handler
+		IsBasicAuthenticated(realm string, creds map[string]string) func(next http.Handler) http.Handler
 		Token() Tokens
 		Social() Social
 		Session() Sessions

@@ -2,7 +2,7 @@ package mfa_recovery_code
 
 import (
 	"github.com/nori-plugins/authentication/internal/config"
-	"github.com/nori-plugins/authentication/internal/domain/helper/mfa_recovery_code"
+	"github.com/nori-plugins/authentication/internal/domain/helper"
 )
 
 type mfaRecoveryCodesHelper struct {
@@ -13,6 +13,6 @@ type Params struct {
 	Config config.Config
 }
 
-func New(params Params) mfa_recovery_code.MfaRecoveryCodesHelper {
+func New(params Params) helper.MfaRecoveryCodesHelper {
 	return &mfaRecoveryCodesHelper{config: params.Config}
 }

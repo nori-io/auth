@@ -1,4 +1,4 @@
-package error
+package helper
 
 import "net/http"
 

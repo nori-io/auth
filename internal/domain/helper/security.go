@@ -1,4 +1,4 @@
-package security
+package helper
 
 type SecurityHelper interface {
 	GenerateHash(password string) ([]byte, error)

@@ -1,4 +1,4 @@
-package mfa_totp
+package helper
 
 type MfaTotpHelper interface {
 	Generate(email string) (url string, secret string, err error)

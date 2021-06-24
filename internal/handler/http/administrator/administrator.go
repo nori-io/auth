@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	http2 "github.com/nori-io/interfaces/nori/http"
+	http2 "github.com/nori-io/interfaces/nori/http/v2"
 
 	"github.com/nori-plugins/authentication/pkg/enum/session_status"
 
@@ -12,14 +12,14 @@ import (
 
 	"github.com/nori-plugins/authentication/internal/handler/http/response"
 
-	"github.com/nori-io/common/v4/pkg/domain/logger"
+	"github.com/nori-io/common/v5/pkg/domain/logger"
 	"github.com/nori-plugins/authentication/internal/domain/helper/cookie"
 	error2 "github.com/nori-plugins/authentication/internal/domain/helper/error"
 	"github.com/nori-plugins/authentication/internal/domain/service"
 )
 
 type AdminHandler struct {
-	R              http2.Http
+	R              http2.Router
 	sessionService service.SessionService
 	userService    service.UserService
 	cookieHelper   cookie.CookieHelper
@@ -28,7 +28,7 @@ type AdminHandler struct {
 }
 
 type Params struct {
-	R              http2.Http
+	R              http2.Router
 	SessionService service.SessionService
 	UserService    service.UserService
 	CookieHelper   cookie.CookieHelper

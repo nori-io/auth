@@ -3,7 +3,7 @@ package postgres
 import (
 	"context"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 	"github.com/nori-plugins/authentication/pkg/errors"

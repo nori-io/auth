@@ -7,7 +7,7 @@ import (
 
 	"github.com/nori-plugins/authentication/internal/handler/http/administrator"
 
-	"github.com/nori-io/interfaces/nori/http"
+	"github.com/nori-io/interfaces/nori/http/v2"
 	"github.com/nori-plugins/authentication/internal/domain/helper/goth_provider"
 	"github.com/nori-plugins/authentication/internal/domain/service"
 	"github.com/nori-plugins/authentication/internal/handler/http/authentication"
@@ -18,7 +18,7 @@ import (
 )
 
 type Handler struct {
-	R                      http.Http
+	R                      http.Router
 	AdminHandler           *administrator.AdminHandler
 	AuthenticationHandler  *authentication.AuthenticationHandler
 	MfaRecoveryCodeHandler *mfa_recovery_code.MfaRecoveryCodeHandler
@@ -31,7 +31,7 @@ type Handler struct {
 }
 
 type Params struct {
-	R                      http.Http
+	R                      http.Router
 	AdminHandler           *administrator.AdminHandler
 	AuthenticationHandler  *authentication.AuthenticationHandler
 	MfaRecoveryCodeHandler *mfa_recovery_code.MfaRecoveryCodeHandler

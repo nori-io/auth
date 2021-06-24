@@ -1,6 +1,6 @@
 package config
 
-import "github.com/nori-io/common/v4/pkg/domain/config"
+import "github.com/nori-io/common/v5/pkg/domain/config"
 
 type Config struct {
 	CookiesPath                   config.String

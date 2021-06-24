@@ -7,7 +7,7 @@ import (
 	error2 "github.com/nori-plugins/authentication/internal/domain/helper/error"
 	"github.com/nori-plugins/authentication/internal/handler/http/response"
 
-	"github.com/nori-io/common/v4/pkg/domain/logger"
+	"github.com/nori-io/common/v5/pkg/domain/logger"
 	"github.com/nori-plugins/authentication/internal/domain/service"
 )
 

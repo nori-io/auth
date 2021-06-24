@@ -3,8 +3,8 @@ package postgres
 import (
 	"context"
 
-	"github.com/jinzhu/gorm"
 	"github.com/nori-plugins/authentication/pkg/errors"
+	"gorm.io/gorm"
 
 	"github.com/nori-plugins/authentication/internal/domain/repository"
 	"github.com/nori-plugins/authentication/pkg/transactor"
@@ -120,8 +120,8 @@ func (r *UserRepository) FindByFilter(ctx context.Context, filter repository.Use
 	return entities, nil
 }
 
-func (r *UserRepository) Count(ctx context.Context) (uint64, error) {
-	var count uint64
+func (r *UserRepository) Count(ctx context.Context) (int64, error) {
+	var count int64
 	if err := r.Tx.GetDB(ctx).Count(&count).Error; err != nil {
 		return 0, err
 	}

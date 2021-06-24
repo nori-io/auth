@@ -3,7 +3,7 @@ package postgres
 import (
 	"context"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 
 	"github.com/nori-plugins/authentication/pkg/transactor"
 

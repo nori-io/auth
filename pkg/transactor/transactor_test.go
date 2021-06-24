@@ -17,7 +17,7 @@ import (
 
 	"github.com/nori-plugins/authentication/pkg/enum/users_type"
 
-	"github.com/nori-io/common/v4/pkg/domain/config"
+	"github.com/nori-io/common/v5/pkg/domain/config"
 
 	config2 "github.com/nori-plugins/authentication/internal/config"
 
@@ -30,14 +30,15 @@ import (
 	"github.com/nori-plugins/authentication/pkg/enum/users_status"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/jinzhu/gorm"
 	"github.com/nori-io/logger"
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 	userRepository "github.com/nori-plugins/authentication/internal/repository/user"
 	userLogRepository "github.com/nori-plugins/authentication/internal/repository/user_log"
+	"gorm.io/gorm"
 
 	"github.com/nori-plugins/authentication/pkg/transactor"
 	"github.com/stretchr/testify/require"
+	"gorm.io/driver/postgres"
 )
 
 type AnyTime struct{}
@@ -73,15 +74,18 @@ func TestTxManager_Transact(t *testing.T) {
 	}
 	sqlInsertString := `INSERT INTO "nori_authentication_users" ` +
 		`("status","user_type","mfa_type","phone_country_code","phone_number","email","password","salt","hash_algorithm","is_email_verified","is_phone_verified","email_activation_code ","email_activation_code_ttl","created_at","updated_at") ` +
-		`VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING "nori_authentication_users"."id"`
+		`VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING "id"`
 
-	mock.ExpectQuery(`SELECT * FROM "nori_authentication_users"  WHERE (email=$1) ORDER BY "nori_authentication_users"."id" ASC LIMIT 1`).
+	mock.ExpectQuery(`SELECT * FROM "nori_authentication_users" WHERE email=$1 ORDER BY "nori_authentication_users"."id" LIMIT 1`).
 		WithArgs(user.Email).WillReturnError(gorm.ErrRecordNotFound)
 	mock.ExpectBegin()
 	mock.ExpectQuery(sqlInsertString).
 		WithArgs(user.Status, user.UserType, user.MfaType, user.PhoneCountryCode, user.PhoneNumber, user.Email, sqlmock.AnyArg(), user.Salt, user.HashAlgorithm, user.IsEmailVerified, user.IsPhoneVerified, user.EmailActivationCode, AnyTime{}, AnyTime{}, AnyTime{}).WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 	mock.ExpectCommit()
-	gdb, err := gorm.Open("postgres", db)
+
+	gdb, err := gorm.Open(postgres.New(postgres.Config{
+		Conn: db,
+	}), &gorm.Config{})
 
 	txParams := transactor.Params{
 		Db:     gdb,
@@ -158,21 +162,25 @@ func TestTxManager_TransactNested(t *testing.T) {
 		CreatedAt: time.Now(),
 	}
 	mock.ExpectBegin()
-	mock.ExpectQuery(`SELECT * FROM "nori_authentication_users"  WHERE (email=$1) ORDER BY "nori_authentication_users"."id" ASC LIMIT 1`).
+	mock.ExpectQuery(`SELECT * FROM "nori_authentication_users" WHERE email=$1 ORDER BY "nori_authentication_users"."id" LIMIT 1`).
 		WithArgs(user.Email).WillReturnError(gorm.ErrRecordNotFound)
 	sqlUserInsert := `INSERT INTO "nori_authentication_users" ` +
 		`("status","user_type","mfa_type","phone_country_code","phone_number","email","password","salt","hash_algorithm","is_email_verified","is_phone_verified","email_activation_code ","email_activation_code_ttl","created_at","updated_at") ` +
-		`VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING "nori_authentication_users"."id"`
+		`VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING "id"`
 	mock.ExpectQuery(sqlUserInsert).
 		WithArgs(user.Status, user.UserType, user.MfaType, user.PhoneCountryCode, user.PhoneNumber, user.Email, sqlmock.AnyArg(), user.Salt, user.HashAlgorithm, user.IsEmailVerified, user.IsPhoneVerified, user.EmailActivationCode, AnyTime{}, AnyTime{}, AnyTime{}).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 
-	sqlAuthenticationLogInsert := `INSERT INTO "nori_authentication_user_log" ("user_id","action","session_id","meta","created_at") VALUES ($1,$2,$3,$4,$5) RETURNING "nori_authentication_user_log"."id"`
+	sqlAuthenticationLogInsert := `INSERT INTO "nori_authentication_user_log" ` +
+		`("user_id","action","session_id","meta","created_at") VALUES ($1,$2,$3,$4,$5) RETURNING "id"`
 	mock.ExpectQuery(sqlAuthenticationLogInsert).
 		WithArgs(user_log.UserID, user_log.Action, sqlmock.AnyArg(), user_log.Meta, AnyTime{}).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 	mock.ExpectCommit()
-	gdb, err := gorm.Open("postgres", db)
+
+	gdb, err := gorm.Open(postgres.New(postgres.Config{
+		Conn: db,
+	}), &gorm.Config{})
 
 	txParams := transactor.Params{
 		Db:     gdb,

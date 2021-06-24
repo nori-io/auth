@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	http2 "github.com/nori-io/interfaces/nori/http"
+	http2 "github.com/nori-io/interfaces/nori/http/v2"
 
 	"github.com/markbates/goth/gothic"
 	"github.com/nori-plugins/authentication/internal/domain/errors"
@@ -21,7 +21,7 @@ import (
 
 	"github.com/nori-plugins/authentication/internal/handler/http/response"
 
-	"github.com/nori-io/common/v4/pkg/domain/logger"
+	"github.com/nori-io/common/v5/pkg/domain/logger"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 
@@ -29,7 +29,7 @@ import (
 )
 
 type AuthenticationHandler struct {
-	R                     http2.Http
+	R                     http2.Router
 	authenticationService service.AuthenticationService
 	sessionService        service.SessionService
 	socialProviderService service.SocialProvider
@@ -40,7 +40,7 @@ type AuthenticationHandler struct {
 }
 
 type Params struct {
-	R                     http2.Http
+	R                     http2.Router
 	AuthenticationService service.AuthenticationService
 	SessionService        service.SessionService
 	SocialProviderService service.SocialProvider

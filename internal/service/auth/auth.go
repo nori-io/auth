@@ -253,7 +253,7 @@ func (srv *AuthenticationService) LogOut(ctx context.Context, data service.LogOu
 	return nil
 }
 
-func (srv *AuthenticationService) IsAuthenticated(r *http.Request) func(next http.Handler) http.Handler {
+func (srv *AuthenticationService) IsAuthenticated() func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			sid, err := srv.cookieHelper.GetSessionID(r)

@@ -2,30 +2,37 @@ package settings
 
 import (
 	"github.com/nori-plugins/authentication/internal/config"
-	"github.com/nori-plugins/authentication/internal/domain/helper/security"
+	"github.com/nori-plugins/authentication/internal/domain/helper"
 	"github.com/nori-plugins/authentication/internal/domain/repository"
 	"github.com/nori-plugins/authentication/internal/domain/service"
+	"github.com/nori-plugins/authentication/pkg/transactor"
 )
 
 type SettingsService struct {
-	sessionRepository repository.SessionRepository
 	userService       service.UserService
+	userLogService    service.UserLogService
+	sessionRepository repository.SessionRepository
+	securityHelper    helper.SecurityHelper
 	config            config.Config
-	securityHelper    security.SecurityHelper
+	transactor        transactor.Transactor
 }
 
 type Params struct {
-	SessionRepository repository.SessionRepository
 	UserService       service.UserService
+	UserLogService    service.UserLogService
+	SessionRepository repository.SessionRepository
+	SecurityHelper    helper.SecurityHelper
 	Config            config.Config
-	SecurityHelper    security.SecurityHelper
+	Transactor        transactor.Transactor
 }
 
 func New(params Params) service.SettingsService {
 	return &SettingsService{
-		sessionRepository: params.SessionRepository,
 		userService:       params.UserService,
-		config:            params.Config,
+		userLogService:    params.UserLogService,
+		sessionRepository: params.SessionRepository,
 		securityHelper:    params.SecurityHelper,
+		config:            params.Config,
+		transactor:        params.Transactor,
 	}
 }

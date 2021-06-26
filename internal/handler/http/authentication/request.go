@@ -24,34 +24,34 @@ func newSignUpData(r *http.Request) (service.SignUpData, error) {
 	}, nil
 }
 
-type SignInRequest struct {
+type LogInRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
-func newSignInData(r *http.Request) (service.SignInData, error) {
-	var body SignInRequest
+func newLogInData(r *http.Request) (service.LogInData, error) {
+	var body LogInRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		return service.SignInData{}, err
+		return service.LogInData{}, err
 	}
-	return service.SignInData{
+	return service.LogInData{
 		Email:    body.Email,
 		Password: body.Password,
 	}, nil
 }
 
-type SignInMfaRequest struct {
+type LogInMfaRequest struct {
 	Code string `json:"code"`
 }
 
-func newSignInMfaData(r *http.Request) (service.SignInMfaData, error) {
-	var body SignInMfaRequest
+func newLogInMfaData(r *http.Request) (service.LogInMfaData, error) {
+	var body LogInMfaRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		return service.SignInMfaData{}, err
+		return service.LogInMfaData{}, err
 	}
-	return service.SignInMfaData{
+	return service.LogInMfaData{
 		Code: body.Code,
 	}, nil
 }

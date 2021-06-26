@@ -2,42 +2,47 @@ package auth
 
 import (
 	"github.com/nori-plugins/authentication/internal/config"
-	"github.com/nori-plugins/authentication/internal/domain/helper/security"
+	"github.com/nori-plugins/authentication/internal/domain/helper"
 	"github.com/nori-plugins/authentication/internal/domain/service"
+	cookieHelper "github.com/nori-plugins/authentication/internal/helper/cookie"
 	"github.com/nori-plugins/authentication/pkg/transactor"
 )
 
 type AuthenticationService struct {
-	config                   config.Config
-	userService              service.UserService
-	authenticationLogService service.AuthenticationLogService
-	sessionService           service.SessionService
-	mfaRecoveryCodeService   service.MfaRecoveryCodeService
-	socialProviderService    service.SocialProvider
-	transactor               transactor.Transactor
-	securityHelper           security.SecurityHelper
+	mfaRecoveryCodeService service.MfaRecoveryCodeService
+	mfaTotpService         service.MfaTotpService
+	sessionService         service.SessionService
+	socialProviderService  service.SocialProvider
+	userService            service.UserService
+	userLogService         service.UserLogService
+	cookieHelper           cookieHelper.CookieHelper
+	securityHelper         helper.SecurityHelper
+	config                 config.Config
+	transactor             transactor.Transactor
 }
 
 type Params struct {
-	Config                   config.Config
-	UserService              service.UserService
-	AuthenticationLogService service.AuthenticationLogService
-	SessionService           service.SessionService
-	MfaRecoveryCodeService   service.MfaRecoveryCodeService
-	SocialProviderService    service.SocialProvider
-	Transactor               transactor.Transactor
-	SecurityHelper           security.SecurityHelper
+	MfaRecoveryCodeService service.MfaRecoveryCodeService
+	MfaTotpService         service.MfaTotpService
+	SessionService         service.SessionService
+	SocialProviderService  service.SocialProvider
+	UserService            service.UserService
+	UserLogService         service.UserLogService
+	SecurityHelper         helper.SecurityHelper
+	Config                 config.Config
+	Transactor             transactor.Transactor
 }
 
 func New(params Params) service.AuthenticationService {
 	return &AuthenticationService{
-		config:                   params.Config,
-		userService:              params.UserService,
-		authenticationLogService: params.AuthenticationLogService,
-		sessionService:           params.SessionService,
-		mfaRecoveryCodeService:   params.MfaRecoveryCodeService,
-		transactor:               params.Transactor,
-		securityHelper:           params.SecurityHelper,
-		socialProviderService:    params.SocialProviderService,
+		mfaRecoveryCodeService: params.MfaRecoveryCodeService,
+		mfaTotpService:         params.MfaTotpService,
+		sessionService:         params.SessionService,
+		socialProviderService:  params.SocialProviderService,
+		userService:            params.UserService,
+		userLogService:         params.UserLogService,
+		securityHelper:         params.SecurityHelper,
+		config:                 params.Config,
+		transactor:             params.Transactor,
 	}
 }

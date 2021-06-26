@@ -2,18 +2,13 @@ package authentication
 
 import "time"
 
-type SignInResponse struct {
+type LogInResponse struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
 	MfaType string `json:"mfa_type"`
 }
 
-type SignInMfaResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-}
-
-type SignInOutResponse struct {
+type LogInMfaResponse struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
 }

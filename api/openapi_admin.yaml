@@ -51,14 +51,6 @@ paths:
         explode: true
         schema:
           type: string
-      - name: ssid
-        in: cookie
-        description: admin session id
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
       responses:
         "200":
           description: Ok
@@ -93,14 +85,6 @@ paths:
         explode: false
         schema:
           type: string
-      - name: ssid
-        in: cookie
-        description: admin session id
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
       responses:
         "200":
           description: Ok
@@ -127,14 +111,6 @@ paths:
     put:
       summary: update status (active, blocked, locked, deleted)
       parameters:
-      - name: ssid
-        in: cookie
-        description: admin session id
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
       - name: id
         in: path
         required: true
@@ -148,7 +124,7 @@ paths:
         style: form
         explode: true
         schema:
-          type: string
+          type: integer
       responses:
         "200":
           description: User's status updated
@@ -230,7 +206,7 @@ components:
       type: object
       properties:
         id:
-          type: string
+          type: integer
         status:
           type: string
         email:

@@ -6,55 +6,59 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/nori-plugins/authentication/internal/domain/helper"
+
+	http2 "github.com/nori-io/interfaces/nori/http/v2"
+
 	"github.com/markbates/goth/gothic"
 	"github.com/nori-plugins/authentication/internal/domain/errors"
 	"github.com/nori-plugins/authentication/pkg/enum/social_provider_status"
 
-	error2 "github.com/nori-plugins/authentication/internal/domain/helper/error"
-
-	"github.com/nori-plugins/authentication/internal/domain/helper/cookie"
 	"github.com/nori-plugins/authentication/pkg/enum/session_status"
 
 	"github.com/nori-plugins/authentication/internal/config"
 
 	"github.com/nori-plugins/authentication/internal/handler/http/response"
 
-	"github.com/nori-io/common/v4/pkg/domain/logger"
+	"github.com/nori-io/common/v5/pkg/domain/logger"
 
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 
-	"github.com/go-chi/chi"
 	"github.com/nori-plugins/authentication/internal/domain/service"
 )
 
 type AuthenticationHandler struct {
+	R                     http2.Router
 	authenticationService service.AuthenticationService
 	sessionService        service.SessionService
-	logger                logger.FieldLogger
-	config                config.Config
-	cookieHelper          cookie.CookieHelper
-	errorHelper           error2.ErrorHelper
 	socialProviderService service.SocialProvider
+	cookieHelper          helper.CookieHelper
+	errorHelper           helper.ErrorHelper
+	config                config.Config
+	logger                logger.FieldLogger
 }
 
 type Params struct {
+	R                     http2.Router
 	AuthenticationService service.AuthenticationService
 	SessionService        service.SessionService
-	Logger                logger.FieldLogger
-	Config                config.Config
-	CookieHelper          cookie.CookieHelper
-	ErrorHelper           error2.ErrorHelper
 	SocialProviderService service.SocialProvider
+	CookieHelper          helper.CookieHelper
+	ErrorHelper           helper.ErrorHelper
+	Config                config.Config
+	Logger                logger.FieldLogger
 }
 
 func New(params Params) *AuthenticationHandler {
 	return &AuthenticationHandler{
+		R:                     params.R,
 		authenticationService: params.AuthenticationService,
 		sessionService:        params.SessionService,
-		logger:                params.Logger,
-		config:                params.Config,
+		socialProviderService: params.SocialProviderService,
 		cookieHelper:          params.CookieHelper,
 		errorHelper:           params.ErrorHelper,
+		config:                params.Config,
+		logger:                params.Logger,
 	}
 }
 
@@ -65,7 +69,7 @@ func (h *AuthenticationHandler) Session(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
 	}
 
-	sess, user, err := h.authenticationService.GetSessionInfo(r.Context(), sessionId)
+	sess, user, err := h.authenticationService.GetSessionData(r.Context(), service.GetSessionData{SessionKey: sessionId})
 	if err != nil {
 		h.logger.Error("%s", err)
 		h.errorHelper.Error(w, err)
@@ -96,14 +100,14 @@ func (h *AuthenticationHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
-	data, err := newSignInData(r)
+func (h *AuthenticationHandler) LogIn(w http.ResponseWriter, r *http.Request) {
+	data, err := newLogInData(r)
 	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	sess, mfaType, err := h.authenticationService.SignIn(r.Context(), data)
+	sess, mfaType, err := h.authenticationService.LogIn(r.Context(), data)
 	if err != nil {
 		h.logger.Error("%s", err)
 		h.errorHelper.Error(w, err)
@@ -111,27 +115,27 @@ func (h *AuthenticationHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 
 	h.cookieHelper.SetSession(w, sess)
 
-	response.JSON(w, r, SignInResponse{
+	response.JSON(w, r, LogInResponse{
 		Success: true,
 		Message: "User sign in",
 		MfaType: *mfaType,
 	})
 }
 
-func (h *AuthenticationHandler) SignInMfa(w http.ResponseWriter, r *http.Request) {
+func (h *AuthenticationHandler) LogInMfa(w http.ResponseWriter, r *http.Request) {
 	_, err := h.cookieHelper.GetSessionID(r)
 	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, http.ErrNoCookie.Error(), http.StatusUnauthorized)
 	}
 
-	data, err := newSignInMfaData(r)
+	data, err := newLogInMfaData(r)
 	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	sess, err := h.authenticationService.SignInMfa(r.Context(), data)
+	sess, err := h.authenticationService.LogInMfa(r.Context(), data)
 	if err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -139,13 +143,13 @@ func (h *AuthenticationHandler) SignInMfa(w http.ResponseWriter, r *http.Request
 
 	h.cookieHelper.SetSession(w, sess)
 
-	response.JSON(w, r, SignInMfaResponse{
+	response.JSON(w, r, LogInMfaResponse{
 		Success: true,
 		Message: "User sign in by mfa",
 	})
 }
 
-func (h *AuthenticationHandler) SignOut(w http.ResponseWriter, r *http.Request) {
+func (h *AuthenticationHandler) LogOut(w http.ResponseWriter, r *http.Request) {
 	sessionId, err := h.cookieHelper.GetSessionID(r)
 	if err != nil {
 		h.logger.Error("%s", err)
@@ -165,20 +169,19 @@ func (h *AuthenticationHandler) SignOut(w http.ResponseWriter, r *http.Request) 
 	if data.Status != session_status.Active {
 	}
 
-	if err := h.authenticationService.SignOut(r.Context(), &entity.Session{SessionKey: []byte(sessionId)}); err != nil {
+	if err := h.authenticationService.LogOut(r.Context(), service.LogOutData{SessionKey: sessionId}); err != nil {
 		h.logger.Error("%s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	// todo: redirect
-
 	h.cookieHelper.UnsetSession(w)
 
-	http.Redirect(w, r, "/", 0)
+	// todo: redirect
+	http.Redirect(w, r, h.config.UrlLogoutRedirect(), 0)
 }
 
 func (h *AuthenticationHandler) HandleSocialProvider(w http.ResponseWriter, r *http.Request) {
-	name := chi.URLParam(r, "social_provider")
+	name := h.R.URLParam(r, "social_provider")
 
 	h.checkProviderName(w, r, name)
 
@@ -191,7 +194,7 @@ func (h *AuthenticationHandler) HandleSocialProvider(w http.ResponseWriter, r *h
 }
 
 func (h *AuthenticationHandler) HandleSocialProviderCallBack(w http.ResponseWriter, r *http.Request) {
-	name := chi.URLParam(r, "social_provider")
+	name := h.R.URLParam(r, "social_provider")
 
 	h.checkProviderName(w, r, name)
 
@@ -205,12 +208,12 @@ func (h *AuthenticationHandler) HandleSocialProviderCallBack(w http.ResponseWrit
 }
 
 func (h *AuthenticationHandler) HandleSocialProviderLogout(w http.ResponseWriter, r *http.Request) {
-	name := chi.URLParam(r, "social_provider")
+	name := h.R.URLParam(r, "social_provider")
 
 	h.checkProviderName(w, r, name)
 
 	gothic.Logout(w, r)
-	w.Header().Set("Location", "/")
+	w.Header().Set("Location", h.config.UrlLogoutRedirect())
 	w.WriteHeader(http.StatusTemporaryRedirect)
 }
 

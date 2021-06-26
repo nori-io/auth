@@ -4,16 +4,31 @@ import (
 	"context"
 	"time"
 
+	"github.com/nori-plugins/authentication/pkg/enum/mfa_type"
+	"github.com/nori-plugins/authentication/pkg/enum/users_action"
+
+	"github.com/nori-plugins/authentication/internal/domain/service"
+
 	"github.com/nori-plugins/authentication/internal/domain/entity"
 	errors2 "github.com/nori-plugins/authentication/internal/domain/errors"
 )
 
-//@todo как передать сюда всю сессию? скорее, нужно извлечь пользовательский userID из контекста
-//@todo что мы будем хранить в контексте?
-func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data *entity.Session) ([]*entity.MfaRecoveryCode, error) {
+func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data service.GetMfaRecoveryCodes) ([]*entity.MfaRecoveryCode, error) {
 	//@todo будет ли использоваться паттерн?
 	//@todo нужна ли максимальная длина, или указать всё в паттерне?
 	//@todo указать ограничение на максимальную длину, связанную с базой данных?
+	if err := data.Validate(); err != nil {
+		return nil, err
+	}
+
+	session, err := srv.sessionService.GetBySessionKey(ctx, service.GetBySessionKeyData{SessionKey: data.SessionKey})
+	if err != nil {
+		return nil, err
+	}
+
+	if session == nil {
+		return nil, errors2.SessionNotFound
+	}
 
 	var mfaRecoveryCodes []*entity.MfaRecoveryCode
 	mfa_recovery_codes, err := srv.mfaRecoveryCodeHelper.Generate()
@@ -23,18 +38,35 @@ func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data
 	for _, v := range mfa_recovery_codes {
 		mfaRecoveryCodes = append(mfaRecoveryCodes, &entity.MfaRecoveryCode{
 			ID:        0,
-			UserID:    data.UserID,
+			UserID:    session.UserID,
 			Code:      v,
 			CreatedAt: time.Now(),
 		})
 	}
 
 	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
-		if err = srv.mfaRecoveryCodeRepository.DeleteMfaRecoveryCodes(ctx, data.UserID); err != nil {
+		if err = srv.mfaRecoveryCodeRepository.DeleteMfaRecoveryCodes(ctx, session.UserID); err != nil {
 			return err
 		}
 		if err = srv.mfaRecoveryCodeRepository.Create(ctx, mfaRecoveryCodes); err != nil {
 			return err
+		}
+
+		user, err := srv.userService.GetByID(ctx, service.GetByIdData{Id: session.UserID})
+		if err != nil {
+			return err
+		}
+
+		if user.MfaType != mfa_type.None {
+			if err := srv.userLogService.Create(ctx, service.UserLogCreateData{
+				UserID:    user.ID,
+				Action:    users_action.MfaRecoveryCodesGenerate,
+				SessionID: session.ID,
+				Meta:      "",
+				CreatedAt: time.Now(),
+			}); err != nil {
+				return err
+			}
 		}
 
 		return nil
@@ -45,20 +77,43 @@ func (srv *MfaRecoveryCodeService) GetMfaRecoveryCodes(ctx context.Context, data
 	return mfaRecoveryCodes, nil
 }
 
-func (srv *MfaRecoveryCodeService) GetByUserId(ctx context.Context, userID uint64, code string) (*entity.MfaRecoveryCode, error) {
-	//@todo проверить кэш и отп
-	mfaRecoveryCode, err := srv.mfaRecoveryCodeRepository.FindByUserID(ctx, userID, code)
+func (srv *MfaRecoveryCodeService) Apply(ctx context.Context, data service.ApplyData) error {
+	if err := data.Validate(); err != nil {
+		return err
+	}
+
+	session, err := srv.sessionService.GetBySessionKey(ctx, service.GetBySessionKeyData{SessionKey: data.SessionKey})
 	if err != nil {
-		return nil, err
+		return err
+	}
+
+	if session == nil {
+		return errors2.SessionNotFound
+	}
+
+	mfaRecoveryCode, err := srv.mfaRecoveryCodeRepository.FindByUserID(ctx, data.UserID, data.Code)
+	if err != nil {
+		return err
 	}
 	if mfaRecoveryCode == nil {
-		return nil, errors2.MfaRecoveryCodeNotFound
+		return errors2.MfaRecoveryCodeNotFound
 	}
-	return mfaRecoveryCode, nil
-}
 
-func (srv *MfaRecoveryCodeService) Apply(ctx context.Context, userID uint64, code string) error {
-	if err := srv.mfaRecoveryCodeRepository.DeleteMfaRecoveryCode(ctx, userID, code); err != nil {
+	if err := srv.transactor.Transact(ctx, func(tx context.Context) error {
+		if err := srv.mfaRecoveryCodeRepository.DeleteMfaRecoveryCode(ctx, data.UserID, data.Code); err != nil {
+			return err
+		}
+		if err := srv.userLogService.Create(ctx, service.UserLogCreateData{
+			UserID:    mfaRecoveryCode.UserID,
+			Action:    users_action.MfaRecoveryCodeApply,
+			SessionID: session.ID,
+			Meta:      "",
+			CreatedAt: time.Now(),
+		}); err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
 		return err
 	}
 	return nil

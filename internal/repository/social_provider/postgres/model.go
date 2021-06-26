@@ -59,5 +59,5 @@ func newModel(e *entity.SocialProvider) *model {
 
 // TableName
 func (model) TableName() string {
-	return "social_providers"
+	return "nori_authentication_social_providers"
 }

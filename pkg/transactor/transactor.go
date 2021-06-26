@@ -5,7 +5,7 @@ import (
 
 	"github.com/nori-plugins/authentication/pkg/errors"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 const (

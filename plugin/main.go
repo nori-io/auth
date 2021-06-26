@@ -3,22 +3,24 @@ package main
 import (
 	"context"
 
-	p "github.com/nori-io/common/v4/pkg/domain/plugin"
+	"github.com/nori-io/interfaces/nori/http/v2"
+
+	p "github.com/nori-io/common/v5/pkg/domain/plugin"
 	"github.com/nori-plugins/authentication/pkg/authentication"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 
 	"github.com/nori-plugins/authentication/internal/domain/service"
 
-	em "github.com/nori-io/common/v4/pkg/domain/enum/meta"
+	em "github.com/nori-io/common/v5/pkg/domain/enum/meta"
 
-	"github.com/nori-io/common/v4/pkg/domain/config"
-	"github.com/nori-io/common/v4/pkg/domain/logger"
-	"github.com/nori-io/common/v4/pkg/domain/meta"
-	"github.com/nori-io/common/v4/pkg/domain/registry"
-	m "github.com/nori-io/common/v4/pkg/meta"
+	"github.com/nori-io/common/v5/pkg/domain/config"
+	"github.com/nori-io/common/v5/pkg/domain/logger"
+	"github.com/nori-io/common/v5/pkg/domain/meta"
+	"github.com/nori-io/common/v5/pkg/domain/registry"
+	m "github.com/nori-io/common/v5/pkg/meta"
 
-	noriGorm "github.com/nori-io/interfaces/database/orm/gorm"
+	noriGorm "github.com/nori-io/interfaces/database/gorm"
 	conf "github.com/nori-plugins/authentication/internal/config"
 )
 
@@ -32,6 +34,40 @@ type plugin struct {
 	logger   logger.FieldLogger
 }
 
+func (p plugin) Init(ctx context.Context, config config.Config, log logger.FieldLogger) error {
+	p.config = conf.Config{
+		CookiesName:                   config.String("cookies.name", "name of cookies for keeping session id"),
+		CookiesPath:                   config.String("cookies.path", "path of cookies"),
+		CookiesDomain:                 config.String("cookies.domain", "domain of cookies"),
+		CookiesExpires:                config.Int64("cookies.expires", ""),
+		CookiesMaxAge:                 config.Int("cookies.maxage", ""),
+		CookiesSecure:                 config.Bool("cookies.secure", ""),
+		CookiesHttpOnly:               config.Bool("cookies.httponly", ""),
+		CookiesSameSite:               config.Int("cookies.samesite", ""),
+		EmailVerification:             config.Bool("email.verification", "verification of email"),
+		EmailActivationCodeTTLSeconds: config.Int64("email.activationcodettl", "time to live of email activation code in seconds"),
+		UrlPrefix:                     config.String("url.prefix", "url prefix for all handlers"),
+		UrlLogoutRedirect:             config.String("url.logout.redirect", "url for logout redirect"),
+		MfaRecoveryCodePattern:        config.String("mfa.recoverycode.pattern", "pattern for mfa recovery codes"),
+		MfaRecoveryCodeSymbols:        config.String("mfa.recoverycode.symbols", "symbols that use when mfa recovery code generating"),
+		MfaRecoveryCodeLength:         config.Int("mfa.recoverycode.maxlength", "max length of mfaRecoveryCode"),
+		MfaRecoveryCodeCount:          config.Int("mfa.recoverycode.count", "count of mfa recovery codes"),
+		Issuer:                        config.String("mfa.issuer", "issuer"),
+		PasswordBcryptCost:            config.Int("password.bcrypt.cost", "cost passed into GenerateFromPassword func"),
+	}
+
+	p.logger = log
+	return nil
+}
+
+func (p plugin) Instance() interface{} {
+	return p.getInstance()
+}
+
+func (p plugin) getInstance() service.AuthenticationService {
+	return p.instance
+}
+
 func (p plugin) Meta() meta.Meta {
 	return m.Meta{
 		ID: m.ID{
@@ -42,46 +78,20 @@ func (p plugin) Meta() meta.Meta {
 			Name: "",
 			URL:  "",
 		},
-		Dependencies: []meta.Dependency{},
-		Description:  nil,
-		Interface:    authentication.AuthenticationInterface,
-		License:      nil,
-		Links:        nil,
+		Dependencies: []meta.Dependency{
+			http.RouterInterface,
+			noriGorm.GormInterface,
+		},
+		Description: nil,
+		Interface:   authentication.AuthenticationInterface,
+		License:     nil,
+		Links:       nil,
 		Repository: m.Repository{
 			Type: em.Git,
-			URL:  "github.com/nori-io/http",
+			URL:  "github.com/nori-plugins/authentication",
 		},
 		Tags: nil,
 	}
-}
-
-func (p plugin) Instance() interface{} {
-	return p.instance
-}
-
-func (p plugin) Init(ctx context.Context, config config.Config, log logger.FieldLogger) error {
-	p.config = conf.Config{
-		EmailVerification:      config.Bool("email.verification", "verification of email"),
-		EmailActivationCodeTTL: config.UInt64("email.activationcodettl", "time to live of email activation code"),
-		UrlPrefix:              config.String("urlprefix", "url prefix for all handlers"),
-		MfaRecoveryCodePattern: config.String("mfa.recoverycode.pattern", "pattern for mfa recovery codes"),
-		MfaRecoveryCodeSymbols: config.String("mfa.recoverycode.symbols", "symbols that use when mfa recovery code generating"),
-		MfaRecoveryCodeLength:  config.Int("mfa.recoverycode.maxlength", "max length of mfaRecoveryCode"),
-		MfaRecoveryCodeCount:   config.Int("mfa.recoverycode.count", "count of mfa recovery codes"),
-		Issuer:                 config.String("mfa.issuer", "issuer"),
-		PasswordBcryptCost:     config.Int("password.bcrypt.cost", "cost passed into GenerateFromPassword func"),
-		CookiesName:            config.String("cookies.name", "name of cookies for keeping session id"),
-		CookiesPath:            config.String("cookies.path", "path of cookies"),
-		CookiesDomain:          config.String("cookies.domain", "domain of cookies"),
-		CookiesExpires:         config.Int64("cookies.expires", ""),
-		CookiesMaxAge:          config.Int("cookies.maxage", ""),
-		CookiesSecure:          config.Bool("cookies.secure", ""),
-		CookiesHttpOnly:        config.Bool("cookies.httponly", ""),
-		CookiesSameSite:        config.Int("cookies.samesite", ""),
-	}
-
-	p.logger = log
-	return nil
 }
 
 func (p plugin) Start(ctx context.Context, registry registry.Registry) error {

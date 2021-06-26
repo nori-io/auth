@@ -7,18 +7,27 @@ import (
 	errorHelper "github.com/nori-plugins/authentication/internal/helper/error"
 	gothProviderHelper "github.com/nori-plugins/authentication/internal/helper/goth_provider"
 	mfaRecoveryCodeHelper "github.com/nori-plugins/authentication/internal/helper/mfa_recovery_code"
+	mfaTotpHelper "github.com/nori-plugins/authentication/internal/helper/mfa_totp"
+
 	securityHelper "github.com/nori-plugins/authentication/internal/helper/security"
 )
 
 var HelperSet = wire.NewSet(
-	wire.Struct(new(mfaRecoveryCodeHelper.Params), "Config"),
-	mfaRecoveryCodeHelper.New,
-	wire.Struct(new(cookieHelper.Params), "Config"),
+	wire.Struct(new(cookieHelper.Params),
+		"Config"),
 	cookieHelper.New,
-	wire.Struct(new(errorHelper.Params), "Logger"),
+	wire.Struct(new(errorHelper.Params),
+		"Logger"),
 	errorHelper.New,
-	wire.Struct(new(securityHelper.Params), "Config"),
+	gothProviderHelper.New,
+	wire.Struct(new(mfaRecoveryCodeHelper.Params),
+		"Config"),
+	mfaRecoveryCodeHelper.New,
+	wire.Struct(new(mfaTotpHelper.Params),
+		"Config"),
+	mfaTotpHelper.New,
+	wire.Struct(new(securityHelper.Params),
+		"Config"),
 	securityHelper.New,
 	helper.New,
-	gothProviderHelper.New,
 )

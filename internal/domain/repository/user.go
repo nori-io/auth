@@ -16,7 +16,7 @@ type UserRepository interface {
 	FindByEmail(ctx context.Context, email string) (*entity.User, error)
 	FindByPhone(ctx context.Context, phone string) (*entity.User, error)
 	FindByFilter(ctx context.Context, filter UserFilter) ([]entity.User, error)
-	Count(ctx context.Context) (uint64, error)
+	Count(ctx context.Context) (int64, error)
 }
 
 type UserFilter struct {

@@ -1,10 +1,12 @@
 package goth_provider
 
-import "github.com/nori-plugins/authentication/internal/domain/helper/goth_provider"
+import (
+	"github.com/nori-plugins/authentication/internal/domain/helper"
+)
 
 type GothProviderHelper struct {
 }
 
-func New() goth_provider.GothProviderHelper {
+func New() helper.GothProviderHelper {
 	return &GothProviderHelper{}
 }
